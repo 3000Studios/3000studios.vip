@@ -1,0 +1,40 @@
+{
+  "name": "3000studios-vip",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "format": "turbo format"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3000Studios/3000studios.vip.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/3000Studios/3000studios.vip/issues"
+  },
+  "homepage": "https://github.com/3000Studios/3000studios.vip#readme",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.4",
+    "eslint": "^10.2.1",
+    "prettier": "^3.8.3",
+    "turbo": "^2.9.6",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.4"
+  }
+}

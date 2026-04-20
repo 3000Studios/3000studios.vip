@@ -1,0 +1,16 @@
+name = "apex-citadel-api"
+main = "src/index.ts"
+compatibility_date = "2026-04-20"
+account_id = "d6ec056b27a57bcf807a46b2e3379d60"
+
+[vars]
+APP_ENV = "production"
+ACCESS_REQUIRED = "0"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "apex_citadel"
+database_id = "d39c2f05-77dc-4ff5-826b-b05be33d31ec"
+
+[triggers]
+crons = ["*/5 * * * *"]

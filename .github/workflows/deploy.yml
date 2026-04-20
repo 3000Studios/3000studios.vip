@@ -1,0 +1,59 @@
+name: Deploy (Apex Citadel)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Deploy API (Workers)
+        working-directory: apps/api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OWNER_EMAIL: ${{ secrets.OWNER_EMAIL }}
+          ALERT_FROM_EMAIL: ${{ secrets.ALERT_FROM_EMAIL }}
+          MAILCHANNELS_API_KEY: ${{ secrets.MAILCHANNELS_API_KEY }}
+        run: |
+          npm ci
+          npx wrangler d1 migrations apply apex_citadel --remote
+          npx wrangler secret put OWNER_EMAIL <<< "$OWNER_EMAIL"
+          npx wrangler secret put ALERT_FROM_EMAIL <<< "$ALERT_FROM_EMAIL"
+          npx wrangler secret put MAILCHANNELS_API_KEY <<< "$MAILCHANNELS_API_KEY"
+          npx wrangler deploy
+
+      - name: Build Web (Pages)
+        working-directory: apps/web
+        env:
+          VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy Web (Pages)
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_PAGES_PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
+        run: |
+          npx wrangler pages deploy dist --project-name "$CF_PAGES_PROJECT"
+
+      - name: Post-deploy verify
+        if: ${{ secrets.CITADEL_LIVE_URL != '' }}
+        env:
+          CITADEL_LIVE_URL: ${{ secrets.CITADEL_LIVE_URL }}
+        run: |
+          curl -fsSL "$CITADEL_LIVE_URL" | head -n 5
+
