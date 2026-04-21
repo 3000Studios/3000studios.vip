@@ -16,6 +16,10 @@ Owner-only control center for monitoring and self-healing across the 3000 Studio
 This repo expects GitHub Actions secrets to be configured:
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
-- `D1_DATABASE_ID`
 - `CF_PAGES_PROJECT`
+- `VITE_API_BASE`
+- `OWNER_EMAIL`
+- `ALERT_FROM_EMAIL`
+- `MAILCHANNELS_API_KEY`
 
+<!-- deploy trigger: 2026-04-21 -->
