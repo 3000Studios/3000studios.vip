@@ -1,30 +1,39 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { CitadelCore } from './CitadelCore';
 import { motion } from 'framer-motion';
+import { useAuth } from '../lib/auth';
 
 export function Shell() {
+  const { logout } = useAuth();
+
   return (
     <div className="app">
       <header className="topbar">
         <div className="brand">
           <CitadelCore />
           <div className="brandText">
-            <Link to="/" className="brandName">
-              Apex Citadel
+            <Link to="/vault" className="brandName">
+              3000 Studios Vault
             </Link>
-            <div className="brandSub">the3000studios.Vip — Owner Console</div>
+            <div className="brandSub">the3000studios.Vip - Owner Console</div>
           </div>
         </div>
         <nav className="nav">
-          <NavLink to="/" end className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
-            Dashboard
+          <NavLink to="/vault" end className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
+            Vault
           </NavLink>
-          <NavLink to="/sites" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
+          <NavLink to="/vault/sites" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
             Sites
           </NavLink>
-          <NavLink to="/settings" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
+          <NavLink to="/vault/settings" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
             Audio
           </NavLink>
+          <Link to="/" className="navLink">
+            Public
+          </Link>
+          <button className="navLink navButton" onClick={logout} type="button">
+            Logout
+          </button>
         </nav>
       </header>
 
@@ -49,4 +58,3 @@ export function Shell() {
     </div>
   );
 }
-

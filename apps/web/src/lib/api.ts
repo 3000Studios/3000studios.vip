@@ -16,7 +16,8 @@ export type Site = {
   updated_at: string;
 };
 
-const API_BASE = import.meta.env.VITE_API_BASE?.toString() || '/api';
+const API_BASE =
+  import.meta.env.VITE_API_BASE?.toString() || 'https://apex-citadel-api.mr-jwswain.workers.dev';
 
 async function apiFetch(path: string, init?: RequestInit) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -67,4 +68,3 @@ export async function runDeployHook(id: string): Promise<any> {
     body: '{}',
   });
 }
-

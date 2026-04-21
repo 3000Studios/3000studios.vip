@@ -87,7 +87,7 @@ export function Sites() {
                 <div className="cardTitle">{s.name}</div>
                 <div className="cardMeta">{s.url}</div>
                 <div className="cardActions">
-                  <Link to={`/sites/${s.id}`} className="btn sm">
+                  <Link to={`/vault/sites/${s.id}`} className="btn sm">
                     Open
                   </Link>
                   <button className="btn sm danger" disabled={busy} onClick={() => onDelete(s.id)}>
@@ -111,4 +111,3 @@ export function Sites() {
     </div>
   );
 }
-

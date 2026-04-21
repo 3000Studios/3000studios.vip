@@ -27,13 +27,14 @@ export function Dashboard() {
 
   return (
     <div className="grid">
-      <div className="hero">
+      <div className="hero vaultHero">
         <div className="heroGlow" />
         <div className="heroInner">
-          <h1>Apex Citadel</h1>
+          <div className="eyebrow">Owner Vault</div>
+          <h1>Studio command over launches, sites, and incidents.</h1>
           <p className="muted">
-            Portfolio monitoring + self-heal playbooks. Music, motion, and wireframe power — fully
-            owner-controlled.
+            The vault stays focused on portfolio visibility while the public home page handles the
+            cinematic brand presentation and login entry point.
           </p>
           {err ? <div className="errorBox">{err}</div> : null}
           <div className="kpis">
@@ -51,10 +52,10 @@ export function Dashboard() {
             </div>
           </div>
           <div className="heroActions">
-            <Link className="btn primary" to="/sites">
+            <Link className="btn primary" to="/vault/sites">
               Open Sites
             </Link>
-            <Link className="btn" to="/settings">
+            <Link className="btn" to="/vault/settings">
               Audio Console
             </Link>
           </div>
@@ -90,4 +91,3 @@ export function Dashboard() {
     </div>
   );
 }
-
