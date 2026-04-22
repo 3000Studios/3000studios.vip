@@ -15,6 +15,13 @@ export type SiteRow = {
   expected_redirects: string;
   critical_routes: string;
   deploy_hook_url: string | null;
+  workspace_key: string | null;
+  workspace_path: string | null;
+  bridge_origin: string | null;
+  cloudflare_zone_id: string | null;
+  cloudflare_zone_name: string | null;
+  bridge_enabled: number;
+  edit_surfaces: string;
   enabled: number;
   created_at: string;
   updated_at: string;
@@ -56,11 +63,15 @@ export async function upsertSite(
     INSERT INTO sites (
       id, name, url, environment, platform, tags,
       expected_status, expected_title, expected_canonical, expected_redirects,
-      critical_routes, deploy_hook_url, enabled, created_at, updated_at
+      critical_routes, deploy_hook_url, workspace_key, workspace_path, bridge_origin,
+      cloudflare_zone_id, cloudflare_zone_name, bridge_enabled, edit_surfaces,
+      enabled, created_at, updated_at
     ) VALUES (
       ?1, ?2, ?3, ?4, ?5, ?6,
       ?7, ?8, ?9, ?10,
-      ?11, ?12, ?13, ?14, ?15
+      ?11, ?12, ?13, ?14, ?15,
+      ?16, ?17, ?18, ?19,
+      ?20, ?21, ?22
     )
     ON CONFLICT(id) DO UPDATE SET
       name=excluded.name,
@@ -74,6 +85,13 @@ export async function upsertSite(
       expected_redirects=excluded.expected_redirects,
       critical_routes=excluded.critical_routes,
       deploy_hook_url=excluded.deploy_hook_url,
+      workspace_key=excluded.workspace_key,
+      workspace_path=excluded.workspace_path,
+      bridge_origin=excluded.bridge_origin,
+      cloudflare_zone_id=excluded.cloudflare_zone_id,
+      cloudflare_zone_name=excluded.cloudflare_zone_name,
+      bridge_enabled=excluded.bridge_enabled,
+      edit_surfaces=excluded.edit_surfaces,
       enabled=excluded.enabled,
       updated_at=excluded.updated_at
   `,
@@ -91,6 +109,13 @@ export async function upsertSite(
       site.expected_redirects,
       site.critical_routes,
       site.deploy_hook_url,
+      site.workspace_key,
+      site.workspace_path,
+      site.bridge_origin,
+      site.cloudflare_zone_id,
+      site.cloudflare_zone_name,
+      site.bridge_enabled,
+      site.edit_surfaces,
       site.enabled,
       createdAt,
       updatedAt,
@@ -139,7 +164,7 @@ export async function listAllEnabledChecks(env: Env): Promise<Array<CheckRow & {
     JOIN sites s ON s.id = c.site_id
     WHERE c.enabled=1 AND s.enabled=1
   `,
-  ).all<Array<CheckRow & { site_url: string }>>();
+  ).all<CheckRow & { site_url: string }>();
   return results;
 }
 
@@ -246,3 +271,120 @@ export async function insertAudit(params: {
     .run();
 }
 
+export async function insertBridgeSnapshot(params: {
+  env: Env;
+  siteId: string | null;
+  origin: string;
+  pageStatus: number | null;
+  assetUrl: string | null;
+  config: unknown;
+  endpointStatus: unknown;
+  selectorStatus: unknown;
+  error?: string | null;
+}): Promise<void> {
+  await params.env.DB.prepare(
+    `INSERT INTO bridge_snapshots (
+      id, site_id, origin, inspected_at, config_json, endpoint_status_json, selector_status_json,
+      page_status, asset_url, error
+    ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`,
+  )
+    .bind(
+      crypto.randomUUID(),
+      params.siteId,
+      params.origin,
+      nowIso(),
+      JSON.stringify(params.config ?? {}),
+      JSON.stringify(params.endpointStatus ?? {}),
+      JSON.stringify(params.selectorStatus ?? {}),
+      params.pageStatus,
+      params.assetUrl,
+      params.error ?? null,
+    )
+    .run();
+}
+
+export async function listLatestBridgeSnapshots(env: Env): Promise<
+  Array<{
+    site_id: string | null;
+    origin: string;
+    inspected_at: string;
+    config_json: string;
+    endpoint_status_json: string;
+    selector_status_json: string;
+    page_status: number | null;
+    asset_url: string | null;
+    error: string | null;
+  }>
+> {
+  const { results } = await env.DB.prepare(
+    `SELECT bs.*
+     FROM bridge_snapshots bs
+     JOIN (
+       SELECT origin, MAX(inspected_at) as latest
+       FROM bridge_snapshots
+       GROUP BY origin
+     ) latest ON latest.origin = bs.origin AND latest.latest = bs.inspected_at
+     ORDER BY bs.inspected_at DESC`,
+  ).all();
+  return results as any[];
+}
+
+export async function insertZoneSnapshot(params: {
+  env: Env;
+  siteId: string | null;
+  zoneId: string;
+  zoneName: string;
+  analytics: unknown;
+  error?: string | null;
+}): Promise<void> {
+  await params.env.DB.prepare(
+    `INSERT INTO zone_snapshots (id, site_id, zone_id, zone_name, captured_at, analytics_json, error)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
+  )
+    .bind(
+      crypto.randomUUID(),
+      params.siteId,
+      params.zoneId,
+      params.zoneName,
+      nowIso(),
+      JSON.stringify(params.analytics ?? {}),
+      params.error ?? null,
+    )
+    .run();
+}
+
+export async function listLatestZoneSnapshots(env: Env): Promise<any[]> {
+  const { results } = await env.DB.prepare(
+    `SELECT zs.*
+     FROM zone_snapshots zs
+     JOIN (
+       SELECT zone_id, MAX(captured_at) as latest
+       FROM zone_snapshots
+       GROUP BY zone_id
+     ) latest ON latest.zone_id = zs.zone_id AND latest.latest = zs.captured_at
+     ORDER BY zs.captured_at DESC`,
+  ).all();
+  return results as any[];
+}
+
+export async function insertCommandRun(params: {
+  env: Env;
+  siteId: string | null;
+  commandText: string;
+  parsedAction: string;
+  result: unknown;
+}): Promise<void> {
+  await params.env.DB.prepare(
+    `INSERT INTO command_runs (id, site_id, command_text, parsed_action, result_json, created_at)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6)`,
+  )
+    .bind(
+      crypto.randomUUID(),
+      params.siteId,
+      params.commandText,
+      params.parsedAction,
+      JSON.stringify(params.result ?? {}),
+      nowIso(),
+    )
+    .run();
+}
