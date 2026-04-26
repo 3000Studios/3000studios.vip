@@ -51,6 +51,9 @@ export function SiteDetail() {
 
   if (!data) return <div className="panel">Loading…</div>;
 
+  const surfaces = JSON.parse(data.site.edit_surfaces || '[]') as string[];
+  const criticalRoutes = JSON.parse(data.site.critical_routes || '[]') as string[];
+
   return (
     <div className="grid">
       <div className="panel">
@@ -66,6 +69,64 @@ export function SiteDetail() {
           <button className="btn" disabled={busy || !data.site.deploy_hook_url} onClick={onDeployHook}>
             Trigger Deploy Hook
           </button>
+        </div>
+      </div>
+
+      <div className="split splitWide">
+        <div className="panel">
+          <div className="panelHeader">
+            <h2>Site Identity</h2>
+            <span className="muted">Workspace, bridge, and zone map</span>
+          </div>
+          <div className="detailStats">
+            <div className="detailStat">
+              <span>Platform</span>
+              <strong>{data.site.platform}</strong>
+            </div>
+            <div className="detailStat">
+              <span>Workspace</span>
+              <strong>{data.site.workspace_key || 'not mapped'}</strong>
+            </div>
+            <div className="detailStat">
+              <span>Bridge Origin</span>
+              <strong>{data.site.bridge_origin || 'not enabled'}</strong>
+            </div>
+            <div className="detailStat">
+              <span>Cloudflare Zone</span>
+              <strong>{data.site.cloudflare_zone_name || 'external'}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panelHeader">
+            <h2>Routes and Surfaces</h2>
+            <span className="muted">Clickable review and edit targets</span>
+          </div>
+          <div className="microList paddedList">
+            {criticalRoutes.map((route) => (
+              <a
+                className="chip"
+                href={`${data.site.url}${route}`}
+                key={route}
+                rel="noreferrer"
+                target="_blank"
+              >
+                route {route}
+              </a>
+            ))}
+            {surfaces.map((surface) => (
+              <a
+                className="chip chipAccent"
+                href={`${data.site.url}${surface}`}
+                key={surface}
+                rel="noreferrer"
+                target="_blank"
+              >
+                edit {surface}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -97,4 +158,3 @@ export function SiteDetail() {
     </div>
   );
 }
-
