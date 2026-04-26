@@ -55,6 +55,8 @@ export function Dashboard() {
   }, []);
 
   const selectedSite = sites.find((site) => site.id === selectedSiteId) ?? null;
+  const selectedSurfaces = selectedSite ? (JSON.parse(selectedSite.edit_surfaces || '[]') as string[]) : [];
+  const selectedRoutes = selectedSite ? (JSON.parse(selectedSite.critical_routes || '[]') as string[]) : [];
 
   async function handleSeed() {
     setBusy(true);
@@ -252,6 +254,81 @@ export function Dashboard() {
         </div>
       </div>
 
+      {selectedSite ? (
+        <div className="split splitWide">
+          <div className="panel">
+            <div className="panelHeader">
+              <h2>Site Control</h2>
+              <span className="muted">{selectedSite.name}</span>
+            </div>
+            <div className="controlGrid">
+              <button className="controlTile" onClick={handleInspectBridge} type="button">
+                <strong>Bridge Inspect</strong>
+                <span>Read `#studio-ops-bridge`, endpoint health, and ads-protected selectors.</span>
+              </button>
+              <button
+                className="controlTile"
+                disabled={!selectedSite.cloudflare_zone_id}
+                onClick={handleAnalytics}
+                type="button"
+              >
+                <strong>Cloudflare Analytics</strong>
+                <span>Load cached or live zone metrics for traffic, views, and performance.</span>
+              </button>
+              <button
+                className="controlTile"
+                onClick={() => setCommandText(`Run checks on ${selectedSite.name}`)}
+                type="button"
+              >
+                <strong>Health Checks</strong>
+                <span>Queue uptime, route, seo, tls, dns, and performance checks.</span>
+              </button>
+              <button
+                className="controlTile"
+                onClick={() => setCommandText(`List editor surfaces for ${selectedSite.name}`)}
+                type="button"
+              >
+                <strong>Edit Surfaces</strong>
+                <span>Prepare safe review targets for `/dashboard`, `/pricing`, `/blog`, and more.</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="panel">
+            <div className="panelHeader">
+              <h2>Selected Site Matrix</h2>
+              <span className="muted">Active routes, surfaces, and controls.</span>
+            </div>
+            <div className="detailStats">
+              <div className="detailStat">
+                <span>Workspace</span>
+                <strong>{selectedSite.workspace_key || 'not mapped'}</strong>
+              </div>
+              <div className="detailStat">
+                <span>Zone</span>
+                <strong>{selectedSite.cloudflare_zone_name || 'external'}</strong>
+              </div>
+              <div className="detailStat">
+                <span>Bridge</span>
+                <strong>{selectedSite.bridge_enabled ? 'enabled' : 'off'}</strong>
+              </div>
+            </div>
+            <div className="microList">
+              {selectedRoutes.map((route) => (
+                <span className="chip" key={route}>
+                  route {route}
+                </span>
+              ))}
+              {selectedSurfaces.map((surface) => (
+                <span className="chip chipAccent" key={surface}>
+                  edit {surface}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="split">
         <div className="panel">
           <div className="panelHeader">
@@ -337,6 +414,50 @@ export function Dashboard() {
               </div>
             ));
           })}
+        </div>
+      </div>
+
+      <div className="split splitWide">
+        <div className="panel">
+          <div className="panelHeader">
+            <h2>Secure Storage</h2>
+            <span className="muted">Owner-only encrypted file vault planning surface.</span>
+          </div>
+          <div className="featureList">
+            <div className="featureLine">
+              <strong>Status</strong>
+              <span>UI ready; production storage binding still requires encrypted object storage configuration.</span>
+            </div>
+            <div className="featureLine">
+              <strong>Scope</strong>
+              <span>Intended for owner files, deployment packs, exports, archives, and dashboard evidence.</span>
+            </div>
+            <div className="featureLine">
+              <strong>Next step</strong>
+              <span>Bind R2 or equivalent secure store before exposing upload and retrieval controls.</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panelHeader">
+            <h2>Private Stream Vault</h2>
+            <span className="muted">Protected stream control and archive readiness.</span>
+          </div>
+          <div className="featureList">
+            <div className="featureLine">
+              <strong>Status</strong>
+              <span>Dashboard placeholder removed from public exposure; stream backend not yet configured.</span>
+            </div>
+            <div className="featureLine">
+              <strong>Required</strong>
+              <span>Dedicated ingest, recording storage, and password-gated playback service.</span>
+            </div>
+            <div className="featureLine">
+              <strong>Safe mode</strong>
+              <span>No broken stream controls appear until a real recording pipeline exists.</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

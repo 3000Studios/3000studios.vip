@@ -110,7 +110,13 @@ app.post('/sites', async (c) => {
     updated_at: now,
   });
   await ensureDefaultChecks(c.env, id);
-  await insertAudit({ env: c.env, actor: 'owner', action: 'site.upsert', target: `site:${id}`, diff: body });
+  await insertAudit({
+    env: c.env,
+    actor: 'owner',
+    action: 'site.upsert',
+    target: `site:${id}`,
+    diff: body,
+  });
   return c.json({ ok: true, id });
 });
 
@@ -124,7 +130,13 @@ app.get('/sites/:id', async (c) => {
 app.delete('/sites/:id', async (c) => {
   const id = c.req.param('id');
   await deleteSite(c.env, id);
-  await insertAudit({ env: c.env, actor: 'owner', action: 'site.delete', target: `site:${id}`, diff: {} });
+  await insertAudit({
+    env: c.env,
+    actor: 'owner',
+    action: 'site.delete',
+    target: `site:${id}`,
+    diff: {},
+  });
   return c.json({ ok: true });
 });
 
@@ -209,9 +221,9 @@ app.get('/stats', async (c) => {
   const bridgeCount = await c.env.DB.prepare(
     `SELECT COUNT(*) as n FROM sites WHERE bridge_enabled = 1`,
   ).first<{ n: number }>();
-  const commandCount = await c.env.DB.prepare(
-    `SELECT COUNT(*) as n FROM command_runs`,
-  ).first<{ n: number }>();
+  const commandCount = await c.env.DB.prepare(`SELECT COUNT(*) as n FROM command_runs`).first<{
+    n: number;
+  }>();
   return c.json({
     sites: sites?.n ?? 0,
     openIncidents: openIncidents?.n ?? 0,
@@ -231,7 +243,9 @@ app.post('/ops/seed-network', async (c) => {
   const existingSites = await listSites(c.env);
 
   for (const entry of catalogSites) {
-    const foundZone = zones.find((zone) => zone.name === entry.zoneName || zone.name === new URL(entry.origin).hostname);
+    const foundZone = zones.find(
+      (zone) => zone.name === entry.zoneName || zone.name === new URL(entry.origin).hostname,
+    );
     const existing = existingSites.find((site) => site.url === entry.origin);
     await upsertSite(c.env, {
       id: existing?.id ?? crypto.randomUUID(),
@@ -305,7 +319,8 @@ app.get('/ops/analytics/:zoneId', async (c) => {
   const zoneId = c.req.param('zoneId');
   try {
     const analytics = await getZoneDashboard(c.env, zoneId);
-    const site = (await listSites(c.env)).find((entry) => entry.cloudflare_zone_id === zoneId) ?? null;
+    const site =
+      (await listSites(c.env)).find((entry) => entry.cloudflare_zone_id === zoneId) ?? null;
     await insertZoneSnapshot({
       env: c.env,
       siteId: site?.id ?? null,
@@ -338,7 +353,8 @@ app.get('/ops/bridge-inspect', async (c) => {
   if (!origin) return c.json({ error: 'origin_required' }, 400);
 
   const sites = await listSites(c.env);
-  const site = sites.find((entry) => entry.url === origin || entry.bridge_origin === origin) ?? null;
+  const site =
+    sites.find((entry) => entry.url === origin || entry.bridge_origin === origin) ?? null;
   const result = await inspectBridge(origin);
   await insertBridgeSnapshot({
     env: c.env,
@@ -408,7 +424,11 @@ app.post('/ops/command', async (c) => {
   } else if (lower.includes('deploy hook') || lower.includes('redeploy')) {
     parsedAction = 'trigger_deploy_hook';
     if (!site?.deploy_hook_url) return c.json({ error: 'deploy_hook_missing' }, 400);
-    result = await runDeployHook({ env: c.env, siteId: site.id, deployHookUrl: site.deploy_hook_url });
+    result = await runDeployHook({
+      env: c.env,
+      siteId: site.id,
+      deployHookUrl: site.deploy_hook_url,
+    });
   } else if (lower.includes('editor') || lower.includes('route')) {
     parsedAction = 'list_edit_surfaces';
     result = { surfaces: JSON.parse(site?.edit_surfaces ?? '[]') };
@@ -442,18 +462,31 @@ app.post('/admin/seed', async (c) => {
     critical_routes: JSON.stringify(['/']),
     deploy_hook_url: null,
     workspace_key: '3000studios-vip',
-    workspace_path: 'C:\\Workspaces\\3000studios-vip',
+    workspace_path: null,
     bridge_origin: null,
     cloudflare_zone_id: null,
     cloudflare_zone_name: '3000studios.vip',
     bridge_enabled: 0,
-    edit_surfaces: JSON.stringify(['/dashboard', '/admin', '/products', '/pricing', '/blog', '/contact']),
+    edit_surfaces: JSON.stringify([
+      '/dashboard',
+      '/admin',
+      '/products',
+      '/pricing',
+      '/blog',
+      '/contact',
+    ]),
     enabled: 1,
     created_at: now,
     updated_at: now,
   });
   await ensureDefaultChecks(c.env, id);
-  await insertAudit({ env: c.env, actor: 'owner', action: 'admin.seed', target: 'seed', diff: { id } });
+  await insertAudit({
+    env: c.env,
+    actor: 'owner',
+    action: 'admin.seed',
+    target: 'seed',
+    diff: { id },
+  });
   return c.json({ ok: true, id });
 });
 
@@ -467,7 +500,9 @@ export default {
 async function runScheduledChecks(env: Env): Promise<void> {
   const checks = await listAllEnabledChecks(env);
   for (const check of checks) {
-    const site = await env.DB.prepare(`SELECT * FROM sites WHERE id=?1`).bind(check.site_id).first<any>();
+    const site = await env.DB.prepare(`SELECT * FROM sites WHERE id=?1`)
+      .bind(check.site_id)
+      .first<any>();
     if (!site) continue;
     const startedAt = nowIso();
     const start = Date.now();

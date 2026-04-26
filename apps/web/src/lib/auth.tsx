@@ -10,12 +10,11 @@ import {
 const STORAGE_KEY = 'studio-vip-auth-v1';
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 const OWNER_PASSCODE = '5555';
-const SECRET_ANSWER = 'georgia';
 
 type AuthState = {
   isAuthenticated: boolean;
   ownerEmail: string;
-  login: (email: string, passcode: string, secretAnswer: string) => boolean;
+  login: (email: string, passcode: string) => boolean;
   logout: () => void;
 };
 
@@ -31,11 +30,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (email: string, passcode: string, secretAnswer: string) => {
-    const ok =
-      email.trim().toLowerCase() === OWNER_EMAIL &&
-      passcode === OWNER_PASSCODE &&
-      secretAnswer.trim().toLowerCase() === SECRET_ANSWER;
+  const login = (email: string, passcode: string) => {
+    const ok = email.trim().toLowerCase() === OWNER_EMAIL && passcode === OWNER_PASSCODE;
     if (!ok) {
       return false;
     }

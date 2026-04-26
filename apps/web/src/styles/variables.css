@@ -1,0 +1,18 @@
+:root {
+  --ink: #f4efe7;
+  --subtle: rgba(244, 239, 231, 0.72);
+  --shadow: rgba(2, 6, 23, 0.42);
+  --line: rgba(244, 239, 231, 0.16);
+  --glass: rgba(10, 14, 26, 0.68);
+  --glass-strong: rgba(7, 11, 22, 0.86);
+  --gold: #f1b74e;
+  --gold-soft: rgba(241, 183, 78, 0.22);
+  --cyan: #6ff4ff;
+  --ember: #ff6a3d;
+  --bg: #060914;
+  color-scheme: dark;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

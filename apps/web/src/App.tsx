@@ -1,3 +1,3 @@
 export default function App() {
-  return null;
+  return <div>Apex Citadel</div>;
 }

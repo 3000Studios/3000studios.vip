@@ -66,7 +66,11 @@ export function SiteDetail() {
           <button className="btn primary" disabled={busy} onClick={onRun}>
             Run Checks
           </button>
-          <button className="btn" disabled={busy || !data.site.deploy_hook_url} onClick={onDeployHook}>
+          <button
+            className="btn"
+            disabled={busy || !data.site.deploy_hook_url}
+            onClick={onDeployHook}
+          >
             Trigger Deploy Hook
           </button>
         </div>
@@ -153,7 +157,9 @@ export function SiteDetail() {
           <h2>Last Run</h2>
           <span className="muted">Evidence + status</span>
         </div>
-        <pre className="pre">{run ? JSON.stringify(run, null, 2) : 'Run checks to see results.'}</pre>
+        <pre className="pre">
+          {run ? JSON.stringify(run, null, 2) : 'Run checks to see results.'}
+        </pre>
       </div>
     </div>
   );
