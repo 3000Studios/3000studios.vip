@@ -210,6 +210,17 @@ export function Home() {
             </div>
           </div>
         </motion.div>
+        <footer className="lockFooter">
+          <div className="lockFooterLinks">
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+          </div>
+          <div className="lockFooterCopy">
+            © {new Date().getFullYear()} 3000 Studios. All rights reserved.
+          </div>
+        </footer>
         <button
           aria-label="Owner entry trigger"
           className="ownerDot"

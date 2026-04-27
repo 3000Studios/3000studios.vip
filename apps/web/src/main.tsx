@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Dashboard } from './pages/Dashboard';
 import { Home } from './pages/Home';
+import { About, Contact, Privacy, Terms } from './pages/Legal';
 import { Sites } from './pages/Sites';
 import { SiteDetail } from './pages/SiteDetail';
 import { Settings } from './pages/Settings';
@@ -14,6 +15,10 @@ import { AuthProvider } from './lib/auth';
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
+  { path: '/about', element: <About /> },
+  { path: '/contact', element: <Contact /> },
+  { path: '/privacy', element: <Privacy /> },
+  { path: '/terms', element: <Terms /> },
   {
     element: <ProtectedRoute />,
     children: [
