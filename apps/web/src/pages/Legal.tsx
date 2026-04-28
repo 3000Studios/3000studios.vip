@@ -1,34 +1,142 @@
-import React from 'react';
+import type { ReactNode } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { LiveBackdrop } from '../components/LiveBackdrop';
 
-export default function Legal() {
+function LegalFrame({
+  eyebrow,
+  title,
+  intro,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  children: ReactNode;
+}) {
   return (
-    <div className="container mx-auto px-4 py-20">
-      <div className="glass-card p-12 max-w-4xl mx-auto bg-black/40 backdrop-blur-3xl border-white/5">
-        <span className="text-gold font-bold uppercase tracking-widest text-xs">Compliance Console</span>
-        <h1 className="text-5xl font-black mb-12 text-white tracking-tighter">Legal & Regulatory Disclosure</h1>
-        
-        <div className="space-y-16">
-          <section className="p-10 border border-red-500/30 bg-red-500/5 rounded-[2rem]">
-            <h2 className="text-2xl font-bold text-red-500 mb-4">NO REFUND POLICY</h2>
-            <p className="text-lg text-white font-bold leading-relaxed">
-              ALL SALES ARE FINAL. 3000 STUDIOS VIP OPERATES ON A ZERO-REFUND BASIS. ONCE ACCESS IS GRANTED OR A TRANSACTION IS PROCESSED, IT IS NON-REFUNDABLE AND NON-REVERSIBLE.
-            </p>
-          </section>
-
-          <section className="p-10 border border-gold/30 bg-gold/5 rounded-[2rem]">
-            <h2 className="text-2xl font-bold text-gold mb-4">LIABILITY WAIVER & INDEMNITY</h2>
-            <p className="text-lg text-white font-bold italic leading-relaxed">
-              TO THE MAXIMUM EXTENT PERMITTED BY LAW, 3000 STUDIOS AND ITS OPERATORS ARE NOT LIABLE FOR ANY LOSSES, DAMAGES, LEGAL CONSEQUENCES, OR DISPUTES ARISING FROM THE USE OF OUR TOOLS, API, OR GENERATED OUTPUTS. USER ASSUMES 100% RESPONSIBILITY. WE CANNOT BE HELD LIABLE FOR ANYTHING.
-            </p>
-          </section>
-
-          <section className="text-white/60 space-y-6">
-            <h2 className="text-2xl font-bold text-white">General Terms</h2>
-            <p>This platform provides advanced operational tools and manifest engine access. Usage implies full agreement with these terms. We reserve the right to terminate access at any time for any reason without refund.</p>
-            <p>All software is provided "as-is" for enterprise and individual use. Compliance with local advertising and financial regulations is the sole responsibility of the operator.</p>
-          </section>
+    <div className="legalPage">
+      <LiveBackdrop variant="legal" />
+      <div className="legalShade" />
+      <motion.div
+        className="legalShell"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+      >
+        <div className="eyebrow">{eyebrow}</div>
+        <h1>{title}</h1>
+        <p className="lead legalLead">{intro}</p>
+        <div className="legalCard">{children}</div>
+        <div className="legalLinkRow">
+          <Link className="btn" to="/">
+            Return Home
+          </Link>
+          <Link className="btn primary" to="/vault">
+            Open Dashboard
+          </Link>
         </div>
-      </div>
+      </motion.div>
     </div>
+  );
+}
+
+export function About() {
+  return (
+    <LegalFrame
+      eyebrow="3000 Studios"
+      title="Portfolio command center for live sites."
+      intro="3000 Studios VIP is the owner console for site operations, analytics visibility, monetization controls, bridge telemetry, and production-safe rollout management."
+    >
+      <section className="legalSection">
+        <h2>What this controls</h2>
+        <p>
+          The dashboard tracks connected websites, traffic snapshots, edit surfaces, ad readiness,
+          and deployment utilities from one control plane.
+        </p>
+      </section>
+      <section className="legalSection">
+        <h2>How it is used</h2>
+        <p>
+          Owner workflows stay focused on real production websites, live custom domains,
+          operational health, and measurable business outcomes.
+        </p>
+      </section>
+    </LegalFrame>
+  );
+}
+
+export function Contact() {
+  return (
+    <LegalFrame
+      eyebrow="Contact"
+      title="Reach the operator of the 3000 Studios network."
+      intro="Use the owner contact channel for production operations, partnership inquiries, and site management requests."
+    >
+      <section className="legalSection">
+        <h2>Primary contact</h2>
+        <p>
+          Email: <a href="mailto:admin@3000studios.vip">admin@3000studios.vip</a>
+        </p>
+      </section>
+      <section className="legalSection">
+        <h2>Operations note</h2>
+        <p>
+          Requests tied to deployments, analytics, monetization, or compliance should include the
+          site name and production domain.
+        </p>
+      </section>
+    </LegalFrame>
+  );
+}
+
+export function Privacy() {
+  return (
+    <LegalFrame
+      eyebrow="Privacy"
+      title="Privacy practices for the 3000 Studios web portfolio."
+      intro="This site respects visitor privacy and limits collection to what is needed for operations, analytics, lead handling, and site performance."
+    >
+      <section className="legalSection">
+        <h2>Information use</h2>
+        <p>
+          Information is used to operate the website network, improve reliability, monitor
+          performance, and respond to direct inquiries.
+        </p>
+      </section>
+      <section className="legalSection">
+        <h2>Storage and disclosure</h2>
+        <p>
+          Data is retained only as long as operationally necessary and is not publicly disclosed
+          except where required by law or platform compliance requirements.
+        </p>
+      </section>
+    </LegalFrame>
+  );
+}
+
+export function Terms() {
+  return (
+    <LegalFrame
+      eyebrow="Terms"
+      title="Terms for access to 3000 Studios properties and tools."
+      intro="Use of the site network and associated tools means acceptance of the operational, legal, and platform-specific terms that govern access."
+    >
+      <section className="legalSection">
+        <h2>Use conditions</h2>
+        <p>
+          Access may be restricted, revoked, or updated at any time to protect production systems,
+          customers, or network integrity.
+        </p>
+      </section>
+      <section className="legalSection">
+        <h2>Refund and liability</h2>
+        <p>
+          Unless otherwise stated on a specific offer page, transactions are handled under the
+          applicable product terms, and software/services are provided as-is to the maximum extent
+          permitted by law.
+        </p>
+      </section>
+    </LegalFrame>
   );
 }

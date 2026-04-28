@@ -2,14 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   getCatalog,
+  getSiteOverview,
   getStats,
   getZoneAnalytics,
   inspectBridge,
   listBridgeSnapshots,
   listZoneSnapshots,
+  restartAdsense,
   runNaturalCommand,
   seedNetwork,
   type Site,
+  type SiteOverview,
 } from '../lib/api';
 
 type RecognitionCtor = new () => {
@@ -27,8 +30,9 @@ export function Dashboard() {
   const [sites, setSites] = useState<Site[]>([]);
   const [bridgeSnapshots, setBridgeSnapshots] = useState<any[]>([]);
   const [zoneSnapshots, setZoneSnapshots] = useState<any[]>([]);
+  const [overview, setOverview] = useState<SiteOverview[]>([]);
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
-  const [commandText, setCommandText] = useState('Show analytics for 3000 Studios VIP');
+  const [commandText, setCommandText] = useState('Show analytics and ad status for 3000 Studios VIP');
   const [commandResult, setCommandResult] = useState<any>(null);
   const [livePanel, setLivePanel] = useState<any>(null);
   const [busy, setBusy] = useState(false);
@@ -37,16 +41,18 @@ export function Dashboard() {
   const recognitionRef = useRef<InstanceType<RecognitionCtor> | null>(null);
 
   async function load() {
-    const [nextStats, catalog, bridges, zones] = await Promise.all([
+    const [nextStats, catalog, bridges, zones, siteOverview] = await Promise.all([
       getStats(),
       getCatalog(),
       listBridgeSnapshots(),
       listZoneSnapshots(),
+      getSiteOverview(),
     ]);
     setStats(nextStats);
     setSites(catalog.sites);
     setBridgeSnapshots(bridges.snapshots);
     setZoneSnapshots(zones.snapshots);
+    setOverview(siteOverview.overview);
     setSelectedSiteId((current) => current || catalog.sites[0]?.id || '');
   }
 
@@ -55,6 +61,7 @@ export function Dashboard() {
   }, []);
 
   const selectedSite = sites.find((site) => site.id === selectedSiteId) ?? null;
+  const selectedOverview = overview.find((entry) => entry.site.id === selectedSiteId) ?? null;
   const selectedSurfaces = selectedSite ? (JSON.parse(selectedSite.edit_surfaces || '[]') as string[]) : [];
   const selectedRoutes = selectedSite ? (JSON.parse(selectedSite.critical_routes || '[]') as string[]) : [];
 
@@ -96,6 +103,21 @@ export function Dashboard() {
       await load();
     } catch (error) {
       setErr(error instanceof Error ? error.message : 'analytics_failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleAdsenseRestart() {
+    if (!selectedSite) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      const result = await restartAdsense(selectedSite.id);
+      setLivePanel(result);
+      await load();
+    } catch (error) {
+      setErr(error instanceof Error ? error.message : 'adsense_restart_failed');
     } finally {
       setBusy(false);
     }
@@ -156,10 +178,11 @@ export function Dashboard() {
         <div className="heroGlow" />
         <div className="heroInner">
           <div className="eyebrow">Super Admin Hub</div>
-          <h1>One vault for site status, bridge telemetry, edits, traffic, and control.</h1>
+          <h1>One vault for site edits, traffic, monetization, and live production control.</h1>
           <p className="muted">
-            This dashboard tracks Cloudflare-managed domains, bridge-enabled applications, edit
-            surfaces, command runs, and endpoint health from the same control plane.
+            This dashboard tracks connected websites, prompt-driven edit commands, Cloudflare
+            traffic, AdSense health, deploy actions, and bridge telemetry from one 3000studios.vip
+            control plane.
           </p>
           {err ? <div className="errorBox">{err}</div> : null}
           <div className="kpis">
@@ -186,14 +209,69 @@ export function Dashboard() {
             <button className="btn" disabled={busy || !selectedSite?.cloudflare_zone_id} onClick={handleAnalytics}>
               Load Cloudflare Analytics
             </button>
+            <button className="btn" disabled={busy || !selectedSite} onClick={handleAdsenseRestart}>
+              Restart AdSense
+            </button>
           </div>
         </div>
       </div>
 
       <div className="panel">
         <div className="panelHeader">
+          <h2>Portfolio Overview</h2>
+          <span className="muted">Visitors, monetization, ad visibility, and edit readiness.</span>
+        </div>
+        <div className="cards siteOverviewGrid">
+          {overview.map((entry) => {
+            const adsState = entry.monetization.adsense.state;
+            return (
+              <div key={entry.site.id} className="card overviewCard">
+                <div className="cardGlow" />
+                <div className="cardInner">
+                  <div className="cardTitle">{entry.site.name}</div>
+                  <div className="cardMeta">{entry.site.url}</div>
+                  <div className="statusLine">
+                    <span className={`statusDot ${adsState}`} />
+                    <strong>AdSense {adsState}</strong>
+                    <span>{entry.traffic.visitors24h ?? '—'} visitors</span>
+                  </div>
+                  <div className="detailStats compact">
+                    <div className="detailStat">
+                      <span>Revenue</span>
+                      <strong>{formatCurrency(entry.monetization.revenueLast30dCents)}</strong>
+                    </div>
+                    <div className="detailStat">
+                      <span>Pageviews</span>
+                      <strong>{formatMetric(entry.traffic.pageviews24h)}</strong>
+                    </div>
+                    <div className="detailStat">
+                      <span>Requests</span>
+                      <strong>{formatMetric(entry.traffic.requests24h)}</strong>
+                    </div>
+                    <div className="detailStat">
+                      <span>Edit Paths</span>
+                      <strong>{entry.workspace.editSurfaces.length}</strong>
+                    </div>
+                  </div>
+                  <div className="cardActions">
+                    <Link to={`/vault/sites/${entry.site.id}`} className="btn sm">
+                      Open
+                    </Link>
+                    <button className="btn sm" onClick={() => setSelectedSiteId(entry.site.id)}>
+                      Target
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="panel">
+        <div className="panelHeader">
           <h2>Command Box</h2>
-          <span className="muted">Voice or type natural language to drive site actions.</span>
+          <span className="muted">Choose a site, describe the change, and queue the site action.</span>
         </div>
         <div className="commandBar">
           <select
@@ -211,7 +289,7 @@ export function Dashboard() {
             className="input"
             value={commandText}
             onChange={(event) => setCommandText(event.target.value)}
-            placeholder="Run checks on VoiceToWebsite"
+            placeholder="Update homepage hero copy and verify AdSense on VoiceToWebsite"
           />
           <button className="btn" disabled={busy} onClick={handleVoice}>
             {listening ? 'Stop Mic' : 'Voice'}
@@ -291,13 +369,17 @@ export function Dashboard() {
                 <strong>Edit Surfaces</strong>
                 <span>Prepare safe review targets for `/dashboard`, `/pricing`, `/blog`, and more.</span>
               </button>
+              <button className="controlTile" onClick={handleAdsenseRestart} type="button">
+                <strong>AdSense Restart</strong>
+                <span>Reinspect the page, check ad slots, and trigger deploy recovery when configured.</span>
+              </button>
             </div>
           </div>
 
           <div className="panel">
             <div className="panelHeader">
               <h2>Selected Site Matrix</h2>
-              <span className="muted">Active routes, surfaces, and controls.</span>
+              <span className="muted">Active routes, monetization, and workspace controls.</span>
             </div>
             <div className="detailStats">
               <div className="detailStat">
@@ -312,6 +394,18 @@ export function Dashboard() {
                 <span>Bridge</span>
                 <strong>{selectedSite.bridge_enabled ? 'enabled' : 'off'}</strong>
               </div>
+              <div className="detailStat">
+                <span>Visitors</span>
+                <strong>{formatMetric(selectedOverview?.traffic.visitors24h ?? null)}</strong>
+              </div>
+              <div className="detailStat">
+                <span>Revenue</span>
+                <strong>{formatCurrency(selectedOverview?.monetization.revenueLast30dCents ?? null)}</strong>
+              </div>
+              <div className="detailStat">
+                <span>AdSense</span>
+                <strong>{selectedOverview?.monetization.adsense.state ?? 'missing'}</strong>
+              </div>
             </div>
             <div className="microList">
               {selectedRoutes.map((route) => (
@@ -325,6 +419,30 @@ export function Dashboard() {
                 </span>
               ))}
             </div>
+            {selectedOverview ? (
+              <div className="adsensePanel">
+                <div className="statusLine">
+                  <span className={`statusDot ${selectedOverview.monetization.adsense.state}`} />
+                  <strong>
+                    AdSense {selectedOverview.monetization.adsense.state === 'live' ? 'is visible' : 'needs attention'}
+                  </strong>
+                </div>
+                <div className="featureList">
+                  <div className="featureLine">
+                    <strong>Configured client</strong>
+                    <span>{selectedOverview.monetization.adsense.configuredClientId || 'not set'}</span>
+                  </div>
+                  <div className="featureLine">
+                    <strong>Bridge-detected client</strong>
+                    <span>{selectedOverview.monetization.adsense.bridgeClientId || 'not detected'}</span>
+                  </div>
+                  <div className="featureLine">
+                    <strong>Slots on page</strong>
+                    <span>{selectedOverview.monetization.adsense.adSlotsDetected ? 'detected' : 'not detected'}</span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -462,4 +580,20 @@ export function Dashboard() {
       </div>
     </div>
   );
+}
+
+function formatMetric(value: number | null) {
+  if (value == null) return '—';
+  return new Intl.NumberFormat('en-US', { notation: value > 999 ? 'compact' : 'standard' }).format(
+    value,
+  );
+}
+
+function formatCurrency(cents: number | null) {
+  if (cents == null) return 'Not connected';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(cents / 100);
 }

@@ -77,6 +77,11 @@ const SiteUpsertSchema = z.object({
   cloudflare_zone_name: z.string().max(255).nullable().default(null),
   bridge_enabled: z.boolean().default(false),
   edit_surfaces: z.array(z.string().max(255)).default([]),
+  adsense_client_id: z.string().max(128).nullable().default(null),
+  adsense_enabled: z.boolean().default(false),
+  ga_property_id: z.string().max(128).nullable().default(null),
+  revenue_last_30d_cents: z.number().int().nonnegative().nullable().default(null),
+  revenue_source: z.string().max(64).nullable().default(null),
   enabled: z.boolean().default(true),
 });
 
@@ -105,6 +110,11 @@ app.post('/sites', async (c) => {
     cloudflare_zone_name: body.cloudflare_zone_name,
     bridge_enabled: body.bridge_enabled ? 1 : 0,
     edit_surfaces: JSON.stringify(body.edit_surfaces),
+    adsense_client_id: body.adsense_client_id,
+    adsense_enabled: body.adsense_enabled ? 1 : 0,
+    ga_property_id: body.ga_property_id,
+    revenue_last_30d_cents: body.revenue_last_30d_cents,
+    revenue_source: body.revenue_source,
     enabled: body.enabled ? 1 : 0,
     created_at: now,
     updated_at: now,
@@ -267,6 +277,11 @@ app.post('/ops/seed-network', async (c) => {
       cloudflare_zone_name: foundZone?.name ?? null,
       bridge_enabled: entry.bridgeEnabled ? 1 : 0,
       edit_surfaces: JSON.stringify(entry.editSurfaces ?? []),
+      adsense_client_id: null,
+      adsense_enabled: 0,
+      ga_property_id: null,
+      revenue_last_30d_cents: null,
+      revenue_source: null,
       enabled: 1,
       created_at: now,
       updated_at: now,
@@ -348,6 +363,61 @@ app.get('/ops/analytics', async (c) => {
   return c.json({ snapshots });
 });
 
+app.get('/ops/sites/overview', async (c) => {
+  const [sites, bridgeSnapshots, zoneSnapshots] = await Promise.all([
+    listSites(c.env),
+    listLatestBridgeSnapshots(c.env),
+    listLatestZoneSnapshots(c.env),
+  ]);
+
+  const overview = sites.map((site) => {
+    const bridge =
+      bridgeSnapshots.find((snapshot) => snapshot.site_id === site.id) ??
+      bridgeSnapshots.find((snapshot) => snapshot.origin === (site.bridge_origin ?? site.url)) ??
+      null;
+    const zone =
+      zoneSnapshots.find((snapshot) => snapshot.site_id === site.id) ??
+      zoneSnapshots.find((snapshot) => snapshot.zone_id === site.cloudflare_zone_id) ??
+      null;
+
+    const traffic = extractTraffic(zone?.analytics_json ? JSON.parse(zone.analytics_json) : null);
+    const bridgeConfig = bridge?.config_json ? JSON.parse(bridge.config_json) : null;
+    const selectors = bridge?.selector_status_json ? JSON.parse(bridge.selector_status_json) : {};
+    const adsenseSignals = extractAdsenseSignals({
+      configuredClientId: site.adsense_client_id,
+      configuredEnabled: site.adsense_enabled === 1,
+      bridgeConfig,
+      selectors,
+    });
+
+    return {
+      site,
+      traffic: {
+        ...traffic,
+        capturedAt: zone?.captured_at ?? null,
+      },
+      monetization: {
+        revenueLast30dCents: site.revenue_last_30d_cents,
+        revenueSource: site.revenue_source,
+        adsenseClientId: site.adsense_client_id,
+        adsenseEnabled: site.adsense_enabled === 1,
+        gaPropertyId: site.ga_property_id,
+        lastBridgeInspectionAt: bridge?.inspected_at ?? null,
+        pageStatus: bridge?.page_status ?? null,
+        adsense: adsenseSignals,
+      },
+      workspace: {
+        key: site.workspace_key,
+        path: site.workspace_path,
+        editSurfaces: JSON.parse(site.edit_surfaces || '[]'),
+        criticalRoutes: JSON.parse(site.critical_routes || '[]'),
+      },
+    };
+  });
+
+  return c.json({ overview });
+});
+
 app.get('/ops/bridge-inspect', async (c) => {
   const origin = c.req.query('origin');
   if (!origin) return c.json({ error: 'origin_required' }, 400);
@@ -373,6 +443,64 @@ app.get('/ops/bridge-inspect', async (c) => {
 app.get('/ops/bridges', async (c) => {
   const snapshots = await listLatestBridgeSnapshots(c.env);
   return c.json({ snapshots });
+});
+
+app.post('/sites/:id/adsense/restart', async (c) => {
+  const siteId = c.req.param('id');
+  const site = await getSite(c.env, siteId);
+  if (!site) return c.json({ error: 'not_found' }, 404);
+
+  const origin = site.bridge_origin ?? site.url;
+  const inspection = await inspectBridge(origin);
+  await insertBridgeSnapshot({
+    env: c.env,
+    siteId: site.id,
+    origin,
+    pageStatus: inspection.pageStatus,
+    assetUrl: inspection.assetUrl,
+    config: inspection.config,
+    endpointStatus: inspection.endpointStatus,
+    selectorStatus: inspection.selectorStatus,
+    error: inspection.error ?? null,
+  });
+
+  const adsenseSignals = extractAdsenseSignals({
+    configuredClientId: site.adsense_client_id,
+    configuredEnabled: site.adsense_enabled === 1,
+    bridgeConfig: inspection.config,
+    selectors: inspection.selectorStatus,
+  });
+
+  let deploy: { ok: boolean; status: number } | null = null;
+  if (
+    site.deploy_hook_url &&
+    (adsenseSignals.state === 'missing' || adsenseSignals.state === 'issue')
+  ) {
+    deploy = await runDeployHook({
+      env: c.env,
+      siteId: site.id,
+      deployHookUrl: site.deploy_hook_url,
+    });
+  }
+
+  await insertAudit({
+    env: c.env,
+    actor: 'owner',
+    action: 'site.adsense.restart',
+    target: `site:${site.id}`,
+    diff: {
+      inspectedOrigin: origin,
+      adsenseState: adsenseSignals.state,
+      deployTriggered: Boolean(deploy),
+    },
+  });
+
+  return c.json({
+    ok: true,
+    inspection,
+    adsense: adsenseSignals,
+    deploy,
+  });
 });
 
 const CommandSchema = z.object({
@@ -421,6 +549,20 @@ app.post('/ops/command', async (c) => {
     parsedAction = 'fetch_analytics';
     if (!site?.cloudflare_zone_id) return c.json({ error: 'cloudflare_zone_required' }, 400);
     result = (await getZoneDashboard(c.env, site.cloudflare_zone_id)) as Record<string, unknown>;
+  } else if (lower.includes('adsense') || lower.includes('ads')) {
+    parsedAction = 'adsense_status';
+    if (!site) return c.json({ error: 'site_required_for_adsense' }, 400);
+    const origin = site.bridge_origin ?? site.url;
+    const inspection = await inspectBridge(origin);
+    result = {
+      inspection,
+      adsense: extractAdsenseSignals({
+        configuredClientId: site.adsense_client_id,
+        configuredEnabled: site.adsense_enabled === 1,
+        bridgeConfig: inspection.config,
+        selectors: inspection.selectorStatus,
+      }),
+    };
   } else if (lower.includes('deploy hook') || lower.includes('redeploy')) {
     parsedAction = 'trigger_deploy_hook';
     if (!site?.deploy_hook_url) return c.json({ error: 'deploy_hook_missing' }, 400);
@@ -475,6 +617,11 @@ app.post('/admin/seed', async (c) => {
       '/blog',
       '/contact',
     ]),
+    adsense_client_id: null,
+    adsense_enabled: 0,
+    ga_property_id: null,
+    revenue_last_30d_cents: null,
+    revenue_source: null,
     enabled: 1,
     created_at: now,
     updated_at: now,
@@ -528,4 +675,88 @@ async function runScheduledChecks(env: Env): Promise<void> {
       });
     }
   }
+}
+
+function extractTraffic(analytics: any): {
+  requests24h: number | null;
+  pageviews24h: number | null;
+  visitors24h: number | null;
+  bandwidth24h: number | null;
+} {
+  if (!analytics) {
+    return {
+      requests24h: null,
+      pageviews24h: null,
+      visitors24h: null,
+      bandwidth24h: null,
+    };
+  }
+
+  const totals = analytics?.result?.totals ?? analytics?.totals ?? analytics?.result ?? analytics;
+  const requests24h = pickNumber(totals, [
+    ['requests', 'all'],
+    ['requests'],
+  ]);
+  const pageviews24h = pickNumber(totals, [
+    ['pageviews', 'all'],
+    ['pageviews'],
+  ]);
+  const visitors24h = pickNumber(totals, [
+    ['uniques', 'all'],
+    ['uniques'],
+    ['visits', 'all'],
+    ['visits'],
+  ]);
+  const bandwidth24h = pickNumber(totals, [
+    ['bandwidth', 'all'],
+    ['bandwidth'],
+  ]);
+
+  return { requests24h, pageviews24h, visitors24h, bandwidth24h };
+}
+
+function pickNumber(input: any, paths: string[][]): number | null {
+  for (const path of paths) {
+    let current = input;
+    for (const key of path) {
+      current = current?.[key];
+    }
+    if (typeof current === 'number' && Number.isFinite(current)) {
+      return current;
+    }
+  }
+  return null;
+}
+
+function extractAdsenseSignals(params: {
+  configuredClientId: string | null;
+  configuredEnabled: boolean;
+  bridgeConfig: any;
+  selectors: Record<string, unknown>;
+}) {
+  const bridgeAdsense = params.bridgeConfig?.adsense ?? {};
+  const scriptPresent = Boolean(bridgeAdsense.scriptPresent);
+  const bridgeClientId =
+    typeof bridgeAdsense.clientId === 'string' && bridgeAdsense.clientId.length > 0
+      ? bridgeAdsense.clientId
+      : null;
+  const adSlotsDetected = Object.values(params.selectors ?? {}).some(Boolean);
+  const configured = params.configuredEnabled || Boolean(params.configuredClientId);
+
+  let state: 'live' | 'issue' | 'configured' | 'missing' = 'missing';
+  if (scriptPresent && adSlotsDetected) {
+    state = 'live';
+  } else if (configured && (scriptPresent || adSlotsDetected || bridgeClientId)) {
+    state = 'issue';
+  } else if (configured) {
+    state = 'configured';
+  }
+
+  return {
+    state,
+    scriptPresent,
+    adSlotsDetected,
+    bridgeClientId,
+    configuredClientId: params.configuredClientId,
+  };
 }

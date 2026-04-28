@@ -2,6 +2,7 @@ import { useDeferredValue, useEffect, useMemo, useState, type FormEvent } from '
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../lib/auth';
+import { LockFieldBackdrop } from '../components/LockFieldBackdrop';
 
 const challengePrompts = [
   'Security calibration phrase',
@@ -87,6 +88,7 @@ export function Home() {
   return (
     <div className={`landing lockLanding ${lockdown ? 'lockdown' : ''}`}>
       <section className="lockStage">
+        <LockFieldBackdrop />
         <div className="lockAurora" />
         <div className="lockNoise" />
         <div className="lockTicker" aria-hidden="true">

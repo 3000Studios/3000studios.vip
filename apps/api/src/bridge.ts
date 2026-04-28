@@ -35,7 +35,7 @@ export async function inspectBridge(origin: string): Promise<InspectResult> {
       bundle = await assetRes.text();
     }
 
-    const config = parseBridgeConfig(bundle);
+    const config = parseBridgeConfig(bundle, html);
     const endpointStatus = await probeBridgeEndpoints(origin);
     const selectorStatus = detectSelectors(html, bundle);
 
@@ -86,12 +86,24 @@ function detectSelectors(html: string, bundle: string): Record<string, boolean |
   return out;
 }
 
-function parseBridgeConfig(bundle: string): Record<string, unknown> | null {
-  if (!bundle) return null;
+function parseBridgeConfig(bundle: string, html: string): Record<string, unknown> | null {
+  if (!bundle && !html) return null;
 
   const siteMatch = bundle.match(/site:`([^`]+)`/);
   const originMatch = bundle.match(/origin:`([^`]+)`/);
   const ingestMatch = bundle.match(/monitorEndpoint:`([^`]+)`/);
+  const adsenseClientId =
+    bundle.match(/ca-pub-[0-9]+/)?.[0] ??
+    html.match(/ca-pub-[0-9]+/)?.[0] ??
+    null;
+  const adsenseScriptPresent =
+    bundle.includes('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js') ||
+    html.includes('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
+  const adsenseSlotSignals =
+    Number(html.includes('adsbygoogle')) +
+    Number(bundle.includes('adsbygoogle')) +
+    Number(html.includes('data-ads-lock')) +
+    Number(bundle.includes('data-ads-lock'));
 
   const config = {
     site: siteMatch?.[1] ?? null,
@@ -109,6 +121,11 @@ function parseBridgeConfig(bundle: string): Record<string, unknown> | null {
     },
     editSurfaces: ['/dashboard', '/admin', '/products', '/pricing', '/blog', '/contact'],
     adSelectors: [...adSelectors],
+    adsense: {
+      clientId: adsenseClientId,
+      scriptPresent: adsenseScriptPresent,
+      slotSignals: adsenseSlotSignals,
+    },
   };
 
   return config;

@@ -22,6 +22,11 @@ export type SiteRow = {
   cloudflare_zone_name: string | null;
   bridge_enabled: number;
   edit_surfaces: string;
+  adsense_client_id: string | null;
+  adsense_enabled: number;
+  ga_property_id: string | null;
+  revenue_last_30d_cents: number | null;
+  revenue_source: string | null;
   enabled: number;
   created_at: string;
   updated_at: string;
@@ -65,13 +70,15 @@ export async function upsertSite(
       expected_status, expected_title, expected_canonical, expected_redirects,
       critical_routes, deploy_hook_url, workspace_key, workspace_path, bridge_origin,
       cloudflare_zone_id, cloudflare_zone_name, bridge_enabled, edit_surfaces,
+      adsense_client_id, adsense_enabled, ga_property_id, revenue_last_30d_cents, revenue_source,
       enabled, created_at, updated_at
     ) VALUES (
       ?1, ?2, ?3, ?4, ?5, ?6,
       ?7, ?8, ?9, ?10,
       ?11, ?12, ?13, ?14, ?15,
       ?16, ?17, ?18, ?19,
-      ?20, ?21, ?22
+      ?20, ?21, ?22, ?23, ?24,
+      ?25, ?26, ?27
     )
     ON CONFLICT(id) DO UPDATE SET
       name=excluded.name,
@@ -92,6 +99,11 @@ export async function upsertSite(
       cloudflare_zone_name=excluded.cloudflare_zone_name,
       bridge_enabled=excluded.bridge_enabled,
       edit_surfaces=excluded.edit_surfaces,
+      adsense_client_id=excluded.adsense_client_id,
+      adsense_enabled=excluded.adsense_enabled,
+      ga_property_id=excluded.ga_property_id,
+      revenue_last_30d_cents=excluded.revenue_last_30d_cents,
+      revenue_source=excluded.revenue_source,
       enabled=excluded.enabled,
       updated_at=excluded.updated_at
   `,
@@ -116,6 +128,11 @@ export async function upsertSite(
       site.cloudflare_zone_name,
       site.bridge_enabled,
       site.edit_surfaces,
+      site.adsense_client_id,
+      site.adsense_enabled,
+      site.ga_property_id,
+      site.revenue_last_30d_cents,
+      site.revenue_source,
       site.enabled,
       createdAt,
       updatedAt,

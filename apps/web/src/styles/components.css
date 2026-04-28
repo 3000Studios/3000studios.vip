@@ -16,6 +16,7 @@
     box-shadow 180ms ease,
     background 180ms ease;
   font: 600 0.94rem/1 Arial, Helvetica, sans-serif;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .btn:hover,
@@ -54,6 +55,7 @@
   background: rgba(255, 255, 255, 0.04);
   color: var(--ink);
   outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .input:focus {

@@ -18,6 +18,11 @@ export type Site = {
   cloudflare_zone_name: string | null;
   bridge_enabled: number;
   edit_surfaces: string;
+  adsense_client_id: string | null;
+  adsense_enabled: number;
+  ga_property_id: string | null;
+  revenue_last_30d_cents: number | null;
+  revenue_source: string | null;
   enabled: number;
   created_at: string;
   updated_at: string;
@@ -40,6 +45,39 @@ export type ZoneSummary = {
   name: string;
   status: string;
   name_servers: string[];
+};
+
+export type SiteOverview = {
+  site: Site;
+  traffic: {
+    requests24h: number | null;
+    pageviews24h: number | null;
+    visitors24h: number | null;
+    bandwidth24h: number | null;
+    capturedAt: string | null;
+  };
+  monetization: {
+    revenueLast30dCents: number | null;
+    revenueSource: string | null;
+    adsenseClientId: string | null;
+    adsenseEnabled: boolean;
+    gaPropertyId: string | null;
+    lastBridgeInspectionAt: string | null;
+    pageStatus: number | null;
+    adsense: {
+      state: 'live' | 'issue' | 'configured' | 'missing';
+      scriptPresent: boolean;
+      adSlotsDetected: boolean;
+      bridgeClientId: string | null;
+      configuredClientId: string | null;
+    };
+  };
+  workspace: {
+    key: string | null;
+    path: string | null;
+    editSurfaces: string[];
+    criticalRoutes: string[];
+  };
 };
 
 const API_BASE =
@@ -80,6 +118,19 @@ export async function upsertSite(input: {
   url: string;
   tags?: string[];
   deploy_hook_url?: string | null;
+  workspace_key?: string | null;
+  workspace_path?: string | null;
+  cloudflare_zone_id?: string | null;
+  cloudflare_zone_name?: string | null;
+  bridge_origin?: string | null;
+  bridge_enabled?: boolean;
+  edit_surfaces?: string[];
+  critical_routes?: string[];
+  adsense_client_id?: string | null;
+  adsense_enabled?: boolean;
+  ga_property_id?: string | null;
+  revenue_last_30d_cents?: number | null;
+  revenue_source?: string | null;
   enabled?: boolean;
 }): Promise<{ ok: boolean; id: string }> {
   return apiFetch('/sites', { method: 'POST', body: JSON.stringify(input) });
@@ -125,8 +176,19 @@ export async function inspectBridge(origin: string): Promise<any> {
   return apiFetch(`/ops/bridge-inspect?origin=${encoded}`);
 }
 
+export async function getSiteOverview(): Promise<{ overview: SiteOverview[] }> {
+  return apiFetch('/ops/sites/overview');
+}
+
 export async function listBridgeSnapshots(): Promise<{ snapshots: BridgeSnapshot[] }> {
   return apiFetch('/ops/bridges');
+}
+
+export async function restartAdsense(siteId: string): Promise<any> {
+  return apiFetch(`/sites/${encodeURIComponent(siteId)}/adsense/restart`, {
+    method: 'POST',
+    body: '{}',
+  });
 }
 
 export async function runNaturalCommand(input: {
