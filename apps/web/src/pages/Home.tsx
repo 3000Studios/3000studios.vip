@@ -15,8 +15,8 @@ const challengePrompts = [
 export function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated, ownerEmail } = useAuth();
-  const [email] = useState(ownerEmail);
+  const { login, isAuthenticated, ownerUsername } = useAuth();
+  const [username, setUsername] = useState('');
   const [passcode, setPasscode] = useState('');
   const [decoyUser, setDecoyUser] = useState('');
   const [decoyPass, setDecoyPass] = useState('');
@@ -68,7 +68,7 @@ export function Home() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const ok = login(email, passcode);
+    const ok = login(username, passcode);
     if (!ok) {
       triggerLockdown('Access denied. This private system is monitored and requires approved credentials.');
       return;
@@ -177,8 +177,14 @@ export function Home() {
                   <form className="lockForm realGate" onSubmit={handleSubmit}>
                     <div className="gateHeader">Real Login</div>
                     <label className="field">
-                      <span>Email</span>
-                      <input className="input" autoComplete="username" readOnly value={email} />
+                      <span>User Name</span>
+                      <input
+                        className="input"
+                        autoComplete="username"
+                        value={username}
+                        onChange={(event) => setUsername(event.target.value)}
+                        placeholder="Owner username"
+                      />
                     </label>
                     <label className="field">
                       <span>Passcode</span>
@@ -199,7 +205,7 @@ export function Home() {
                   </form>
                 ) : null}
                 <div className="lockMeta">
-                  <span>Private monitored system • owner mailbox: {ownerEmail}</span>
+                  <span>Private monitored system • owner id: {ownerUsername}</span>
                   <span>Cloudflare Access remains the required production edge gate.</span>
                   <span>The hidden control dot sits at the bottom center.</span>
                 </div>

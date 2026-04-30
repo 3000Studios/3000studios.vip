@@ -1,37 +1,32 @@
-import {
-  createContext,
-  startTransition,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
+/* eslint-disable react-refresh/only-export-components */
+
+import { createContext, startTransition, useContext, useState, type ReactNode } from 'react';
 
 const STORAGE_KEY = 'studio-vip-auth-v1';
-const OWNER_EMAIL = 'mr.jwswain@gmail.com';
-const OWNER_PASSCODE = '5555';
+
+const DEFAULT_OWNER_USERNAME = 'mr.jwswain@gmail.com';
+const DEFAULT_OWNER_PASSCODE = '5555';
+
+const OWNER_USERNAME = (import.meta.env.VITE_VAULT_USERNAME as string | undefined)?.trim() || DEFAULT_OWNER_USERNAME;
+const OWNER_PASSCODE = (import.meta.env.VITE_VAULT_PASSCODE as string | undefined) ?? DEFAULT_OWNER_PASSCODE;
 
 type AuthState = {
   isAuthenticated: boolean;
-  ownerEmail: string;
-  login: (email: string, passcode: string) => boolean;
+  ownerUsername: string;
+  login: (username: string, passcode: string) => boolean;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw === '1') {
-      setIsAuthenticated(true);
-    }
-  }, []);
+    return raw === '1';
+  });
 
   const login = (email: string, passcode: string) => {
-    const ok = email.trim().toLowerCase() === OWNER_EMAIL && passcode === OWNER_PASSCODE;
+    const ok = email.trim().toLowerCase() === OWNER_USERNAME.toLowerCase() && passcode === OWNER_PASSCODE;
     if (!ok) {
       return false;
     }
@@ -51,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, ownerEmail: OWNER_EMAIL, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, ownerUsername: OWNER_USERNAME, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
