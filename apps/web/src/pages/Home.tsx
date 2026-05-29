@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../lib/auth';
@@ -26,6 +26,7 @@ export function Home() {
   const [lockdown, setLockdown] = useState(false);
   const [showChallenge, setShowChallenge] = useState(false);
   const [realLoginReady, setRealLoginReady] = useState(false);
+  const sealTaps = useRef(0);
   const deferredPasscode = useDeferredValue(passcode);
   const matrixRows = useMemo(
     () =>
@@ -55,7 +56,7 @@ export function Home() {
 
   function handleChallengeSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const ok = challengeAnswer.trim() === '5555';
+    const ok = challengeAnswer.trim().toLowerCase() === 'z';
     if (!ok) {
       triggerLockdown('Challenge failed. Private access remains sealed.');
       return;
@@ -83,6 +84,14 @@ export function Home() {
     setChallengeAnswer('');
     setShowChallenge(true);
     setError('');
+  }
+
+  function handleSealTap() {
+    sealTaps.current += 1;
+    if (sealTaps.current >= 5) {
+      sealTaps.current = 0;
+      openChallenge();
+    }
   }
 
   return (
@@ -147,9 +156,6 @@ export function Home() {
                   <button className="btn primary wide" type="submit">
                     Attempt Access
                   </button>
-                  <button className="btn ghost wide" onClick={openChallenge} type="button">
-                    Owner Entry
-                  </button>
                   <div className="passcodePulse">
                     Animated lock engaged • public fields are decoy-only
                   </div>
@@ -207,7 +213,6 @@ export function Home() {
                 <div className="lockMeta">
                   <span>Private monitored system • owner id: {ownerUsername}</span>
                   <span>Cloudflare Access remains the required production edge gate.</span>
-                  <span>The hidden control dot sits at the bottom center.</span>
                 </div>
                 {isAuthenticated ? (
                   <button className="btn" onClick={() => navigate('/vault')} type="button">
@@ -226,17 +231,24 @@ export function Home() {
             <a href="/terms">Terms</a>
           </div>
           <div className="lockFooterCopy">
-            © {new Date().getFullYear()} 3000 Studios. All rights reserved.
+            <span
+              className="lockSeal"
+              role="button"
+              tabIndex={0}
+              aria-label="Studio seal"
+              onClick={handleSealTap}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  handleSealTap();
+                }
+              }}
+            >
+              ©
+            </span>{' '}
+            {new Date().getFullYear()} 3000 Studios. All rights reserved.
           </div>
         </footer>
-        <button
-          aria-label="Owner entry trigger"
-          className="ownerDot"
-          onClick={openChallenge}
-          type="button"
-        >
-          ☻
-        </button>
       </section>
     </div>
   );

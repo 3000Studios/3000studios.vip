@@ -208,28 +208,19 @@
   line-height: 1;
 }
 
-.ownerDot {
-  position: fixed;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: transparent;
-  border: none;
-  color: var(--ink);
-  opacity: 0.018;
-  cursor: pointer;
-  font-size: 10px;
-  line-height: 1;
-  width: 14px;
-  height: 14px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  transition: opacity 0.3s;
+.lockSeal {
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease;
 }
 
-.ownerDot:hover {
-  opacity: 0.22;
+.lockSeal:hover {
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
 }
 
 .lockFooter {

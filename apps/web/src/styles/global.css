@@ -48,6 +48,16 @@ input {
 h1,
 h2,
 h3,
+h4,
+.brandName,
+.cardTitle,
+.kpiValue {
+  font-family: var(--font-display);
+}
+
+h1,
+h2,
+h3,
 .brandName,
 .cardTitle,
 .kpiValue {
