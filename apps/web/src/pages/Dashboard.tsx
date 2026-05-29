@@ -13,6 +13,9 @@ import {
   seedNetwork,
   type Site,
   type SiteOverview,
+  type BridgeSnapshot,
+  type ZoneSnapshot,
+  type CommandResult,
 } from '../lib/api';
 
 type RecognitionCtor = new () => {
@@ -28,13 +31,13 @@ type RecognitionCtor = new () => {
 export function Dashboard() {
   const [stats, setStats] = useState<Awaited<ReturnType<typeof getStats>> | null>(null);
   const [sites, setSites] = useState<Site[]>([]);
-  const [bridgeSnapshots, setBridgeSnapshots] = useState<any[]>([]);
-  const [zoneSnapshots, setZoneSnapshots] = useState<any[]>([]);
+  const [bridgeSnapshots, setBridgeSnapshots] = useState<BridgeSnapshot[]>([]);
+  const [zoneSnapshots, setZoneSnapshots] = useState<ZoneSnapshot[]>([]);
   const [overview, setOverview] = useState<SiteOverview[]>([]);
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
   const [commandText, setCommandText] = useState('Show analytics and ad status for 3000 Studios VIP');
-  const [commandResult, setCommandResult] = useState<any>(null);
-  const [livePanel, setLivePanel] = useState<any>(null);
+  const [commandResult, setCommandResult] = useState<CommandResult | null>(null);
+  const [livePanel, setLivePanel] = useState<Record<string, unknown> | BridgeSnapshot | ZoneSnapshot | null>(null);
   const [busy, setBusy] = useState(false);
   const [listening, setListening] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -57,7 +60,14 @@ export function Dashboard() {
   }
 
   useEffect(() => {
-    load().catch((error) => setErr(error instanceof Error ? error.message : 'dashboard_failed'));
+    void (async () => {
+      try {
+        await load();
+        setErr(null);
+      } catch (error) {
+        setErr(error instanceof Error ? error.message : 'dashboard_failed');
+      }
+    })();
   }, []);
 
   const selectedSite = sites.find((site) => site.id === selectedSiteId) ?? null;
@@ -143,8 +153,11 @@ export function Dashboard() {
   }
 
   function handleVoice() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const windowObj = window as unknown as {
+      SpeechRecognition?: RecognitionCtor;
+      webkitSpeechRecognition?: RecognitionCtor;
+    };
+    const SpeechRecognition = windowObj.SpeechRecognition || windowObj.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setErr('Speech input is not available in this browser.');
       return;

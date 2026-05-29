@@ -9,13 +9,16 @@ import {
   runSiteChecks,
   upsertSite,
   type SiteOverview,
+  type SiteDetail,
+  type CommandResult,
+  type Check,
 } from '../lib/api';
 
 export function SiteDetail() {
   const { id } = useParams();
-  const [data, setData] = useState<any | null>(null);
+  const [data, setData] = useState<SiteDetail | null>(null);
   const [overview, setOverview] = useState<SiteOverview | null>(null);
-  const [run, setRun] = useState<any | null>(null);
+  const [run, setRun] = useState<Record<string, unknown> | CommandResult | null>(null);
   const [commandText, setCommandText] = useState('Refresh homepage copy and verify ads are rendering');
   const [busy, setBusy] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -49,7 +52,15 @@ export function SiteDetail() {
   };
 
   useEffect(() => {
-    refresh().catch((e) => setErr(e instanceof Error ? e.message : 'failed'));
+    void (async () => {
+      try {
+        await refresh();
+        setErr(null);
+      } catch (e) {
+        setErr(e instanceof Error ? e.message : 'failed');
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const onRun = async () => {
@@ -350,7 +361,7 @@ export function SiteDetail() {
           <span className="muted">{data.checks.length}</span>
         </div>
         <div className="cards">
-          {data.checks.map((c: any) => (
+          {data.checks.map((c: Check) => (
             <div key={c.id} className="card">
               <div className="cardGlow" />
               <div className="cardInner">

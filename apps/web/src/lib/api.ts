@@ -28,6 +28,12 @@ export type Site = {
   updated_at: string;
 };
 
+export type Check = {
+  id: string;
+  type: string;
+  timeout_ms: number;
+};
+
 export type BridgeSnapshot = {
   site_id: string | null;
   origin: string;
@@ -45,6 +51,14 @@ export type ZoneSummary = {
   name: string;
   status: string;
   name_servers: string[];
+};
+
+export type ZoneSnapshot = {
+  zone_id: string;
+  zone_name: string;
+  captured_at: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
 };
 
 export type SiteOverview = {
@@ -80,6 +94,16 @@ export type SiteOverview = {
   };
 };
 
+export type SiteDetail = {
+  site: Site;
+  checks: Check[];
+};
+
+export type CommandResult = {
+  parsedAction: string;
+  result: Record<string, unknown>;
+};
+
 const API_BASE =
   import.meta.env.VITE_API_BASE?.toString() || 'https://apex-citadel-api.mr-jwswain.workers.dev';
 
@@ -108,7 +132,7 @@ export async function listSites(): Promise<{ sites: Site[] }> {
   return apiFetch('/sites');
 }
 
-export async function getSite(id: string): Promise<any> {
+export async function getSite(id: string): Promise<SiteDetail> {
   return apiFetch(`/sites/${encodeURIComponent(id)}`);
 }
 
@@ -140,18 +164,18 @@ export async function deleteSite(id: string): Promise<{ ok: boolean }> {
   return apiFetch(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
 
-export async function runSiteChecks(id: string): Promise<any> {
+export async function runSiteChecks(id: string): Promise<Record<string, unknown>> {
   return apiFetch(`/sites/${encodeURIComponent(id)}/run`, { method: 'POST', body: '{}' });
 }
 
-export async function runDeployHook(id: string): Promise<any> {
+export async function runDeployHook(id: string): Promise<Record<string, unknown>> {
   return apiFetch(`/sites/${encodeURIComponent(id)}/playbooks/deploy-hook`, {
     method: 'POST',
     body: '{}',
   });
 }
 
-export async function getCatalog(): Promise<{ catalog: any[]; sites: Site[] }> {
+export async function getCatalog(): Promise<{ catalog: Array<Record<string, unknown>>; sites: Site[] }> {
   return apiFetch('/ops/catalog');
 }
 
@@ -163,15 +187,15 @@ export async function listZones(): Promise<{ zones: ZoneSummary[]; error?: strin
   return apiFetch('/ops/zones');
 }
 
-export async function getZoneAnalytics(zoneId: string): Promise<any> {
+export async function getZoneAnalytics(zoneId: string): Promise<Record<string, unknown>> {
   return apiFetch(`/ops/analytics/${encodeURIComponent(zoneId)}`);
 }
 
-export async function listZoneSnapshots(): Promise<{ snapshots: any[] }> {
+export async function listZoneSnapshots(): Promise<{ snapshots: ZoneSnapshot[] }> {
   return apiFetch('/ops/analytics');
 }
 
-export async function inspectBridge(origin: string): Promise<any> {
+export async function inspectBridge(origin: string): Promise<Record<string, unknown>> {
   const encoded = encodeURIComponent(origin);
   return apiFetch(`/ops/bridge-inspect?origin=${encoded}`);
 }
@@ -184,7 +208,7 @@ export async function listBridgeSnapshots(): Promise<{ snapshots: BridgeSnapshot
   return apiFetch('/ops/bridges');
 }
 
-export async function restartAdsense(siteId: string): Promise<any> {
+export async function restartAdsense(siteId: string): Promise<Record<string, unknown>> {
   return apiFetch(`/sites/${encodeURIComponent(siteId)}/adsense/restart`, {
     method: 'POST',
     body: '{}',
@@ -194,7 +218,7 @@ export async function restartAdsense(siteId: string): Promise<any> {
 export async function runNaturalCommand(input: {
   siteId?: string | null;
   command: string;
-}): Promise<{ parsedAction: string; result: any }> {
+}): Promise<CommandResult> {
   return apiFetch('/ops/command', {
     method: 'POST',
     body: JSON.stringify({

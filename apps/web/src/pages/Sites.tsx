@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { deleteSite, listSites, upsertSite } from '../lib/api';
+import { deleteSite, listSites, upsertSite, type Site } from '../lib/api';
 import { Link } from 'react-router-dom';
 
 export function Sites() {
-  const [sites, setSites] = useState<any[]>([]);
+  const [sites, setSites] = useState<Site[]>([]);
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -15,7 +15,14 @@ export function Sites() {
   };
 
   useEffect(() => {
-    refresh().catch((e) => setErr(e instanceof Error ? e.message : 'failed'));
+    void (async () => {
+      try {
+        await refresh();
+        setErr(null);
+      } catch (e) {
+        setErr(e instanceof Error ? e.message : 'failed');
+      }
+    })();
   }, []);
 
   const onAdd = async () => {

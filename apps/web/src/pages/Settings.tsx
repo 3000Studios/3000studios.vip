@@ -3,20 +3,23 @@ import { loadAudioPrefs, saveAudioPrefs } from '../lib/prefs';
 import { Synth } from '../lib/synth';
 
 export function Settings() {
-  const synth = useRef(new Synth()).current;
+  const synthRef = useRef<Synth | null>(null);
   const [prefs, setPrefs] = useState(loadAudioPrefs());
   const [armed, setArmed] = useState(false);
 
   useEffect(() => {
+    if (!synthRef.current) {
+      synthRef.current = new Synth();
+    }
     saveAudioPrefs(prefs);
-    synth.setVolumes(prefs);
-  }, [prefs, synth]);
+    synthRef.current.setVolumes(prefs);
+  }, [prefs]);
 
   useEffect(() => {
-    if (!armed) return;
-    const stop = synth.startAmbientPulse();
+    if (!armed || !synthRef.current) return;
+    const stop = synthRef.current.startAmbientPulse();
     return () => stop();
-  }, [armed, synth]);
+  }, [armed]);
 
   const reducedMotion = useMemo(
     () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -24,9 +27,12 @@ export function Settings() {
   );
 
   const armAudio = async () => {
-    await synth.resume();
+    if (!synthRef.current) {
+      synthRef.current = new Synth();
+    }
+    await synthRef.current.resume();
     setArmed(true);
-    synth.blip('sfx', 660, 140);
+    synthRef.current.blip('sfx', 660, 140);
   };
 
   return (
@@ -43,10 +49,10 @@ export function Settings() {
           <button className="btn primary" onClick={armAudio} disabled={armed}>
             Arm Audio
           </button>
-          <button className="btn" onClick={() => synth.blip('sfx', 880, 120)} disabled={!armed}>
+          <button className="btn" onClick={() => synthRef.current?.blip('sfx', 880, 120)} disabled={!armed}>
             SFX Blip
           </button>
-          <button className="btn" onClick={() => synth.blip('music', 220, 220)} disabled={!armed}>
+          <button className="btn" onClick={() => synthRef.current?.blip('music', 220, 220)} disabled={!armed}>
             Music Pulse
           </button>
         </div>
