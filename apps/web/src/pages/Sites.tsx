@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { deleteSite, listSites, upsertSite, type Site } from '../lib/api';
 import { Link } from 'react-router-dom';
+import { deleteSite, listSites, upsertSite, type Site } from '../lib/api';
 
 export function Sites() {
   const [sites, setSites] = useState<Site[]>([]);

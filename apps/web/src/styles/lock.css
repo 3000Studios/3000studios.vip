@@ -22,7 +22,7 @@
   position: absolute;
   inset: 0;
   z-index: -3;
-  opacity: 0.92;
+  opacity: 0.38;
 }
 
 .lockAurora {
@@ -96,12 +96,18 @@
 
 .lockBody {
   position: relative;
-  background: var(--glass-strong);
+  background: rgba(7, 11, 22, 0.97);
   backdrop-filter: blur(24px);
   border-radius: 36px;
   padding: 40px;
   border: 1px solid rgba(244, 239, 231, 0.12);
   box-shadow: 0 32px 64px -16px var(--shadow);
+}
+
+@media (max-width: 760px) {
+  .lockFieldBackdrop {
+    opacity: 0.16;
+  }
 }
 
 .lockShackle {

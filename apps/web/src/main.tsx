@@ -11,6 +11,7 @@ import { About, Contact, Privacy, Terms } from './pages/Legal';
 import { Sites } from './pages/Sites';
 import { SiteDetail } from './pages/SiteDetail';
 import { Settings } from './pages/Settings';
+import { StreamVault } from './pages/StreamVault';
 import { AuthProvider } from './lib/auth';
 
 const router = createBrowserRouter([
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
           { index: true, element: <Dashboard /> },
           { path: 'sites', element: <Sites /> },
           { path: 'sites/:id', element: <SiteDetail /> },
+          { path: 'stream', element: <StreamVault /> },
           { path: 'settings', element: <Settings /> },
         ],
       },

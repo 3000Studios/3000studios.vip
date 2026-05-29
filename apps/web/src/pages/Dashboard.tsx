@@ -1,21 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  getCatalog,
-  getSiteOverview,
-  getStats,
-  getZoneAnalytics,
-  inspectBridge,
-  listBridgeSnapshots,
-  listZoneSnapshots,
-  restartAdsense,
-  runNaturalCommand,
-  seedNetwork,
-  type Site,
-  type SiteOverview,
-  type BridgeSnapshot,
-  type ZoneSnapshot,
-  type CommandResult,
+    getCatalog,
+    getSiteOverview,
+    getStats,
+    getZoneAnalytics,
+    inspectBridge,
+    listBridgeSnapshots,
+    listZoneSnapshots,
+    restartAdsense,
+    runNaturalCommand,
+    seedNetwork,
+    type BridgeSnapshot,
+    type CommandResult,
+    type Site,
+    type SiteOverview,
+    type ZoneSnapshot,
 } from '../lib/api';
 
 type RecognitionCtor = new () => {

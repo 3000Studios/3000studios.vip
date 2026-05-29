@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  getSite,
-  getSiteOverview,
-  restartAdsense,
-  runDeployHook,
-  runNaturalCommand,
-  runSiteChecks,
-  upsertSite,
-  type SiteOverview,
-  type SiteDetail,
-  type CommandResult,
-  type Check,
+    getSite,
+    getSiteOverview,
+    restartAdsense,
+    runDeployHook,
+    runNaturalCommand,
+    runSiteChecks,
+    upsertSite,
+    type Check,
+    type CommandResult,
+    type SiteDetail,
+    type SiteOverview,
 } from '../lib/api';
 
 export function SiteDetail() {

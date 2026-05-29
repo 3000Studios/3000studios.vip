@@ -39,6 +39,9 @@ export function Shell() {
           <NavLink to="/vault/sites" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
             Sites
           </NavLink>
+          <NavLink to="/vault/stream" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
+            Stream
+          </NavLink>
           <NavLink to="/vault/settings" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
             Audio
           </NavLink>
