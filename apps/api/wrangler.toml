@@ -10,7 +10,7 @@ ACCESS_REQUIRED = "0"
 [[d1_databases]]
 binding = "DB"
 database_name = "apex_citadel"
-database_id = "d39c2f05-77dc-4ff5-826b-b05be33d31ec"
+database_id = "6ae6bd18-e43a-4c57-beba-0c3ed1b5a56b"
 
 [triggers]
 crons = ["*/5 * * * *"]
