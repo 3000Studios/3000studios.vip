@@ -1,77 +1,100 @@
-import { Link, NavLink, Outlet } from 'react-router-dom';
-import { CitadelCore } from './CitadelCore';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '../lib/auth';
 import { useState } from 'react';
-import { LiveBackdrop } from './LiveBackdrop';
+import { useAuth } from '../lib/auth';
+import { DudeAgent } from './DudeAgent';
+
+const NAV = [
+  { to: '/vault', end: true, icon: '◈', label: 'Command Center', title: 'Command Center', sub: 'Fleet health at a glance' },
+  { to: '/vault/sites', end: false, icon: '▦', label: 'Fleet', title: 'Fleet', sub: 'Every site under watch' },
+  { to: '/vault/ops', end: false, icon: '⌘', label: 'Ops Console', title: 'Ops Console', sub: 'Commands, bridges, analytics' },
+  { to: '/vault/stream', end: false, icon: '⦿', label: 'Stream Vault', title: 'Stream Vault', sub: 'Private stream control' },
+  { to: '/vault/settings', end: false, icon: '♪', label: 'Audio', title: 'Audio Console', sub: 'Ambient mix & SFX' },
+];
+
+function titleFor(pathname: string): { title: string; sub: string } {
+  if (/^\/vault\/sites\/[^/]+$/.test(pathname)) return { title: 'Site Detail', sub: 'Deep dive & controls' };
+  const match = [...NAV].reverse().find((n) => (n.end ? pathname === n.to : pathname.startsWith(n.to)));
+  return match ? { title: match.title, sub: match.sub } : { title: 'Vault', sub: '' };
+}
 
 export function Shell() {
-  const { logout } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { logout, ownerUsername } = useAuth();
+  const { pathname } = useLocation();
+  const [navOpen, setNavOpen] = useState(false);
+  const { title, sub } = titleFor(pathname);
 
   return (
-    <div className="app">
-      <LiveBackdrop variant="vault" />
-      <header className="topbar">
-        <div className="brand">
-          <CitadelCore />
-          <div className="brandText">
-            <Link to="/vault" className="brandName">
-              3000 Studios Vault
-            </Link>
-            <div className="brandSub">the3000studios.Vip - Owner Console</div>
+    <div className={`console ${navOpen ? 'navOpen' : ''}`}>
+      <aside className="cSidebar" onClick={() => setNavOpen(false)}>
+        <div className="cBrand">
+          <div className="cBrandMark">3K</div>
+          <div className="cBrandText">
+            <Link to="/vault" className="cBrandName">3000 Studios</Link>
+            <span className="cBrandSub">Fleet Control · Owner</span>
           </div>
         </div>
-        <button
-          aria-expanded={menuOpen}
-          aria-label="Toggle navigation"
-          className={`lockMenuButton ${menuOpen ? 'active' : ''}`}
-          onClick={() => setMenuOpen((value) => !value)}
-          type="button"
-        >
-          <span className="lockMenuShackle" />
-          <span className="lockMenuBody">LOCK</span>
-        </button>
-        <nav className={`nav ${menuOpen ? 'open' : ''}`}>
-          <NavLink to="/vault" end className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
-            Vault
-          </NavLink>
-          <NavLink to="/vault/sites" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
-            Sites
-          </NavLink>
-          <NavLink to="/vault/stream" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
-            Stream
-          </NavLink>
-          <NavLink to="/vault/settings" className={({ isActive }) => (isActive ? 'navLink active' : 'navLink')}>
-            Audio
-          </NavLink>
-          <Link to="/" className="navLink">
-            Public
-          </Link>
-          <button className="navLink navButton" onClick={logout} type="button">
-            Logout
-          </button>
-        </nav>
-      </header>
 
-      <main className="content">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="page"
-        >
-          <Outlet />
-        </motion.div>
-      </main>
-
-      <footer className="footer">
-        <div className="footerGrid" />
-        <div className="footerInner">
-          <span>© {new Date().getFullYear()} 3000 Studios</span>
-          <span className="footerHint">Private system. Access required.</span>
+        <div className="cNavGroup">
+          <div className="cNavLabel">Operations</div>
+          {NAV.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) => (isActive ? 'cNavLink active' : 'cNavLink')}
+            >
+              <span className="cNavIcon">{item.icon}</span>
+              {item.label}
+            </NavLink>
+          ))}
         </div>
-      </footer>
+
+        <div className="cNavSpacer" />
+
+        <div className="cNavGroup">
+          <Link to="/" className="cNavLink">
+            <span className="cNavIcon">↗</span>
+            Public Site
+          </Link>
+          <button className="cNavLink" onClick={logout} type="button">
+            <span className="cNavIcon">⏻</span>
+            Lock Vault
+          </button>
+        </div>
+      </aside>
+
+      <div className="cMain">
+        <header className="cTopbar">
+          <button
+            className="cMobileToggle"
+            aria-label="Toggle navigation"
+            onClick={() => setNavOpen((v) => !v)}
+            type="button"
+          >
+            ☰
+          </button>
+          <div className="cTitle">
+            <h1>{title}</h1>
+            {sub ? <span className="cTitleSub">{sub}</span> : null}
+          </div>
+          <div className="cTopbarRight">
+            <span className="cPill ok"><span className="cDot" />System nominal</span>
+          </div>
+        </header>
+
+        <main className="cScroll">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.28 }}
+          >
+            <Outlet />
+          </motion.div>
+        </main>
+      </div>
+      <DudeAgent ownerEmail={ownerUsername} />
     </div>
   );
 }

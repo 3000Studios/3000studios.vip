@@ -6,3 +6,7 @@
 .env.*
 !.env.example
 
+
+# Shared media is served from the central R2/Worker CDN - never commit local copies
+shared-media/
+**/shared-media/

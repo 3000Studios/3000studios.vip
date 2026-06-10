@@ -4,6 +4,7 @@
 @import './styles/landing.css';
 @import './styles/app.css';
 @import './styles/lock.css';
+@import './styles/console.css';
 
 @media (max-width: 1100px) {
   .landingInner,

@@ -9,6 +9,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Home } from './pages/Home';
 import { About, Contact, Privacy, Terms } from './pages/Legal';
 import { Sites } from './pages/Sites';
+import { Ops } from './pages/Ops';
 import { SiteDetail } from './pages/SiteDetail';
 import { Settings } from './pages/Settings';
 import { StreamVault } from './pages/StreamVault';
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
           { index: true, element: <Dashboard /> },
           { path: 'sites', element: <Sites /> },
           { path: 'sites/:id', element: <SiteDetail /> },
+          { path: 'ops', element: <Ops /> },
           { path: 'stream', element: <StreamVault /> },
           { path: 'settings', element: <Settings /> },
         ],

@@ -5,7 +5,11 @@ account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 
 [vars]
 APP_ENV = "production"
-ACCESS_REQUIRED = "0"
+ACCESS_REQUIRED = "1"
+OWNER_EMAIL = "mr.jwswain@gmail.com"
+
+[ai]
+binding = "AI"
 
 [[d1_databases]]
 binding = "DB"

@@ -104,6 +104,11 @@ export type CommandResult = {
   result: Record<string, unknown>;
 };
 
+export type DudeChatMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
 const API_BASE =
   import.meta.env.VITE_API_BASE?.toString() || 'https://apex-citadel-api.mr-jwswain.workers.dev';
 
@@ -224,6 +229,21 @@ export async function runNaturalCommand(input: {
     body: JSON.stringify({
       siteId: input.siteId ?? null,
       command: input.command,
+    }),
+  });
+}
+
+export async function sendDudeChat(input: {
+  ownerEmail: string;
+  message: string;
+  history: DudeChatMessage[];
+}): Promise<{ reply: string; learned?: boolean }> {
+  return apiFetch('/dude/chat', {
+    method: 'POST',
+    headers: { 'x-owner-email': input.ownerEmail },
+    body: JSON.stringify({
+      message: input.message,
+      history: input.history.slice(-12),
     }),
   });
 }

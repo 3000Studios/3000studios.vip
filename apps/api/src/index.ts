@@ -28,6 +28,13 @@ import { runDeployHook } from './playbooks';
 import { catalogSites } from './catalog';
 import { inspectBridge } from './bridge';
 import { getZoneDashboard, listManagedZones } from './cloudflare';
+import {
+  extractOwnerEmail,
+  isOwnerEmailAllowed,
+  isSyncTokenAllowed,
+  shouldPersistLearning,
+  toDudeMessages,
+} from './dude';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -44,6 +51,13 @@ app.use(
 app.use('*', async (c, next) => {
   const env = c.env;
   if (env.APP_ENV === 'production' && env.ACCESS_REQUIRED === '1') {
+    if (
+      c.req.path === '/dude/learn' &&
+      isSyncTokenAllowed(c.req.header('x-dude-sync-token'), env.DUDE_SYNC_TOKEN)
+    ) {
+      await next();
+      return;
+    }
     const token = c.req.header('cf-access-jwt-assertion');
     if (!token) return c.json({ error: 'unauthorized' }, 401);
   }
@@ -51,6 +65,108 @@ app.use('*', async (c, next) => {
 });
 
 app.get('/health', (c) => c.json({ ok: true, at: nowIso() }));
+
+const DudeChatSchema = z.object({
+  message: z.string().min(1).max(2000),
+  history: z
+    .array(
+      z.object({
+        role: z.string().max(20).optional(),
+        content: z.string().max(4000).optional(),
+      }),
+    )
+    .max(20)
+    .default([]),
+});
+
+app.post('/dude/chat', async (c) => {
+  const ownerEmail = c.env.OWNER_EMAIL ?? 'mr.jwswain@gmail.com';
+  const requesterEmail = extractOwnerEmail(c.req.raw.headers);
+  if (!isOwnerEmailAllowed(requesterEmail, ownerEmail)) {
+    return c.json({ error: 'owner_email_required' }, 403);
+  }
+
+  const body = DudeChatSchema.parse(await c.req.json());
+  const learned = shouldPersistLearning(body.message);
+  if (learned) {
+    await c.env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS dude_memory (
+        id TEXT PRIMARY KEY,
+        owner_email TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      )`,
+    ).run();
+    await c.env.DB.prepare(
+      `INSERT INTO dude_memory (id, owner_email, content, created_at) VALUES (?1, ?2, ?3, ?4)`,
+    )
+      .bind(crypto.randomUUID(), ownerEmail, learned, nowIso())
+      .run();
+  }
+
+  const rows = await c.env.DB.prepare(
+    `SELECT content FROM dude_memory WHERE owner_email = ?1 ORDER BY created_at DESC LIMIT 12`,
+  )
+    .bind(ownerEmail)
+    .all<{ content: string }>()
+    .catch(() => ({ results: [] as Array<{ content: string }> }));
+
+  const messages = toDudeMessages({
+    ownerEmail,
+    message: body.message,
+    history: body.history,
+    memories: rows.results?.map((row) => row.content) ?? [],
+  });
+
+  if (!c.env.AI) {
+    return c.json({
+      reply:
+        'DUDE cloud brain is wired, but the Cloudflare Workers AI binding is not enabled on this deployment yet.',
+      learned: Boolean(learned),
+    });
+  }
+
+  const ai = c.env.AI as unknown as {
+    run: (model: string, input: Record<string, unknown>) => Promise<{ response?: string } | string>;
+  };
+  const result = await ai.run('@cf/meta/llama-3.1-8b-instruct', {
+    messages,
+    max_tokens: 700,
+  });
+  const reply = typeof result === 'string' ? result : result.response;
+  return c.json({ reply: reply ?? 'No response from DUDE cloud brain.', learned: Boolean(learned) });
+});
+
+const DudeLearnSchema = z.object({
+  content: z.string().min(3).max(4000),
+  source: z.string().min(1).max(120).default('local-runner'),
+});
+
+app.post('/dude/learn', async (c) => {
+  const ownerEmail = c.env.OWNER_EMAIL ?? 'mr.jwswain@gmail.com';
+  const requesterEmail = extractOwnerEmail(c.req.raw.headers);
+  const syncToken = c.req.header('x-dude-sync-token');
+  const allowed =
+    isOwnerEmailAllowed(requesterEmail, ownerEmail) ||
+    isSyncTokenAllowed(syncToken, c.env.DUDE_SYNC_TOKEN);
+  if (!allowed) return c.json({ error: 'owner_or_sync_token_required' }, 403);
+
+  const body = DudeLearnSchema.parse(await c.req.json());
+  await c.env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS dude_memory (
+      id TEXT PRIMARY KEY,
+      owner_email TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )`,
+  ).run();
+  await c.env.DB.prepare(
+    `INSERT INTO dude_memory (id, owner_email, content, created_at) VALUES (?1, ?2, ?3, ?4)`,
+  )
+    .bind(crypto.randomUUID(), ownerEmail, `[${body.source}] ${body.content}`, nowIso())
+    .run();
+  return c.json({ ok: true });
+});
 
 app.get('/sites', async (c) => {
   const sites = await listSites(c.env);
@@ -471,7 +587,7 @@ app.post('/sites/:id/adsense/restart', async (c) => {
     selectors: inspection.selectorStatus,
   });
 
-  let deploy: { ok: boolean; status: number } | null = null;
+  let deploy: { ok: boolean; status: number | string } | null = null;
   if (
     site.deploy_hook_url &&
     (adsenseSignals.state === 'missing' || adsenseSignals.state === 'issue')
