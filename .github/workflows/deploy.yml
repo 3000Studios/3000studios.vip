@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      CITADEL_LIVE_URL: ${{ secrets.CITADEL_LIVE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -48,12 +50,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CF_PAGES_PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
         run: |
-          npx wrangler pages deploy dist --project-name "$CF_PAGES_PROJECT"
+          npx wrangler pages deploy dist --project-name "$CF_PAGES_PROJECT" --branch main
 
       - name: Post-deploy verify
-        if: ${{ secrets.CITADEL_LIVE_URL != '' }}
-        env:
-          CITADEL_LIVE_URL: ${{ secrets.CITADEL_LIVE_URL }}
+        if: ${{ env.CITADEL_LIVE_URL != '' }}
         run: |
           curl -fsSL "$CITADEL_LIVE_URL" | head -n 5
 
