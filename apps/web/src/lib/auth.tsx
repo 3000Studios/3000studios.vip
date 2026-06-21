@@ -8,12 +8,13 @@ const DEFAULT_OWNER_USERNAME = 'mr.jwswain@gmail.com';
 
 const OWNER_USERNAME = (import.meta.env.VITE_VAULT_USERNAME as string | undefined)?.trim() || DEFAULT_OWNER_USERNAME;
 const OWNER_PASSCODE = (import.meta.env.VITE_VAULT_PASSCODE as string | undefined)?.trim() ?? '';
+const OWNER_SECRET_ANSWER = (import.meta.env.VITE_VAULT_SECRET_ANSWER as string | undefined)?.trim() ?? '';
 
 type AuthState = {
   isAuthenticated: boolean;
   ownerUsername: string;
   enterOwnerGate: () => void;
-  login: (username: string, passcode: string) => boolean;
+  login: (username: string, passcode: string, secretAnswer?: string) => boolean;
   logout: () => void;
 };
 
@@ -25,12 +26,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return raw === '1';
   });
 
-  const login = (email: string, passcode: string) => {
-    if (!OWNER_PASSCODE) {
+  const login = (email: string, passcode: string, secretAnswer = '') => {
+    if (!OWNER_PASSCODE || !OWNER_SECRET_ANSWER) {
       return false;
     }
 
-    const ok = email.trim().toLowerCase() === OWNER_USERNAME.toLowerCase() && passcode === OWNER_PASSCODE;
+    const ok =
+      email.trim().toLowerCase() === OWNER_USERNAME.toLowerCase() &&
+      passcode === OWNER_PASSCODE &&
+      secretAnswer.trim().toLowerCase() === OWNER_SECRET_ANSWER.toLowerCase();
     if (!ok) {
       return false;
     }

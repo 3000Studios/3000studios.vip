@@ -71,6 +71,9 @@ This repo expects GitHub Actions secrets to be configured:
 - `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account ID
 - `CF_PAGES_PROJECT` - Cloudflare Pages project name
 - `VITE_API_BASE` - API base URL for web app
+- `VITE_VAULT_USERNAME` - Owner username for the hidden vault entry
+- `VITE_VAULT_PASSCODE` - Owner passcode for the hidden vault entry
+- `VITE_VAULT_SECRET_ANSWER` - Secret-question answer for the hidden vault entry
 - `OWNER_EMAIL` - Email for alerts
 - `ALERT_FROM_EMAIL` - From email for alerts
 - `MAILCHANNELS_API_KEY` - MailChannels API key
@@ -87,6 +90,9 @@ This repo expects GitHub Actions secrets to be configured:
 ### Web
 
 - `VITE_API_BASE` - API base URL
+- `VITE_VAULT_USERNAME` - Owner username for the hidden vault entry
+- `VITE_VAULT_PASSCODE` - Owner passcode for the hidden vault entry
+- `VITE_VAULT_SECRET_ANSWER` - Secret-question answer for the hidden vault entry
 
 ## Tech Stack
 
