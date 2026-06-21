@@ -1,37 +1,64 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../lib/auth';
 import { LockFieldBackdrop } from '../components/LockFieldBackdrop';
 
-const challengePrompts = [
-  'Security calibration phrase',
-  'Vault resonance code',
-  'Citadel challenge response',
-  'Owner override sequence',
-  'Night access verification',
-];
+function playBreachSound() {
+  const AudioCtx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioCtx) return;
+
+  const ctx = new AudioCtx();
+  const master = ctx.createGain();
+  const distortion = ctx.createWaveShaper();
+  const now = ctx.currentTime;
+
+  distortion.curve = Float32Array.from({ length: 512 }, (_, i) => {
+    const x = (i * 2) / 511 - 1;
+    return Math.tanh(x * 7);
+  });
+
+  master.gain.setValueAtTime(0.0001, now);
+  master.gain.exponentialRampToValueAtTime(0.2, now + 0.04);
+  master.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
+  distortion.connect(master);
+  master.connect(ctx.destination);
+
+  [72, 111, 159, 233, 377].forEach((freq, index) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = index % 2 === 0 ? 'sawtooth' : 'square';
+    osc.frequency.setValueAtTime(freq, now + index * 0.035);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.52, now + 0.75);
+    gain.gain.setValueAtTime(0.0001, now + index * 0.035);
+    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.05 + index * 0.035);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.92 + index * 0.04);
+    osc.connect(gain);
+    gain.connect(distortion);
+    osc.start(now + index * 0.035);
+    osc.stop(now + 1.05 + index * 0.04);
+  });
+
+  window.setTimeout(() => void ctx.close(), 1600);
+}
 
 export function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated, ownerUsername } = useAuth();
-  const [username, setUsername] = useState('');
-  const [passcode, setPasscode] = useState('');
+  const { enterOwnerGate, isAuthenticated } = useAuth();
   const [decoyUser, setDecoyUser] = useState('');
   const [decoyPass, setDecoyPass] = useState('');
-  const [challengeAnswer, setChallengeAnswer] = useState('');
-  const [challengePrompt, setChallengePrompt] = useState(challengePrompts[0]);
   const [error, setError] = useState('');
   const [lockdown, setLockdown] = useState(false);
-  const [showChallenge, setShowChallenge] = useState(false);
-  const [realLoginReady, setRealLoginReady] = useState(false);
-  const sealTaps = useRef(0);
-  const deferredPasscode = useDeferredValue(passcode);
+  const lastSealTap = useRef(0);
   const matrixRows = useMemo(
     () =>
-      Array.from({ length: 24 }, (_, row) =>
-        Array.from({ length: 42 }, (_, col) => ((row * 7 + col * 13) % 2 === 0 ? '1' : '0')).join(' '),
+      Array.from({ length: 34 }, (_, row) =>
+        Array.from({ length: 58 }, (_, col) =>
+          ['0', '1', 'A', 'X', '7', '#'][(row * 7 + col * 13) % 6],
+        ).join(' '),
       ),
     [],
   );
@@ -45,53 +72,25 @@ export function Home() {
   function triggerLockdown(message: string) {
     setError(message);
     setLockdown(true);
+    playBreachSound();
   }
 
   function handleDecoySubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setDecoyUser('');
     setDecoyPass('');
-    triggerLockdown('Decoy access rejected. Use the hidden owner entry to reach the real vault.');
-  }
-
-  function handleChallengeSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const ok = challengeAnswer.trim().toLowerCase() === 'z';
-    if (!ok) {
-      triggerLockdown('Challenge failed. Private access remains sealed.');
-      return;
-    }
-    setChallengeAnswer('');
-    setShowChallenge(false);
-    setRealLoginReady(true);
-    setError('');
-  }
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const ok = login(username, passcode);
-    if (!ok) {
-      triggerLockdown('Access denied. This private system is monitored and requires approved credentials.');
-      return;
-    }
-    const next = (location.state as { next?: string } | null)?.next ?? '/vault';
-    navigate(next);
-  };
-
-  function openChallenge() {
-    const nextPrompt = challengePrompts[Math.floor(Math.random() * challengePrompts.length)];
-    setChallengePrompt(nextPrompt);
-    setChallengeAnswer('');
-    setShowChallenge(true);
-    setError('');
+    triggerLockdown('Trace denied. Public credential surface is a monitored decoy.');
   }
 
   function handleSealTap() {
-    sealTaps.current += 1;
-    if (sealTaps.current >= 5) {
-      sealTaps.current = 0;
-      openChallenge();
+    const now = window.performance.now();
+    if (now - lastSealTap.current < 700) {
+      return;
     }
+    lastSealTap.current = now;
+    enterOwnerGate();
+    const next = (location.state as { next?: string } | null)?.next ?? '/vault';
+    navigate(next);
   }
 
   return (
@@ -128,14 +127,13 @@ export function Home() {
               <div className="lockShackle" />
               <div className="lockPanel">
                 <div className="eyebrow">Private System</div>
-                <h1>3000 Studios Master Lock</h1>
+                <h1>3000 Studios</h1>
                 <p className="lead lockLead">
-                  Owner-only webmaster hub. The public face is a sealed lock. The real control
-                  plane stays behind the hidden owner path and approved credentials.
+                  Owner-only command gate. This surface is sealed for the public internet.
                 </p>
                 <form className="lockForm" onSubmit={handleDecoySubmit}>
                   <label className="field">
-                    <span>User Name</span>
+                    <span>Username</span>
                     <input
                       className="input"
                       autoComplete="off"
@@ -154,66 +152,13 @@ export function Home() {
                     />
                   </label>
                   <button className="btn primary wide" type="submit">
-                    Attempt Access
+                    Login
                   </button>
                   <div className="passcodePulse">
-                    Animated lock engaged • public fields are decoy-only
+                    Encrypted session required
                   </div>
                   {error ? <div className="errorBox inline">{error}</div> : null}
                 </form>
-                {showChallenge ? (
-                  <form className="lockForm realGate" onSubmit={handleChallengeSubmit}>
-                    <div className="gateHeader">Hidden Access Question</div>
-                    <label className="field">
-                      <span>{challengePrompt}</span>
-                      <input
-                        className="input"
-                        autoFocus
-                        value={challengeAnswer}
-                        onChange={(event) => setChallengeAnswer(event.target.value)}
-                        placeholder="Enter response"
-                      />
-                    </label>
-                    <button className="btn primary wide" type="submit">
-                      Validate Owner Trigger
-                    </button>
-                  </form>
-                ) : null}
-                {realLoginReady ? (
-                  <form className="lockForm realGate" onSubmit={handleSubmit}>
-                    <div className="gateHeader">Real Login</div>
-                    <label className="field">
-                      <span>User Name</span>
-                      <input
-                        className="input"
-                        autoComplete="username"
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
-                        placeholder="Owner username"
-                      />
-                    </label>
-                    <label className="field">
-                      <span>Passcode</span>
-                      <input
-                        className="input"
-                        autoComplete="current-password"
-                        type="password"
-                        value={passcode}
-                        onChange={(event) => setPasscode(event.target.value)}
-                      />
-                    </label>
-                    <button className="btn primary wide" type="submit">
-                      Unlock Vault
-                    </button>
-                    <div className="passcodePulse">
-                      Familiar device lock engaged • passcode length {deferredPasscode.length}
-                    </div>
-                  </form>
-                ) : null}
-                <div className="lockMeta">
-                  <span>Private monitored system • owner id: {ownerUsername}</span>
-                  <span>Cloudflare Access remains the required production edge gate.</span>
-                </div>
                 {isAuthenticated ? (
                   <button className="btn" onClick={() => navigate('/vault')} type="button">
                     Open Vault
@@ -224,12 +169,6 @@ export function Home() {
           </div>
         </motion.div>
         <footer className="lockFooter">
-          <div className="lockFooterLinks">
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-            <a href="/privacy">Privacy</a>
-            <a href="/terms">Terms</a>
-          </div>
           <div className="lockFooterCopy">
             <span
               className="lockSeal"

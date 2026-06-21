@@ -54,6 +54,23 @@ export function Dashboard() {
     <div className="cStack">
       {err ? <div className="cError">{err}</div> : null}
 
+      <section className="cHero">
+        <div>
+          <span className="cTag accent">Master Site</span>
+          <h2>3000 Studios command center</h2>
+          <p>
+            One owner dashboard for domain health, Cloudflare checks, monetization visibility,
+            bridge status, and deploy controls.
+          </p>
+        </div>
+        <div className="cHeroActions">
+          <button className="cBtn primary" disabled={busy} onClick={handleSeed} type="button">
+            {busy ? 'Syncing network...' : 'Sync Domains'}
+          </button>
+          <Link to="/vault/ops" className="cBtn ghost">Open Ops</Link>
+        </div>
+      </section>
+
       <div className="cKpis">
         <div className="cKpi">
           <div className="cKpiLabel">Sites Tracked</div>
@@ -88,7 +105,7 @@ export function Dashboard() {
           <span className="cSub">Live traffic, monetization, and ad visibility per site</span>
           <span className="cSpacer" />
           <button className="cBtn sm" disabled={busy} onClick={handleSeed}>
-            {busy ? 'Syncing…' : 'Sync Network'}
+            {busy ? 'Syncing...' : 'Sync Network'}
           </button>
         </div>
         <div className="cPanelBody flush">
@@ -172,11 +189,11 @@ export function Dashboard() {
           <div className="cPanelBody">
             <div className="cTiles">
               <Link to="/vault/sites" className="cTile">
-                <strong>Manage Fleet ▦</strong>
+                <strong>Manage Fleet</strong>
                 <span>Add, remove, and inspect every connected site.</span>
               </Link>
               <Link to="/vault/ops" className="cTile">
-                <strong>Open Ops Console ⌘</strong>
+                <strong>Open Ops Console</strong>
                 <span>Run natural-language commands, inspect bridges, pull analytics.</span>
               </Link>
               <button className="cTile" disabled={busy} onClick={handleSeed} type="button">

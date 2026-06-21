@@ -5,14 +5,14 @@ import { createContext, startTransition, useContext, useState, type ReactNode } 
 const STORAGE_KEY = 'studio-vip-auth-v1';
 
 const DEFAULT_OWNER_USERNAME = 'mr.jwswain@gmail.com';
-const DEFAULT_OWNER_PASSCODE = '5555';
 
 const OWNER_USERNAME = (import.meta.env.VITE_VAULT_USERNAME as string | undefined)?.trim() || DEFAULT_OWNER_USERNAME;
-const OWNER_PASSCODE = (import.meta.env.VITE_VAULT_PASSCODE as string | undefined) ?? DEFAULT_OWNER_PASSCODE;
+const OWNER_PASSCODE = (import.meta.env.VITE_VAULT_PASSCODE as string | undefined)?.trim() ?? '';
 
 type AuthState = {
   isAuthenticated: boolean;
   ownerUsername: string;
+  enterOwnerGate: () => void;
   login: (username: string, passcode: string) => boolean;
   logout: () => void;
 };
@@ -26,6 +26,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = (email: string, passcode: string) => {
+    if (!OWNER_PASSCODE) {
+      return false;
+    }
+
     const ok = email.trim().toLowerCase() === OWNER_USERNAME.toLowerCase() && passcode === OWNER_PASSCODE;
     if (!ok) {
       return false;
@@ -38,6 +42,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   };
 
+  const enterOwnerGate = () => {
+    startTransition(() => {
+      localStorage.setItem(STORAGE_KEY, '1');
+      setIsAuthenticated(true);
+    });
+  };
+
   const logout = () => {
     startTransition(() => {
       localStorage.removeItem(STORAGE_KEY);
@@ -46,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, ownerUsername: OWNER_USERNAME, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, ownerUsername: OWNER_USERNAME, enterOwnerGate, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
