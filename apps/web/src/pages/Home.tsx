@@ -4,7 +4,7 @@ import { useAuth } from '../lib/auth';
 import { songs } from '../data/songs';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Daily unlock logic (one random locked song per day, persists for that day)
+// Daily unlock logic
 function getDailyUnlockedSlugs(): string[] {
   const today = new Date().toISOString().split('T')[0];
   const seed = today.split('-').reduce((a, b) => a + parseInt(b), 0);
@@ -97,7 +97,7 @@ export function Home() {
   const [adminCode, setAdminCode] = useState('');
   const [adminError, setAdminError] = useState('');
 
-  // Make opening video automatically fit any viewport
+  // Auto play intro video
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -112,7 +112,7 @@ export function Home() {
 
   const goToSong = (slug: string) => navigate(`/song/${slug}`);
 
-  // Secret admin (© 10 taps)
+  // Secret admin
   const sealTaps = useRef(0);
   const handleSealTap = () => {
     sealTaps.current += 1;
@@ -132,13 +132,25 @@ export function Home() {
 
   return (
     <main className="premiumHome">
-      {/* Full-viewport auto-fitting intro video */}
+      {/* FULL VIEWPORT VIDEO OPENER - using your exact CSS */}
       {introState !== 'done' && (
-        <div className="heroVideoWrap">
-          <video ref={videoRef} src={INTRO_VIDEO} className="heroVideo" playsInline muted={muted} onEnded={revealHome} />
+        <div className="videoOpener">
+          <video
+            ref={videoRef}
+            src={INTRO_VIDEO}
+            playsInline
+            muted={muted}
+            onEnded={revealHome}
+          />
           <div className="heroShade" />
-          {needsGesture && <button className="bigEnter" onClick={startIntro}>TAP TO ENTER VIP</button>}
-          <button className="muteFloating" onClick={toggleMute}>{muted ? 'UNMUTE' : 'MUTE'}</button>
+          {needsGesture && (
+            <button className="bigEnter" onClick={startIntro}>
+              TAP TO ENTER VIP
+            </button>
+          )}
+          <button className="muteFloating" onClick={toggleMute}>
+            {muted ? 'UNMUTE' : 'MUTE'}
+          </button>
         </div>
       )}
 
@@ -167,7 +179,6 @@ export function Home() {
       <section className="miniGameSection">
         <h2>Interactive Experience</h2>
         <p>Tap the notes. Feel the rollout.</p>
-        {/* MusicNoteGame component can be imported here if desired */}
       </section>
 
       <footer className="siteFooter">
