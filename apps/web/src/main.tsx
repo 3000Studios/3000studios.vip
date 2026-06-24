@@ -14,9 +14,11 @@ import { SiteDetail } from './pages/SiteDetail';
 import { Settings } from './pages/Settings';
 import { StreamVault } from './pages/StreamVault';
 import { AuthProvider } from './lib/auth';
+import { SongPage } from './pages/SongPage';
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
+  { path: '/song/:slug', element: <SongPage /> },
   { path: '/about', element: <About /> },
   { path: '/contact', element: <Contact /> },
   { path: '/privacy', element: <Privacy /> },
