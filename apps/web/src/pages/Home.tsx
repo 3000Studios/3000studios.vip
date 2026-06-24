@@ -250,6 +250,20 @@ export function Home() {
           <Link to="/terms">Terms</Link>
           <Link to="/contact">Contact</Link>
         </nav>
+        <a
+          className="vipSponsor"
+          href="https://open.spotify.com/"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Spotify sponsorship link"
+        >
+          <span className="spotifyMark" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span>Spotify</span>
+        </a>
         <button className="vipCircuitButton" type="button" onClick={handleSealTap} aria-label="Owner seal">
           <span />
         </button>
