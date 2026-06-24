@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { LockFieldBackdrop } from '../components/LockFieldBackdrop';
 
@@ -8,8 +7,6 @@ type TrailPoint = {
   id: number;
   x: number;
   y: number;
-  size: number;
-  hue: number;
 };
 
 function playBreachSound() {
@@ -21,40 +18,33 @@ function playBreachSound() {
   const ctx = new AudioCtx();
   const master = ctx.createGain();
   const filter = ctx.createBiquadFilter();
-  const distortion = ctx.createWaveShaper();
   const now = ctx.currentTime;
 
-  distortion.curve = Float32Array.from({ length: 768 }, (_, i) => {
-    const x = (i * 2) / 767 - 1;
-    return Math.tanh(x * 11);
-  });
   filter.type = 'bandpass';
   filter.frequency.setValueAtTime(920, now);
   filter.frequency.exponentialRampToValueAtTime(120, now + 1.45);
   master.gain.setValueAtTime(0.0001, now);
-  master.gain.exponentialRampToValueAtTime(0.24, now + 0.035);
-  master.gain.exponentialRampToValueAtTime(0.0001, now + 1.55);
-
-  distortion.connect(filter);
+  master.gain.exponentialRampToValueAtTime(0.22, now + 0.035);
+  master.gain.exponentialRampToValueAtTime(0.0001, now + 1.45);
   filter.connect(master);
   master.connect(ctx.destination);
 
-  [39, 66, 91, 144, 233, 377, 611].forEach((freq, index) => {
+  [39, 66, 91, 144, 233, 377].forEach((freq, index) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = index % 3 === 0 ? 'square' : index % 2 === 0 ? 'sawtooth' : 'triangle';
+    osc.type = index % 2 === 0 ? 'sawtooth' : 'square';
     osc.frequency.setValueAtTime(freq, now + index * 0.025);
-    osc.frequency.exponentialRampToValueAtTime(Math.max(24, freq * 0.36), now + 1.1);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(24, freq * 0.34), now + 1.05);
     gain.gain.setValueAtTime(0.0001, now + index * 0.025);
-    gain.gain.exponentialRampToValueAtTime(0.18 / Math.max(1, index * 0.5), now + 0.07 + index * 0.025);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.22 + index * 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.08 + index * 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.15 + index * 0.03);
     osc.connect(gain);
-    gain.connect(distortion);
+    gain.connect(filter);
     osc.start(now + index * 0.025);
-    osc.stop(now + 1.45 + index * 0.03);
+    osc.stop(now + 1.35 + index * 0.03);
   });
 
-  window.setTimeout(() => void ctx.close(), 1900);
+  window.setTimeout(() => void ctx.close(), 1800);
 }
 
 function createMatrixRows(rows: number, columns: number) {
@@ -69,29 +59,16 @@ function CursorTrail() {
   const nextId = useRef(0);
 
   useEffect(() => {
-    let cleanupTimer = 0;
-
     function addPoint(event: globalThis.PointerEvent) {
-      const id = nextId.current++;
-      setPoints((current) => [
-        ...current.slice(-17),
-        {
-          id,
-          x: event.clientX,
-          y: event.clientY,
-          size: 10 + ((id * 7) % 20),
-          hue: (id * 29) % 360,
-        },
-      ]);
-      window.clearTimeout(cleanupTimer);
-      cleanupTimer = window.setTimeout(() => setPoints([]), 700);
+      const point = { id: nextId.current++, x: event.clientX, y: event.clientY };
+      setPoints((current) => [...current.slice(-15), point]);
+      window.setTimeout(() => {
+        setPoints((current) => current.filter((item) => item.id !== point.id));
+      }, 580);
     }
 
     window.addEventListener('pointermove', addPoint, { passive: true });
-    return () => {
-      window.removeEventListener('pointermove', addPoint);
-      window.clearTimeout(cleanupTimer);
-    };
+    return () => window.removeEventListener('pointermove', addPoint);
   }, []);
 
   return (
@@ -99,13 +76,13 @@ function CursorTrail() {
       {points.map((point, index) => (
         <span
           key={point.id}
-          style={{
-            '--trail-x': `${point.x}px`,
-            '--trail-y': `${point.y}px`,
-            '--trail-size': `${point.size}px`,
-            '--trail-hue': `${point.hue}`,
-            '--trail-age': `${index}`,
-          } as CSSProperties}
+          style={
+            {
+              '--trail-x': `${point.x}px`,
+              '--trail-y': `${point.y}px`,
+              '--trail-scale': 1 + index * 0.05,
+            } as CSSProperties
+          }
         />
       ))}
     </div>
@@ -116,18 +93,48 @@ export function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated, ownerUsername } = useAuth();
+  const [introVisible, setIntroVisible] = useState(() => localStorage.getItem('studio-vip-intro-seen') !== '1');
   const [decoyUser, setDecoyUser] = useState('');
   const [decoyPass, setDecoyPass] = useState('');
+  const [secondsLeft, setSecondsLeft] = useState(20);
+  const [countdownActive, setCountdownActive] = useState(false);
   const [ownerUser, setOwnerUser] = useState(ownerUsername);
   const [ownerPass, setOwnerPass] = useState('');
   const [secretAnswer, setSecretAnswer] = useState('');
-  const [error, setError] = useState('');
   const [ownerError, setOwnerError] = useState('');
   const [lockdown, setLockdown] = useState(false);
+  const [rickrollOpen, setRickrollOpen] = useState(false);
   const [ownerGateOpen, setOwnerGateOpen] = useState(false);
+  const [jCount, setJCount] = useState(0);
+  const decoyCompleted = useRef(false);
   const sealTaps = useRef(0);
   const tapReset = useRef<number | null>(null);
-  const matrixRows = useMemo(() => createMatrixRows(36, 54), []);
+  const matrixRows = useMemo(() => createMatrixRows(34, 56), []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== 'j') return;
+
+      setJCount((current) => {
+        const next = current + 1;
+        if (next >= 5) {
+          setOwnerGateOpen(true);
+          setOwnerError('');
+          return 0;
+        }
+        return next;
+      });
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (jCount === 0) return;
+    const timer = window.setTimeout(() => setJCount(0), 2400);
+    return () => window.clearTimeout(timer);
+  }, [jCount]);
 
   useEffect(() => {
     if (!lockdown) return;
@@ -135,18 +142,51 @@ export function Home() {
     return () => window.clearTimeout(timer);
   }, [lockdown]);
 
-  function triggerLockdown(message: string) {
-    setError(message);
-    setOwnerError('');
+  useEffect(() => {
+    if (!countdownActive || rickrollOpen) return;
+
+    const interval = window.setInterval(() => {
+      setSecondsLeft((current) => {
+        if (current <= 1) {
+          if (!decoyCompleted.current) {
+            decoyCompleted.current = true;
+            window.setTimeout(() => {
+              triggerLockdown();
+              setRickrollOpen(true);
+            }, 0);
+          }
+          return 0;
+        }
+
+        return current - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(interval);
+  }, [countdownActive, rickrollOpen]);
+
+  function skipIntro() {
+    localStorage.setItem('studio-vip-intro-seen', '1');
+    setIntroVisible(false);
+  }
+
+  function triggerLockdown() {
     setLockdown(true);
     playBreachSound();
   }
 
+  function startDecoyCountdown() {
+    if (!countdownActive) {
+      setSecondsLeft(20);
+      decoyCompleted.current = false;
+      setCountdownActive(true);
+    }
+  }
+
   function handleDecoySubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setDecoyUser('');
-    setDecoyPass('');
-    triggerLockdown('ACCESS DENIED. Public credential surface is a monitored decoy.');
+    startDecoyCountdown();
+    triggerLockdown();
+    setRickrollOpen(true);
   }
 
   function handleOwnerSubmit(event: FormEvent<HTMLFormElement>) {
@@ -156,7 +196,7 @@ export function Home() {
       setOwnerPass('');
       setSecretAnswer('');
       setOwnerError('Owner verification failed.');
-      triggerLockdown('OWNER CHECK FAILED. Matrix countermeasure active.');
+      triggerLockdown();
       return;
     }
 
@@ -166,9 +206,7 @@ export function Home() {
 
   function handleSealTap() {
     sealTaps.current += 1;
-    if (tapReset.current) {
-      window.clearTimeout(tapReset.current);
-    }
+    if (tapReset.current) window.clearTimeout(tapReset.current);
     tapReset.current = window.setTimeout(() => {
       sealTaps.current = 0;
     }, 2200);
@@ -176,7 +214,6 @@ export function Home() {
     if (sealTaps.current >= 10) {
       sealTaps.current = 0;
       setOwnerGateOpen(true);
-      setError('');
       setOwnerError('');
     }
   }
@@ -188,161 +225,197 @@ export function Home() {
   }
 
   return (
-    <div className={`landing lockLanding ${lockdown ? 'lockdown' : ''}`} onPointerMove={updateSpotlight}>
-      <section className="lockStage">
-        <LockFieldBackdrop />
-        <CursorTrail />
-        <div className="lockAurora" />
-        <div className="lockNoise" />
-        <div className="lockTicker" aria-hidden="true">
+    <main className={`vipConcept ${lockdown ? 'lockdown' : ''}`} onPointerMove={updateSpotlight}>
+      <LockFieldBackdrop />
+      <CursorTrail />
+      <div className="vipGrid" aria-hidden="true" />
+      <div className="vipNebula" aria-hidden="true" />
+
+      {introVisible ? (
+        <button className="vipIntro" type="button" onClick={skipIntro}>
+          <span className="vipIntroMark">3K</span>
+          <span>3000 Studios perimeter loading</span>
+          <small>Tap anywhere to continue</small>
+        </button>
+      ) : null}
+
+      <header className="vipHeader">
+        <button className="vipBrand" type="button" onClick={handleSealTap} aria-label="Studio seal">
+          <span className="vipBrandMark">3K</span>
+          <span>3000 Studios VIP</span>
+        </button>
+        <nav className="vipNav" aria-label="Public links">
+          <Link to="/about">About</Link>
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link>
+          <Link to="/contact">Contact</Link>
+        </nav>
+        <button className="vipCircuitButton" type="button" onClick={handleSealTap} aria-label="Owner seal">
           <span />
-          <span />
-          <span />
-          <span />
-        </div>
-        {lockdown ? (
-          <div className="matrixOverlay" aria-hidden="true">
-            <div className="skullRain">
-              {Array.from({ length: 16 }, (_, index) => (
-                <span key={index}>☠</span>
-              ))}
-            </div>
-            {matrixRows.map((row, index) => (
-              <div key={index}>{row}</div>
+        </button>
+      </header>
+
+      {lockdown ? (
+        <div className="matrixOverlay" aria-hidden="true">
+          <div className="skullRain">
+            {Array.from({ length: 16 }, (_, index) => (
+              <span key={index}>SKULL</span>
             ))}
-            <strong>ACCESS DENIED</strong>
           </div>
-        ) : null}
-        <motion.div
-          className="lockShell"
-          initial={{ opacity: 0, y: 18, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="lockHalo" />
-          <div className="lockCore">
-            <div className="lockRing lockRingOuter" />
-            <div className="lockRing lockRingMid" />
-            <div className="lockRing lockRingInner" />
-            <div className="lockBody">
-              <div className="lockBrandOrb">
-                <span>3K</span>
-              </div>
-              <div className="lockPanel">
-                <div className="eyebrow">Synthetic Public Gate</div>
-                <h1>3000 Studios</h1>
-                <p className="lead lockLead">
-                  This screen is a decoy terminal. Owner access is hidden behind the studio seal.
-                </p>
-                <form className="lockForm" onSubmit={handleDecoySubmit}>
-                  <label className="field">
-                    <span>Username</span>
-                    <input
-                      className="input"
-                      autoComplete="off"
-                      value={decoyUser}
-                      onChange={(event) => setDecoyUser(event.target.value)}
-                    />
-                  </label>
-                  <label className="field">
-                    <span>Access Code</span>
-                    <input
-                      className="input"
-                      autoComplete="off"
-                      type="password"
-                      value={decoyPass}
-                      onChange={(event) => setDecoyPass(event.target.value)}
-                    />
-                  </label>
-                  <button className="btn primary wide" type="submit">
-                    Enter System
-                  </button>
-                  <div className="passcodePulse">Decoy channel armed</div>
-                  {error ? <div className="errorBox inline">{error}</div> : null}
-                </form>
-                {isAuthenticated ? (
-                  <button className="btn" onClick={() => navigate('/vault')} type="button">
-                    Open Vault
-                  </button>
-                ) : null}
-              </div>
+          {matrixRows.map((row, index) => (
+            <div key={index}>{row}</div>
+          ))}
+          <strong>ACCESS DENIED</strong>
+        </div>
+      ) : null}
+
+      <section className="vipHero" aria-label="3000 Studios VIP access">
+        <div className="vipCopy">
+          <h1>3000 Studios VIP</h1>
+          <p>
+            A private owner access interface wrapped in a public decoy gate. The visible terminal is
+            not the real entrance.
+          </p>
+
+          <div className="vipSignals" aria-label="Access status">
+            <div>
+              <strong>{countdownActive ? secondsLeft : 20}s</strong>
+              <span>decoy timer</span>
+            </div>
+            <div>
+              <strong>{jCount}/5</strong>
+              <span>silent key sequence</span>
+            </div>
+            <div>
+              <strong>{isAuthenticated ? 'open' : 'sealed'}</strong>
+              <span>owner vault</span>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {ownerGateOpen ? (
-          <div className="ownerModalBackdrop" role="presentation">
-            <motion.form
-              className="ownerModal"
-              onSubmit={handleOwnerSubmit}
-              initial={{ opacity: 0, y: 20, scale: 0.94 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.28 }}
-              aria-label="Owner entry"
-            >
-              <button className="ownerClose" type="button" onClick={() => setOwnerGateOpen(false)} aria-label="Close owner entry">
-                x
-              </button>
-              <span className="eyebrow">Owner Entry</span>
-              <h2>Vault challenge</h2>
-              <label className="field">
-                <span>Owner Username</span>
-                <input
-                  className="input"
-                  autoComplete="username"
-                  value={ownerUser}
-                  onChange={(event) => setOwnerUser(event.target.value)}
-                />
-              </label>
-              <label className="field">
-                <span>Password / Code</span>
-                <input
-                  className="input"
-                  autoComplete="current-password"
-                  type="password"
-                  value={ownerPass}
-                  onChange={(event) => setOwnerPass(event.target.value)}
-                />
-              </label>
-              <label className="field">
-                <span>Secret Question</span>
-                <input
-                  className="input"
-                  autoComplete="off"
-                  value={secretAnswer}
-                  onChange={(event) => setSecretAnswer(event.target.value)}
-                  placeholder="Answer"
-                />
-              </label>
-              {ownerError ? <div className="errorBox inline">{ownerError}</div> : null}
-              <button className="btn primary wide" type="submit">
-                Unlock Real Vault
-              </button>
-            </motion.form>
+        <form className="vipDecoyPanel" onSubmit={handleDecoySubmit}>
+          <div className="vipPanelHead">
+            <span className="vipSiren">!</span>
+            <div>
+              <h2>Public login</h2>
+              <p>This entrance always fails.</p>
+            </div>
           </div>
-        ) : null}
 
-        <footer className="lockFooter">
-          <div className="lockFooterCopy">
-            <span
-              className="lockSeal"
-              role="button"
-              tabIndex={0}
-              aria-label="Studio seal"
-              onClick={handleSealTap}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  handleSealTap();
-                }
+          <label className="vipField">
+            <span>Display name</span>
+            <input
+              autoComplete="off"
+              value={decoyUser}
+              placeholder="Type anything"
+              onChange={(event) => {
+                setDecoyUser(event.target.value);
+                if (event.target.value) startDecoyCountdown();
               }}
-            >
-              ©
-            </span>{' '}
-            {new Date().getFullYear()} 3000 Studios. All rights reserved.
+            />
+          </label>
+          <label className="vipField">
+            <span>Access code</span>
+            <input
+              autoComplete="off"
+              value={decoyPass}
+              placeholder="This door is fake"
+              type="password"
+              onChange={(event) => {
+                setDecoyPass(event.target.value);
+                if (event.target.value) startDecoyCountdown();
+              }}
+            />
+          </label>
+
+          <div className="vipCountdown" role="status" aria-live="polite">
+            <strong>{countdownActive ? `${secondsLeft}s` : '20s'}</strong>
+            <span>You have less than 20 seconds to input the correct code, or you get Rick Astley.</span>
           </div>
-        </footer>
+
+          <button className="vipPrimary" type="submit">
+            Attempt entry
+          </button>
+        </form>
       </section>
-    </div>
+
+      <footer className="vipFooter">
+        <button type="button" onClick={handleSealTap}>
+          Copyright 3000 Studios
+        </button>
+        <span>Public login is intentionally non-functional.</span>
+      </footer>
+
+      {ownerGateOpen ? (
+        <section className="vipModalScrim" aria-label="Owner login" role="dialog" aria-modal="true">
+          <form className="vipOwnerModal" onSubmit={handleOwnerSubmit}>
+            <button
+              className="vipClose"
+              type="button"
+              onClick={() => setOwnerGateOpen(false)}
+              aria-label="Close owner login"
+            >
+              x
+            </button>
+            <div className="vipPanelHead">
+              <span className="vipSiren secure">3K</span>
+              <div>
+                <h2>Owner gateway</h2>
+                <p>Enter the protected owner credentials to open the dashboard.</p>
+              </div>
+            </div>
+            <label className="vipField">
+              <span>Owner email</span>
+              <input autoComplete="username" value={ownerUser} onChange={(event) => setOwnerUser(event.target.value)} />
+            </label>
+            <label className="vipField">
+              <span>Passcode</span>
+              <input
+                autoComplete="current-password"
+                type="password"
+                value={ownerPass}
+                onChange={(event) => setOwnerPass(event.target.value)}
+              />
+            </label>
+            <label className="vipField">
+              <span>Secret answer</span>
+              <input
+                autoComplete="off"
+                type="password"
+                value={secretAnswer}
+                onChange={(event) => setSecretAnswer(event.target.value)}
+              />
+            </label>
+            {ownerError ? <p className="vipError">{ownerError}</p> : null}
+            <button className="vipPrimary" type="submit">
+              Open dashboard
+            </button>
+          </form>
+        </section>
+      ) : null}
+
+      {rickrollOpen ? (
+        <section className="vipModalScrim" aria-label="Decoy result" role="dialog" aria-modal="true">
+          <div className="vipRickroll">
+            <button
+              className="vipClose"
+              type="button"
+              onClick={() => setRickrollOpen(false)}
+              aria-label="Close decoy result"
+            >
+              x
+            </button>
+            <h2>Wrong entrance.</h2>
+            <p>The public screen never unlocks 3000 Studios VIP.</p>
+            <iframe
+              title="Rick Astley result"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&playsinline=1"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </section>
+      ) : null}
+    </main>
   );
 }

@@ -5,6 +5,7 @@
 .env
 .env.*
 !.env.example
+apps/web/preview-*.png
 
 
 # Shared media is served from the central R2/Worker CDN - never commit local copies
