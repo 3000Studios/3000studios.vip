@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEven
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { LockFieldBackdrop } from '../components/LockFieldBackdrop';
+import { alwaysFeelLikeLyrics, type LyricLine } from '../data/lyrics';
 
 type Note = {
   id: number;
@@ -118,6 +119,59 @@ function MusicNoteGame() {
   );
 }
 
+// Timed Lyric Overlay - ready for real lyrics (copyright safe - empty until owner provides)
+function TimedLyricOverlay({ audioRef, isPlaying }: { audioRef: React.RefObject<HTMLAudioElement>; isPlaying: boolean }) {
+  const [visibleLyrics, setVisibleLyrics] = useState<{ id: number; text: string; x: number; y: number }[]>([]);
+  const lyrics = alwaysFeelLikeLyrics;
+
+  useEffect(() => {
+    if (!isPlaying || lyrics.length === 0) {
+      setVisibleLyrics([]);
+      return;
+    }
+
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const checkLyrics = () => {
+      const currentTime = audio.currentTime;
+      const newVisible: { id: number; text: string; x: number; y: number }[] = [];
+
+      lyrics.forEach((lyric, index) => {
+        if (currentTime >= lyric.time && currentTime <= lyric.time + lyric.duration) {
+          const pos = lyric.position === 'random' 
+            ? ['left', 'center', 'right'][Math.floor(Math.random() * 3)] 
+            : lyric.position || 'center';
+          const x = pos === 'left' ? 15 : pos === 'right' ? 75 : 50;
+          const y = 25 + (index % 4) * 12;
+          newVisible.push({ id: index, text: lyric.text, x, y });
+        }
+      });
+
+      setVisibleLyrics(newVisible);
+    };
+
+    const interval = window.setInterval(checkLyrics, 250);
+    return () => clearInterval(interval);
+  }, [isPlaying, audioRef, lyrics]);
+
+  if (visibleLyrics.length === 0) return null;
+
+  return (
+    <div className="lyricOverlay" aria-live="polite" aria-atomic="true">
+      {visibleLyrics.map((lyric) => (
+        <div
+          key={lyric.id}
+          className="lyricLine"
+          style={{ left: `${lyric.x}%`, top: `${lyric.y}%` } as CSSProperties }
+        >
+          {lyric.text}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function Home() {
   const navigate = useNavigate();
   const { login, ownerUsername } = useAuth();
@@ -132,6 +186,13 @@ export function Home() {
   const [adminCode, setAdminCode] = useState('');
   const [adminError, setAdminError] = useState('');
   const [tapSparks, setTapSparks] = useState<Spark[]>([]);
+  const [songPlaying, setSongPlaying] = useState(false);
+
+  // Audio reactive equalizer state
+  const [eqLevels, setEqLevels] = useState<number[]>(Array(28).fill(0.3));
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -158,6 +219,48 @@ export function Home() {
     audio.muted = muted;
   }, [muted]);
 
+  // Audio reactive visualizer setup (Web Audio API)
+  const setupAudioVisualizer = () => {
+    const audio = audioRef.current;
+    if (!audio || audioContextRef.current) return;
+
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const source = ctx.createMediaElementSource(audio);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+
+      audioContextRef.current = ctx;
+      analyserRef.current = analyser;
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      const updateEQ = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.getByteFrequencyData(dataArray);
+
+        const newLevels: number[] = [];
+        const binSize = Math.floor(dataArray.length / 28);
+        for (let i = 0; i < 28; i++) {
+          let sum = 0;
+          for (let j = 0; j < binSize; j++) {
+            sum += dataArray[i * binSize + j] || 0;
+          }
+          const avg = sum / binSize / 255;
+          newLevels.push(Math.max(0.15, Math.min(1, avg * 1.6)));
+        }
+        setEqLevels(newLevels);
+        animationFrameRef.current = requestAnimationFrame(updateEQ);
+      };
+
+      updateEQ();
+    } catch (e) {
+      console.warn('Audio visualizer unavailable, using CSS fallback');
+    }
+  };
+
   function startIntro() {
     const video = videoRef.current;
     if (!video) return;
@@ -175,7 +278,10 @@ export function Home() {
     audio.currentTime = 0;
     audio.volume = 0.4;
     audio.muted = muted;
-    void audio.play().catch(() => setNeedsGesture(true));
+    void audio.play().then(() => {
+      setSongPlaying(true);
+      setupAudioVisualizer();
+    }).catch(() => setNeedsGesture(true));
   }
 
   function toggleMute() {
@@ -230,12 +336,20 @@ export function Home() {
     }, 800);
   }
 
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      if (audioContextRef.current) audioContextRef.current.close().catch(() => {});
+    };
+  }, []);
+
   return (
     <main className="rolloutPage" onPointerDown={createTapParticle}>
       <LockFieldBackdrop />
       <div className="rolloutAura" aria-hidden="true" />
       <div className="redCarpet" aria-hidden="true" />
-      <audio ref={audioRef} src={HOME_SONG} preload="auto" />
+      <audio ref={audioRef} src={HOME_SONG} preload="auto" onEnded={() => setSongPlaying(false)} />
 
       {introState !== 'done' ? (
         <section className="videoOpener" aria-label="3000 Studios video opener">
@@ -326,11 +440,21 @@ export function Home() {
             opens the brand direction before the full platform goes live.
           </p>
         </div>
-        <div className="equalizer" aria-hidden="true">
-          {Array.from({ length: 28 }, (_, index) => (
-            <span key={index} style={{ '--eq-delay': `${(index % 8) * 0.08}s` } as CSSProperties} />
+
+        {/* Audio-reactive equalizer using Web Audio API */}
+        <div className="equalizer audioReactive" aria-hidden="true">
+          {eqLevels.map((level, index) => (
+            <span
+              key={index}
+              style={{
+                '--eq-delay': `${(index % 8) * 0.08}s`,
+                '--eq-height': `${level * 100}%`,
+              } as CSSProperties}
+            />
           ))}
         </div>
+
+        <TimedLyricOverlay audioRef={audioRef} isPlaying={songPlaying} />
       </section>
 
       <MusicNoteGame />
@@ -354,7 +478,10 @@ export function Home() {
               if (!audio) return;
               audio.volume = 0.4;
               audio.muted = muted;
-              void audio.play();
+              void audio.play().then(() => {
+                setSongPlaying(true);
+                setupAudioVisualizer();
+              });
             }}
           >
             Play Preview
