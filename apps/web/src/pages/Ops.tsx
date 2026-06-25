@@ -141,7 +141,6 @@ export function Ops() {
                 className="cInput"
                 value={commandText}
                 onChange={(e) => setCommandText(e.target.value)}
-                placeholder="Update hero copy and verify AdSense on VoiceToWebsite"
               />
             </label>
             <div className="cBtnRow">

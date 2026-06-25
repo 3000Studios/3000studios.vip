@@ -19,14 +19,6 @@ export const catalogSites: CatalogSite[] = [
     editSurfaces: ['/', '/vault', '/vault/sites', '/vault/ops', '/vault/settings'],
   },
   {
-    name: 'VoiceToWebsite',
-    origin: 'https://voicetowebsite.com',
-    workspaceKey: 'voicetowebsite-copyright-mrjwswain',
-    workspacePath: 'C:\\WorkSpaces\\voicetowebsite-copyright-mrjwswain',
-    bridgeEnabled: true,
-    editSurfaces: ['/dashboard', '/admin', '/products', '/pricing', '/blog', '/contact'],
-  },
-  {
     name: 'Swain Pro',
     origin: 'https://swain.pro',
     workspaceKey: 'Swain-Pro',

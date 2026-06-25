@@ -64,11 +64,11 @@ export function Sites() {
           <div className="cFormRow">
             <label className="cField">
               <span>Site name</span>
-              <input className="cInput" value={name} onChange={(e) => setName(e.target.value)} placeholder="My Project" />
+              <input className="cInput" value={name} onChange={(e) => setName(e.target.value)} />
             </label>
             <label className="cField">
               <span>URL</span>
-              <input className="cInput" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com" />
+              <input className="cInput" value={url} onChange={(e) => setUrl(e.target.value)} />
             </label>
             <button className="cBtn primary" type="button" disabled={busy || !name || !url} onClick={onAdd}>Add Site</button>
           </div>

@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';

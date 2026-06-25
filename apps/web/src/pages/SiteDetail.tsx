@@ -307,7 +307,6 @@ export function SiteDetail() {
               className="input"
               value={form.adsenseClientId}
               onChange={(event) => setForm((current) => ({ ...current, adsenseClientId: event.target.value }))}
-              placeholder="ca-pub-xxxxxxxxxxxxxxxx"
             />
           </label>
           <label className="field">
@@ -317,7 +316,6 @@ export function SiteDetail() {
               inputMode="decimal"
               value={form.revenueLast30d}
               onChange={(event) => setForm((current) => ({ ...current, revenueLast30d: event.target.value }))}
-              placeholder="0.00"
             />
           </label>
           <label className="field">
@@ -326,7 +324,6 @@ export function SiteDetail() {
               className="input"
               value={form.revenueSource}
               onChange={(event) => setForm((current) => ({ ...current, revenueSource: event.target.value }))}
-              placeholder="adsense, stripe, paypal, affiliate"
             />
           </label>
           <label className="field">
@@ -335,7 +332,6 @@ export function SiteDetail() {
               className="input"
               value={form.workspacePath}
               onChange={(event) => setForm((current) => ({ ...current, workspacePath: event.target.value }))}
-              placeholder="C:\Workspaces\site-name"
             />
           </label>
           <label className="field fieldSpan">
@@ -344,7 +340,6 @@ export function SiteDetail() {
               className="input"
               value={form.editSurfaces}
               onChange={(event) => setForm((current) => ({ ...current, editSurfaces: event.target.value }))}
-              placeholder="/, /pricing, /blog, /contact"
             />
           </label>
         </div>

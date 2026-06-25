@@ -37,5 +37,8 @@
     "turbo": "^2.9.6",
     "typescript": "^6.0.3",
     "vitest": "^4.1.4"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
   }
 }

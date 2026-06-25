@@ -5,6 +5,12 @@
 .env
 .env.*
 !.env.example
+global.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
 apps/web/preview-*.png
 
 

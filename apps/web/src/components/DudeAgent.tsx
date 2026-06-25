@@ -79,7 +79,6 @@ export function DudeAgent({ ownerEmail }: DudeAgentProps) {
                   void handleSubmit();
                 }
               }}
-              placeholder="Ask DUDE..."
               rows={2}
             />
             <button type="submit" aria-label="Send message" disabled={busy || input.trim().length === 0}>

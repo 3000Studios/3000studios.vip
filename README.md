@@ -72,8 +72,8 @@ This repo expects GitHub Actions secrets to be configured:
 - `CF_PAGES_PROJECT` - Cloudflare Pages project name
 - `VITE_API_BASE` - API base URL for web app
 - `VITE_VAULT_USERNAME` - Owner username for the hidden vault entry
-- `VITE_VAULT_PASSCODE` - Owner passcode for the hidden vault entry
-- `VITE_VAULT_SECRET_ANSWER` - Secret-question answer for the hidden vault entry
+- `VITE_VAULT_PASSCODE_SHA256` - SHA-256 hash of the owner passcode
+- `VITE_VAULT_SECRET_ANSWER_SHA256` - SHA-256 hash of the secret-question answer
 - `OWNER_EMAIL` - Email for alerts
 - `ALERT_FROM_EMAIL` - From email for alerts
 - `MAILCHANNELS_API_KEY` - MailChannels API key
@@ -91,8 +91,11 @@ This repo expects GitHub Actions secrets to be configured:
 
 - `VITE_API_BASE` - API base URL
 - `VITE_VAULT_USERNAME` - Owner username for the hidden vault entry
-- `VITE_VAULT_PASSCODE` - Owner passcode for the hidden vault entry
-- `VITE_VAULT_SECRET_ANSWER` - Secret-question answer for the hidden vault entry
+- `VITE_VAULT_PASSCODE_SHA256` - SHA-256 hash of the owner passcode
+- `VITE_VAULT_SECRET_ANSWER_SHA256` - SHA-256 hash of the secret-question answer
+- `VITE_STREAM_CUSTOMER_CODE` - Optional Cloudflare Stream customer code
+- `VITE_STREAM_LIVE_INPUT_ID` - Optional Cloudflare Stream live input ID
+- `VITE_STREAM_TITLE` - Optional private stream title
 
 ## Tech Stack
 
