@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { getSongBySlug, songs } from '../data/songs';
+import { getSongBySlug } from '../data/songs';
 import { motion } from 'framer-motion';
 
 export function SongPage() {
@@ -16,8 +16,7 @@ export function SongPage() {
 
   if (!song) return <div className="notFound">Song not found. <button onClick={() => navigate('/')}>Back home</button></div>;
 
-  // For demo: treat all as playable (in real app check daily unlock)
-  const canPlayFull = true; // extend with daily unlock check later
+  const canPlayFull = true;
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -84,7 +83,6 @@ export function SongPage() {
 
         <div className="interactionsBig">
           <button onClick={() => { setLiked(!liked); if (!liked) setHearts(h => h+1); }} className={`bigAction ${liked ? 'active' : ''}`}>❤️ {hearts}</button>
-          <button onClick={() => alert('Comment posted (demo)')} className="bigAction">💬 Comment</button>
           <button onClick={() => window.location.reload()} className="bigAction">↻ Restart Vibe</button>
         </div>
       </div>
@@ -116,7 +114,7 @@ export function SongPage() {
       </div>
 
       <footer className="songFooter">
-        This track is part of the 3000 Studios VIP rollout. More unlocks daily.
+        This track is part of the 3000 Studios VIP rollout. More official releases will be added as assets are finalized.
       </footer>
     </div>
   );

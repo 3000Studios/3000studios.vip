@@ -91,20 +91,50 @@
   padding: 0 24px;
 }
 
-.soundToggle {
+.mediaControls {
   position: fixed;
   top: 92px;
   right: 20px;
   z-index: 40;
+  display: flex;
+  gap: 8px;
+}
+
+.soundToggle {
   min-height: 42px;
   padding: 0 14px;
 }
 
 .openerToggle {
+  position: fixed;
   top: auto;
   right: 22px;
   bottom: 22px;
   z-index: 84;
+}
+
+.openerPause {
+  position: fixed;
+  right: 116px;
+  bottom: 22px;
+  z-index: 84;
+  min-height: 42px;
+  border: 1px solid rgba(255, 211, 106, 0.36);
+  background: rgba(255, 211, 106, 0.12);
+  color: #fff8e7;
+  padding: 0 14px;
+}
+
+.mediaSkip {
+  position: fixed;
+  bottom: 22px;
+  left: 22px;
+  z-index: 84;
+  min-height: 42px;
+  border: 1px solid rgba(255, 248, 231, 0.3);
+  background: rgba(0, 0, 0, 0.46);
+  color: #fff8e7;
+  padding: 0 14px;
 }
 
 .rolloutHeader {
@@ -133,6 +163,39 @@
   font: inherit;
 }
 
+.rolloutNav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rolloutNav a {
+  position: relative;
+  color: rgba(255, 248, 231, 0.76);
+  font-size: 0.84rem;
+  font-weight: 900;
+  padding: 12px 10px 8px;
+  text-decoration: none;
+}
+
+.rolloutNav a::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 4px;
+  left: 10px;
+  height: 1px;
+  background: var(--green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.rolloutNav a:hover::after,
+.rolloutNav a:focus-visible::after {
+  transform: scaleX(1);
+}
+
 .rolloutBrand span {
   display: grid;
   width: 42px;
@@ -151,6 +214,16 @@
   place-items: center;
   border: 1px solid rgba(30, 215, 96, 0.42);
   background: rgba(30, 215, 96, 0.1);
+}
+
+.backstagePass {
+  display: none;
+  min-height: 42px;
+  border: 1px solid rgba(255, 211, 106, 0.36);
+  background: rgba(255, 211, 106, 0.08);
+  color: var(--gold);
+  padding: 0 12px;
+  font-weight: 950;
 }
 
 .streamBadge span {
@@ -572,6 +645,34 @@ input:focus-visible {
 }
 
 @media (max-width: 860px) {
+  .rolloutNav {
+    position: fixed;
+    top: 72px;
+    right: 8px;
+    left: 8px;
+    display: none;
+    grid-template-columns: 1fr;
+    border: 1px solid rgba(255, 211, 106, 0.28);
+    background:
+      radial-gradient(circle at 80% 12%, rgba(30, 215, 96, 0.16), transparent 28%),
+      rgba(3, 3, 3, 0.94);
+    padding: 12px;
+    backdrop-filter: blur(18px);
+  }
+
+  .rolloutNav.open {
+    display: grid;
+  }
+
+  .rolloutNav a {
+    min-height: 48px;
+  }
+
+  .backstagePass {
+    display: inline-flex;
+    align-items: center;
+  }
+
   .rolloutHero {
     grid-template-columns: 1fr;
     padding-top: 112px;
@@ -592,8 +693,16 @@ input:focus-visible {
 
 @media (max-width: 560px) {
   .soundToggle {
+    min-height: 40px;
+    padding: 0 10px;
+  }
+
+  .mediaControls {
     top: 82px;
     right: 14px;
+    left: 14px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .rolloutHeader {

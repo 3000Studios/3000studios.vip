@@ -32,9 +32,6 @@ function LegalFrame({
           <Link className="btn" to="/">
             Return Home
           </Link>
-          <Link className="btn primary" to="/vault">
-            Open Dashboard
-          </Link>
         </div>
       </motion.div>
     </div>
@@ -45,21 +42,21 @@ export function About() {
   return (
     <LegalFrame
       eyebrow="3000 Studios"
-      title="Portfolio command center for live sites."
-      intro="3000 Studios VIP is the owner console for site operations, analytics visibility, monetization controls, bridge telemetry, and production-safe rollout management."
+      title="Premium music and media experiences."
+      intro="3000 Studios VIP is a private creative rollout for music, media, and high-impact digital experiences."
     >
       <section className="legalSection">
         <h2>What this controls</h2>
         <p>
-          The dashboard tracks connected websites, traffic snapshots, edit surfaces, ad readiness,
-          and deployment utilities from one control plane.
+          3000 Studios builds original media, interactive web experiences, launch pages, and
+          production systems for a growing network of digital properties.
         </p>
       </section>
       <section className="legalSection">
         <h2>How it is used</h2>
         <p>
-          Owner workflows stay focused on real production websites, live custom domains,
-          operational health, and measurable business outcomes.
+          Public releases stay focused on polished media, fast pages, accessible design, and
+          reliable production delivery.
         </p>
       </section>
     </LegalFrame>
@@ -76,7 +73,7 @@ export function Contact() {
       <section className="legalSection">
         <h2>Primary contact</h2>
         <p>
-          Email: <a href="mailto:admin@3000studios.vip">admin@3000studios.vip</a>
+          Email: <a href="mailto:Mr.jwswain@gmail.com">Mr.jwswain@gmail.com</a>
         </p>
       </section>
       <section className="legalSection">
