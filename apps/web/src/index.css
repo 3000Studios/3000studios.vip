@@ -6,6 +6,13 @@
 @import './styles/lock.css';
 @import './styles/console.css';
 
+.routeLoader {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(255, 211, 106, 0.12), transparent 28%),
+    linear-gradient(145deg, #050505, #10100f 48%, #16030a);
+}
+
 @media (max-width: 1100px) {
   .landingInner,
   .mosaic,

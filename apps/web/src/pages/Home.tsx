@@ -1,7 +1,16 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent } from 'react';
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type PointerEvent,
+} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LockFieldBackdrop } from '../components/LockFieldBackdrop';
 import { rolloutSongs } from '../data/music';
 
 type Note = {
@@ -22,6 +31,9 @@ type Spark = {
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
 const HOME_SONG = '/media/always-feel-like.mp3';
 const ADMIN_TRIGGER_CODE = '5555';
+const LockFieldBackdrop = lazy(() =>
+  import('../components/LockFieldBackdrop').then((module) => ({ default: module.LockFieldBackdrop })),
+);
 
 function seededNotes(level: number): Note[] {
   const count = Math.min(6 + level, 14);
@@ -280,7 +292,9 @@ export function Home() {
 
   return (
     <main className="rolloutPage" onPointerDown={createTapParticle}>
-      <LockFieldBackdrop />
+      <Suspense fallback={<div className="lockFieldFallback" aria-hidden="true" />}>
+        <LockFieldBackdrop />
+      </Suspense>
       <div className="rolloutAura" aria-hidden="true" />
       <div className="redCarpet" aria-hidden="true" />
       <audio ref={audioRef} src={HOME_SONG} preload="auto" />

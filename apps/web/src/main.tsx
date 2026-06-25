@@ -1,41 +1,49 @@
-import { StrictMode } from 'react';
+import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
-import { Shell } from './components/Shell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { Dashboard } from './pages/Dashboard';
 import { Home } from './pages/Home';
-import { About, Contact, Privacy, Terms } from './pages/Legal';
-import { Sites } from './pages/Sites';
-import { Ops } from './pages/Ops';
-import { SiteDetail } from './pages/SiteDetail';
-import { Settings } from './pages/Settings';
-import { StreamVault } from './pages/StreamVault';
 import { AuthProvider } from './lib/auth';
-import { SongPage } from './pages/SongPage';
+
+const Shell = lazy(() => import('./components/Shell').then((module) => ({ default: module.Shell })));
+const Dashboard = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.Dashboard })));
+const Sites = lazy(() => import('./pages/Sites').then((module) => ({ default: module.Sites })));
+const Ops = lazy(() => import('./pages/Ops').then((module) => ({ default: module.Ops })));
+const SiteDetail = lazy(() => import('./pages/SiteDetail').then((module) => ({ default: module.SiteDetail })));
+const Settings = lazy(() => import('./pages/Settings').then((module) => ({ default: module.Settings })));
+const StreamVault = lazy(() => import('./pages/StreamVault').then((module) => ({ default: module.StreamVault })));
+const SongPage = lazy(() => import('./pages/SongPage').then((module) => ({ default: module.SongPage })));
+const About = lazy(() => import('./pages/Legal').then((module) => ({ default: module.About })));
+const Contact = lazy(() => import('./pages/Legal').then((module) => ({ default: module.Contact })));
+const Privacy = lazy(() => import('./pages/Legal').then((module) => ({ default: module.Privacy })));
+const Terms = lazy(() => import('./pages/Legal').then((module) => ({ default: module.Terms })));
+
+function RouteLoader({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<div className="routeLoader" aria-label="Loading" />}>{children}</Suspense>;
+}
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
-  { path: '/song/:slug', element: <SongPage /> },
-  { path: '/about', element: <About /> },
-  { path: '/contact', element: <Contact /> },
-  { path: '/privacy', element: <Privacy /> },
-  { path: '/terms', element: <Terms /> },
+  { path: '/song/:slug', element: <RouteLoader><SongPage /></RouteLoader> },
+  { path: '/about', element: <RouteLoader><About /></RouteLoader> },
+  { path: '/contact', element: <RouteLoader><Contact /></RouteLoader> },
+  { path: '/privacy', element: <RouteLoader><Privacy /></RouteLoader> },
+  { path: '/terms', element: <RouteLoader><Terms /></RouteLoader> },
   {
     element: <ProtectedRoute />,
     children: [
       {
         path: '/vault',
-        element: <Shell />,
+        element: <RouteLoader><Shell /></RouteLoader>,
         children: [
-          { index: true, element: <Dashboard /> },
-          { path: 'sites', element: <Sites /> },
-          { path: 'sites/:id', element: <SiteDetail /> },
-          { path: 'ops', element: <Ops /> },
-          { path: 'stream', element: <StreamVault /> },
-          { path: 'settings', element: <Settings /> },
+          { index: true, element: <RouteLoader><Dashboard /></RouteLoader> },
+          { path: 'sites', element: <RouteLoader><Sites /></RouteLoader> },
+          { path: 'sites/:id', element: <RouteLoader><SiteDetail /></RouteLoader> },
+          { path: 'ops', element: <RouteLoader><Ops /></RouteLoader> },
+          { path: 'stream', element: <RouteLoader><StreamVault /></RouteLoader> },
+          { path: 'settings', element: <RouteLoader><Settings /></RouteLoader> },
         ],
       },
     ],
