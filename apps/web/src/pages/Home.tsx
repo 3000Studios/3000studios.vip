@@ -304,6 +304,7 @@ export function Home() {
           <video
             ref={videoRef}
             src={INTRO_VIDEO}
+            autoPlay
             playsInline
             preload="auto"
             onEnded={revealHome}

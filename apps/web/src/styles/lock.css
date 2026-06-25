@@ -640,6 +640,181 @@
   padding: 0 12px;
 }
 
+.songDetailPage {
+  --song-green: #1ed760;
+  --song-gold: #ffd36a;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 22% 12%, rgba(30, 215, 96, 0.18), transparent 30%),
+    radial-gradient(circle at 78% 18%, rgba(255, 211, 106, 0.16), transparent 28%),
+    linear-gradient(145deg, #050505, #10100f 48%, #18030a);
+  color: #fff8e7;
+  padding: clamp(18px, 4vw, 44px);
+}
+
+.songDetailPage .backBtn,
+.songDetailPage .bigAction,
+.songDetailPage .playBig {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 211, 106, 0.34);
+  background: rgba(0, 0, 0, 0.36);
+  color: #fff8e7;
+  min-height: 44px;
+  padding: 0 14px;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.songDetailPage .backBtn:hover,
+.songDetailPage .bigAction:hover,
+.songDetailPage .playBig:hover {
+  transform: translateY(-1px);
+  border-color: rgba(30, 215, 96, 0.55);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+}
+
+.songHero,
+.playerSection,
+.themedGame,
+.songDescription,
+.songPanel {
+  width: min(1040px, 100%);
+  margin: 22px auto 0;
+  border: 1px solid rgba(255, 211, 106, 0.22);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(18px);
+}
+
+.songHero {
+  min-height: clamp(360px, 58vh, 620px);
+  overflow: hidden;
+}
+
+.heroVisual {
+  display: grid;
+  min-height: inherit;
+  place-items: end start;
+  padding: clamp(24px, 5vw, 58px);
+  background:
+    radial-gradient(circle at 72% 30%, rgba(30, 215, 96, 0.28), transparent 24%),
+    radial-gradient(circle at 22% 70%, rgba(255, 211, 106, 0.22), transparent 28%),
+    linear-gradient(180deg, #111 0%, #0a0a0f 100%) !important;
+}
+
+.songMetaBig h1 {
+  max-width: 780px;
+  margin: 10px 0;
+  font-size: clamp(3rem, 11vw, 8rem);
+  line-height: 0.86;
+  letter-spacing: 0;
+}
+
+.genrePill {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  border: 1px solid rgba(30, 215, 96, 0.42);
+  border-radius: 999px;
+  color: var(--song-green);
+  padding: 0 12px;
+  font-weight: 900;
+}
+
+.playerSection,
+.themedGame,
+.songDescription,
+.songPanel {
+  padding: clamp(18px, 4vw, 32px);
+}
+
+.playerControls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.playBig {
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(135deg, var(--song-gold), var(--song-green)) !important;
+  color: #070706 !important;
+  font-weight: 950;
+}
+
+.progressBar {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 248, 231, 0.12);
+}
+
+.progressBar .fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--song-green), var(--song-gold));
+}
+
+.playerMeta {
+  color: rgba(255, 248, 231, 0.72);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.interactionsBig {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.gameArena {
+  position: relative;
+  min-height: 340px;
+  overflow: hidden;
+  border: 1px solid rgba(30, 215, 96, 0.26);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(30, 215, 96, 0.14), transparent 34%),
+    rgba(0, 0, 0, 0.24);
+}
+
+.vibeWord {
+  position: absolute;
+  display: grid;
+  min-width: 92px;
+  min-height: 44px;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 211, 106, 0.34);
+  background: rgba(255, 211, 106, 0.12);
+  color: #fff;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.score,
+.hint,
+.songDescription p,
+.songFooter {
+  color: rgba(255, 248, 231, 0.72);
+}
+
+.score {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  font-weight: 950;
+}
+
+.songFooter {
+  width: min(1040px, 100%);
+  margin: 22px auto 0;
+  text-align: center;
+}
+
 .modalClose {
   position: absolute;
   top: 12px;
@@ -726,6 +901,14 @@ input:focus-visible {
 
   .songCard {
     grid-template-columns: 1fr;
+  }
+
+  .playerControls {
+    grid-template-columns: 1fr;
+  }
+
+  .playBig {
+    width: 100%;
   }
 }
 
