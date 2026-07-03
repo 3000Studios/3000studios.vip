@@ -65,7 +65,7 @@ This is a Turborepo monorepo with the following structure:
 
 ## Deploy (Cloudflare)
 
-This repo expects GitHub Actions secrets to be configured:
+Deployments run directly through Cloudflare Pages and Workers. GitHub is source control only.
 
 - `CLOUDFLARE_API_TOKEN` - Cloudflare API token
 - `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account ID
