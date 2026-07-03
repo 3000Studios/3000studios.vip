@@ -16,36 +16,6 @@
   isolation: isolate;
 }
 
-.lockFieldBackdrop {
-  position: fixed;
-  inset: -8vh -8vw;
-  z-index: -8;
-  opacity: 0.24;
-  filter: saturate(1.2) contrast(1.08);
-}
-
-.lockFieldFallback {
-  position: fixed;
-  inset: -8vh -8vw;
-  z-index: -8;
-  background:
-    linear-gradient(120deg, transparent 0 18%, rgba(30, 215, 96, 0.08) 18% 19%, transparent 19% 42%),
-    linear-gradient(145deg, rgba(255, 211, 106, 0.08), transparent 44%);
-}
-
-.rolloutAura {
-  position: fixed;
-  inset: -20%;
-  z-index: -7;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 211, 106, 0.18), transparent 26%),
-    radial-gradient(circle at 78% 34%, rgba(30, 215, 96, 0.22), transparent 28%),
-    radial-gradient(circle at 48% 80%, rgba(124, 16, 36, 0.34), transparent 32%);
-  filter: blur(40px);
-  animation: rolloutAura 14s ease-in-out infinite alternate;
-}
-
 .redCarpet {
   position: fixed;
   inset: auto 18% 0;
@@ -840,10 +810,6 @@ a:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 3px;
-}
-
-@keyframes rolloutAura {
-  to { transform: translate3d(2%, -2%, 0) scale(1.04); }
 }
 
 @keyframes spotlight {
