@@ -8,6 +8,7 @@ import {
   type PointerEvent,
 } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useAuth } from '../lib/auth';
 import { rolloutSongs } from '../data/music';
 
@@ -29,6 +30,18 @@ type Spark = {
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
 const HOME_SONG = '/media/always-feel-like.mp3';
 const ADMIN_TRIGGER_CODE = '5555';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 36 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.12 } },
+};
+
+const softSpring = { type: 'spring' as const, stiffness: 120, damping: 18, mass: 0.8 };
 
 function seededNotes(level: number): Note[] {
   const count = Math.min(6 + level, 14);
@@ -65,6 +78,28 @@ function playTapTone() {
   window.setTimeout(() => void ctx.close(), 320);
 }
 
+function FloatingOrbs() {
+  return (
+    <div className="floatingOrbs" aria-hidden="true">
+      {Array.from({ length: 9 }).map((_, i) => (
+        <span
+          key={i}
+          className="orb"
+          style={
+            {
+              '--orb-x': `${12 + (i * 11) % 76}%`,
+              '--orb-y': `${18 + (i * 17) % 62}%`,
+              '--orb-size': `${28 + (i % 4) * 18}px`,
+              '--orb-delay': `${i * 0.7}s`,
+              '--orb-dur': `${9 + (i % 5) * 2.2}s`,
+            } as CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
 function MusicNoteGame() {
   const sparkCounter = useRef(0);
   const [score, setScore] = useState(0);
@@ -84,22 +119,31 @@ function MusicNoteGame() {
   }
 
   return (
-    <section className="musicGame" aria-label="Tap the notes music game">
-      <div className="sectionHead">
+    <motion.section
+      className="musicGame"
+      aria-label="Tap the notes music game"
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.25 }}
+      variants={stagger}
+    >
+      <motion.div className="sectionHead" variants={fadeUp}>
         <span>Interactive Preview</span>
         <h2>Tap the Notes</h2>
         <p>Catch the floating notes and light up the rollout stage.</p>
-      </div>
-      <div className="gameStats">
+      </motion.div>
+      <motion.div className="gameStats" variants={fadeUp}>
         <strong>Score {score}</strong>
         <strong>Level {level}</strong>
-      </div>
-      <div className="noteArena">
+      </motion.div>
+      <motion.div className="noteArena" variants={fadeUp}>
         {notes.map((note) => (
-          <button
+          <motion.button
             className="tapNote"
             key={note.id}
             type="button"
+            whileHover={{ scale: 1.18, rotate: 8 }}
+            whileTap={{ scale: 0.88 }}
             onClick={() => collect(note)}
             style={
               {
@@ -112,7 +156,7 @@ function MusicNoteGame() {
             aria-label="Collect music note"
           >
             {note.glyph}
-          </button>
+          </motion.button>
         ))}
         {sparks.map((spark) => (
           <span
@@ -121,8 +165,8 @@ function MusicNoteGame() {
             style={{ '--spark-x': `${spark.x}%`, '--spark-y': `${spark.y}%` } as CSSProperties}
           />
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
 
@@ -147,6 +191,12 @@ export function Home() {
   const [secretAnswer, setSecretAnswer] = useState('');
   const [adminError, setAdminError] = useState('');
   const [tapSparks, setTapSparks] = useState<Spark[]>([]);
+
+  const { scrollYProgress } = useScroll();
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
+  const heroY = useTransform(smoothProgress, [0, 0.35], [0, -80]);
+  const heroScale = useTransform(smoothProgress, [0, 0.3], [1, 0.94]);
+  const carpetOpacity = useTransform(smoothProgress, [0, 0.4], [0.78, 0.25]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -287,49 +337,67 @@ export function Home() {
 
   return (
     <main className="rolloutPage" onPointerDown={createTapParticle}>
-      <div className="redCarpet" aria-hidden="true" />
+      <motion.div className="redCarpet" style={{ opacity: carpetOpacity }} aria-hidden="true" />
+      <FloatingOrbs />
       <audio ref={audioRef} src={HOME_SONG} preload="auto" />
 
-      {introState !== 'done' ? (
-        <section className="videoOpener" aria-label="3000 Studios video opener">
-          <video
-            ref={videoRef}
-            src={INTRO_VIDEO}
-            autoPlay
-            playsInline
-            preload="auto"
-            onEnded={revealHome}
-            onError={revealHome}
-          />
-          <div className="openerShade" />
-          {needsGesture || introState === 'pending' ? (
-            <button className="enterVipButton" type="button" onClick={startIntro}>
-              Tap to Enter VIP
+      <AnimatePresence>
+        {introState !== 'done' ? (
+          <motion.section
+            className="videoOpener"
+            aria-label="3000 Studios video opener"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.04, filter: 'blur(12px)' }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <video
+              ref={videoRef}
+              src={INTRO_VIDEO}
+              autoPlay
+              playsInline
+              preload="auto"
+              onEnded={revealHome}
+              onError={revealHome}
+            />
+            <div className="openerShade" />
+            {(needsGesture || introState === 'pending') && (
+              <motion.button
+                className="enterVipButton"
+                type="button"
+                onClick={startIntro}
+                initial={{ scale: 0.86, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.96 }}
+                transition={softSpring}
+              >
+                Tap to Enter VIP
+              </motion.button>
+            )}
+            <button className="soundToggle openerToggle" type="button" onClick={toggleMute}>
+              {muted ? 'Unmute' : 'Mute'}
             </button>
-          ) : null}
-          <button className="soundToggle openerToggle" type="button" onClick={toggleMute}>
-            {muted ? 'Unmute' : 'Mute'}
-          </button>
-          <button className="openerPause" type="button" onClick={togglePause}>
-            {paused ? 'Resume' : 'Pause'}
-          </button>
-          <button className="mediaSkip" type="button" onClick={revealHome}>
-            Skip Intro
-          </button>
-        </section>
-      ) : null}
+            <button className="openerPause" type="button" onClick={togglePause}>
+              {paused ? 'Resume' : 'Pause'}
+            </button>
+            <button className="mediaSkip" type="button" onClick={revealHome}>
+              Skip Intro
+            </button>
+          </motion.section>
+        ) : null}
+      </AnimatePresence>
 
       <div className="mediaControls" aria-label="Media controls">
-        <button className="soundToggle" type="button" onClick={toggleMute}>
+        <motion.button className="soundToggle" type="button" onClick={toggleMute} whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }}>
           {muted ? 'Sound Off' : 'Sound On'}
-        </button>
-        <button className="soundToggle" type="button" onClick={togglePause}>
+        </motion.button>
+        <motion.button className="soundToggle" type="button" onClick={togglePause} whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }}>
           {paused ? 'Resume' : 'Pause'}
-        </button>
+        </motion.button>
         {needsGesture && introState === 'done' ? (
-          <button className="soundToggle" type="button" onClick={startMainSong}>
+          <motion.button className="soundToggle" type="button" onClick={startMainSong} whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }}>
             Start Music
-          </button>
+          </motion.button>
         ) : null}
       </div>
 
@@ -341,7 +409,12 @@ export function Home() {
         />
       ))}
 
-      <header className="rolloutHeader">
+      <motion.header
+        className="rolloutHeader"
+        initial={{ y: -40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      >
         <button className="rolloutBrand" type="button" onClick={handleSealTap} aria-label="3000 Studios seal">
           <span>3K</span>
           <strong>3000 Studios</strong>
@@ -367,30 +440,50 @@ export function Home() {
         >
           {menuOpen ? 'Close' : 'Pass'}
         </button>
-      </header>
+      </motion.header>
 
-      <section className="rolloutHero">
+      <motion.section className="rolloutHero" style={{ y: heroY, scale: heroScale }}>
         <div className="velvetRope left" aria-hidden="true" />
         <div className="velvetRope right" aria-hidden="true" />
         <div className="spotlight one" aria-hidden="true" />
         <div className="spotlight two" aria-hidden="true" />
 
-        <div className="heroCopy">
-          <p className="vipKicker">Private music rollout</p>
-          <h1>3000 Studios VIP Access</h1>
-          <p>
+        <motion.div
+          className="heroCopy"
+          initial="hidden"
+          animate="show"
+          variants={stagger}
+        >
+          <motion.p className="vipKicker" variants={fadeUp}>Private music rollout</motion.p>
+          <motion.h1 variants={fadeUp}>
+            <span className="glowText">3000 Studios</span>
+            <br />
+            VIP Access
+          </motion.h1>
+          <motion.p variants={fadeUp}>
             The full rollout is coming soon. For now, the doors are velvet-roped, the music is live,
             and VIP access is limited.
-          </p>
-          <div className="heroActions">
-            <a href="#sound" className="goldButton">
+          </motion.p>
+          <motion.div className="heroActions" variants={fadeUp}>
+            <motion.a
+              href="#sound"
+              className="goldButton"
+              whileHover={{ scale: 1.04, boxShadow: '0 0 40px rgba(255,211,106,0.45)' }}
+              whileTap={{ scale: 0.97 }}
+            >
               Enter the Sound
-            </a>
+            </motion.a>
             <span>Music. Media. Motion. Built for creators who move different.</span>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="vipHost" aria-label="VIP music executive character">
+        <motion.div
+          className="vipHost"
+          aria-label="VIP music executive character"
+          initial={{ opacity: 0, scale: 0.86, rotate: -4 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ delay: 0.45, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="hostGlow" />
           <div className="hostHead" />
           <div className="hostBody">
@@ -400,44 +493,67 @@ export function Home() {
             <span className="chromeTie" />
           </div>
           <div className="hostRope" />
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className="soundSection" id="sound">
-        <div className="sectionHead">
+      <motion.section
+        className="soundSection"
+        id="sound"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={stagger}
+      >
+        <motion.div className="sectionHead" variants={fadeUp}>
           <span>Coming Soon</span>
           <h2>Private Music Rollout</h2>
           <p>
             3000 Studios is building a premium creative, music, and media experience. This preview
             opens the brand direction before the full platform goes live.
           </p>
-        </div>
-        <div className="equalizer" aria-hidden="true">
+        </motion.div>
+        <motion.div className="equalizer" aria-hidden="true" variants={fadeUp}>
           {Array.from({ length: 28 }, (_, index) => (
             <span key={index} style={{ '--eq-delay': `${(index % 8) * 0.08}s` } as CSSProperties} />
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       <div id="game">
         <MusicNoteGame />
       </div>
 
-      <section className="chartSection" id="songs">
-        <div className="sectionHead">
+      <motion.section
+        className="chartSection"
+        id="songs"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.15 }}
+        variants={stagger}
+      >
+        <motion.div className="sectionHead" variants={fadeUp}>
           <span>Ranked Preview</span>
           <h2>3000 Studios Originals</h2>
           <p>Real available assets are shown first. More official tracks can drop into this chart.</p>
-        </div>
-        {rolloutSongs.map((song) => (
-          <article className="songCard" key={song.title}>
+        </motion.div>
+        {rolloutSongs.map((song, i) => (
+          <motion.article
+            className="songCard"
+            key={song.title}
+            variants={fadeUp}
+            custom={i}
+            whileHover={{ y: -4, borderColor: 'rgba(30,215,96,0.55)' }}
+            transition={softSpring}
+          >
             <strong>#{song.rank}</strong>
             <div>
               <h3>{song.title}</h3>
               <p>{song.description}</p>
             </div>
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => {
                 const audio = audioRef.current;
                 if (!audio) return;
@@ -449,10 +565,10 @@ export function Home() {
               }}
             >
               Play Preview
-            </button>
-          </article>
+            </motion.button>
+          </motion.article>
         ))}
-      </section>
+      </motion.section>
 
       <footer className="rolloutFooter">
         <button className="copyrightTrigger" type="button" onClick={handleSealTap} aria-label="Copyright">
@@ -461,52 +577,69 @@ export function Home() {
         <a href="mailto:Mr.jwswain@gmail.com">Mr.jwswain@gmail.com</a>
       </footer>
 
-      {adminOpen ? (
-        <section className="adminScrim" role="dialog" aria-modal="true" aria-label="Restricted verification">
-          <form className="adminCodeModal" onSubmit={handleAdminUnlock}>
-            <button className="modalClose" type="button" onClick={() => setAdminOpen(false)}>
-              x
-            </button>
-            <span>{adminVerified ? 'Verification' : 'Access'}</span>
-            <h2>Restricted</h2>
-            {!adminVerified ? (
-              <label>
-                <span>Code</span>
-                <input value={adminCode} onChange={(event) => setAdminCode(event.target.value)} autoComplete="off" />
-              </label>
-            ) : (
-              <>
+      <AnimatePresence>
+        {adminOpen ? (
+          <motion.section
+            className="adminScrim"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Restricted verification"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.form
+              className="adminCodeModal"
+              onSubmit={handleAdminUnlock}
+              initial={{ scale: 0.9, y: 24, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.94, y: 12, opacity: 0 }}
+              transition={softSpring}
+            >
+              <button className="modalClose" type="button" onClick={() => setAdminOpen(false)}>
+                x
+              </button>
+              <span>{adminVerified ? 'Verification' : 'Access'}</span>
+              <h2>Restricted</h2>
+              {!adminVerified ? (
                 <label>
-                  <span>Email</span>
-                  <input value={ownerUsername} readOnly autoComplete="username" />
+                  <span>Code</span>
+                  <input value={adminCode} onChange={(event) => setAdminCode(event.target.value)} autoComplete="off" />
                 </label>
-                <label>
-                  <span>Passcode</span>
-                  <input
-                    value={ownerPass}
-                    type="password"
-                    onChange={(event) => setOwnerPass(event.target.value)}
-                    autoComplete="current-password"
-                  />
-                </label>
-                <label>
-                  <span>Answer</span>
-                  <input
-                    value={secretAnswer}
-                    type="password"
-                    onChange={(event) => setSecretAnswer(event.target.value)}
-                    autoComplete="off"
-                  />
-                </label>
-              </>
-            )}
-            {adminError ? <p>{adminError}</p> : null}
-            <button className="goldButton" type="submit">
-              Continue
-            </button>
-          </form>
-        </section>
-      ) : null}
+              ) : (
+                <>
+                  <label>
+                    <span>Email</span>
+                    <input value={ownerUsername} readOnly autoComplete="username" />
+                  </label>
+                  <label>
+                    <span>Passcode</span>
+                    <input
+                      value={ownerPass}
+                      type="password"
+                      onChange={(event) => setOwnerPass(event.target.value)}
+                      autoComplete="current-password"
+                    />
+                  </label>
+                  <label>
+                    <span>Answer</span>
+                    <input
+                      value={secretAnswer}
+                      type="password"
+                      onChange={(event) => setSecretAnswer(event.target.value)}
+                      autoComplete="off"
+                    />
+                  </label>
+                </>
+              )}
+              {adminError ? <p>{adminError}</p> : null}
+              <button className="goldButton" type="submit">
+                Continue
+              </button>
+            </motion.form>
+          </motion.section>
+        ) : null}
+      </AnimatePresence>
     </main>
   );
 }

@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { DudeAgent } from './DudeAgent';
@@ -18,6 +18,13 @@ function titleFor(pathname: string): { title: string; sub: string } {
   return match ? { title: match.title, sub: match.sub } : { title: 'Vault', sub: '' };
 }
 
+const pageTransition = {
+  initial: { opacity: 0, y: 16, filter: 'blur(4px)' },
+  animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
+  exit: { opacity: 0, y: -10, filter: 'blur(4px)' },
+  transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] },
+};
+
 export function Shell() {
   const { logout, ownerUsername } = useAuth();
   const { pathname } = useLocation();
@@ -27,26 +34,37 @@ export function Shell() {
   return (
     <div className={`console ${navOpen ? 'navOpen' : ''}`}>
       <aside className="cSidebar" onClick={() => setNavOpen(false)}>
-        <div className="cBrand">
+        <motion.div
+          className="cBrand"
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.45 }}
+        >
           <div className="cBrandMark">3K</div>
           <div className="cBrandText">
             <Link to="/vault" className="cBrandName">3000 Studios</Link>
             <span className="cBrandSub">Fleet Control · Owner</span>
           </div>
-        </div>
+        </motion.div>
 
         <div className="cNavGroup">
           <div className="cNavLabel">Operations</div>
-          {NAV.map((item) => (
-            <NavLink
+          {NAV.map((item, i) => (
+            <motion.div
               key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => (isActive ? 'cNavLink active' : 'cNavLink')}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.05 * i, duration: 0.35 }}
             >
-              <span className="cNavIcon">{item.icon}</span>
-              {item.label}
-            </NavLink>
+              <NavLink
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) => (isActive ? 'cNavLink active' : 'cNavLink')}
+              >
+                <span className="cNavIcon">{item.icon}</span>
+                {item.label}
+              </NavLink>
+            </motion.div>
           ))}
         </div>
 
@@ -75,7 +93,14 @@ export function Shell() {
             ☰
           </button>
           <div className="cTitle">
-            <h1>{title}</h1>
+            <motion.h1
+              key={title}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {title}
+            </motion.h1>
             {sub ? <span className="cTitleSub">{sub}</span> : null}
           </div>
           <div className="cTopbarRight">
@@ -84,14 +109,14 @@ export function Shell() {
         </header>
 
         <main className="cScroll">
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28 }}
-          >
-            <Outlet />
-          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              {...pageTransition}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
       <DudeAgent ownerEmail={ownerUsername} />

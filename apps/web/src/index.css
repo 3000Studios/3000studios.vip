@@ -5,6 +5,7 @@
 @import './styles/app.css';
 @import './styles/lock.css';
 @import './styles/console.css';
+@import './styles/effects.css';
 
 .routeLoader {
   min-height: 100vh;
