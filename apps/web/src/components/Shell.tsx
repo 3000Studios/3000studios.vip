@@ -33,7 +33,7 @@ export function Shell() {
   const { title, sub } = titleFor(pathname);
 
   return (
-    <div className={`console ${navOpen ? 'navOpen' : ''`}>
+    <div className={`console ${navOpen ? 'navOpen' : ''}`}>
       <aside className="cSidebar" onClick={() => setNavOpen(false)}>
         <motion.div
           className="cBrand"
