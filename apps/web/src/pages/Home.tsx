@@ -7,6 +7,7 @@ const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
 const DEFAULT_TRACK = '/media/always-feel-like.mp3';
 const ADMIN_PATH = '/vault/stream';
+const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-5800977493749262';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -178,6 +179,35 @@ function BeatDancingTitle({ text }: { text: string }) {
         </span>
       ))}
     </motion.h1>
+  );
+}
+
+function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; label?: string }) {
+  useEffect(() => {
+    if (!slot) return;
+    try {
+      const target = window as unknown as { adsbygoogle?: unknown[] };
+      target.adsbygoogle = target.adsbygoogle ?? [];
+      target.adsbygoogle.push({});
+    } catch {
+      // Ad blockers or pending AdSense approval can block the client script.
+    }
+  }, [slot]);
+
+  if (!slot) return null;
+
+  return (
+    <aside className="adsenseSlot" aria-label={label}>
+      <span>{label}</span>
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block' }}
+        data-ad-client={ADSENSE_CLIENT}
+        data-ad-slot={slot}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+    </aside>
   );
 }
 
@@ -381,6 +411,8 @@ export function Home() {
           </motion.div>
         </section>
 
+        <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
+
         <motion.section className="vipSection featureRail" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
           {[
             ['Music Showcase', 'Original tracks, playable previews, direct purchase and licensing paths.'],
@@ -424,6 +456,7 @@ export function MusicShowcase() {
             </motion.article>
           ))}
         </motion.section>
+        <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_MUSIC_SLOT} />
       </main>
     </PublicLayout>
   );
@@ -449,6 +482,7 @@ export function VideoPage() {
             <StudioButton to="/sponsors">Sponsor A Video</StudioButton>
           </div>
         </section>
+        <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
       </main>
     </PublicLayout>
   );
@@ -490,6 +524,7 @@ export function LivePage() {
             </div>
           )}
         </section>
+        <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_LIVE_SLOT} />
       </main>
     </PublicLayout>
   );
@@ -647,6 +682,7 @@ export function BlogPage() {
             </article>
           ))}
         </section>
+        <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_BLOG_SLOT} />
       </main>
     </PublicLayout>
   );
@@ -716,7 +752,7 @@ export function LegalPage({ type }: { type: 'privacy' | 'terms' | 'copyright' | 
     privacy: {
       title: 'Privacy Policy',
       text:
-        '3000 Studios.vip limits personal data collection to contact requests, site operations, security, analytics, legal compliance, and optional community submissions. Do not submit sensitive personal information in public forms.',
+        '3000 Studios.vip limits personal data collection to contact requests, site operations, security, analytics, advertising measurement, legal compliance, and optional community submissions. Google AdSense may use cookies or similar technologies to serve and measure ads when ad serving is active. Do not submit sensitive personal information in public forms.',
     },
     terms: {
       title: 'Terms Of Use',
@@ -731,7 +767,7 @@ export function LegalPage({ type }: { type: 'privacy' | 'terms' | 'copyright' | 
     cookies: {
       title: 'Cookie Notice',
       text:
-        'The site may use necessary storage for preferences, local community entries, playback settings, security, analytics, and advertising review. Browser controls can clear local data at any time.',
+        'The site may use necessary storage for preferences, local community entries, playback settings, security, analytics, AdSense advertising, fraud prevention, and advertising review. Browser controls can clear local data at any time.',
     },
     disclaimer: {
       title: 'Legal Disclaimer',

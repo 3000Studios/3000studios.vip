@@ -117,6 +117,12 @@ $pagesValues = [ordered]@{
   VITE_STREAM_CUSTOMER_CODE = Get-EnvValue -Names @('VITE_STREAM_CUSTOMER_CODE', 'STREAM_CUSTOMER_CODE') -Default $null
   VITE_STREAM_LIVE_INPUT_ID = Get-EnvValue -Names @('VITE_STREAM_LIVE_INPUT_ID', 'STREAM_LIVE_INPUT_ID') -Default $null
   VITE_STREAM_TITLE = Get-EnvValue -Names @('VITE_STREAM_TITLE') -Default '3000 Studios Private Stream'
+  VITE_ADSENSE_CLIENT_ID = Get-EnvValue -Names @('VITE_ADSENSE_CLIENT_ID', 'ADSENSE_CLIENT_ID') -Default 'ca-pub-5800977493749262'
+  VITE_ADSENSE_HOME_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_HOME_SLOT', 'ADSENSE_HOME_SLOT') -Default $null
+  VITE_ADSENSE_MUSIC_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_MUSIC_SLOT', 'ADSENSE_MUSIC_SLOT') -Default $null
+  VITE_ADSENSE_VIDEO_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_VIDEO_SLOT', 'ADSENSE_VIDEO_SLOT') -Default $null
+  VITE_ADSENSE_LIVE_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_LIVE_SLOT', 'ADSENSE_LIVE_SLOT') -Default $null
+  VITE_ADSENSE_BLOG_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_BLOG_SLOT', 'ADSENSE_BLOG_SLOT') -Default $null
 }
 
 $secretPageNames = @(
