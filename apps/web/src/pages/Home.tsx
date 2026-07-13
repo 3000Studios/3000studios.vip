@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { rolloutSongs } from '../data/music';
@@ -161,6 +161,23 @@ function AudioReactiveWallpaper({ variant = 'spiral' }: { variant?: string }) {
       <span />
       <span />
     </div>
+  );
+}
+
+function BeatDancingTitle({ text }: { text: string }) {
+  return (
+    <motion.h1 className="beatGoldTitle" variants={fadeUp} aria-label={text}>
+      {Array.from(text).map((char, index) => (
+        <span
+          key={`${char}-${index}`}
+          className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter'}
+          style={{ '--letter-index': index } as CSSProperties}
+          aria-hidden="true"
+        >
+          {char}
+        </span>
+      ))}
+    </motion.h1>
   );
 }
 
@@ -347,7 +364,7 @@ export function Home() {
             <motion.span className="vipKicker" variants={fadeUp}>
               Music video content live stream
             </motion.span>
-            <motion.h1 variants={fadeUp}>3000 Studios.vip</motion.h1>
+            <BeatDancingTitle text="3000 Studios.vip" />
             <motion.p variants={fadeUp}>
               A premium music and video destination with live streaming, animated sound-reactive wallpapers,
               sponsor-ready pages, community requests, and VIP creator operations.

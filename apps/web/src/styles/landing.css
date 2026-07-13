@@ -730,7 +730,8 @@
 .vipSite {
   --metal-green: #1ef078;
   --metal-cobalt: #236dff;
-  --metal-gold: #f6c75f;
+  --metal-gold: #ffd700;
+  --metal-gold-dark: #8b6508;
   --onyx: #030507;
   position: relative;
   min-height: 100vh;
@@ -1099,6 +1100,54 @@
   text-shadow:
     0 0 16px rgba(246, 199, 95, 0.34),
     0 18px 42px rgba(0, 0, 0, 0.55);
+}
+
+.heroCopy .beatGoldTitle {
+  max-width: min(10.5ch, 100%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0;
+  color: transparent;
+  text-shadow: none;
+}
+
+.beatGoldLetter,
+.beatGoldSpace {
+  display: inline-block;
+  white-space: pre;
+}
+
+.beatGoldLetter {
+  --delay: calc(var(--letter-index) * -0.07s);
+  color: transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 18%),
+    linear-gradient(115deg, #fff9d0 0%, #ffd700 16%, #c7961a 36%, #fff2a8 53%, #9d740b 72%, #ffe680 100%);
+  background-size: 100% 100%, 230% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter:
+    drop-shadow(0 0 calc(7px + var(--beat) * 22px) rgba(255, 215, 0, 0.52))
+    drop-shadow(0 16px 28px rgba(0, 0, 0, 0.48));
+  transform-origin: 50% 82%;
+  animation:
+    beatLetterDance calc(1.16s - var(--beat) * 0.42s) ease-in-out infinite,
+    goldShine calc(4.8s - var(--beat) * 1.4s) linear infinite;
+  animation-delay: var(--delay), calc(var(--letter-index) * -0.11s);
+  will-change: transform, filter, background-position;
+}
+
+.beatGoldLetter:nth-child(3n) {
+  animation-name: beatLetterDanceAlt, goldShine;
+}
+
+.beatGoldLetter:nth-child(4n) {
+  animation-name: beatLetterDanceTwist, goldShine;
+}
+
+.beatGoldSpace {
+  width: 0.26em;
 }
 
 .vipPageHero h1 {
@@ -1501,6 +1550,54 @@
   }
 }
 
+@keyframes beatLetterDance {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  42% {
+    transform: translateY(calc(-6px - var(--beat) * 22px)) rotate(calc(-2deg - var(--beat) * 7deg))
+      scale(calc(1 + var(--beat) * 0.22));
+  }
+  68% {
+    transform: translateY(calc(2px + var(--beat) * 5px)) rotate(2deg) scale(0.98);
+  }
+}
+
+@keyframes beatLetterDanceAlt {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  44% {
+    transform: translate3d(calc(var(--beat) * 8px), calc(-4px - var(--beat) * 18px), 0)
+      rotate(calc(3deg + var(--beat) * 8deg)) scale(calc(1 + var(--beat) * 0.18));
+  }
+  70% {
+    transform: translate3d(calc(var(--beat) * -5px), 2px, 0) rotate(-2deg) scale(0.99);
+  }
+}
+
+@keyframes beatLetterDanceTwist {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0deg) rotateZ(0deg) scale(1);
+  }
+  46% {
+    transform: translateY(calc(-7px - var(--beat) * 20px)) rotateX(calc(8deg + var(--beat) * 18deg))
+      rotateZ(calc(-3deg - var(--beat) * 8deg)) scale(calc(1 + var(--beat) * 0.2));
+  }
+  72% {
+    transform: translateY(2px) rotateX(-4deg) rotateZ(2deg) scale(0.99);
+  }
+}
+
+@keyframes goldShine {
+  to {
+    background-position: 0 0, -230% 0;
+  }
+}
+
 @media (max-width: 1080px) {
   .featureRail,
   .blogGrid,
@@ -1621,6 +1718,17 @@
     overflow-wrap: anywhere;
   }
 
+  .heroCopy .beatGoldTitle {
+    max-width: 100%;
+    font-size: clamp(2.35rem, 14vw, 3.45rem);
+    line-height: 0.95;
+    overflow-wrap: normal;
+  }
+
+  .beatGoldSpace {
+    width: 0.22em;
+  }
+
   .heroCopy p,
   .vipPageHero p {
     max-width: 100%;
@@ -1737,5 +1845,12 @@
 
   .videoShowcase video {
     min-height: 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beatGoldLetter {
+    animation: none;
+    transform: none;
   }
 }
