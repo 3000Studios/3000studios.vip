@@ -36,6 +36,7 @@
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.4",
     "eslint": "^10.2.1",
+    "playwright": "^1.61.1",
     "prettier": "^3.8.3",
     "turbo": "^2.9.6",
     "typescript": "^6.0.3",
@@ -43,5 +44,10 @@
   },
   "overrides": {
     "esbuild": "^0.28.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true,
+    "workerd@1.20260623.1": true
   }
 }
