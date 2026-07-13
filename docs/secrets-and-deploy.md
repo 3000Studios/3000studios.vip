@@ -5,31 +5,49 @@
 - GitHub is source control only.
 - Cloudflare Pages project `3000studios-vip` is connected to `3000Studios/3000studios.vip`.
 - **Every push and every PR to `main` auto-builds and deploys.**
+- Local Git hooks can also run Wrangler deploys after commits and before pushes:
+  - `npm run hooks:install`
+  - hooks call `scripts/Deploy-Cloudflare.ps1`
 - Only one branch: `main`.
 - Build: `npm ci && npm run build` → output `apps/web/dist`
+
+GitHub Actions is not required for production deployment. Cloudflare direct Git integration and Wrangler are the supported production paths.
+
+## global.env source
+
+Secrets stay outside Git. The sync/deploy scripts load the first existing file from:
+
+1. `C:\WorkSpaces\global.env`
+2. `C:\Users\Servi\.config\env\global.env`
+3. `C:\Users\Servi\OneDrive\Documents\global.env`
+
+Run:
+
+```powershell
+npm run env:sync
+npm run deploy:cloudflare
+```
+
+The scripts print variable names and counts only. They do not print secret values.
 
 ## Required secrets to inject
 
 ### Cloudflare Pages (production + preview)
-Already partially set:
 - NODE_VERSION=20
 - APP_ENV=production
 - VITE_API_BASE=https://api.3000studios.vip
 - OWNER_EMAIL / VITE_VAULT_USERNAME = Mr.jwswain@gmail.com
-
-Still required (set via dashboard or API as secret_text):
 - VITE_VAULT_PASSCODE_SHA256  (sha256 hex of owner passcode)
 - VITE_VAULT_SECRET_ANSWER_SHA256  (sha256 hex of secret answer lowercase)
+- VITE_STREAM_CUSTOMER_CODE / VITE_STREAM_LIVE_INPUT_ID / VITE_STREAM_TITLE when Cloudflare Stream is enabled
 
 ### Worker `apex-citadel-api` (deploy with wrangler)
 ```bash
-cd apps/api
-npx wrangler secret put MAILCHANNELS_API_KEY
-npx wrangler secret put DUDE_SYNC_TOKEN
-npx wrangler deploy
+npm run env:sync
+npm run deploy:cloudflare
 ```
 
-Vars already in wrangler.toml: OWNER_EMAIL, APP_ENV, ACCESS_REQUIRED, D1 binding.
+Vars already in `apps/api/wrangler.toml`: OWNER_EMAIL, APP_ENV, ACCESS_REQUIRED, D1 binding.
 
 ## Google AdSense
 - Client: ca-pub-5800977493749262

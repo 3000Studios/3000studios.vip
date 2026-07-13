@@ -6,7 +6,19 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { Home } from './pages/Home';
+import {
+  AboutPage,
+  BlogPage,
+  CommunityPage,
+  ContactPage,
+  Home,
+  LegalPage,
+  LivePage,
+  MusicShowcase,
+  RequestsPage,
+  SponsorsPage,
+  VideoPage,
+} from './pages/Home';
 import { AuthProvider } from './lib/auth';
 
 const Shell = lazy(() => import('./components/Shell').then((module) => ({ default: module.Shell })));
@@ -17,10 +29,6 @@ const SiteDetail = lazy(() => import('./pages/SiteDetail').then((module) => ({ d
 const Settings = lazy(() => import('./pages/Settings').then((module) => ({ default: module.Settings })));
 const StreamVault = lazy(() => import('./pages/StreamVault').then((module) => ({ default: module.StreamVault })));
 const SongPage = lazy(() => import('./pages/SongPage').then((module) => ({ default: module.SongPage })));
-const About = lazy(() => import('./pages/Legal').then((module) => ({ default: module.About })));
-const Contact = lazy(() => import('./pages/Legal').then((module) => ({ default: module.Contact })));
-const Privacy = lazy(() => import('./pages/Legal').then((module) => ({ default: module.Privacy })));
-const Terms = lazy(() => import('./pages/Legal').then((module) => ({ default: module.Terms })));
 
 function RouteLoader({ children }: { children: ReactNode }) {
   return <Suspense fallback={<div className="routeLoader" aria-label="Loading" />}>{children}</Suspense>;
@@ -28,11 +36,21 @@ function RouteLoader({ children }: { children: ReactNode }) {
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
+  { path: '/music', element: <MusicShowcase /> },
+  { path: '/video', element: <VideoPage /> },
+  { path: '/live', element: <LivePage /> },
+  { path: '/community', element: <CommunityPage /> },
+  { path: '/requests', element: <RequestsPage /> },
+  { path: '/blog', element: <BlogPage /> },
+  { path: '/sponsors', element: <SponsorsPage /> },
   { path: '/song/:slug', element: <RouteLoader><SongPage /></RouteLoader> },
-  { path: '/about', element: <RouteLoader><About /></RouteLoader> },
-  { path: '/contact', element: <RouteLoader><Contact /></RouteLoader> },
-  { path: '/privacy', element: <RouteLoader><Privacy /></RouteLoader> },
-  { path: '/terms', element: <RouteLoader><Terms /></RouteLoader> },
+  { path: '/about', element: <AboutPage /> },
+  { path: '/contact', element: <ContactPage /> },
+  { path: '/privacy', element: <LegalPage type="privacy" /> },
+  { path: '/terms', element: <LegalPage type="terms" /> },
+  { path: '/copyright', element: <LegalPage type="copyright" /> },
+  { path: '/cookies', element: <LegalPage type="cookies" /> },
+  { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
   {
     element: <ProtectedRoute />,
     children: [

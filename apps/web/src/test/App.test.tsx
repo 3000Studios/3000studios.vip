@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import App from '../App';
 
 describe('App', () => {
-  it('renders Apex Citadel text', () => {
+  it('renders the public brand text', () => {
     render(<App />);
-    expect(screen.getByText('Apex Citadel')).toBeInTheDocument();
+    expect(screen.getByText('3000 Studios.vip')).toBeInTheDocument();
   });
 });

@@ -1,3 +1,3 @@
 export default function App() {
-  return <div>Apex Citadel</div>;
+  return <div>3000 Studios.vip</div>;
 }

@@ -1,9 +1,19 @@
 User-agent: *
 Allow: /$
 Allow: /about
+Allow: /music
+Allow: /video
+Allow: /live
+Allow: /community
+Allow: /requests
+Allow: /blog
+Allow: /sponsors
 Allow: /contact
 Allow: /privacy
 Allow: /terms
+Allow: /copyright
+Allow: /cookies
+Allow: /disclaimer
 Disallow: /vault
 
 Sitemap: https://3000studios.vip/sitemap.xml
