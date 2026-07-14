@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { getSongBySlug } from '../data/songs';
 import { motion } from 'framer-motion';
+import { PublicLayout } from './Home';
 
 type FloatingVibe = { id: number; text: string; x: number; y: number };
 
@@ -56,12 +57,14 @@ export function SongPage() {
 
   if (!song) {
     return (
-      <div className="songDetailPage notFound">
-        <div className="songPanel">
-          <h1>Track unavailable</h1>
-          <button className="bigAction" type="button" onClick={() => navigate('/')}>Back home</button>
-        </div>
-      </div>
+      <PublicLayout variant="blackhole">
+        <main className="songDetailPage notFound">
+          <div className="songPanel">
+            <h1>Track unavailable</h1>
+            <button className="bigAction" type="button" onClick={() => navigate('/')}>Back home</button>
+          </div>
+        </main>
+      </PublicLayout>
     );
   }
 
@@ -82,7 +85,8 @@ export function SongPage() {
   };
 
   return (
-    <div className="songDetailPage">
+    <PublicLayout variant="vortex">
+    <main className="songDetailPage">
       <button className="backBtn" onClick={() => navigate('/')}>← Back to Collection</button>
 
       <div className="songHero">
@@ -137,10 +141,7 @@ export function SongPage() {
         <p>{song.description}</p>
         <p className="vibe">Vibe: {song.vibe}</p>
       </div>
-
-      <footer className="songFooter">
-        This track is part of the 3000 Studios VIP rollout. More official releases will be added as assets are finalized.
-      </footer>
-    </div>
+    </main>
+    </PublicLayout>
   );
 }

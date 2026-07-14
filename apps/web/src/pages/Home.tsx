@@ -30,6 +30,8 @@ const navItems = [
   { to: '/requests', label: 'Requests' },
   { to: '/blog', label: 'Blog' },
   { to: '/sponsors', label: 'Sponsors' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
 ];
 
 const blogSeeds = [
@@ -79,6 +81,13 @@ type RequestIdea = {
   mood: string;
   votes: number;
   createdAt: string;
+};
+
+type FloatingVibe = {
+  id: number;
+  text: string;
+  x: number;
+  y: number;
 };
 
 function safeDate(value: string) {
@@ -335,7 +344,69 @@ function MusicController() {
   );
 }
 
-function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
+function FooterVibeGame() {
+  const vibeWords = ['bass', 'gold', 'stream', 'video', 'sponsor', 'live', 'vip', 'drop'];
+  const vibeId = useRef(0);
+  const [score, setScore] = useState(0);
+  const [floating, setFloating] = useState<FloatingVibe[]>([]);
+
+  const spawnVibe = () => {
+    const word = vibeWords[Math.floor(Math.random() * vibeWords.length)];
+    vibeId.current += 1;
+    const newItem = {
+      id: vibeId.current,
+      text: word,
+      x: Math.random() * 72 + 12,
+      y: Math.random() * 48 + 24,
+    };
+    setFloating((current) => [...current.slice(-6), newItem]);
+    window.setTimeout(() => {
+      setFloating((current) => current.filter((item) => item.id !== newItem.id));
+    }, 2800);
+  };
+
+  const catchVibe = (id: number) => {
+    setScore((current) => current + 10);
+    setFloating((current) => current.filter((item) => item.id !== id));
+    playPop();
+    if (navigator.vibrate) navigator.vibrate(25);
+  };
+
+  return (
+    <section className="footerGame" aria-labelledby="footer-game-title">
+      <div className="footerGameCopy">
+        <span className="vipKicker">Footer arcade</span>
+        <h2 id="footer-game-title">Vibe Catcher</h2>
+        <p>Tap the arena to release studio words, then catch them before they fade.</p>
+      </div>
+      <div className="gameArena footerGameArena" onClick={spawnVibe} role="button" tabIndex={0} onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          spawnVibe();
+        }
+      }}>
+        {floating.map((item) => (
+          <motion.button
+            key={item.id}
+            type="button"
+            className="vibeWord"
+            style={{ left: `${item.x}%`, top: `${item.y}%` }}
+            onClick={(event) => {
+              event.stopPropagation();
+              catchVibe(item.id);
+            }}
+            whileTap={{ scale: 0.82 }}
+          >
+            {item.text}
+          </motion.button>
+        ))}
+        <div className="score">Score: {score}</div>
+      </div>
+    </section>
+  );
+}
+
+export function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className={`vipSite vipSite-${variant}`}>
@@ -361,7 +432,8 @@ function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; v
       {children}
       <footer className="vipFooter">
         <AudioReactiveWallpaper variant="global" />
-        <div>
+        <FooterVibeGame />
+        <div className="footerBrand">
           <strong>3000 Studios.vip</strong>
           <p>Music, cinematic video content, live streams, sponsorships, song requests, and private creator operations.</p>
         </div>
@@ -432,6 +504,33 @@ export function Home() {
 }
 
 export function MusicShowcase() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeSong = rolloutSongs[activeIndex] ?? rolloutSongs[0];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % rolloutSongs.length);
+    }, 7000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const moveCarousel = (direction: -1 | 1) => {
+    playPop();
+    setActiveIndex((current) => (current + direction + rolloutSongs.length) % rolloutSongs.length);
+  };
+
+  const getCarouselSlot = (index: number) => {
+    const length = rolloutSongs.length;
+    const rawOffset = index - activeIndex;
+    const wrappedOffset =
+      rawOffset > length / 2 ? rawOffset - length : rawOffset < -length / 2 ? rawOffset + length : rawOffset;
+    if (wrappedOffset === 0) return 'middle';
+    if (wrappedOffset === -1) return 'left';
+    if (wrappedOffset === 1) return 'right';
+    if (wrappedOffset < -1) return 'left-hidden';
+    return 'right-hidden';
+  };
+
   return (
     <PublicLayout variant="vortex">
       <main className="vipMain">
@@ -444,15 +543,70 @@ export function MusicShowcase() {
             Play the current 3000 Studios catalog, open the featured song page, and route purchases or licensing inquiries through real contact and payment paths.
           </motion.p>
         </motion.section>
+        <section className="itunesScrollerSection" aria-label="3000 Studios song carousel">
+          <div className="itunesScrollerHeader">
+            <span className="vipKicker">CodePen-inspired cover flow</span>
+            <h2>{activeSong.title}</h2>
+            <p>{activeSong.description}</p>
+          </div>
+          <div className="itunesScroller" role="region" aria-roledescription="carousel" aria-label="Original song carousel">
+            <div className="itunesNav" aria-label="Carousel controls">
+              <button type="button" className="prev" onClick={() => moveCarousel(-1)} aria-label="Previous song">
+                &laquo;
+              </button>
+              <button type="button" className="next" onClick={() => moveCarousel(1)} aria-label="Next song">
+                &raquo;
+              </button>
+            </div>
+            {rolloutSongs.map((song, index) => {
+              const slot = getCarouselSlot(index);
+              return (
+                <button
+                  type="button"
+                  className={`itunesItem ${slot}`}
+                  key={song.src}
+                  onClick={() => {
+                    playPop();
+                    setActiveIndex(index);
+                  }}
+                  aria-current={index === activeIndex ? 'true' : undefined}
+                  aria-label={`Play ${song.title}`}
+                >
+                  <span className="itunesCover">
+                    <span className="itunesRank">#{song.rank}</span>
+                    <strong>{song.title}</strong>
+                    <small>3000 Studios Original</small>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="itunesNowPlaying">
+            <div>
+              <span>Now selected</span>
+              <strong>{activeSong.title}</strong>
+            </div>
+            <audio key={activeSong.src} src={activeSong.src} controls preload="metadata" />
+          </div>
+        </section>
         <motion.section className="vipSection trackList" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
           {rolloutSongs.map((song) => (
-            <motion.article className="trackCard" key={song.title} variants={fadeUp}>
+            <motion.article className="trackCard" key={song.title} variants={fadeUp} data-active={song.src === activeSong.src ? 'true' : undefined}>
               <span>#{song.rank}</span>
               <div>
                 <h2>{song.title}</h2>
                 <p>{song.description}</p>
               </div>
-              <audio src={song.src} controls preload="metadata" />
+              <button
+                type="button"
+                className="trackSelectButton"
+                onClick={() => {
+                  playPop();
+                  setActiveIndex(song.rank - 1);
+                }}
+              >
+                Select
+              </button>
             </motion.article>
           ))}
         </motion.section>
