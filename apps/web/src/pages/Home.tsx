@@ -505,18 +505,30 @@ export function Home() {
 
 export function MusicShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [shouldPlaySelected, setShouldPlaySelected] = useState(false);
+  const selectedAudioRef = useRef<HTMLAudioElement | null>(null);
   const activeSong = rolloutSongs[activeIndex] ?? rolloutSongs[0];
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % rolloutSongs.length);
-    }, 7000);
-    return () => window.clearInterval(timer);
-  }, []);
+    const audio = selectedAudioRef.current;
+    if (!audio || !shouldPlaySelected) return;
+    audio.currentTime = 0;
+    void audio.play().catch(() => undefined);
+  }, [activeSong.src, shouldPlaySelected]);
+
+  const selectSong = (index: number) => {
+    playPop();
+    setShouldPlaySelected(true);
+    if (index === activeIndex && selectedAudioRef.current) {
+      selectedAudioRef.current.currentTime = 0;
+      void selectedAudioRef.current.play().catch(() => undefined);
+    }
+    setActiveIndex(index);
+  };
 
   const moveCarousel = (direction: -1 | 1) => {
-    playPop();
-    setActiveIndex((current) => (current + direction + rolloutSongs.length) % rolloutSongs.length);
+    const nextIndex = (activeIndex + direction + rolloutSongs.length) % rolloutSongs.length;
+    selectSong(nextIndex);
   };
 
   const getCarouselSlot = (index: number) => {
@@ -565,10 +577,7 @@ export function MusicShowcase() {
                   type="button"
                   className={`itunesItem ${slot}`}
                   key={song.src}
-                  onClick={() => {
-                    playPop();
-                    setActiveIndex(index);
-                  }}
+                  onClick={() => selectSong(index)}
                   aria-current={index === activeIndex ? 'true' : undefined}
                   aria-label={`Play ${song.title}`}
                 >
@@ -586,7 +595,7 @@ export function MusicShowcase() {
               <span>Now selected</span>
               <strong>{activeSong.title}</strong>
             </div>
-            <audio key={activeSong.src} src={activeSong.src} controls preload="metadata" />
+            <audio ref={selectedAudioRef} key={activeSong.src} src={activeSong.src} controls preload="auto" />
           </div>
         </section>
         <motion.section className="vipSection trackList" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
@@ -600,12 +609,9 @@ export function MusicShowcase() {
               <button
                 type="button"
                 className="trackSelectButton"
-                onClick={() => {
-                  playPop();
-                  setActiveIndex(song.rank - 1);
-                }}
+                onClick={() => selectSong(song.rank - 1)}
               >
-                Select
+                Play Full Song
               </button>
             </motion.article>
           ))}
