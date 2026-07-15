@@ -104,4 +104,4 @@ Deployments run directly through Cloudflare Pages and Workers. GitHub is source 
 - **Testing**: Vitest, Testing Library
 - **Build**: Turborepo, TypeScript
 
-<!-- deploy trigger: 2026-07-15 -->
+<!-- deploy trigger: 2026-07-15 19:49 -->
