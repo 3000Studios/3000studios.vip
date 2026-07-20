@@ -1,1 +1,1 @@
-[the full updated content]
+[full correct Home.tsx code as above]
