@@ -4,12 +4,14 @@
   "packageManager": "npm@11.12.1",
   "description": "",
   "private": true,
+  "engines": { "node": ">=22" },
   "directories": {
     "doc": "docs"
   },
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
+    "check:placeholders": "node scripts/check-no-placeholders.mjs",
     "test": "turbo test",
     "lint": "turbo lint",
     "format": "turbo format",

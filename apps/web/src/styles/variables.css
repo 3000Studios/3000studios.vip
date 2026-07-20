@@ -10,6 +10,10 @@
   --cyan: #6ff4ff;
   --ember: #ff6a3d;
   --bg: #060914;
+  --beat: 0.08;
+  --vip-level: 1;
+  --vip-pointer-x: -100px;
+  --vip-pointer-y: -100px;
   color-scheme: dark;
   --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-body: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;

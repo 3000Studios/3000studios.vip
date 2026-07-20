@@ -1,24 +1,18 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { getSongBySlug } from '../data/songs';
-import { motion } from 'framer-motion';
 import { PublicLayout } from './Home';
-
-type FloatingVibe = { id: number; text: string; x: number; y: number };
 
 export function SongPage() {
   const { slug } = useParams<{ slug: string }>(); 
   const navigate = useNavigate();
   const song = getSongBySlug(slug || '');
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const vibeId = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [needsGesture, setNeedsGesture] = useState(false);
   const [progress, setProgress] = useState(0);
   const [liked, setLiked] = useState(false);
   const [hearts, setHearts] = useState(124);
-  const [score, setScore] = useState(0);
-  const [floating, setFloating] = useState<FloatingVibe[]>([]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -68,22 +62,6 @@ export function SongPage() {
     );
   }
 
-  const vibeWords = song.vibe.split('•').map(w => w.trim());
-
-  const spawnVibe = () => {
-    const word = vibeWords[Math.floor(Math.random()*vibeWords.length)];
-    vibeId.current += 1;
-    const newItem = { id: vibeId.current, text: word, x: Math.random()*70 + 15, y: Math.random()*40 + 30 };
-    setFloating(prev => [...prev.slice(-5), newItem]);
-    setTimeout(() => setFloating(f => f.filter(i => i.id !== newItem.id)), 2800);
-  };
-
-  const catchVibe = (id: number) => {
-    setScore(s => s + 10);
-    setFloating(f => f.filter(i => i.id !== id));
-    if (navigator.vibrate) navigator.vibrate(30);
-  };
-
   return (
     <PublicLayout variant="vortex">
     <main className="songDetailPage">
@@ -115,26 +93,6 @@ export function SongPage() {
           <button onClick={() => window.location.reload()} className="bigAction">↻ Restart Vibe</button>
         </div>
       </div>
-
-      <section className="themedGame">
-        <h2>{song.title} — Vibe Catcher</h2>
-        <p>Tap the floating words that match the energy of the track. Feel it.</p>
-        <div className="gameArena" onClick={spawnVibe}>
-          {floating.map(item => (
-            <motion.div
-              key={item.id}
-              className="vibeWord"
-              style={{ left: `${item.x}%`, top: `${item.y}%` }}
-              onClick={(e) => { e.stopPropagation(); catchVibe(item.id); }}
-              whileTap={{ scale: 0.8 }}
-            >
-              {item.text}
-            </motion.div>
-          ))}
-          <div className="score">Score: {score}</div>
-        </div>
-        <p className="hint">Click anywhere in the arena to release new vibes</p>
-      </section>
 
       <div className="songDescription">
         <h3>About this track</h3>

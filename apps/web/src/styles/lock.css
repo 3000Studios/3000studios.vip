@@ -653,7 +653,6 @@
 
 .songHero,
 .playerSection,
-.themedGame,
 .songDescription,
 .songPanel {
   width: min(1040px, 100%);
@@ -701,7 +700,6 @@
 }
 
 .playerSection,
-.themedGame,
 .songDescription,
 .songPanel {
   padding: clamp(18px, 4vw, 32px);
@@ -748,43 +746,9 @@
   margin-top: 16px;
 }
 
-.gameArena {
-  position: relative;
-  min-height: 340px;
-  overflow: hidden;
-  border: 1px solid rgba(30, 215, 96, 0.26);
-  border-radius: 8px;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(30, 215, 96, 0.14), transparent 34%),
-    rgba(0, 0, 0, 0.24);
-}
-
-.vibeWord {
-  position: absolute;
-  display: grid;
-  min-width: 92px;
-  min-height: 44px;
-  place-items: center;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 211, 106, 0.34);
-  background: rgba(255, 211, 106, 0.12);
-  color: #fff;
-  font-weight: 950;
-  cursor: pointer;
-}
-
-.score,
-.hint,
 .songDescription p,
 .songFooter {
   color: rgba(255, 248, 231, 0.72);
-}
-
-.score {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  font-weight: 950;
 }
 
 .songFooter {
