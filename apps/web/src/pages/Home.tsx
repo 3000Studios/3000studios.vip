@@ -349,6 +349,7 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
           <span className="logoOrb">3000</span>
           <strong>3000 Studios</strong>
         </Link>
+        <span className="ownerTag">Owner/artist = {OWNER_EMAIL}</span>
         <nav className={open ? 'vipNav open' : 'vipNav'} aria-label="Primary navigation">
           {navItems.map((item) => (
             <Link key={item.to} to={item.to} onClick={() => setOpen(false)}>

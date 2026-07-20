@@ -883,6 +883,27 @@
   text-shadow: 0 0 14px rgba(246, 199, 95, 0.34);
 }
 
+.ownerTag {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  margin: 0 10px;
+  font: 950 clamp(0.46rem, 1.2vw, 0.68rem)/1 Arial, Helvetica, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 18%),
+    linear-gradient(115deg, #fff9d0 0%, #ffd700 16%, #c7961a 36%, #fff2a8 53%, #9d740b 72%, #ffe680 100%);
+  background-size: 100% 100%, 230% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter:
+    drop-shadow(0 0 calc(4px + var(--beat) * 10px) rgba(255, 215, 0, 0.44))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.38));
+  white-space: nowrap;
+}
+
 .vipNav {
   position: relative;
   z-index: 1;
@@ -2025,6 +2046,10 @@
   .vipLogo strong {
     max-width: 120px;
     font-size: 0.78rem;
+  }
+
+  .ownerTag {
+    display: none;
   }
 
   .vipMenu {
