@@ -1135,7 +1135,6 @@
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 0;
-  /* Preserve animated glyph descenders inside the clipped hero. */
   line-height: 1.05;
   color: transparent;
   text-shadow: none;
@@ -1924,10 +1923,129 @@
   }
 }
 
+/* ===== NEW VIP UPGRADE STYLES ===== */
+.heroArtistName {
+  margin: 8px 0 18px !important;
+  font: 900 clamp(1.4rem, 4vw, 2.6rem)/1 Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: transparent !important;
+  background: linear-gradient(115deg, #7ef9ff 0%, #00e5ff 25%, #1ef078 55%, #00e5ff 80%, #7ef9ff 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.55)) drop-shadow(0 0 24px rgba(30, 240, 120, 0.35));
+  animation: goldShine 5s linear infinite;
+}
+
+.noteCatcher {
+  width: min(1180px, calc(100% - 32px));
+  margin: 48px auto;
+  padding: 28px;
+  border: 1px solid rgba(30, 240, 120, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(2, 8, 10, 0.92), rgba(0, 0, 0, 0.78));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.noteCatcherHeader {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.noteCatcherHeader h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+.noteStats {
+  display: flex;
+  gap: 18px;
+  font: 900 0.9rem/1 Arial, Helvetica, sans-serif;
+  color: var(--metal-green);
+  text-transform: uppercase;
+}
+
+.noteArena {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+  border: 1px solid rgba(246, 199, 95, 0.18);
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 50%, rgba(30, 240, 120, 0.08), transparent 60%);
+}
+
+.floatingNote {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(30, 240, 120, 0.6);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.35), transparent 40%), linear-gradient(135deg, #1ef078, #00b36b);
+  color: #02100a;
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 18px rgba(30, 240, 120, 0.45);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  z-index: 2;
+}
+
+.floatingNote:hover,
+.floatingNote:active {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 0 28px rgba(30, 240, 120, 0.75);
+}
+
+.networkSection {
+  padding: 60px 0 90px;
+}
+
+.networkSection h2 {
+  margin: 10px 0 28px;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+}
+
+.networkGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.networkCard {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.networkTag {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(30, 240, 120, 0.12);
+  color: var(--metal-green);
+  font: 900 0.7rem/1 Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+}
+
+.networkCard h3 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.networkCard .studioButton {
+  margin-top: auto;
+}
+
 @media (max-width: 1080px) {
   .featureRail,
   .blogGrid,
-  .sponsorGrid {
+  .sponsorGrid,
+  .networkGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2012,7 +2130,8 @@
 
   .featureRail,
   .blogGrid,
-  .sponsorGrid {
+  .sponsorGrid,
+  .networkGrid {
     grid-template-columns: 1fr;
     padding: 48px 0;
   }
@@ -2031,7 +2150,8 @@
   .streamPublicPanel,
   .interactionGrid,
   .blogGrid,
-  .sponsorGrid {
+  .sponsorGrid,
+  .noteCatcher {
     width: min(360px, calc(100% - 32px));
     margin-left: 16px;
     margin-right: auto;
@@ -2115,6 +2235,10 @@
 
   .footerLinks {
     justify-content: flex-start;
+  }
+
+  .noteArena {
+    height: 220px;
   }
 }
 
@@ -2215,9 +2339,9 @@
   .beatGoldLetter,
   .vipEnergyDivider,
   .vipSite h1,
-  .vipSite h2:not(.cTitle) {
+  .vipSite h2:not(.cTitle),
+  .heroArtistName {
     animation: none;
     transform: none;
   }
-
 }
