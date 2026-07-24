@@ -447,9 +447,6 @@ export function Home() {
               Music video content live stream
             </motion.span>
             <BeatDancingTitle text="3000 Studios" />
-            <motion.p className="heroArtistName" variants={fadeUp}>
-              Jeremy Swain
-            </motion.p>
             <motion.p variants={fadeUp}>
               A premium music and video destination with live streaming, animated sound-reactive wallpapers,
               sponsor-ready pages, community requests, and VIP creator operations.
