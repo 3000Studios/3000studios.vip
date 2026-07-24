@@ -47,16 +47,6 @@
   will-change: height;
 }
 
-.tapNote {
-  will-change: transform;
-  transition: box-shadow 0.25s ease;
-}
-
-.tapNote:hover,
-.tapNote:focus-visible {
-  box-shadow: 0 0 28px rgba(30, 215, 96, 0.55), 0 0 8px rgba(255, 211, 106, 0.4);
-}
-
 .songCard {
   will-change: transform, border-color;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -112,8 +102,7 @@ html {
   .glowText,
   .hostGlow,
   .wavePin,
-  .equalizer span,
-  .tapNote {
+  .equalizer span {
     animation: none !important;
   }
 }

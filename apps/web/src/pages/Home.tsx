@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEven
 import { Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { rolloutSongs } from '../data/music';
-import { VipExperience, VipLeaderboard } from '../components/VipExperience';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -366,7 +365,6 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
       <div className="vipEnergyDivider" aria-hidden="true" />
       <footer className="vipFooter">
         <AudioReactiveWallpaper variant="global" />
-        <VipLeaderboard />
         <div className="footerBrand">
           <strong>3000 Studios</strong>
           <p>Music, cinematic video content, live streams, sponsorships, song requests, and private creator operations.</p>
@@ -393,7 +391,6 @@ export function Home() {
 
   return (
     <PublicLayout variant="spiral">
-      <VipExperience />
       <main className="vipMain">
         <section className="redCarpetHero">
           <video src={INTRO_VIDEO} autoPlay muted loop playsInline preload="auto" />
