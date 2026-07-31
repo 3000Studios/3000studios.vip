@@ -29,6 +29,7 @@ const SiteDetail = lazy(() => import('./pages/SiteDetail').then((module) => ({ d
 const Settings = lazy(() => import('./pages/Settings').then((module) => ({ default: module.Settings })));
 const StreamVault = lazy(() => import('./pages/StreamVault').then((module) => ({ default: module.StreamVault })));
 const SongPage = lazy(() => import('./pages/SongPage').then((module) => ({ default: module.SongPage })));
+const Admin = lazy(() => import('./pages/Admin').then((module) => ({ default: module.Admin })));
 
 function RouteLoader({ children }: { children: ReactNode }) {
   return <Suspense fallback={<div className="routeLoader" aria-label="Loading" />}>{children}</Suspense>;
@@ -51,6 +52,7 @@ const router = createBrowserRouter([
   { path: '/copyright', element: <LegalPage type="copyright" /> },
   { path: '/cookies', element: <LegalPage type="cookies" /> },
   { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
+  { path: '/admin', element: <RouteLoader><Admin /></RouteLoader> },
   {
     element: <ProtectedRoute />,
     children: [
