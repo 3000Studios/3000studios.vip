@@ -1,4 +1,9 @@
-/* Mobile nav auto-size, touch scroll, admin FAB */
+/* Mobile nav auto-size, touch scroll, admin FAB, hide TEST banner */
+
+/* Remove temporary TEST hero text */
+.heroCopy > div[aria-label="TEST"] {
+  display: none !important;
+}
 
 .adminFab {
   position: fixed;
@@ -62,7 +67,6 @@
   cursor: pointer;
 }
 
-/* Desktop: keep nav fully visible with auto-size + horizontal scroll if needed */
 @media (min-width: 1081px) {
   .vipNav {
     display: flex;
@@ -94,7 +98,6 @@
   }
 }
 
-/* Tablet / mobile: open menu is full list, swipeable areas */
 @media (max-width: 1080px) {
   .vipNav.open {
     display: flex;
@@ -116,7 +119,6 @@
   }
 }
 
-/* Touch-friendly carousels and lists */
 .itunesScroller,
 .noteArena,
 .messageList,
@@ -137,7 +139,6 @@
   touch-action: manipulation;
 }
 
-/* Fix over-constrained 360px mobile widths so content can use full width */
 @media (max-width: 720px) {
   .heroCopy,
   .vipSection,
