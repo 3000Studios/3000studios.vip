@@ -14,12 +14,12 @@ import {
   ContactPage,
   Home,
   LegalPage,
-  LivePage,
   MusicShowcase,
   RequestsPage,
   SponsorsPage,
   VideoPage,
 } from './pages/Home';
+import { LiveStreamPage } from './pages/LiveStreamPage';
 import { AuthProvider } from './lib/auth';
 
 const Shell = lazy(() => import('./components/Shell').then((module) => ({ default: module.Shell })));
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
       { path: '/', element: <Home /> },
       { path: '/music', element: <MusicShowcase /> },
       { path: '/video', element: <VideoPage /> },
-      { path: '/live', element: <LivePage /> },
+      { path: '/live', element: <LiveStreamPage /> },
       { path: '/community', element: <CommunityPage /> },
       { path: '/requests', element: <RequestsPage /> },
       { path: '/blog', element: <BlogPage /> },
