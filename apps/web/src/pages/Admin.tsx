@@ -5,8 +5,14 @@ const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
 const LIVE_FLAG_KEY = '3000-stream-live-v1';
 
-const customerCode = import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim();
-const liveInputId = import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim();
+/** Cloudflare Stream live input — public playback IDs (stream key stays in OBS only) */
+const DEFAULT_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
+const DEFAULT_LIVE_INPUT_ID = '6502a441fdad0df6eebf3270a569c1ab';
+
+const customerCode =
+  import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() || DEFAULT_CUSTOMER_CODE;
+const liveInputId =
+  import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() || DEFAULT_LIVE_INPUT_ID;
 const streamTitle = import.meta.env.VITE_STREAM_TITLE?.toString().trim() || '3000 Studios Live';
 
 export function Admin() {
@@ -183,7 +189,7 @@ export function Admin() {
               <div className={`cKpi ${isConfigured ? 'ok' : 'warn'}`}>
                 <div className="cKpiLabel">Cloudflare Stream</div>
                 <div className="cKpiValue">{isConfigured ? 'Ready' : 'Pending'}</div>
-                <div className="cKpiHint">{isConfigured ? 'Env vars present' : 'Add customer code + live input'}</div>
+                <div className="cKpiHint">{isConfigured ? 'Live input connected' : 'Add customer code + live input'}</div>
               </div>
               <div className={`cKpi ${previewState === 'ready' ? 'ok' : ''}`}>
                 <div className="cKpiLabel">Camera Preview</div>
@@ -195,7 +201,7 @@ export function Admin() {
               <div className="cKpi gold">
                 <div className="cKpiLabel">Public Page</div>
                 <div className="cKpiValue">/live</div>
-                <div className="cKpiHint">Auto-plays when ingest is active</div>
+                <div className="cKpiHint">Plays when OBS ingest is active</div>
               </div>
             </div>
 
@@ -319,9 +325,6 @@ export function Admin() {
                 ) : (
                   <div className="cEmpty">
                     <strong>Cloudflare Stream is not configured yet.</strong>
-                    <br />
-                    Add <code>VITE_STREAM_CUSTOMER_CODE</code> and <code>VITE_STREAM_LIVE_INPUT_ID</code> in Cloudflare
-                    Pages environment variables after creating the live input. Then redeploy.
                   </div>
                 )}
               </div>
@@ -344,6 +347,10 @@ export function Admin() {
                       <span>Cloudflare Stream Live Input key only — never commit it.</span>
                     </div>
                     <div className="featureLine">
+                      <strong>Live Input ID</strong>
+                      <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>{liveInputId}</span>
+                    </div>
+                    <div className="featureLine">
                       <strong>Recommended</strong>
                       <span>CBR · AAC · 2s keyframe · B-frames 0 for lower latency.</span>
                     </div>
@@ -354,7 +361,7 @@ export function Admin() {
               <div className="cPanel">
                 <div className="cPanelHead">
                   <h2>Phone / Remote Playback</h2>
-                  <span className="cSub">Private paths</span>
+                  <span className="cSub">Public + HLS paths</span>
                 </div>
                 <div className="cPanelBody">
                   <div className="featureList">
@@ -364,11 +371,11 @@ export function Admin() {
                     </div>
                     <div className="featureLine">
                       <strong>HLS</strong>
-                      <span style={{ wordBreak: 'break-all' }}>{hlsUrl || 'Available after Stream env vars are set.'}</span>
+                      <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{hlsUrl}</span>
                     </div>
                     <div className="featureLine">
                       <strong>Admin</strong>
-                      <span>This page — passcode protected.</span>
+                      <span>This page — passcode 3000.</span>
                     </div>
                   </div>
                 </div>
