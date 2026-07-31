@@ -6,7 +6,7 @@ import { rolloutSongs } from '../data/music';
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
 const DEFAULT_TRACK = '/media/big-old-hands-tore-up-the-hole.mp3';
-const ADMIN_PATH = '/vault/stream';
+const ADMIN_PATH = '/admin';
 const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-5800977493749262';
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -65,7 +65,7 @@ const networkSites = [
   { name: '3000 Studios VIP', url: 'https://3000studios.vip', tag: 'Main Launch' },
   { name: 'Music Catalog', url: '/music', tag: 'Tracks' },
   { name: 'Live Stream', url: '/live', tag: 'Broadcast' },
-  { name: 'Creator Ops', url: '/vault/stream', tag: 'Private' },
+  { name: 'Creator Ops', url: '/admin', tag: 'Private' },
 ];
 
 type StoredMessage = {
@@ -674,10 +674,11 @@ export function LivePage() {
           </motion.span>
           <motion.h1 variants={fadeUp}>Watch 3000 Studios live when the broadcast is active.</motion.h1>
           <motion.p variants={fadeUp}>
-            Public playback is wired for Cloudflare Stream. Ingest keys stay in Cloudflare and OBS, not in the browser.
+            Public playback is powered by Cloudflare Stream. When you go live from the owner admin console and OBS,
+            this page plays the broadcast automatically. Stream keys stay in Cloudflare and OBS only.
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
-            <StudioButton to={ADMIN_PATH}>Owner Stream Console</StudioButton>
+            <StudioButton to={ADMIN_PATH}>Owner Admin Console</StudioButton>
             <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20live%20stream`} variant="secondary">
               Stream Inquiry
             </StudioButton>
@@ -685,11 +686,23 @@ export function LivePage() {
         </motion.section>
         <section className="streamPublicPanel">
           {embedUrl ? (
-            <iframe title="3000 Studios live stream" src={embedUrl} allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+            <div style={{ position: 'relative', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,211,106,0.22)', boxShadow: '0 24px 70px rgba(0,0,0,0.45)' }}>
+              <iframe
+                title="3000 Studios live stream"
+                src={embedUrl}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           ) : (
             <div className="vipCard">
               <h2>Stream setup required</h2>
-              <p>Add VITE_STREAM_CUSTOMER_CODE and VITE_STREAM_LIVE_INPUT_ID in Cloudflare Pages after creating the Stream live input.</p>
+              <p>
+                Add <code>VITE_STREAM_CUSTOMER_CODE</code> and <code>VITE_STREAM_LIVE_INPUT_ID</code> in Cloudflare Pages
+                after creating the Stream live input. Then open the passcode-protected admin at{' '}
+                <Link to="/admin">/admin</Link> to run the go-live checklist.
+              </p>
             </div>
           )}
         </section>
