@@ -443,6 +443,23 @@ export function Home() {
           <video src={INTRO_VIDEO} autoPlay muted loop playsInline preload="auto" />
           <div className="carpetDepth" aria-hidden="true" />
           <motion.div className="heroCopy" initial="hidden" animate="show" variants={stagger}>
+            <motion.div
+              variants={fadeUp}
+              style={{
+                fontSize: 'clamp(4rem, 12vw, 9rem)',
+                fontWeight: 900,
+                color: '#1e90ff',
+                textAlign: 'center',
+                letterSpacing: '0.08em',
+                textShadow: '0 0 40px rgba(30, 144, 255, 0.85), 0 0 80px rgba(30, 144, 255, 0.45)',
+                marginBottom: '0.35em',
+                lineHeight: 1,
+                fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif',
+              }}
+              aria-label="TEST"
+            >
+              TEST
+            </motion.div>
             <motion.span className="vipKicker" variants={fadeUp}>
               Music video content live stream
             </motion.span>
