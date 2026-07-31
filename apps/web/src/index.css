@@ -4,6 +4,7 @@
 @import './styles/landing.css';
 @import './styles/app.css';
 @import './styles/console.css';
+@import './styles/mobile-touch.css';
 
 .routeLoader {
   min-height: 100vh;
