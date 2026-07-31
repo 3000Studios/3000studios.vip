@@ -2,10 +2,11 @@
 
 import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { AdminFab } from './components/AdminFab';
 import {
   AboutPage,
   BlogPage,
@@ -35,37 +36,51 @@ function RouteLoader({ children }: { children: ReactNode }) {
   return <Suspense fallback={<div className="routeLoader" aria-label="Loading" />}>{children}</Suspense>;
 }
 
+function RootLayout() {
+  return (
+    <>
+      <Outlet />
+      <AdminFab />
+    </>
+  );
+}
+
 const router = createBrowserRouter([
-  { path: '/', element: <Home /> },
-  { path: '/music', element: <MusicShowcase /> },
-  { path: '/video', element: <VideoPage /> },
-  { path: '/live', element: <LivePage /> },
-  { path: '/community', element: <CommunityPage /> },
-  { path: '/requests', element: <RequestsPage /> },
-  { path: '/blog', element: <BlogPage /> },
-  { path: '/sponsors', element: <SponsorsPage /> },
-  { path: '/song/:slug', element: <RouteLoader><SongPage /></RouteLoader> },
-  { path: '/about', element: <AboutPage /> },
-  { path: '/contact', element: <ContactPage /> },
-  { path: '/privacy', element: <LegalPage type="privacy" /> },
-  { path: '/terms', element: <LegalPage type="terms" /> },
-  { path: '/copyright', element: <LegalPage type="copyright" /> },
-  { path: '/cookies', element: <LegalPage type="cookies" /> },
-  { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
-  { path: '/admin', element: <RouteLoader><Admin /></RouteLoader> },
   {
-    element: <ProtectedRoute />,
+    element: <RootLayout />,
     children: [
+      { path: '/', element: <Home /> },
+      { path: '/music', element: <MusicShowcase /> },
+      { path: '/video', element: <VideoPage /> },
+      { path: '/live', element: <LivePage /> },
+      { path: '/community', element: <CommunityPage /> },
+      { path: '/requests', element: <RequestsPage /> },
+      { path: '/blog', element: <BlogPage /> },
+      { path: '/sponsors', element: <SponsorsPage /> },
+      { path: '/song/:slug', element: <RouteLoader><SongPage /></RouteLoader> },
+      { path: '/about', element: <AboutPage /> },
+      { path: '/contact', element: <ContactPage /> },
+      { path: '/privacy', element: <LegalPage type="privacy" /> },
+      { path: '/terms', element: <LegalPage type="terms" /> },
+      { path: '/copyright', element: <LegalPage type="copyright" /> },
+      { path: '/cookies', element: <LegalPage type="cookies" /> },
+      { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
+      { path: '/admin', element: <RouteLoader><Admin /></RouteLoader> },
       {
-        path: '/vault',
-        element: <RouteLoader><Shell /></RouteLoader>,
+        element: <ProtectedRoute />,
         children: [
-          { index: true, element: <RouteLoader><Dashboard /></RouteLoader> },
-          { path: 'sites', element: <RouteLoader><Sites /></RouteLoader> },
-          { path: 'sites/:id', element: <RouteLoader><SiteDetail /></RouteLoader> },
-          { path: 'ops', element: <RouteLoader><Ops /></RouteLoader> },
-          { path: 'stream', element: <RouteLoader><StreamVault /></RouteLoader> },
-          { path: 'settings', element: <RouteLoader><Settings /></RouteLoader> },
+          {
+            path: '/vault',
+            element: <RouteLoader><Shell /></RouteLoader>,
+            children: [
+              { index: true, element: <RouteLoader><Dashboard /></RouteLoader> },
+              { path: 'sites', element: <RouteLoader><Sites /></RouteLoader> },
+              { path: 'sites/:id', element: <RouteLoader><SiteDetail /></RouteLoader> },
+              { path: 'ops', element: <RouteLoader><Ops /></RouteLoader> },
+              { path: 'stream', element: <RouteLoader><StreamVault /></RouteLoader> },
+              { path: 'settings', element: <RouteLoader><Settings /></RouteLoader> },
+            ],
+          },
         ],
       },
     ],
