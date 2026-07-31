@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const AUTH_KEY = '3000-admin-auth-v1';
 const PASSCODE = '3000';
@@ -9,6 +9,11 @@ export function AdminFab() {
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/vault')) {
+    return null;
+  }
 
   function submit(e: FormEvent) {
     e.preventDefault();
