@@ -1,11 +1,12 @@
+import { useEffect, useRef, useState } from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { PublicLayout } from './Home';
+import { WhepPlayer, buildWhepUrl, STREAM_MODE_KEY } from '../lib/webrtcStream';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const ADMIN_PATH = '/admin';
 
-/** Cloudflare Stream live input (public playback IDs) */
 const DEFAULT_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
 const DEFAULT_LIVE_INPUT_ID = '6502a441fdad0df6eebf3270a569c1ab';
 
@@ -28,6 +29,48 @@ export function LiveStreamPage() {
   const embedUrl = configured
     ? `https://customer-${customerCode}.cloudflarestream.com/${liveInputId}/iframe`
     : null;
+  const whepUrl = configured ? buildWhepUrl(customerCode, liveInputId) : null;
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playerRef = useRef<WhepPlayer | null>(null);
+  const [mode, setMode] = useState<'whep' | 'hls'>('whep');
+  const [status, setStatus] = useState<'connecting' | 'live' | 'idle' | 'error'>('connecting');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function connect() {
+      if (!whepUrl || !videoRef.current) return;
+      setStatus('connecting');
+      try {
+        const player = new WhepPlayer(whepUrl);
+        playerRef.current = player;
+        await player.start(videoRef.current);
+        if (!cancelled) {
+          setStatus('live');
+          setMode('whep');
+          try {
+            localStorage.setItem(STREAM_MODE_KEY, 'webrtc');
+          } catch {
+            /* ignore */
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setStatus('idle');
+          setMode('hls');
+        }
+      }
+    }
+
+    void connect();
+
+    return () => {
+      cancelled = true;
+      void playerRef.current?.stop();
+      playerRef.current = null;
+    };
+  }, [whepUrl]);
 
   return (
     <PublicLayout variant="blackhole">
@@ -36,14 +79,14 @@ export function LiveStreamPage() {
           <motion.span className="vipKicker" variants={fadeUp}>
             Live stream
           </motion.span>
-          <motion.h1 variants={fadeUp}>Watch 3000 Studios live when the broadcast is active.</motion.h1>
+          <motion.h1 variants={fadeUp}>Watch 3000 Studios live.</motion.h1>
           <motion.p variants={fadeUp}>
-            Public playback is powered by Cloudflare Stream. Go live from the owner admin console (passcode 3000) and
-            OBS — this page plays the broadcast automatically when ingest is active.
+            Phone and browser broadcasts appear here instantly via Cloudflare WebRTC. Owner goes live
+            from the admin console (passcode 3000) — no OBS required.
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
             <Link className="studioButton primary" to={ADMIN_PATH}>
-              Owner Admin Console
+              Owner Go Live
             </Link>
             <a
               className="studioButton secondary"
@@ -53,18 +96,38 @@ export function LiveStreamPage() {
             </a>
           </motion.div>
         </motion.section>
+
         <section className="streamPublicPanel">
-          {embedUrl ? (
-            <div
+          <div
+            style={{
+              position: 'relative',
+              aspectRatio: '16 / 9',
+              borderRadius: 16,
+              overflow: 'hidden',
+              border: '1px solid rgba(255,211,106,0.22)',
+              boxShadow: '0 24px 70px rgba(0,0,0,0.45)',
+              background: '#000',
+            }}
+          >
+            {/* WHEP player for phone / browser WHIP broadcasts */}
+            <video
+              ref={videoRef}
+              playsInline
+              autoPlay
+              controls
               style={{
-                position: 'relative',
-                aspectRatio: '16 / 9',
-                borderRadius: 16,
-                overflow: 'hidden',
-                border: '1px solid rgba(255,211,106,0.22)',
-                boxShadow: '0 24px 70px rgba(0,0,0,0.45)',
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                background: '#000',
+                display: mode === 'whep' ? 'block' : 'none',
               }}
-            >
+            />
+
+            {/* HLS / Stream iframe fallback (OBS RTMP path) */}
+            {mode === 'hls' && embedUrl ? (
               <iframe
                 title="3000 Studios live stream"
                 src={embedUrl}
@@ -72,15 +135,72 @@ export function LiveStreamPage() {
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen
               />
+            ) : null}
+
+            {status === 'connecting' && mode === 'whep' ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: 'rgba(255,255,255,0.65)',
+                  fontWeight: 700,
+                  fontSize: 14,
+                  pointerEvents: 'none',
+                }}
+              >
+                Connecting to live feed…
+              </div>
+            ) : null}
+
+            {status === 'idle' && mode === 'hls' ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 12,
+                  left: 12,
+                  right: 12,
+                  textAlign: 'center',
+                  color: 'rgba(255,255,255,0.55)',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  pointerEvents: 'none',
+                }}
+              >
+                Waiting for broadcast · Owner starts from /admin on phone
+              </div>
+            ) : null}
+          </div>
+
+          <div
+            style={{
+              marginTop: 14,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 10,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <span style={{ color: 'rgba(226,232,240,0.7)', fontSize: 13, fontWeight: 600 }}>
+              {status === 'live'
+                ? '● Live · low-latency WebRTC'
+                : mode === 'hls'
+                  ? 'Stream player · starts when broadcast is active'
+                  : 'Connecting…'}
+            </span>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                className="studioButton secondary"
+                style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
+                onClick={() => setMode((m) => (m === 'whep' ? 'hls' : 'whep'))}
+              >
+                Switch to {mode === 'whep' ? 'HLS player' : 'WebRTC player'}
+              </button>
             </div>
-          ) : (
-            <div className="vipCard">
-              <h2>Stream setup required</h2>
-              <p>
-                Open the passcode-protected admin at <Link to="/admin">/admin</Link> to run the go-live checklist.
-              </p>
-            </div>
-          )}
+          </div>
         </section>
       </main>
     </PublicLayout>
