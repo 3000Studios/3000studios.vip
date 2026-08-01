@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  WhipPublisher,
+  WHIP_URL_STORAGE_KEY,
+  STREAM_MODE_KEY,
+  buildWhepUrl,
+} from '../lib/webrtcStream';
 
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
 const LIVE_FLAG_KEY = '3000-stream-live-v1';
 
-/** Cloudflare Stream live input — public playback IDs (stream key stays in OBS only) */
 const DEFAULT_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
 const DEFAULT_LIVE_INPUT_ID = '6502a441fdad0df6eebf3270a569c1ab';
 
@@ -14,27 +19,35 @@ const customerCode =
 const liveInputId =
   import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() || DEFAULT_LIVE_INPUT_ID;
 const streamTitle = import.meta.env.VITE_STREAM_TITLE?.toString().trim() || '3000 Studios Live';
+const envWhipUrl = import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() || '';
 
 export function Admin() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem(AUTH_KEY) === '1');
   const [passcode, setPasscode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(() => localStorage.getItem(LIVE_FLAG_KEY) === '1');
-  const [previewState, setPreviewState] = useState<'idle' | 'starting' | 'ready' | 'blocked'>('idle');
+  const [publishState, setPublishState] = useState<'idle' | 'starting' | 'live' | 'error'>('idle');
+  const [publishError, setPublishError] = useState<string | null>(null);
+  const [facing, setFacing] = useState<'user' | 'environment'>('user');
+  const [whipUrl, setWhipUrl] = useState(
+    () => localStorage.getItem(WHIP_URL_STORAGE_KEY) || envWhipUrl || '',
+  );
+  const [showWhipHelp, setShowWhipHelp] = useState(false);
+
   const previewRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const publisherRef = useRef<WhipPublisher | null>(null);
 
   const isConfigured = Boolean(customerCode && liveInputId);
   const embedUrl = isConfigured
     ? `https://customer-${customerCode}.cloudflarestream.com/${liveInputId}/iframe`
     : null;
-  const hlsUrl = isConfigured
-    ? `https://customer-${customerCode}.cloudflarestream.com/${liveInputId}/manifest/video.m3u8`
-    : null;
+  const whepUrl = isConfigured ? buildWhepUrl(customerCode, liveInputId) : null;
+  const whipReady = Boolean(whipUrl.trim().includes('/webRTC/publish'));
 
   useEffect(() => {
     return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      void publisherRef.current?.stop();
+      publisherRef.current = null;
     };
   }, []);
 
@@ -51,54 +64,83 @@ export function Admin() {
     }
   }
 
-  function handleLock() {
+  async function handleLock() {
     sessionStorage.removeItem(AUTH_KEY);
     setAuthed(false);
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    if (previewRef.current) previewRef.current.srcObject = null;
-    setPreviewState('idle');
+    await stopBroadcast();
   }
 
-  function toggleLive() {
-    const next = !isLive;
+  function saveWhipUrl(value: string) {
+    setWhipUrl(value);
+    localStorage.setItem(WHIP_URL_STORAGE_KEY, value.trim());
+  }
+
+  function setLiveFlag(next: boolean) {
     setIsLive(next);
     localStorage.setItem(LIVE_FLAG_KEY, next ? '1' : '0');
+    localStorage.setItem(STREAM_MODE_KEY, next ? 'webrtc' : 'off');
   }
 
-  async function startStudioPreview() {
-    setPreviewState('starting');
+  async function startBroadcast() {
+    if (!whipReady) {
+      setPublishError('Paste your Cloudflare WHIP publish URL first (see setup below).');
+      setPublishState('error');
+      setShowWhipHelp(true);
+      return;
+    }
+    setPublishError(null);
+    setPublishState('starting');
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      streamRef.current = stream;
-      if (previewRef.current) {
-        previewRef.current.srcObject = stream;
-        await previewRef.current.play();
-      }
-      setPreviewState('ready');
-    } catch {
-      setPreviewState('blocked');
+      const publisher = new WhipPublisher(whipUrl.trim());
+      publisherRef.current = publisher;
+      if (!previewRef.current) throw new Error('Preview video not ready');
+      await publisher.start(previewRef.current, facing);
+      setPublishState('live');
+      setLiveFlag(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not start stream';
+      setPublishError(msg);
+      setPublishState('error');
+      setLiveFlag(false);
+      await publisherRef.current?.stop();
+      publisherRef.current = null;
     }
   }
 
-  function stopPreview() {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
+  async function stopBroadcast() {
+    await publisherRef.current?.stop();
+    publisherRef.current = null;
     if (previewRef.current) previewRef.current.srcObject = null;
-    setPreviewState('idle');
+    setPublishState('idle');
+    setPublishError(null);
+    setLiveFlag(false);
   }
 
   if (!authed) {
     return (
-      <div className="adminScrim" style={{ background: 'radial-gradient(ellipse at 50% 20%, rgba(91,140,255,0.18), transparent 50%), #070b14' }}>
+      <div
+        className="adminScrim"
+        style={{
+          background:
+            'radial-gradient(ellipse at 50% 20%, rgba(91,140,255,0.18), transparent 50%), #070b14',
+        }}
+      >
         <form className="adminCodeModal" onSubmit={handleUnlock} style={{ maxWidth: 420 }}>
           <span>3000 Studios · Owner Access</span>
           <h2>Admin Console</h2>
           <p style={{ color: 'rgba(203,213,225,0.72)', lineHeight: 1.55 }}>
-            Enter the owner passcode to unlock streaming setup, live controls, and private admin tools.
+            Enter passcode to unlock phone streaming and live controls.
           </p>
           <label>
-            <span style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: 'rgba(203,213,225,0.7)' }}>
+            <span
+              style={{
+                display: 'block',
+                marginBottom: 6,
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'rgba(203,213,225,0.7)',
+              }}
+            >
               Passcode
             </span>
             <input
@@ -115,13 +157,23 @@ export function Admin() {
               maxLength={12}
             />
           </label>
-          {error ? (
-            <div style={{ color: '#fecaca', fontSize: 13, fontWeight: 600 }}>{error}</div>
-          ) : null}
-          <button type="submit" className="cBtn primary" style={{ width: '100%', justifyContent: 'center', marginTop: 4 }}>
+          {error ? <div style={{ color: '#fecaca', fontSize: 13, fontWeight: 600 }}>{error}</div> : null}
+          <button
+            type="submit"
+            className="cBtn primary"
+            style={{ width: '100%', justifyContent: 'center', marginTop: 4 }}
+          >
             Unlock Admin
           </button>
-          <Link to="/" style={{ textAlign: 'center', color: 'rgba(148,163,184,0.7)', fontSize: 13, textDecoration: 'none' }}>
+          <Link
+            to="/"
+            style={{
+              textAlign: 'center',
+              color: 'rgba(148,163,184,0.7)',
+              fontSize: 13,
+              textDecoration: 'none',
+            }}
+          >
             ← Back to public site
           </Link>
         </form>
@@ -135,21 +187,17 @@ export function Admin() {
         <header className="cTopbar">
           <div className="cTitle">
             <h1>Admin Console</h1>
-            <span className="cTitleSub">Streaming · Controls · Owner tools · Passcode gated</span>
+            <span className="cTitleSub">Phone Go Live · WebRTC · Passcode gated</span>
           </div>
           <div className="cTopbarRight">
-            <span className={`cPill ${isLive ? 'live' : 'warn'}`}>
+            <span className={`cPill ${publishState === 'live' || isLive ? 'live' : 'warn'}`}>
               <span className="cDot" />
-              {isLive ? 'MARKED LIVE' : 'OFFLINE'}
-            </span>
-            <span className={`cPill ${isConfigured ? 'ok' : 'warn'}`}>
-              <span className="cDot" />
-              {isConfigured ? 'Stream configured' : 'Setup needed'}
+              {publishState === 'live' ? 'BROADCASTING' : isLive ? 'MARKED LIVE' : 'OFFLINE'}
             </span>
             <Link to="/live" className="cBtn sm ghost" target="_blank" rel="noreferrer">
               Open Public Live
             </Link>
-            <button className="cBtn sm" type="button" onClick={handleLock}>
+            <button className="cBtn sm" type="button" onClick={() => void handleLock()}>
               Lock Admin
             </button>
           </div>
@@ -159,21 +207,29 @@ export function Admin() {
           <div className="cStack">
             <section className="cHero">
               <div>
-                <span className="cTag accent">Owner Stream Desk</span>
+                <span className="cTag accent">Stream from your phone</span>
                 <h2>{streamTitle}</h2>
                 <p>
-                  Set up your broadcast here. Start the camera preview, follow the OBS checklist, mark the stream live,
-                  then verify playback on the public <strong>/live</strong> page. Ingest keys stay in OBS + Cloudflare only.
+                  Unlock once, paste your Cloudflare WHIP URL (one-time), then tap{' '}
+                  <strong>Go Live</strong>. Your camera streams directly to Cloudflare — viewers see
+                  it on <strong>/live</strong>. No OBS required.
                 </p>
               </div>
               <div className="cHeroActions">
-                <button
-                  className={`cBtn ${isLive ? 'danger' : 'primary'}`}
-                  type="button"
-                  onClick={toggleLive}
-                >
-                  {isLive ? 'End Live Flag' : 'Mark Stream Live'}
-                </button>
+                {publishState === 'live' ? (
+                  <button className="cBtn danger" type="button" onClick={() => void stopBroadcast()}>
+                    End Stream
+                  </button>
+                ) : (
+                  <button
+                    className="cBtn primary"
+                    type="button"
+                    onClick={() => void startBroadcast()}
+                    disabled={publishState === 'starting'}
+                  >
+                    {publishState === 'starting' ? 'Connecting…' : 'Go Live from This Phone'}
+                  </button>
+                )}
                 <a className="cBtn ghost" href="/live" target="_blank" rel="noreferrer">
                   Verify Public Playback
                 </a>
@@ -181,35 +237,41 @@ export function Admin() {
             </section>
 
             <div className="cKpis">
-              <div className={`cKpi ${isLive ? 'ok' : ''}`}>
-                <div className="cKpiLabel">Broadcast Flag</div>
-                <div className="cKpiValue">{isLive ? 'LIVE' : 'OFF'}</div>
-                <div className="cKpiHint">Owner-marked status</div>
+              <div className={`cKpi ${publishState === 'live' ? 'ok' : ''}`}>
+                <div className="cKpiLabel">Broadcast</div>
+                <div className="cKpiValue">
+                  {publishState === 'live'
+                    ? 'LIVE'
+                    : publishState === 'starting'
+                      ? '…'
+                      : publishState === 'error'
+                        ? 'ERR'
+                        : 'OFF'}
+                </div>
+                <div className="cKpiHint">Phone → Cloudflare WebRTC</div>
+              </div>
+              <div className={`cKpi ${whipReady ? 'ok' : 'warn'}`}>
+                <div className="cKpiLabel">WHIP URL</div>
+                <div className="cKpiValue">{whipReady ? 'Ready' : 'Needed'}</div>
+                <div className="cKpiHint">One-time paste from dashboard</div>
               </div>
               <div className={`cKpi ${isConfigured ? 'ok' : 'warn'}`}>
-                <div className="cKpiLabel">Cloudflare Stream</div>
-                <div className="cKpiValue">{isConfigured ? 'Ready' : 'Pending'}</div>
-                <div className="cKpiHint">{isConfigured ? 'Live input connected' : 'Add customer code + live input'}</div>
-              </div>
-              <div className={`cKpi ${previewState === 'ready' ? 'ok' : ''}`}>
-                <div className="cKpiLabel">Camera Preview</div>
-                <div className="cKpiValue">
-                  {previewState === 'ready' ? 'On' : previewState === 'blocked' ? 'Blocked' : 'Idle'}
-                </div>
-                <div className="cKpiHint">Local device check</div>
+                <div className="cKpiLabel">Public Player</div>
+                <div className="cKpiValue">/live</div>
+                <div className="cKpiHint">WHEP low-latency playback</div>
               </div>
               <div className="cKpi gold">
-                <div className="cKpiLabel">Public Page</div>
-                <div className="cKpiValue">/live</div>
-                <div className="cKpiHint">Plays when OBS ingest is active</div>
+                <div className="cKpiLabel">Camera</div>
+                <div className="cKpiValue">{facing === 'user' ? 'Front' : 'Rear'}</div>
+                <div className="cKpiHint">Tap switch below</div>
               </div>
             </div>
 
             <section className="cCols">
               <div className="cPanel">
                 <div className="cPanelHead">
-                  <h2>Studio Camera Preview</h2>
-                  <span className="cSub">Confirm camera + mic before OBS</span>
+                  <h2>Live Camera</h2>
+                  <span className="cSub">What you are sending right now</span>
                 </div>
                 <div className="cPanelBody">
                   <div
@@ -227,9 +289,10 @@ export function Admin() {
                       ref={previewRef}
                       muted
                       playsInline
+                      autoPlay
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
-                    {previewState !== 'ready' ? (
+                    {publishState !== 'live' ? (
                       <div
                         style={{
                           position: 'absolute',
@@ -239,59 +302,175 @@ export function Admin() {
                           color: 'rgba(203,213,225,0.55)',
                           fontSize: 14,
                           fontWeight: 600,
+                          textAlign: 'center',
+                          padding: 16,
                         }}
                       >
-                        {previewState === 'starting'
-                          ? 'Starting camera…'
-                          : previewState === 'blocked'
-                            ? 'Permission blocked'
-                            : 'Camera preview offline'}
+                        {publishState === 'starting'
+                          ? 'Requesting camera + connecting to Cloudflare…'
+                          : publishState === 'error'
+                            ? publishError || 'Stream error'
+                            : 'Tap Go Live to start from this phone'}
                       </div>
-                    ) : null}
+                    ) : (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 12,
+                          left: 12,
+                          background: 'rgba(220,38,38,0.92)',
+                          color: '#fff',
+                          fontWeight: 800,
+                          fontSize: 12,
+                          letterSpacing: '0.08em',
+                          padding: '6px 10px',
+                          borderRadius: 999,
+                        }}
+                      >
+                        ● LIVE
+                      </div>
+                    )}
                   </div>
+
                   <div className="cBtnRow">
-                    <button className="cBtn primary" type="button" onClick={startStudioPreview}>
-                      Start Camera Preview
-                    </button>
-                    <button className="cBtn ghost" type="button" onClick={stopPreview} disabled={previewState === 'idle'}>
-                      Stop Preview
+                    {publishState === 'live' ? (
+                      <button className="cBtn danger" type="button" onClick={() => void stopBroadcast()}>
+                        End Stream
+                      </button>
+                    ) : (
+                      <button
+                        className="cBtn primary"
+                        type="button"
+                        onClick={() => void startBroadcast()}
+                        disabled={publishState === 'starting'}
+                      >
+                        {publishState === 'starting' ? 'Connecting…' : 'Go Live from This Phone'}
+                      </button>
+                    )}
+                    <button
+                      className="cBtn ghost"
+                      type="button"
+                      disabled={publishState === 'live' || publishState === 'starting'}
+                      onClick={() => setFacing((f) => (f === 'user' ? 'environment' : 'user'))}
+                    >
+                      Switch to {facing === 'user' ? 'Rear' : 'Front'} Camera
                     </button>
                   </div>
+
+                  {publishError ? (
+                    <p style={{ marginTop: 12, color: '#fecaca', fontSize: 13, fontWeight: 600 }}>
+                      {publishError}
+                    </p>
+                  ) : null}
+
                   <p className="cMuted" style={{ marginTop: 12, fontSize: 13, lineHeight: 1.5 }}>
-                    Browser preview only confirms this device. Production broadcast still uses OBS → Cloudflare Stream
-                    with the private stream key.
+                    Keep this tab open while live. Closing the tab or locking the phone may stop the
+                    broadcast on some devices. Use a strong Wi‑Fi connection when possible.
                   </p>
                 </div>
               </div>
 
               <div className="cPanel">
                 <div className="cPanelHead">
-                  <h2>Go-Live Checklist</h2>
-                  <span className="cSub">No stream keys are shown here</span>
+                  <h2>One-time WHIP setup</h2>
+                  <span className="cSub">Required for phone streaming</span>
                 </div>
                 <div className="cPanelBody">
-                  <div className="featureList">
+                  <p className="cMuted" style={{ fontSize: 13, lineHeight: 1.55, marginBottom: 12 }}>
+                    Cloudflare Stream dashboard → <strong>Stream → Live inputs</strong> → open your
+                    input → copy the <strong>WebRTC / WHIP publish URL</strong> (ends with{' '}
+                    <code>/webRTC/publish</code>). Paste it once below. It stays on this device only.
+                  </p>
+                  <label style={{ display: 'block', marginBottom: 8 }}>
+                    <span
+                      style={{
+                        display: 'block',
+                        marginBottom: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: 'rgba(203,213,225,0.7)',
+                      }}
+                    >
+                      WHIP publish URL
+                    </span>
+                    <input
+                      type="url"
+                      value={whipUrl}
+                      onChange={(e) => saveWhipUrl(e.target.value)}
+                      placeholder="https://customer-….cloudflarestream.com/…/webRTC/publish"
+                      style={{
+                        width: '100%',
+                        minHeight: 44,
+                        borderRadius: 8,
+                        border: '1px solid rgba(148,163,184,0.25)',
+                        background: 'rgba(2,6,14,0.8)',
+                        color: '#e2e8f0',
+                        padding: '10px 12px',
+                        fontSize: 13,
+                      }}
+                    />
+                  </label>
+                  <div className="featureList" style={{ marginTop: 12 }}>
                     <div className="featureLine">
-                      <strong>1. Open OBS</strong>
-                      <span>Select the 3000 Studios scene. Verify camera, audio meters, overlays.</span>
+                      <strong>1. Paste URL</strong>
+                      <span>From Cloudflare Live Input → webRTC publish.</span>
                     </div>
                     <div className="featureLine">
-                      <strong>2. Start Streaming</strong>
-                      <span>OBS pushes to Cloudflare Stream using the private live-input key.</span>
+                      <strong>2. Go Live</strong>
+                      <span>Allow camera + mic when the browser asks.</span>
                     </div>
                     <div className="featureLine">
-                      <strong>3. Mark Live</strong>
-                      <span>Use the button above so the admin console shows LIVE status.</span>
-                    </div>
-                    <div className="featureLine">
-                      <strong>4. Verify Public</strong>
-                      <span>Open /live — Cloudflare player plays the broadcast when ingest is active.</span>
+                      <strong>3. Viewers</strong>
+                      <span>Open https://3000studios.vip/live — WHEP plays your phone stream.</span>
                     </div>
                   </div>
-                  <div className="cBtnRow" style={{ marginTop: 16 }}>
-                    <button className={`cBtn ${isLive ? 'danger' : 'primary'}`} type="button" onClick={toggleLive}>
-                      {isLive ? 'End Live Flag' : 'Mark Stream Live'}
-                    </button>
+                  <button
+                    className="cBtn ghost"
+                    type="button"
+                    style={{ marginTop: 12 }}
+                    onClick={() => setShowWhipHelp((v) => !v)}
+                  >
+                    {showWhipHelp ? 'Hide help' : 'Where do I find the URL?'}
+                  </button>
+                  {showWhipHelp ? (
+                    <p className="cMuted" style={{ marginTop: 10, fontSize: 13, lineHeight: 1.55 }}>
+                      Dashboard → Stream → Live inputs → select input{' '}
+                      <code>{liveInputId}</code> → look for <strong>webRTC</strong> / WHIP URL. It
+                      looks like{' '}
+                      <code>
+                        https://customer-{customerCode}.cloudflarestream.com/<secret>/webRTC/publish
+                      </code>
+                      . Never share that secret publicly.
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </section>
+
+            <section className="cPanel">
+              <div className="cPanelHead">
+                <h2>Public player status</h2>
+                <span className="cSub">Same endpoints viewers use on /live</span>
+              </div>
+              <div className="cPanelBody">
+                <div className="featureList">
+                  <div className="featureLine">
+                    <strong>Public page</strong>
+                    <span>https://3000studios.vip/live</span>
+                  </div>
+                  <div className="featureLine">
+                    <strong>WHEP (phone streams)</strong>
+                    <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{whepUrl}</span>
+                  </div>
+                  <div className="featureLine">
+                    <strong>HLS / iframe (OBS RTMP still works separately)</strong>
+                    <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{embedUrl}</span>
+                  </div>
+                  <div className="featureLine">
+                    <strong>Live input ID</strong>
+                    <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>
+                      {liveInputId}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -299,84 +478,23 @@ export function Admin() {
 
             <section className="cPanel">
               <div className="cPanelHead">
-                <h2>Live Player (Admin View)</h2>
-                <span className="cSub">Same Cloudflare Stream embed that powers the public /live page</span>
+                <h2>Optional: OBS still supported</h2>
+                <span className="cSub">Desktop RTMP path unchanged</span>
               </div>
               <div className="cPanelBody">
-                {embedUrl ? (
-                  <div
-                    style={{
-                      position: 'relative',
-                      aspectRatio: '16 / 9',
-                      borderRadius: 12,
-                      overflow: 'hidden',
-                      border: '1px solid rgba(148,163,184,0.18)',
-                      background: '#000',
-                    }}
-                  >
-                    <iframe
-                      title={streamTitle}
-                      src={embedUrl}
-                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
-                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                      allowFullScreen
-                    />
+                <p className="cMuted" style={{ fontSize: 13, lineHeight: 1.55 }}>
+                  You can still stream from OBS with RTMPS to Cloudflare. Note: Cloudflare WebRTC
+                  beta does not mix WHIP and HLS on the same session — phone Go Live uses WHEP on
+                  /live; OBS RTMP uses the classic Stream player.
+                </p>
+                <div className="featureList" style={{ marginTop: 12 }}>
+                  <div className="featureLine">
+                    <strong>Server</strong>
+                    <span>rtmps://live.cloudflare.com:443/live/</span>
                   </div>
-                ) : (
-                  <div className="cEmpty">
-                    <strong>Cloudflare Stream is not configured yet.</strong>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            <section className="cCols">
-              <div className="cPanel">
-                <div className="cPanelHead">
-                  <h2>OBS Ingest</h2>
-                  <span className="cSub">Keep the key outside this site</span>
-                </div>
-                <div className="cPanelBody">
-                  <div className="featureList">
-                    <div className="featureLine">
-                      <strong>Server</strong>
-                      <span>rtmps://live.cloudflare.com:443/live/</span>
-                    </div>
-                    <div className="featureLine">
-                      <strong>Stream key</strong>
-                      <span>Cloudflare Stream Live Input key only — never commit it.</span>
-                    </div>
-                    <div className="featureLine">
-                      <strong>Live Input ID</strong>
-                      <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>{liveInputId}</span>
-                    </div>
-                    <div className="featureLine">
-                      <strong>Recommended</strong>
-                      <span>CBR · AAC · 2s keyframe · B-frames 0 for lower latency.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="cPanel">
-                <div className="cPanelHead">
-                  <h2>Phone / Remote Playback</h2>
-                  <span className="cSub">Public + HLS paths</span>
-                </div>
-                <div className="cPanelBody">
-                  <div className="featureList">
-                    <div className="featureLine">
-                      <strong>Public path</strong>
-                      <span>https://3000studios.vip/live</span>
-                    </div>
-                    <div className="featureLine">
-                      <strong>HLS</strong>
-                      <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{hlsUrl}</span>
-                    </div>
-                    <div className="featureLine">
-                      <strong>Admin</strong>
-                      <span>This page — passcode 3000.</span>
-                    </div>
+                  <div className="featureLine">
+                    <strong>Stream key</strong>
+                    <span>Keep in OBS / Cloudflare only — never on this page.</span>
                   </div>
                 </div>
               </div>
@@ -385,34 +503,26 @@ export function Admin() {
             <section className="cPanel">
               <div className="cPanelHead">
                 <h2>Admin Features</h2>
-                <span className="cSub">Quick access to the rest of the control plane</span>
+                <span className="cSub">Quick links</span>
               </div>
               <div className="cPanelBody">
                 <div className="cTiles">
+                  <Link to="/live" className="cTile">
+                    <strong>Public Live</strong>
+                    <span>What viewers see while you broadcast.</span>
+                  </Link>
                   <Link to="/vault" className="cTile">
                     <strong>Full Vault Console</strong>
-                    <span>Command center, fleet health, ops, deeper stream vault (owner auth).</span>
-                  </Link>
-                  <Link to="/vault/stream" className="cTile">
-                    <strong>Stream Vault</strong>
-                    <span>Alternate protected stream desk inside the vault shell.</span>
+                    <span>Command center and deeper tools.</span>
                   </Link>
                   <Link to="/music" className="cTile">
                     <strong>Music Showcase</strong>
-                    <span>Public catalog and featured tracks.</span>
-                  </Link>
-                  <Link to="/blog" className="cTile">
-                    <strong>SEO Blog</strong>
-                    <span>Search-ready editorial for music, video, and live growth.</span>
+                    <span>Catalog and featured tracks.</span>
                   </Link>
                   <Link to="/" className="cTile">
-                    <strong>Public Homepage</strong>
-                    <span>Return to the VIP front door.</span>
+                    <strong>Homepage</strong>
+                    <span>Back to the public front door.</span>
                   </Link>
-                  <a href="mailto:Mr.jwswain@gmail.com?subject=3000%20Studios%20admin" className="cTile">
-                    <strong>Owner Email</strong>
-                    <span>Direct contact for sponsorships, licensing, and ops.</span>
-                  </a>
                 </div>
               </div>
             </section>
