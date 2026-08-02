@@ -1,0 +1,182 @@
+/* Mobile nav auto-size, touch scroll, admin FAB, hide TEST banner */
+
+/* Remove temporary TEST hero text */
+.heroCopy > div[aria-label="TEST"] {
+  display: none !important;
+}
+
+.adminFab {
+  position: fixed;
+  right: 16px;
+  bottom: 18px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 16px 0 14px;
+  border: 1px solid rgba(246, 199, 95, 0.55);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(8, 12, 18, 0.96), rgba(2, 5, 7, 0.94));
+  color: #ffd700;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.45),
+    0 0 20px rgba(255, 215, 0, 0.18);
+  cursor: pointer;
+  font: 900 0.78rem/1 Arial, Helvetica, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.adminFab:hover,
+.adminFab:focus-visible {
+  border-color: rgba(30, 240, 120, 0.7);
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.5),
+    0 0 28px rgba(30, 240, 120, 0.28);
+  outline: none;
+}
+
+.adminFabIcon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.adminFabLabel {
+  padding-right: 2px;
+}
+
+.adminCodeError {
+  color: #fecaca;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.adminUnlockBtn {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffd700, #1ef078);
+  color: #06100a;
+  font: 900 0.88rem/1 Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+@media (min-width: 1081px) {
+  .vipNav {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 4px;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .vipNav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .vipNav a {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 0 10px;
+    font-size: clamp(0.62rem, 0.9vw, 0.74rem);
+    white-space: nowrap;
+  }
+
+  .ownerTag {
+    font-size: clamp(0.42rem, 0.85vw, 0.62rem);
+  }
+}
+
+@media (max-width: 1080px) {
+  .vipNav.open {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 8px 0 4px;
+  }
+
+  .vipNav.open a {
+    width: 100%;
+    min-height: 46px;
+    font-size: 0.82rem;
+    justify-content: flex-start;
+    padding: 0 16px;
+  }
+}
+
+.itunesScroller,
+.noteArena,
+.messageList,
+.featureRail,
+.networkGrid,
+.blogGrid,
+.trackList {
+  touch-action: pan-y pinch-zoom;
+}
+
+.itunesScroller {
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+  user-select: none;
+}
+
+.itunesItem {
+  touch-action: manipulation;
+}
+
+@media (max-width: 720px) {
+  .heroCopy,
+  .vipSection,
+  .vipPageHero,
+  .itunesScrollerSection,
+  .adsenseSlot,
+  .videoGrid,
+  .streamPublicPanel,
+  .interactionGrid,
+  .blogGrid,
+  .sponsorGrid,
+  .noteCatcher {
+    width: min(100% - 24px, 1180px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .vipPageHero {
+    width: min(100% - 24px, 1180px) !important;
+  }
+
+  .vipMenu {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    min-width: 72px;
+    justify-self: end;
+  }
+
+  .vipHeader {
+    grid-template-columns: auto auto;
+  }
+
+  .adminFab {
+    right: 12px;
+    bottom: 14px;
+    min-height: 48px;
+    padding: 0 14px 0 12px;
+  }
+}

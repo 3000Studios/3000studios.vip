@@ -411,7 +411,6 @@
 }
 
 .soundSection,
-.musicGame,
 .chartSection {
   position: relative;
   z-index: 2;
@@ -450,69 +449,11 @@
   animation-delay: var(--eq-delay);
 }
 
-.musicGame {
-  border-top: 1px solid rgba(255, 211, 106, 0.16);
-}
-
-.gameStats {
-  display: flex;
-  gap: 12px;
-  margin: 18px 0;
-}
-
-.gameStats strong,
 .songCard {
   border-radius: 8px;
   border: 1px solid rgba(255, 211, 106, 0.24);
   background: rgba(0, 0, 0, 0.36);
   backdrop-filter: blur(18px);
-}
-
-.gameStats strong {
-  padding: 10px 12px;
-}
-
-.noteArena {
-  position: relative;
-  min-height: 360px;
-  overflow: hidden;
-  border: 1px solid rgba(30, 215, 96, 0.24);
-  background:
-    radial-gradient(circle at 50% 50%, rgba(30, 215, 96, 0.12), transparent 34%),
-    rgba(0, 0, 0, 0.24);
-  border-radius: 8px;
-}
-
-.tapNote {
-  position: absolute;
-  left: var(--note-x);
-  top: var(--note-y);
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border: 1px solid rgba(255, 211, 106, 0.4);
-  border-radius: 50%;
-  background: rgba(30, 215, 96, 0.16);
-  color: #fff;
-  font-size: 1.8rem;
-  animation: noteFloat var(--note-speed) ease-in-out infinite alternate;
-  animation-delay: var(--note-delay);
-}
-
-.noteSpark,
-.tapParticle {
-  position: absolute;
-  left: var(--spark-x);
-  top: var(--spark-y);
-  z-index: 6;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: var(--gold);
-  box-shadow: 0 0 30px var(--green);
-  animation: sparkPop 700ms ease-out forwards;
 }
 
 .songCard {
@@ -783,14 +724,6 @@ input:focus-visible {
 @keyframes equalize {
   from { height: 18%; }
   to { height: calc(36% + (var(--eq-delay) * 150)); }
-}
-
-@keyframes noteFloat {
-  to { transform: translate3d(18px, -42px, 0) rotate(12deg) scale(1.08); }
-}
-
-@keyframes sparkPop {
-  to { opacity: 0; transform: translate(-50%, -50%) scale(3.2); }
 }
 
 @media (max-width: 860px) {

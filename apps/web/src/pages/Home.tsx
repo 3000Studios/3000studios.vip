@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { rolloutSongs } from '../data/music';
-import { VipExperience, VipLeaderboard } from '../components/VipExperience';
+import { featureSong, rolloutSongs } from '../data/music';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
-const DEFAULT_TRACK = '/media/always-feel-like.mp3';
-const ADMIN_PATH = '/vault/stream';
+const DEFAULT_TRACK = featureSong.jazz.src;
+const ADMIN_PATH = '/admin';
 const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-5800977493749262';
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -38,24 +37,18 @@ const navItems = [
 const blogSeeds = [
   {
     title: 'Independent Music Video Production Built For Search, Streams, And Sponsors',
-    keywords:
-      'independent music video production, cinematic artist branding, sponsor-ready video content, Atlanta creator rollout, premium music marketing',
-    summary:
-      '3000 Studios VIP connects original music, cinematic video, sponsor inventory, and search-ready editorial into one conversion-focused media destination.',
+    keywords: 'independent music video production, cinematic artist branding, sponsor-ready video content, Atlanta creator rollout, premium music marketing',
+    summary: '3000 Studios VIP connects original music, cinematic video, sponsor inventory, and search-ready editorial into one conversion-focused media destination.',
   },
   {
     title: 'How 3000 Studios Turns Music Releases Into A Full VIP Media Experience',
-    keywords:
-      'music release strategy, VIP music showcase, creator monetization, live streaming studio, fan engagement platform',
-    summary:
-      'A release should work as more than a song page. It should drive watch time, licensing interest, community activity, and direct buyer action.',
+    keywords: 'music release strategy, VIP music showcase, creator monetization, live streaming studio, fan engagement platform',
+    summary: 'A release should work as more than a song page. It should drive watch time, licensing interest, community activity, and direct buyer action.',
   },
   {
     title: 'Live Streaming, Song Requests, And Community Chat For Modern Music Brands',
-    keywords:
-      'live music stream, song request board, community chat room, music fan engagement, Cloudflare Stream playback',
-    summary:
-      'The site gives fans a direct path to listen, watch, request new song ideas, and follow the next 3000 Studios live broadcast.',
+    keywords: 'live music stream, song request board, community chat room, music fan engagement, Cloudflare Stream playback',
+    summary: 'The site gives fans a direct path to listen, watch, request new song ideas, and follow the next 3000 Studios live broadcast.',
   },
 ];
 
@@ -66,6 +59,13 @@ const sponsors = [
   'VIP drop product placement',
   'Community challenge sponsor',
   'Newsletter and blog sponsor',
+];
+
+const networkSites = [
+  { name: '3000 Studios VIP', url: 'https://3000studios.vip', tag: 'Main Launch' },
+  { name: 'Music Catalog', url: '/music', tag: 'Tracks' },
+  { name: 'Live Stream', url: '/live', tag: 'Broadcast' },
+  { name: 'Creator Ops', url: '/admin', tag: 'Private' },
 ];
 
 type StoredMessage = {
@@ -84,16 +84,19 @@ type RequestIdea = {
   createdAt: string;
 };
 
+type FloatingNote = {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+};
+
 function safeDate(value: string) {
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(
-    new Date(value),
-  );
+  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
 }
 
 function playPop() {
-  const AudioCtx =
-    window.AudioContext ||
-    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioCtx) return;
   const ctx = new AudioCtx();
   const osc = ctx.createOscillator();
@@ -139,13 +142,7 @@ function StudioButton({
   }
   if (href) {
     return (
-      <a
-        className={className}
-        href={href}
-        onClick={handleClick}
-        rel={href.startsWith('http') ? 'noreferrer' : undefined}
-        target={href.startsWith('http') ? '_blank' : undefined}
-      >
+      <a className={className} href={href} onClick={handleClick} rel={href.startsWith('http') ? 'noreferrer' : undefined} target={href.startsWith('http') ? '_blank' : undefined}>
         {children}
       </a>
     );
@@ -172,12 +169,7 @@ function BeatDancingTitle({ text }: { text: string }) {
   return (
     <motion.h1 className="beatGoldTitle" variants={fadeUp} aria-label={text}>
       {Array.from(text).map((char, index) => (
-        <span
-          key={`${char}-${index}`}
-          className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter'}
-          style={{ '--letter-index': index } as CSSProperties}
-          aria-hidden="true"
-        >
+        <span key={`${char}-${index}`} className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter'} style={{ '--letter-index': index } as CSSProperties} aria-hidden="true">
           {char}
         </span>
       ))}
@@ -202,14 +194,7 @@ function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; label?:
   return (
     <aside className="adsenseSlot" aria-label={label}>
       <span>{label}</span>
-      <ins
-        className="adsbygoogle"
-        style={{ display: 'block' }}
-        data-ad-client={ADSENSE_CLIENT}
-        data-ad-slot={slot}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
+      <ins className="adsbygoogle" style={{ display: 'block' }} data-ad-client={ADSENSE_CLIENT} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true" />
     </aside>
   );
 }
@@ -237,7 +222,7 @@ function MusicController() {
   const rafRef = useRef<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [activeTitle, setActiveTitle] = useState('Always Feel Like');
+  const [activeTitle, setActiveTitle] = useState(`${featureSong.title} — ${featureSong.jazz.label}`);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -251,6 +236,16 @@ function MusicController() {
   }, [muted]);
 
   useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { src: string; title: string };
+      if (!detail?.src) return;
+      playTrack(detail.src, detail.title);
+    };
+    window.addEventListener('3000-play-track', handler as EventListener);
+    return () => window.removeEventListener('3000-play-track', handler as EventListener);
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
@@ -259,9 +254,7 @@ function MusicController() {
   function connectAnalyzer() {
     const audio = audioRef.current;
     if (!audio || analyserRef.current) return;
-    const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
     const source = ctx.createMediaElementSource(audio);
@@ -338,6 +331,147 @@ function MusicController() {
   );
 }
 
+function FeatureOfTheWeek() {
+  const [mode, setMode] = useState<'jazz' | 'remix'>('jazz');
+  const version = mode === 'jazz' ? featureSong.jazz : featureSong.remix;
+  const other = mode === 'jazz' ? featureSong.remix : featureSong.jazz;
+
+  function morph() {
+    playPop();
+    const next = mode === 'jazz' ? 'remix' : 'jazz';
+    setMode(next);
+    const v = next === 'jazz' ? featureSong.jazz : featureSong.remix;
+    window.dispatchEvent(new CustomEvent('3000-play-track', { detail: { src: v.src, title: `${featureSong.title} — ${v.label}` } }));
+  }
+
+  return (
+    <section className="featureWeek" aria-labelledby="feature-week-title">
+      <div className="featureWeekInner">
+        <div className="featureWeekCopy">
+          <span className="vipKicker">{featureSong.weekLabel}</span>
+          <h2 id="feature-week-title">{featureSong.title}</h2>
+          <p className="featureWeekArtist">{featureSong.artist}</p>
+          <p>{version.description}</p>
+          <div className="featureMorphToggle" role="group" aria-label="Switch Jazz or Remix">
+            <button
+              type="button"
+              className={mode === 'jazz' ? 'morphBtn active' : 'morphBtn'}
+              onClick={() => {
+                if (mode !== 'jazz') morph();
+              }}
+            >
+              Jazz Edition
+            </button>
+            <button
+              type="button"
+              className="morphSwitch"
+              onClick={morph}
+              aria-label={`Switch to ${other.label}`}
+            >
+              <span className={mode === 'remix' ? 'morphKnob remix' : 'morphKnob'} />
+            </button>
+            <button
+              type="button"
+              className={mode === 'remix' ? 'morphBtn active' : 'morphBtn'}
+              onClick={() => {
+                if (mode !== 'remix') morph();
+              }}
+            >
+              Remix
+            </button>
+          </div>
+          <button
+            type="button"
+            className="studioButton primary featurePlayBtn"
+            onClick={() =>
+              window.dispatchEvent(
+                new CustomEvent('3000-play-track', {
+                  detail: { src: version.src, title: `${featureSong.title} — ${version.label}` },
+                }),
+              )
+            }
+          >
+            Play {version.label}
+          </button>
+        </div>
+        <button type="button" className="featureArtStage" onClick={morph} aria-label={`Morph to ${other.label}`}>
+          <img
+            key={version.cover}
+            className="featureArtImg"
+            src={version.cover}
+            alt={`${featureSong.title} — ${version.label} artwork`}
+          />
+          <span className="featureArtBadge">{version.label}</span>
+          <span className="featureArtHint">Tap art to morph · Jazz ↔ Remix</span>
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function NoteCatcherGame() {
+  const noteId = useRef(0);
+  const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [notes, setNotes] = useState<FloatingNote[]>([]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      noteId.current += 1;
+      setNotes((current) => [
+        ...current.slice(-8),
+        {
+          id: noteId.current,
+          x: Math.random() * 80 + 10,
+          y: Math.random() * 60 + 15,
+          size: Math.random() * 18 + 22,
+        },
+      ]);
+    }, Math.max(900 - level * 80, 320));
+    return () => window.clearInterval(interval);
+  }, [level]);
+
+  useEffect(() => {
+    const nextLevel = Math.floor(score / 50) + 1;
+    if (nextLevel !== level) setLevel(nextLevel);
+  }, [score, level]);
+
+  const catchNote = (id: number) => {
+    setScore((s) => s + 10);
+    setNotes((current) => current.filter((n) => n.id !== id));
+    playPop();
+    if (navigator.vibrate) navigator.vibrate(18);
+  };
+
+  return (
+    <section className="noteCatcher" aria-labelledby="note-catcher-title">
+      <div className="noteCatcherHeader">
+        <span className="vipKicker">VIP Arcade</span>
+        <h2 id="note-catcher-title">Note Catcher</h2>
+        <p>Tap the floating notes. Higher levels move faster.</p>
+        <div className="noteStats">
+          <span>Score {score}</span>
+          <span>Level {level}</span>
+        </div>
+      </div>
+      <div className="noteArena" role="application" aria-label="Note catcher game area">
+        {notes.map((note) => (
+          <button
+            key={note.id}
+            type="button"
+            className="floatingNote"
+            style={{ left: `${note.x}%`, top: `${note.y}%`, width: note.size, height: note.size }}
+            onClick={() => catchNote(note.id)}
+            aria-label="Catch music note"
+          >
+            ♪
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -366,7 +500,6 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
       <div className="vipEnergyDivider" aria-hidden="true" />
       <footer className="vipFooter">
         <AudioReactiveWallpaper variant="global" />
-        <VipLeaderboard />
         <div className="footerBrand">
           <strong>3000 Studios</strong>
           <p>Music, cinematic video content, live streams, sponsorships, song requests, and private creator operations.</p>
@@ -393,7 +526,6 @@ export function Home() {
 
   return (
     <PublicLayout variant="spiral">
-      <VipExperience />
       <main className="vipMain">
         <section className="redCarpetHero">
           <video src={INTRO_VIDEO} autoPlay muted loop playsInline preload="auto" />
@@ -421,6 +553,10 @@ export function Home() {
 
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
 
+        <FeatureOfTheWeek />
+
+        <NoteCatcherGame />
+
         <motion.section className="vipSection featureRail" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
           {[
             ['Music Showcase', 'Original tracks, playable previews, direct purchase and licensing paths.'],
@@ -433,6 +569,24 @@ export function Home() {
               <p>{copy}</p>
             </motion.article>
           ))}
+        </motion.section>
+
+        <motion.section className="vipSection networkSection" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
+          <motion.span className="vipKicker" variants={fadeUp}>
+            3000 Studios Network
+          </motion.span>
+          <motion.h2 variants={fadeUp}>All doors open for VIP members</motion.h2>
+          <div className="networkGrid">
+            {networkSites.map((site) => (
+              <motion.article className="vipCard networkCard" key={site.name} variants={fadeUp}>
+                <span className="networkTag">{site.tag}</span>
+                <h3>{site.name}</h3>
+                <StudioButton to={site.url.startsWith('http') ? undefined : site.url} href={site.url.startsWith('http') ? site.url : undefined} variant="secondary">
+                  Enter
+                </StudioButton>
+              </motion.article>
+            ))}
+          </div>
         </motion.section>
       </main>
     </PublicLayout>
@@ -542,11 +696,7 @@ export function MusicShowcase() {
                 <h2>{song.title}</h2>
                 <p>{song.description}</p>
               </div>
-              <button
-                type="button"
-                className="trackSelectButton"
-                onClick={() => selectSong(song.rank - 1)}
-              >
+              <button type="button" className="trackSelectButton" onClick={() => selectSong(song.rank - 1)}>
                 Play Full Song
               </button>
             </motion.article>
@@ -572,9 +722,7 @@ export function VideoPage() {
           <video className="featureVideo" src={INTRO_VIDEO} controls playsInline preload="metadata" />
           <div className="vipCard">
             <h2>Opening video</h2>
-            <p>
-              This real site asset loads as the first impression on the homepage and remains available here as the official featured video slot.
-            </p>
+            <p>This real site asset loads as the first impression on the homepage and remains available here as the official featured video slot.</p>
             <StudioButton to="/sponsors">Sponsor A Video</StudioButton>
           </div>
         </section>
@@ -599,10 +747,11 @@ export function LivePage() {
           </motion.span>
           <motion.h1 variants={fadeUp}>Watch 3000 Studios live when the broadcast is active.</motion.h1>
           <motion.p variants={fadeUp}>
-            Public playback is wired for Cloudflare Stream. Ingest keys stay in Cloudflare and OBS, not in the browser.
+            Public playback is powered by Cloudflare Stream. When you go live from the owner admin console and OBS,
+            this page plays the broadcast automatically. Stream keys stay in Cloudflare and OBS only.
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
-            <StudioButton to={ADMIN_PATH}>Owner Stream Console</StudioButton>
+            <StudioButton to={ADMIN_PATH}>Owner Admin Console</StudioButton>
             <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20live%20stream`} variant="secondary">
               Stream Inquiry
             </StudioButton>
@@ -610,12 +759,22 @@ export function LivePage() {
         </motion.section>
         <section className="streamPublicPanel">
           {embedUrl ? (
-            <iframe title="3000 Studios live stream" src={embedUrl} allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+            <div style={{ position: 'relative', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,211,106,0.22)', boxShadow: '0 24px 70px rgba(0,0,0,0.45)' }}>
+              <iframe
+                title="3000 Studios live stream"
+                src={embedUrl}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           ) : (
             <div className="vipCard">
               <h2>Stream setup required</h2>
               <p>
-                Add VITE_STREAM_CUSTOMER_CODE and VITE_STREAM_LIVE_INPUT_ID in Cloudflare Pages after creating the Stream live input.
+                Add <code>VITE_STREAM_CUSTOMER_CODE</code> and <code>VITE_STREAM_LIVE_INPUT_ID</code> in Cloudflare Pages
+                after creating the Stream live input. Then open the passcode-protected admin at{' '}
+                <Link to="/admin">/admin</Link> to run the go-live checklist.
               </p>
             </div>
           )}
@@ -727,14 +886,14 @@ export function RequestsPage() {
             {ideas.map((item) => (
               <article className="messageCard requestCard" key={item.id}>
                 <strong>{item.idea}</strong>
-                <span>{item.name} / {item.mood} / {safeDate(item.createdAt)}</span>
+                <span>
+                  {item.name} / {item.mood} / {safeDate(item.createdAt)}
+                </span>
                 <button
                   type="button"
                   onClick={() =>
                     setIdeas((current) =>
-                      current.map((ideaItem) =>
-                        ideaItem.id === item.id ? { ...ideaItem, votes: ideaItem.votes + 1 } : ideaItem,
-                      ),
+                      current.map((ideaItem) => (ideaItem.id === item.id ? { ...ideaItem, votes: ideaItem.votes + 1 } : ideaItem)),
                     )
                   }
                 >
@@ -797,9 +956,7 @@ export function SponsorsPage() {
             Built for music brands, creator tools, local businesses, labels, production partners, and stream sponsors.
           </motion.p>
           <motion.div variants={fadeUp}>
-            <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20sponsorship`}>
-              Request Sponsor Package
-            </StudioButton>
+            <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20sponsorship`}>Request Sponsor Package</StudioButton>
           </motion.div>
         </motion.section>
         <section className="sponsorGrid">
@@ -836,7 +993,9 @@ export function ContactPage() {
         <section className="vipPageHero">
           <span className="vipKicker">Contact</span>
           <h1>Book music, video, sponsorship, licensing, or live stream support.</h1>
-          <p>Email <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a> with the release, budget, timeline, and rights needed.</p>
+          <p>
+            Email <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a> with the release, budget, timeline, and rights needed.
+          </p>
         </section>
       </main>
     </PublicLayout>
@@ -847,28 +1006,23 @@ export function LegalPage({ type }: { type: 'privacy' | 'terms' | 'copyright' | 
   const content = {
     privacy: {
       title: 'Privacy Policy',
-      text:
-        '3000 Studios VIP limits personal data collection to contact requests, site operations, security, analytics, advertising measurement, legal compliance, and optional community submissions. Google AdSense may use cookies or similar technologies to serve and measure ads when ad serving is active. Do not submit sensitive personal information in public forms.',
+      text: '3000 Studios VIP limits personal data collection to contact requests, site operations, security, analytics, advertising measurement, legal compliance, and optional community submissions. Google AdSense may use cookies or similar technologies to serve and measure ads when ad serving is active. Do not submit sensitive personal information in public forms.',
     },
     terms: {
       title: 'Terms Of Use',
-      text:
-        'By using this site you agree to lawful use, respectful community behavior, no scraping or abuse, and no unauthorized copying of music, videos, visuals, source code, private streams, or protected admin content.',
+      text: 'By using this site you agree to lawful use, respectful community behavior, no scraping or abuse, and no unauthorized copying of music, videos, visuals, source code, private streams, or protected admin content.',
     },
     copyright: {
       title: 'Copyright And DMCA',
-      text:
-        'All original music, video, graphics, branding, and site content are owned by 3000 Studios or their respective rights holders. For takedown or licensing requests, send a detailed notice to the contact email.',
+      text: 'All original music, video, graphics, branding, and site content are owned by 3000 Studios or their respective rights holders. For takedown or licensing requests, send a detailed notice to the contact email.',
     },
     cookies: {
       title: 'Cookie Notice',
-      text:
-        'The site may use necessary storage for preferences, local community entries, playback settings, security, analytics, AdSense advertising, fraud prevention, and advertising review. Browser controls can clear local data at any time.',
+      text: 'The site may use necessary storage for preferences, local community entries, playback settings, security, analytics, AdSense advertising, fraud prevention, and advertising review. Browser controls can clear local data at any time.',
     },
     disclaimer: {
       title: 'Legal Disclaimer',
-      text:
-        'The site provides music, media, entertainment, community, and business information. It is not legal, financial, medical, or professional advice. Sponsorships and offers require separate written approval.',
+      text: 'The site provides music, media, entertainment, community, and business information. It is not legal, financial, medical, or professional advice. Sponsorships and offers require separate written approval.',
     },
   }[type];
 
