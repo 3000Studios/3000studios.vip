@@ -84,13 +84,6 @@ type RequestIdea = {
   createdAt: string;
 };
 
-type FloatingNote = {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-};
-
 function safeDate(value: string) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
 }
@@ -409,64 +402,6 @@ function FeatureOfTheWeek() {
   );
 }
 
-function NoteCatcherGame() {
-  const noteId = useRef(0);
-  const [score, setScore] = useState(0);
-  const [notes, setNotes] = useState<FloatingNote[]>([]);
-  const level = useMemo(() => Math.floor(score / 50) + 1, [score]);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      noteId.current += 1;
-      setNotes((current) => [
-        ...current.slice(-8),
-        {
-          id: noteId.current,
-          x: Math.random() * 80 + 10,
-          y: Math.random() * 60 + 15,
-          size: Math.random() * 18 + 22,
-        },
-      ]);
-    }, Math.max(900 - level * 80, 320));
-    return () => window.clearInterval(interval);
-  }, [level]);
-
-  const catchNote = (id: number) => {
-    setScore((s) => s + 10);
-    setNotes((current) => current.filter((n) => n.id !== id));
-    playPop();
-    if (navigator.vibrate) navigator.vibrate(18);
-  };
-
-  return (
-    <section className="noteCatcher" aria-labelledby="note-catcher-title">
-      <div className="noteCatcherHeader">
-        <span className="vipKicker">VIP Arcade</span>
-        <h2 id="note-catcher-title">Note Catcher</h2>
-        <p>Tap the floating notes. Higher levels move faster.</p>
-        <div className="noteStats">
-          <span>Score {score}</span>
-          <span>Level {level}</span>
-        </div>
-      </div>
-      <div className="noteArena" role="application" aria-label="Note catcher game area">
-        {notes.map((note) => (
-          <button
-            key={note.id}
-            type="button"
-            className="floatingNote"
-            style={{ left: `${note.x}%`, top: `${note.y}%`, width: note.size, height: note.size }}
-            onClick={() => catchNote(note.id)}
-            aria-label="Catch music note"
-          >
-            ♪
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 export function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -549,8 +484,6 @@ export function Home() {
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
 
         <FeatureOfTheWeek />
-
-        <NoteCatcherGame />
 
         <motion.section className="vipSection featureRail" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
           {[
