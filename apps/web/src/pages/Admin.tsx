@@ -438,7 +438,7 @@ export function Admin() {
                       <code>{liveInputId}</code> → look for <strong>webRTC</strong> / WHIP URL. It
                       looks like{' '}
                       <code>
-                        https://customer-{customerCode}.cloudflarestream.com/<secret>/webRTC/publish
+                        https://customer-{customerCode}.cloudflarestream.com/{'<secret>'}/webRTC/publish
                       </code>
                       . Never share that secret publicly.
                     </p>
