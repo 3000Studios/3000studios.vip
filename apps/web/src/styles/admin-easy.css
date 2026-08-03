@@ -1,0 +1,245 @@
+/* Admin Go Live — simple guided UI */
+.adminEasyShell .adminCodeModal {
+  max-width: 420px;
+  display: grid;
+  gap: 12px;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: rgba(8, 12, 22, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+.adminEasyShell .adminCodeModal span:first-child {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.85);
+}
+.adminEasyShell .adminCodeModal h2 {
+  margin: 0;
+  color: #f8fafc;
+}
+.adminEasyShell .adminCodeModal p {
+  margin: 0;
+  color: rgba(203, 213, 225, 0.75);
+  line-height: 1.5;
+}
+.adminEasyShell .adminCodeModal label span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(203, 213, 225, 0.7);
+}
+.adminEasyShell .adminCodeModal input {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(2, 6, 14, 0.85);
+  color: #e2e8f0;
+  padding: 10px 12px;
+}
+.adminError {
+  color: #fecaca;
+  font-size: 13px;
+  font-weight: 600;
+}
+.adminBackLink {
+  text-align: center;
+  color: rgba(148, 163, 184, 0.7);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.easyStatusStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.easyChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e2e8f0;
+}
+.easyChip.ok {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(22, 101, 52, 0.25);
+  color: #bbf7d0;
+}
+.easyChip.warn {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(120, 53, 15, 0.25);
+  color: #fde68a;
+}
+.easyChip.bad {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(127, 29, 29, 0.3);
+  color: #fecaca;
+}
+.easyChip.info {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(30, 58, 138, 0.25);
+  color: #bfdbfe;
+}
+
+.easyPathTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.easyPathTab {
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(2, 6, 14, 0.55);
+  color: #e2e8f0;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 15px;
+  display: grid;
+  gap: 6px;
+}
+.easyPathTab small {
+  font-weight: 600;
+  font-size: 12px;
+  color: rgba(148, 163, 184, 0.85);
+}
+.easyPathTab.active {
+  border-color: rgba(255, 215, 0, 0.45);
+  background: linear-gradient(160deg, rgba(40, 28, 8, 0.9), rgba(12, 10, 6, 0.95));
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.12), 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.easyGuide h3 {
+  margin: 0 0 10px;
+  color: #f6e7b0;
+  font-size: 1.05rem;
+}
+.easySteps {
+  margin: 0 0 14px;
+  padding-left: 1.2rem;
+  color: rgba(226, 232, 240, 0.88);
+  line-height: 1.55;
+  font-size: 14px;
+}
+.easySteps li { margin-bottom: 6px; }
+.easySteps a { color: #ffd700; }
+
+.easyField {
+  display: block;
+  margin-bottom: 12px;
+}
+.easyField span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(203, 213, 225, 0.75);
+}
+.easyField input {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(2, 6, 14, 0.85);
+  color: #e2e8f0;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.easyBtnRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.easyHint {
+  margin-top: 12px !important;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.easyCopyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.easyCopyCard {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(2, 6, 14, 0.6);
+}
+.easyCopyLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.8);
+}
+.easyCopyCard code {
+  font-size: 12px;
+  color: #fde68a;
+  word-break: break-all;
+}
+
+.easyObsTips {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.18);
+  background: rgba(40, 28, 8, 0.35);
+  margin-bottom: 12px;
+  color: rgba(244, 239, 231, 0.88);
+  font-size: 13px;
+}
+.easyObsTips strong { color: #ffd700; }
+.easyObsTips ul {
+  margin: 8px 0 0;
+  padding-left: 1.1rem;
+  line-height: 1.5;
+}
+
+.easyCheatGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.easyCheatGrid > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(2, 6, 14, 0.45);
+}
+.easyCheatGrid strong {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffd700;
+}
+.easyCheatGrid span {
+  font-size: 13px;
+  color: rgba(226, 232, 240, 0.9);
+  word-break: break-word;
+}
+
+@media (max-width: 900px) {
+  .easyPathTabs,
+  .easyCopyGrid {
+    grid-template-columns: 1fr;
+  }
+}
