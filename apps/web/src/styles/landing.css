@@ -392,36 +392,6 @@ button, input, select, textarea { font: inherit; }
   text-transform: uppercase;
 }
 
-/* Note Catcher */
-.noteCatcher {
-  max-width: 1120px;
-  margin: 0 auto 3rem;
-  padding: 0 1.25rem;
-}
-.noteCatcherHeader { margin-bottom: 1rem; }
-.noteStats { display: flex; gap: 1rem; margin-top: 0.5rem; font-weight: 700; color: #ffd700; }
-.noteArena {
-  position: relative;
-  min-height: 280px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 215, 0, 0.18);
-  background: rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-}
-.floatingNote {
-  position: absolute;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ffd700, #f0a500);
-  color: #1a1005;
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(255, 185, 0, 0.25);
-  transition: transform 120ms ease;
-}
-.floatingNote:hover { transform: scale(1.12); }
-
-/* Sections / cards */
 .vipSection {
   max-width: 1120px;
   margin: 0 auto 3rem;
@@ -451,7 +421,6 @@ button, input, select, textarea { font: inherit; }
   color: #ffd700;
 }
 
-/* Music carousel basics */
 .itunesScrollerSection { max-width: 1120px; margin: 0 auto 3rem; padding: 0 1.25rem; }
 .itunesScroller {
   position: relative;
@@ -506,7 +475,6 @@ button, input, select, textarea { font: inherit; }
   cursor: pointer;
 }
 
-/* Forms / misc */
 .vipForm { display: grid; gap: 0.75rem; }
 .vipForm input, .vipForm textarea, .vipForm select {
   width: 100%;
@@ -547,7 +515,6 @@ button, input, select, textarea { font: inherit; }
   color: rgba(244, 239, 231, 0.55);
   font-size: 0.8rem;
 }
-.streamPublicPanel { max-width: 1120px; margin: 0 auto 3rem; padding: 0 1.25rem; }
 
 @media (max-width: 900px) {
   .featureWeekInner { grid-template-columns: 1fr; gap: 1.35rem; }
@@ -568,4 +535,250 @@ button, input, select, textarea { font: inherit; }
   .vipNav.open { display: flex; }
   .globalPlayer { flex-wrap: wrap; top: 52px; }
   .globalPlayer select { max-width: 100%; }
+}
+
+/* ── Live / Standby stream window (public + admin) ── */
+.streamPublicPanel { max-width: 1120px; margin: 0 auto 3rem; padding: 0 1.25rem; }
+.streamFrame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 211, 106, 0.22);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  background: #000;
+}
+.streamVideo,
+.streamIframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+  object-fit: contain;
+}
+.streamLiveBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 6;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.92);
+  color: #fff;
+  font: 800 0.7rem/1 Arial, Helvetica, sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
+}
+.streamToolbar {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.streamStatus {
+  color: rgba(226, 232, 240, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+}
+.streamToolbarActions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.standbyStage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(255, 215, 0, 0.12), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(139, 0, 0, 0.2), transparent 55%),
+    linear-gradient(180deg, #0a0806 0%, #050403 100%);
+}
+.standbyArtWrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 1.25rem 1.25rem 0.5rem;
+}
+.standbyCover {
+  max-width: min(42%, 280px);
+  max-height: 70%;
+  width: auto;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 40px rgba(255, 215, 0, 0.12);
+  animation: featureArtIn 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.standbyCoverFallback {
+  max-width: min(42%, 280px);
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  align-content: end;
+  gap: 0.35rem;
+  padding: 1.1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 0, 0.28);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 215, 0, 0.18), transparent 50%),
+    linear-gradient(160deg, #2a1a08, #120c08);
+  text-align: left;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+.standbyRank { color: #ffd700; font-weight: 900; font-size: 0.75rem; letter-spacing: 0.08em; }
+.standbyCoverFallback strong { color: #f6e7b0; font-size: 0.95rem; line-height: 1.25; }
+.standbyCoverFallback small { color: rgba(244, 239, 231, 0.55); font-size: 0.7rem; }
+.standbyVignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+}
+.standbyGlow {
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  left: 30%;
+  top: 20%;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.08);
+  filter: blur(40px);
+  pointer-events: none;
+}
+.standbyMeta {
+  position: relative;
+  z-index: 2;
+  padding: 0.5rem 1.25rem 0.75rem;
+  text-align: center;
+}
+.standbyNow {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffd700;
+}
+.standbyTitle {
+  display: block;
+  color: #f6e7b0;
+  font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+  line-height: 1.25;
+  text-shadow: 0 2px 16px rgba(255, 215, 0, 0.2);
+}
+.standbyDesc {
+  margin: 0.35rem auto 0;
+  max-width: 520px;
+  color: rgba(244, 239, 231, 0.7);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+.standbyControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.65rem;
+}
+.standbyBtn {
+  min-height: 2.2rem !important;
+  padding: 0.45rem 0.95rem !important;
+  font-size: 0.75rem !important;
+}
+
+.streamMarquee {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  height: 36px;
+  border-top: 1px solid rgba(255, 215, 0, 0.28);
+  background: linear-gradient(90deg, rgba(20, 10, 0, 0.95), rgba(40, 8, 8, 0.95), rgba(20, 10, 0, 0.95));
+}
+.streamMarqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: streamMarquee 22s linear infinite;
+  white-space: nowrap;
+}
+.streamMarqueeTrack span {
+  padding: 0 0.5rem;
+  font: 800 0.78rem/36px Arial, Helvetica, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+}
+@keyframes streamMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.standbyStage.compact .standbyCover,
+.standbyStage.compact .standbyCoverFallback {
+  max-width: min(48%, 200px);
+}
+.standbyStage.compact .standbyDesc { display: none; }
+
+.adminStreamGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.adminCameraFrame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0a0f1a;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  margin-bottom: 14px;
+}
+.adminCameraOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(203, 213, 225, 0.55);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.adminPublicPreview { margin-bottom: 0; }
+.adminLivePublicNote {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(220, 38, 38, 0.2), transparent 55%),
+    #0a0806;
+}
+.adminLivePublicNote strong {
+  color: #fecaca;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+}
+.adminLivePublicNote p {
+  margin: 0;
+  color: rgba(244, 239, 231, 0.75);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .adminStreamGrid { grid-template-columns: 1fr; }
+  .standbyCover, .standbyCoverFallback { max-width: min(55%, 220px); }
 }
