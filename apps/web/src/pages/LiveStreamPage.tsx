@@ -9,7 +9,7 @@ const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const ADMIN_PATH = '/admin';
 
 const DEFAULT_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
-const DEFAULT_LIVE_INPUT_ID = '6502a441fdad0df6eebf3270a569c1ab';
+const DEFAULT_LIVE_INPUT_ID = '654382980fc1896d6e16b1e66a299bd6';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const fadeUp: Variants = {
