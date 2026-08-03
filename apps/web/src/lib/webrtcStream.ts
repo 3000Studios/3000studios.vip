@@ -54,13 +54,40 @@ export class WhipPublisher {
   private localStream: MediaStream | null = null;
   private resourceUrl: string | null = null;
   private endpoint: string;
+  private ownsTracks = true;
 
   constructor(endpoint: string) {
     this.endpoint = endpoint.trim();
   }
 
+  /** Publish a pre-built stream (e.g. StreamStudio canvas + mic). */
+  async startWithStream(stream: MediaStream, previewEl?: HTMLVideoElement | HTMLCanvasElement): Promise<void> {
+    await this.stop();
+    this.ownsTracks = false;
+
+    this.pc = new RTCPeerConnection({
+      iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }],
+      bundlePolicy: 'max-bundle',
+    });
+
+    this.localStream = stream;
+    stream.getTracks().forEach((track) => {
+      this.pc!.addTransceiver(track, { direction: 'sendonly' });
+    });
+
+    if (previewEl && 'srcObject' in previewEl) {
+      (previewEl as HTMLVideoElement).srcObject = stream;
+      (previewEl as HTMLVideoElement).muted = true;
+      (previewEl as HTMLVideoElement).playsInline = true;
+      await (previewEl as HTMLVideoElement).play().catch(() => undefined);
+    }
+
+    this.resourceUrl = await negotiateOffer(this.pc, this.endpoint);
+  }
+
   async start(videoEl: HTMLVideoElement, facingMode: 'user' | 'environment' = 'user'): Promise<void> {
     await this.stop();
+    this.ownsTracks = true;
 
     this.pc = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }],
@@ -95,6 +122,11 @@ export class WhipPublisher {
     this.resourceUrl = await negotiateOffer(this.pc, this.endpoint);
   }
 
+  async replaceVideoTrack(track: MediaStreamTrack): Promise<void> {
+    const sender = this.pc?.getSenders().find((s) => s.track?.kind === 'video');
+    if (sender) await sender.replaceTrack(track);
+  }
+
   async stop(): Promise<void> {
     try {
       const delUrl = this.resourceUrl
@@ -108,7 +140,9 @@ export class WhipPublisher {
     }
     this.pc?.close();
     this.pc = null;
-    this.localStream?.getTracks().forEach((t) => t.stop());
+    if (this.ownsTracks) {
+      this.localStream?.getTracks().forEach((t) => t.stop());
+    }
     this.localStream = null;
     this.resourceUrl = null;
   }
