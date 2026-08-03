@@ -9,7 +9,7 @@ const AUTH_KEY = '3000-admin-auth-v1';
 const LIVE_FLAG_KEY = '3000-stream-live-v1';
 
 const DEFAULT_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
-const DEFAULT_LIVE_INPUT_ID = '6502a441fdad0df6eebf3270a569c1ab';
+const DEFAULT_LIVE_INPUT_ID = '654382980fc1896d6e16b1e66a299bd6';
 
 const OBS_SERVER = 'rtmps://live.cloudflare.com:443/live/';
 const CF_LIVE_INPUTS_URL = 'https://dash.cloudflare.com/?to=/:account/stream/inputs';
