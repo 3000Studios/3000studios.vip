@@ -7,6 +7,7 @@
 @import './styles/mobile-touch.css';
 @import './styles/admin-easy.css';
 @import './styles/stream-studio.css';
+@import './styles/blackscreen-fix.css';
 
 .routeLoader {
   min-height: 100vh;
