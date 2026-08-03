@@ -1,0 +1,37 @@
+/* Prevent pure-black homepage when motion/animation fails or cache is stale */
+.heroCopy,
+.vipPageHero,
+.beatGoldTitle,
+.featureWeek,
+.vipMain,
+.globalPlayer,
+.vipHeader {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.beatGoldTitle {
+  color: #f6e7b0 !important;
+  text-shadow: 0 4px 30px rgba(255, 215, 0, 0.4);
+}
+
+.heroCopy p {
+  color: rgba(244, 239, 231, 0.92) !important;
+}
+
+.redCarpetHero {
+  background: #0a0806;
+  min-height: min(72vh, 680px);
+}
+
+.vipSite {
+  color: #f4efe7;
+}
+
+/* Keep sticky chrome readable on dark video */
+.vipHeader {
+  background: rgba(2, 4, 5, 0.88) !important;
+}
+.globalPlayer {
+  background: rgba(0, 0, 0, 0.88) !important;
+}
