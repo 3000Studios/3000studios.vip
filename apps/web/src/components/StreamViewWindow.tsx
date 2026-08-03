@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { featureSong, rolloutSongs } from '../data/music';
 
 function resolveCover(src: string): string {
@@ -31,20 +31,13 @@ const playlist = rolloutSongs.map((song) => ({
 }));
 
 type StreamViewWindowProps = {
-  /** When true, hide audio standby and show only live chrome */
   isLive?: boolean;
-  /** Compact layout for admin panels */
   compact?: boolean;
-  /** Mute autoplay for admin preview so it does not fight the camera mic */
   muted?: boolean;
   className?: string;
 };
 
-/**
- * Shared live window for public /live and admin.
- * Offline: rotates VIP catalog with cover art + STREAMING SOON marquee.
- * Online: parent supplies the live video layer on top.
- */
+/** Shared live window: catalog standby + covers + STREAMING SOON until go-live */
 export function StandbyMusicWindow({
   compact = false,
   muted = false,
@@ -162,7 +155,7 @@ export function StreamFrame({
   isLive = false,
   className = '',
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   isLive?: boolean;
   className?: string;
 }) {
