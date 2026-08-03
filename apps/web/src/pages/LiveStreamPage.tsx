@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { PublicLayout } from './Home';
+import { featureSong, rolloutSongs } from '../data/music';
 import { WhepPlayer, buildWhepUrl, STREAM_MODE_KEY } from '../lib/webrtcStream';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
@@ -20,6 +21,133 @@ const stagger: Variants = {
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.06 } },
 };
 
+/** Resolve cover art path for a catalog track */
+function resolveCover(src: string, title: string): string {
+  if (src.includes('lick-my-balls-jazz')) return featureSong.jazz.cover;
+  if (src.includes('lick-my-balls-remix')) return featureSong.remix.cover;
+
+  // Convention: /media/foo.mp3 → try /media/foo-cover.jpg, then slug-based aliases
+  const base = src.replace(/\.mp3$/i, '').replace(/^\/media\//, '');
+  const aliases: Record<string, string> = {
+    'always-feel-like': '/media/lick-my-balls-jazz-cover.jpg',
+    'betty-boom-boom': '/media/lick-my-balls-remix-cover.jpg',
+    'outkast-3000-studios-style': '/media/lick-my-balls-remix-cover.jpg',
+    'ride-smooth': '/media/lick-my-balls-jazz-cover.jpg',
+    'so-fresh-so-cosmic': '/media/lick-my-balls-jazz-cover.jpg',
+    'waynes-world': '/media/lick-my-balls-remix-cover.jpg',
+    'waynes-world-laid-back-weezy-mix': '/media/lick-my-balls-remix-cover.jpg',
+    'i-always-feel-like': '/media/lick-my-balls-jazz-cover.jpg',
+    'i-always-feel-like-someones': '/media/lick-my-balls-jazz-cover.jpg',
+  };
+  if (aliases[base]) return aliases[base];
+
+  // Prefer explicit -cover.jpg next to the mp3 when uploaded later
+  void title;
+  return `/media/${base}-cover.jpg`;
+}
+
+const playlist = rolloutSongs.map((song) => ({
+  ...song,
+  cover: resolveCover(song.src, song.title),
+}));
+
+function StandbyMusicWindow() {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [coverBroken, setCoverBroken] = useState(false);
+  const song = playlist[index] ?? playlist[0];
+
+  const next = useCallback(() => {
+    setCoverBroken(false);
+    setIndex((i) => (i + 1) % playlist.length);
+  }, []);
+
+  const prev = useCallback(() => {
+    setCoverBroken(false);
+    setIndex((i) => (i - 1 + playlist.length) % playlist.length);
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.src = song.src;
+    audio.volume = 0.55;
+    const attempt = audio.play();
+    if (attempt) {
+      void attempt.then(() => setPlaying(true)).catch(() => setPlaying(false));
+    }
+  }, [song.src]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onEnded = () => next();
+    audio.addEventListener('ended', onEnded);
+    return () => audio.removeEventListener('ended', onEnded);
+  }, [next]);
+
+  function toggle() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+      setPlaying(false);
+      return;
+    }
+    void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+  }
+
+  return (
+    <div className="standbyStage" aria-label="Standby music player until live">
+      <audio ref={audioRef} preload="auto" />
+
+      <div className="standbyArtWrap">
+        {!coverBroken ? (
+          <img
+            key={song.cover}
+            className="standbyCover"
+            src={song.cover}
+            alt={`${song.title} cover art`}
+            onError={() => setCoverBroken(true)}
+          />
+        ) : (
+          <div className="standbyCoverFallback" aria-hidden="true">
+            <span className="standbyRank">#{song.rank}</span>
+            <strong>{song.title}</strong>
+            <small>3000 Studios Original</small>
+          </div>
+        )}
+        <div className="standbyVignette" />
+      </div>
+
+      <div className="standbyMeta">
+        <span className="standbyNow">Now spinning</span>
+        <strong className="standbyTitle">{song.title}</strong>
+        <p className="standbyDesc">{song.description}</p>
+        <div className="standbyControls">
+          <button type="button" className="studioButton secondary" onClick={prev}>
+            Prev
+          </button>
+          <button type="button" className="studioButton primary" onClick={toggle}>
+            {playing ? 'Pause' : 'Play'}
+          </button>
+          <button type="button" className="studioButton secondary" onClick={next}>
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div className="streamMarquee" aria-hidden="true">
+        <div className="streamMarqueeTrack">
+          <span>STREAMING SOON · 3000 STUDIOS LIVE · GO LIVE FROM /ADMIN · STREAMING SOON · 3000 STUDIOS LIVE · GO LIVE FROM /ADMIN · </span>
+          <span>STREAMING SOON · 3000 STUDIOS LIVE · GO LIVE FROM /ADMIN · STREAMING SOON · 3000 STUDIOS LIVE · GO LIVE FROM /ADMIN · </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function LiveStreamPage() {
   const customerCode =
     import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() || DEFAULT_CUSTOMER_CODE;
@@ -35,42 +163,60 @@ export function LiveStreamPage() {
   const playerRef = useRef<WhepPlayer | null>(null);
   const [mode, setMode] = useState<'whep' | 'hls'>('whep');
   const [status, setStatus] = useState<'connecting' | 'live' | 'idle' | 'error'>('connecting');
+  const isLive = status === 'live';
+
+  const tryConnect = useCallback(async () => {
+    if (!whepUrl || !videoRef.current) {
+      setStatus('idle');
+      setMode('hls');
+      return;
+    }
+    setStatus('connecting');
+    try {
+      await playerRef.current?.stop();
+      const player = new WhepPlayer(whepUrl);
+      playerRef.current = player;
+      await player.start(videoRef.current);
+      setStatus('live');
+      setMode('whep');
+      try {
+        localStorage.setItem(STREAM_MODE_KEY, 'webrtc');
+      } catch {
+        /* ignore */
+      }
+    } catch {
+      setStatus('idle');
+      setMode('hls');
+    }
+  }, [whepUrl]);
 
   useEffect(() => {
     let cancelled = false;
+    void (async () => {
+      if (cancelled) return;
+      await tryConnect();
+    })();
 
-    async function connect() {
-      if (!whepUrl || !videoRef.current) return;
-      setStatus('connecting');
-      try {
-        const player = new WhepPlayer(whepUrl);
-        playerRef.current = player;
-        await player.start(videoRef.current);
-        if (!cancelled) {
-          setStatus('live');
-          setMode('whep');
-          try {
-            localStorage.setItem(STREAM_MODE_KEY, 'webrtc');
-          } catch {
-            /* ignore */
-          }
-        }
-      } catch {
-        if (!cancelled) {
-          setStatus('idle');
-          setMode('hls');
-        }
-      }
-    }
-
-    void connect();
+    // Re-check every 20s so the page flips to live when the owner goes on air
+    const poll = window.setInterval(() => {
+      if (cancelled) return;
+      if (status !== 'live') void tryConnect();
+    }, 20000);
 
     return () => {
       cancelled = true;
+      window.clearInterval(poll);
       void playerRef.current?.stop();
       playerRef.current = null;
     };
-  }, [whepUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tryConnect]);
+
+  const statusLabel = useMemo(() => {
+    if (isLive) return '● Live · low-latency WebRTC';
+    if (status === 'connecting') return 'Checking for live broadcast…';
+    return 'Standby · catalog rotation until go-live';
+  }, [isLive, status]);
 
   return (
     <PublicLayout variant="blackhole">
@@ -81,8 +227,8 @@ export function LiveStreamPage() {
           </motion.span>
           <motion.h1 variants={fadeUp}>Watch 3000 Studios live.</motion.h1>
           <motion.p variants={fadeUp}>
-            Phone and browser broadcasts appear here instantly via Cloudflare WebRTC. Owner goes live
-            from the admin console (passcode 3000) — no OBS required.
+            Until the owner goes live, this window rotates the VIP catalog with cover art. When the
+            broadcast starts from the admin console, the live feed takes over automatically.
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
             <Link className="studioButton primary" to={ADMIN_PATH}>
@@ -98,107 +244,59 @@ export function LiveStreamPage() {
         </motion.section>
 
         <section className="streamPublicPanel">
-          <div
-            style={{
-              position: 'relative',
-              aspectRatio: '16 / 9',
-              borderRadius: 16,
-              overflow: 'hidden',
-              border: '1px solid rgba(255,211,106,0.22)',
-              boxShadow: '0 24px 70px rgba(0,0,0,0.45)',
-              background: '#000',
-            }}
-          >
-            {/* WHEP player for phone / browser WHIP broadcasts */}
+          <div className="streamFrame">
+            {/* Always mounted so WHEP can attach when broadcast starts */}
             <video
               ref={videoRef}
               playsInline
               autoPlay
-              controls
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                background: '#000',
-                display: mode === 'whep' ? 'block' : 'none',
-              }}
+              controls={isLive}
+              className="streamVideo"
+              style={{ display: isLive && mode === 'whep' ? 'block' : 'none' }}
             />
 
-            {/* HLS / Stream iframe fallback (OBS RTMP path) */}
-            {mode === 'hls' && embedUrl ? (
+            {isLive && mode === 'hls' && embedUrl ? (
               <iframe
                 title="3000 Studios live stream"
                 src={embedUrl}
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+                className="streamIframe"
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen
               />
             ) : null}
 
-            {status === 'connecting' && mode === 'whep' ? (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'grid',
-                  placeItems: 'center',
-                  color: 'rgba(255,255,255,0.65)',
-                  fontWeight: 700,
-                  fontSize: 14,
-                  pointerEvents: 'none',
-                }}
-              >
-                Connecting to live feed…
-              </div>
-            ) : null}
+            {!isLive ? <StandbyMusicWindow /> : null}
 
-            {status === 'idle' && mode === 'hls' ? (
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 12,
-                  left: 12,
-                  right: 12,
-                  textAlign: 'center',
-                  color: 'rgba(255,255,255,0.55)',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  pointerEvents: 'none',
-                }}
-              >
-                Waiting for broadcast · Owner starts from /admin on phone
+            {isLive ? (
+              <div className="streamLiveBadge" aria-hidden="true">
+                LIVE
               </div>
             ) : null}
           </div>
 
-          <div
-            style={{
-              marginTop: 14,
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 10,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span style={{ color: 'rgba(226,232,240,0.7)', fontSize: 13, fontWeight: 600 }}>
-              {status === 'live'
-                ? '● Live · low-latency WebRTC'
-                : mode === 'hls'
-                  ? 'Stream player · starts when broadcast is active'
-                  : 'Connecting…'}
-            </span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                type="button"
-                className="studioButton secondary"
-                style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
-                onClick={() => setMode((m) => (m === 'whep' ? 'hls' : 'whep'))}
-              >
-                Switch to {mode === 'whep' ? 'HLS player' : 'WebRTC player'}
-              </button>
+          <div className="streamToolbar">
+            <span className="streamStatus">{statusLabel}</span>
+            <div className="streamToolbarActions">
+              {!isLive ? (
+                <button
+                  type="button"
+                  className="studioButton secondary"
+                  style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
+                  onClick={() => void tryConnect()}
+                >
+                  Check for live now
+                </button>
+              ) : null}
+              {isLive ? (
+                <button
+                  type="button"
+                  className="studioButton secondary"
+                  style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
+                  onClick={() => setMode((m) => (m === 'whep' ? 'hls' : 'whep'))}
+                >
+                  Switch to {mode === 'whep' ? 'HLS player' : 'WebRTC player'}
+                </button>
+              ) : null}
             </div>
           </div>
         </section>
