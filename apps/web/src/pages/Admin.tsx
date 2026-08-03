@@ -6,6 +6,7 @@ import {
   STREAM_MODE_KEY,
   buildWhepUrl,
 } from '../lib/webrtcStream';
+import { StandbyMusicWindow, StreamFrame } from '../components/StreamViewWindow';
 
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
@@ -43,6 +44,7 @@ export function Admin() {
     : null;
   const whepUrl = isConfigured ? buildWhepUrl(customerCode, liveInputId) : null;
   const whipReady = Boolean(whipUrl.trim().includes('/webRTC/publish'));
+  const broadcasting = publishState === 'live';
 
   useEffect(() => {
     return () => {
@@ -187,7 +189,7 @@ export function Admin() {
         <header className="cTopbar">
           <div className="cTitle">
             <h1>Admin Console</h1>
-            <span className="cTitleSub">Phone Go Live · WebRTC · Passcode gated</span>
+            <span className="cTitleSub">Phone Go Live · WebRTC · Public standby preview</span>
           </div>
           <div className="cTopbarRight">
             <span className={`cPill ${publishState === 'live' || isLive ? 'live' : 'warn'}`}>
@@ -210,9 +212,8 @@ export function Admin() {
                 <span className="cTag accent">Stream from your phone</span>
                 <h2>{streamTitle}</h2>
                 <p>
-                  Unlock once, paste your Cloudflare WHIP URL (one-time), then tap{' '}
-                  <strong>Go Live</strong>. Your camera streams directly to Cloudflare — viewers see
-                  it on <strong>/live</strong>. No OBS required.
+                  Left: your camera send. Right: the exact public window viewers see on{' '}
+                  <strong>/live</strong> — catalog covers + STREAMING SOON until you go live.
                 </p>
               </div>
               <div className="cHeroActions">
@@ -258,7 +259,7 @@ export function Admin() {
               <div className={`cKpi ${isConfigured ? 'ok' : 'warn'}`}>
                 <div className="cKpiLabel">Public Player</div>
                 <div className="cKpiValue">/live</div>
-                <div className="cKpiHint">WHEP low-latency playback</div>
+                <div className="cKpiHint">Standby → live auto-switch</div>
               </div>
               <div className="cKpi gold">
                 <div className="cKpiLabel">Camera</div>
@@ -267,24 +268,14 @@ export function Admin() {
               </div>
             </div>
 
-            <section className="cCols">
+            <section className="cCols adminStreamGrid">
               <div className="cPanel">
                 <div className="cPanelHead">
-                  <h2>Live Camera</h2>
-                  <span className="cSub">What you are sending right now</span>
+                  <h2>Your camera (send)</h2>
+                  <span className="cSub">What you are pushing to Cloudflare</span>
                 </div>
                 <div className="cPanelBody">
-                  <div
-                    style={{
-                      position: 'relative',
-                      aspectRatio: '16 / 9',
-                      borderRadius: 12,
-                      overflow: 'hidden',
-                      background: '#0a0f1a',
-                      border: '1px solid rgba(148,163,184,0.18)',
-                      marginBottom: 14,
-                    }}
-                  >
+                  <div className="adminCameraFrame">
                     <video
                       ref={previewRef}
                       muted
@@ -293,19 +284,7 @@ export function Admin() {
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                     {publishState !== 'live' ? (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          display: 'grid',
-                          placeItems: 'center',
-                          color: 'rgba(203,213,225,0.55)',
-                          fontSize: 14,
-                          fontWeight: 600,
-                          textAlign: 'center',
-                          padding: 16,
-                        }}
-                      >
+                      <div className="adminCameraOverlay">
                         {publishState === 'starting'
                           ? 'Requesting camera + connecting to Cloudflare…'
                           : publishState === 'error'
@@ -313,22 +292,7 @@ export function Admin() {
                             : 'Tap Go Live to start from this phone'}
                       </div>
                     ) : (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: 12,
-                          left: 12,
-                          background: 'rgba(220,38,38,0.92)',
-                          color: '#fff',
-                          fontWeight: 800,
-                          fontSize: 12,
-                          letterSpacing: '0.08em',
-                          padding: '6px 10px',
-                          borderRadius: 999,
-                        }}
-                      >
-                        ● LIVE
-                      </div>
+                      <div className="streamLiveBadge">● LIVE</div>
                     )}
                   </div>
 
@@ -365,11 +329,42 @@ export function Admin() {
 
                   <p className="cMuted" style={{ marginTop: 12, fontSize: 13, lineHeight: 1.5 }}>
                     Keep this tab open while live. Closing the tab or locking the phone may stop the
-                    broadcast on some devices. Use a strong Wi‑Fi connection when possible.
+                    broadcast on some devices.
                   </p>
                 </div>
               </div>
 
+              <div className="cPanel">
+                <div className="cPanelHead">
+                  <h2>Public live window</h2>
+                  <span className="cSub">Same experience as https://3000studios.vip/live</span>
+                </div>
+                <div className="cPanelBody">
+                  <StreamFrame isLive={broadcasting} className="adminPublicPreview">
+                    {broadcasting ? (
+                      <div className="adminLivePublicNote">
+                        <strong>You are live</strong>
+                        <p>
+                          Viewers on /live now receive your camera via WHEP. Open Public Live to
+                          verify.
+                        </p>
+                        <a className="cBtn primary" href="/live" target="_blank" rel="noreferrer">
+                          Open /live
+                        </a>
+                      </div>
+                    ) : (
+                      <StandbyMusicWindow compact muted />
+                    )}
+                  </StreamFrame>
+                  <p className="cMuted" style={{ marginTop: 12, fontSize: 13, lineHeight: 1.5 }}>
+                    Offline preview is muted here so it does not fight your mic. Public /live plays
+                    audio for viewers.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="cCols">
               <div className="cPanel">
                 <div className="cPanelHead">
                   <h2>One-time WHIP setup</h2>
@@ -421,7 +416,7 @@ export function Admin() {
                     </div>
                     <div className="featureLine">
                       <strong>3. Viewers</strong>
-                      <span>Open https://3000studios.vip/live — WHEP plays your phone stream.</span>
+                      <span>Open https://3000studios.vip/live — standby flips to your stream.</span>
                     </div>
                   </div>
                   <button
@@ -435,66 +430,38 @@ export function Admin() {
                   {showWhipHelp ? (
                     <p className="cMuted" style={{ marginTop: 10, fontSize: 13, lineHeight: 1.55 }}>
                       Dashboard → Stream → Live inputs → select input{' '}
-                      <code>{liveInputId}</code> → look for <strong>webRTC</strong> / WHIP URL. It
-                      looks like{' '}
-                      <code>
-                        https://customer-{customerCode}.cloudflarestream.com/{'<secret>'}/webRTC/publish
-                      </code>
-                      . Never share that secret publicly.
+                      <code>{liveInputId}</code> → look for <strong>webRTC</strong> / WHIP URL. Never
+                      share that secret publicly.
                     </p>
                   ) : null}
                 </div>
               </div>
-            </section>
 
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>Public player status</h2>
-                <span className="cSub">Same endpoints viewers use on /live</span>
-              </div>
-              <div className="cPanelBody">
-                <div className="featureList">
-                  <div className="featureLine">
-                    <strong>Public page</strong>
-                    <span>https://3000studios.vip/live</span>
-                  </div>
-                  <div className="featureLine">
-                    <strong>WHEP (phone streams)</strong>
-                    <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{whepUrl}</span>
-                  </div>
-                  <div className="featureLine">
-                    <strong>HLS / iframe (OBS RTMP still works separately)</strong>
-                    <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{embedUrl}</span>
-                  </div>
-                  <div className="featureLine">
-                    <strong>Live input ID</strong>
-                    <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>
-                      {liveInputId}
-                    </span>
-                  </div>
+              <div className="cPanel">
+                <div className="cPanelHead">
+                  <h2>Public player status</h2>
+                  <span className="cSub">Same endpoints viewers use on /live</span>
                 </div>
-              </div>
-            </section>
-
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>Optional: OBS still supported</h2>
-                <span className="cSub">Desktop RTMP path unchanged</span>
-              </div>
-              <div className="cPanelBody">
-                <p className="cMuted" style={{ fontSize: 13, lineHeight: 1.55 }}>
-                  You can still stream from OBS with RTMPS to Cloudflare. Note: Cloudflare WebRTC
-                  beta does not mix WHIP and HLS on the same session — phone Go Live uses WHEP on
-                  /live; OBS RTMP uses the classic Stream player.
-                </p>
-                <div className="featureList" style={{ marginTop: 12 }}>
-                  <div className="featureLine">
-                    <strong>Server</strong>
-                    <span>rtmps://live.cloudflare.com:443/live/</span>
-                  </div>
-                  <div className="featureLine">
-                    <strong>Stream key</strong>
-                    <span>Keep in OBS / Cloudflare only — never on this page.</span>
+                <div className="cPanelBody">
+                  <div className="featureList">
+                    <div className="featureLine">
+                      <strong>Public page</strong>
+                      <span>https://3000studios.vip/live</span>
+                    </div>
+                    <div className="featureLine">
+                      <strong>WHEP (phone streams)</strong>
+                      <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{whepUrl}</span>
+                    </div>
+                    <div className="featureLine">
+                      <strong>HLS / iframe (OBS RTMP)</strong>
+                      <span style={{ wordBreak: 'break-all', fontSize: 12 }}>{embedUrl}</span>
+                    </div>
+                    <div className="featureLine">
+                      <strong>Live input ID</strong>
+                      <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>
+                        {liveInputId}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
