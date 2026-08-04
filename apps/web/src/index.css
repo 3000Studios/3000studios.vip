@@ -8,6 +8,8 @@
 @import './styles/admin-easy.css';
 @import './styles/stream-studio.css';
 @import './styles/blackscreen-fix.css';
+@import './styles/effects.css';
+@import './styles/velvet-machine.css';
 
 .routeLoader {
   min-height: 100vh;
