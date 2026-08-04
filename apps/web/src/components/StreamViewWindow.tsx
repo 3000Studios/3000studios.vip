@@ -38,7 +38,7 @@ type StreamViewWindowProps = {
   className?: string;
 };
 
-/** Shared live window: catalog standby + covers + STREAMING SOON until go-live */
+/** Catalog standby + covers. Parent StreamFrame / VelvetStage owns the chrome. */
 export function StandbyMusicWindow({
   compact = false,
   muted = false,
@@ -88,55 +88,56 @@ export function StandbyMusicWindow({
       setPlaying(false);
       return;
     }
-    void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    void audio
+      .play()
+      .then(() => setPlaying(true))
+      .catch(() => setPlaying(false));
   }
 
   return (
-    <VelvetStage isLive={false} showSoonTicker className={className}>
-      <div
-        className={`standbyStage ${compact ? 'compact' : ''}`.trim()}
-        aria-label="Standby music player until live"
-      >
-        <audio ref={audioRef} preload="auto" />
+    <div
+      className={`standbyStage ${compact ? 'compact' : ''} ${className}`.trim()}
+      aria-label="Standby music player until live"
+    >
+      <audio ref={audioRef} preload="auto" />
 
-        <div className="standbyArtWrap">
-          {!coverBroken ? (
-            <img
-              key={song.cover}
-              className="standbyCover"
-              src={song.cover}
-              alt={`${song.title} cover art`}
-              onError={() => setCoverBroken(true)}
-            />
-          ) : (
-            <div className="standbyCoverFallback" aria-hidden="true">
-              <span className="standbyRank">#{song.rank}</span>
-              <strong>{song.title}</strong>
-              <small>3000 Studios Original</small>
-            </div>
-          )}
-          <div className="standbyVignette" />
-          <div className="standbyGlow" aria-hidden="true" />
-        </div>
-
-        <div className="standbyMeta">
-          <span className="standbyNow">Now spinning</span>
-          <strong className="standbyTitle">{song.title}</strong>
-          {!compact ? <p className="standbyDesc">{song.description}</p> : null}
-          <div className="standbyControls">
-            <button type="button" className="studioButton secondary standbyBtn" onClick={prev}>
-              Prev
-            </button>
-            <button type="button" className="studioButton primary standbyBtn" onClick={toggle}>
-              {playing ? 'Pause' : 'Play'}
-            </button>
-            <button type="button" className="studioButton secondary standbyBtn" onClick={next}>
-              Next
-            </button>
+      <div className="standbyArtWrap">
+        {!coverBroken ? (
+          <img
+            key={song.cover}
+            className="standbyCover"
+            src={song.cover}
+            alt={`${song.title} cover art`}
+            onError={() => setCoverBroken(true)}
+          />
+        ) : (
+          <div className="standbyCoverFallback" aria-hidden="true">
+            <span className="standbyRank">#{song.rank}</span>
+            <strong>{song.title}</strong>
+            <small>3000 Studios Original</small>
           </div>
+        )}
+        <div className="standbyVignette" />
+        <div className="standbyGlow" aria-hidden="true" />
+      </div>
+
+      <div className="standbyMeta">
+        <span className="standbyNow">Now spinning</span>
+        <strong className="standbyTitle">{song.title}</strong>
+        {!compact ? <p className="standbyDesc">{song.description}</p> : null}
+        <div className="standbyControls">
+          <button type="button" className="studioButton secondary standbyBtn" onClick={prev}>
+            Prev
+          </button>
+          <button type="button" className="studioButton primary standbyBtn" onClick={toggle}>
+            {playing ? 'Pause' : 'Play'}
+          </button>
+          <button type="button" className="studioButton secondary standbyBtn" onClick={next}>
+            Next
+          </button>
         </div>
       </div>
-    </VelvetStage>
+    </div>
   );
 }
 
@@ -151,7 +152,18 @@ export function StreamFrame({
 }) {
   return (
     <VelvetStage isLive={isLive} showSoonTicker={!isLive} className={className}>
-      <div className={`streamFrame ${isLive ? 'is-live' : 'is-standby'}`.trim()} style={{ border: 'none', boxShadow: 'none', background: 'transparent', minHeight: '100%', height: '100%', aspectRatio: 'auto' }}>
+      <div
+        className={`streamFrame ${isLive ? 'is-live' : 'is-standby'}`.trim()}
+        style={{
+          border: 'none',
+          boxShadow: 'none',
+          background: 'transparent',
+          minHeight: '100%',
+          height: '100%',
+          aspectRatio: 'auto',
+          position: 'relative',
+        }}
+      >
         {children}
       </div>
     </VelvetStage>
