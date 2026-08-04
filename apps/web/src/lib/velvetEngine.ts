@@ -100,7 +100,6 @@ class BeatEngine {
   private ctx: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   private source: MediaElementAudioSourceNode | null = null;
-  private data: Uint8Array | null = null;
   private raf = 0;
   private attachedEl: HTMLAudioElement | null = null;
   private reduced =
@@ -112,7 +111,9 @@ class BeatEngine {
     this.detach();
     this.attachedEl = audio;
     try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
       this.ctx = new AudioCtx();
       this.source = this.ctx.createMediaElementSource(audio);
@@ -121,14 +122,16 @@ class BeatEngine {
       this.analyser.smoothingTimeConstant = 0.82;
       this.source.connect(this.analyser);
       this.analyser.connect(this.ctx.destination);
-      this.data = new Uint8Array(this.analyser.frequencyBinCount);
+
+      // Fresh ArrayBuffer-backed buffer each tick — avoids TS5.7 Uint8Array generic mismatch
+      const binCount = this.analyser.frequencyBinCount;
       const tick = () => {
-        if (!this.analyser || !this.data) return;
-        this.analyser.getByteFrequencyData(this.data);
-        const bins = this.data;
+        if (!this.analyser) return;
+        const bins = new Uint8Array(binCount);
+        this.analyser.getByteFrequencyData(bins);
         let sum = 0;
         let bass = 0;
-        const third = Math.floor(bins.length / 3);
+        const third = Math.floor(bins.length / 3) || 1;
         for (let i = 0; i < bins.length; i += 1) {
           sum += bins[i];
           if (i < third) bass += bins[i];
@@ -160,7 +163,6 @@ class BeatEngine {
     this.source = null;
     this.analyser = null;
     this.ctx = null;
-    this.data = null;
     this.attachedEl = null;
   }
 }
@@ -181,7 +183,6 @@ export function initVelvetMachine() {
   };
   window.addEventListener('pointermove', onMove, { passive: true });
 
-  // Feature morph / track plays drive full-site scene grade
   window.addEventListener('3000-play-track', ((e: CustomEvent<{ src?: string; title?: string }>) => {
     const title = (e.detail?.title || '').toLowerCase();
     const src = (e.detail?.src || '').toLowerCase();
