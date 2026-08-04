@@ -10,6 +10,7 @@
 @import './styles/blackscreen-fix.css';
 @import './styles/effects.css';
 @import './styles/velvet-machine.css';
+@import './styles/site-polish.css';
 
 .routeLoader {
   min-height: 100vh;
