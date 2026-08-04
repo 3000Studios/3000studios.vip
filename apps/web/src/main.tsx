@@ -21,6 +21,7 @@ import {
 } from './pages/Home';
 import { LiveStreamPage } from './pages/LiveStreamPage';
 import { AuthProvider } from './lib/auth';
+import { initVelvetMachine } from './lib/velvetEngine';
 
 const Shell = lazy(() => import('./components/Shell').then((module) => ({ default: module.Shell })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.Dashboard })));
@@ -86,6 +87,8 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
+initVelvetMachine();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
