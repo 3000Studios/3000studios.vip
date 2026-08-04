@@ -1,0 +1,368 @@
+/* ═══════════════════════════════════════════════════════════════
+   3000 Studios — Sitewide CSS polish (loads last)
+   Unifies public VIP pages, stream stage, motion-safe visibility
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --ink: #f4efe7;
+  --subtle: rgba(244, 239, 231, 0.78);
+  --line: rgba(255, 215, 0, 0.16);
+  --gold: #ffd700;
+  --gold-soft: #f6e7b0;
+  --ember: #ff6a3d;
+  --void: #020405;
+  --panel: rgba(255, 255, 255, 0.035);
+  --panel-border: rgba(255, 215, 0, 0.16);
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --shadow-deep: 0 28px 70px rgba(0, 0, 0, 0.55);
+  --beat: 0.08;
+  --energy: 0.1;
+  --warmth: 0.72;
+}
+
+/* Base — public VIP should feel ink-black, not blue vault */
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--void);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* When public layout is active, kill vault blue wash */
+body:has(.vipSite),
+.vipSite {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(30, 240, 120, calc(0.07 + var(--beat) * 0.08)), transparent 34%),
+    radial-gradient(circle at 82% 10%, rgba(255, 215, 0, calc(0.06 + var(--energy) * 0.06)), transparent 32%),
+    linear-gradient(180deg, #020405, #070a08 46%, #020405) !important;
+  color: var(--ink);
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Readable focus for accessibility */
+:focus-visible {
+  outline: 2px solid rgba(255, 215, 0, 0.7);
+  outline-offset: 3px;
+}
+
+/* ── Header / player chrome ── */
+.vipHeader {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  background: rgba(2, 4, 5, 0.82) !important;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.globalPlayer {
+  position: sticky;
+  top: 58px;
+  z-index: 45;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(0, 0, 0, 0.86) !important;
+  border-bottom: 1px solid rgba(255, 215, 0, calc(0.12 + var(--beat) * 0.25));
+  box-shadow: 0 1px 0 rgba(255, 215, 0, calc(0.04 + var(--beat) * 0.2));
+}
+
+.vipNav a {
+  transition: color 0.18s ease, opacity 0.18s ease, text-shadow 0.18s ease;
+}
+.vipNav a:hover {
+  color: var(--gold);
+  opacity: 1;
+  text-shadow: 0 0 18px rgba(255, 215, 0, 0.25);
+}
+
+/* ── Typography ── */
+.beatGoldTitle,
+.featureWeekCopy h2,
+.vipPageHero h1,
+.standbyTitle {
+  color: var(--gold-soft) !important;
+  text-shadow:
+    0 2px 20px rgba(255, 215, 0, 0.28),
+    0 0 40px rgba(255, 185, 0, calc(0.08 + var(--beat) * 0.2));
+}
+
+.metallicText {
+  filter: drop-shadow(0 2px 16px rgba(255, 215, 0, calc(0.15 + var(--beat) * 0.35)));
+}
+
+/* ── Cards / sections ── */
+.vipCard,
+.blogCard,
+.trackCard,
+.messageCard {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.vipCard:hover,
+.blogCard:hover,
+.trackCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 215, 0, 0.32);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 215, 0, 0.08);
+}
+
+.studioButton {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+.studioButton:hover {
+  transform: translateY(-2px);
+}
+.studioButton.primary {
+  box-shadow: 0 12px 28px rgba(255, 185, 0, 0.28);
+}
+.studioButton.primary:hover {
+  box-shadow: 0 16px 36px rgba(255, 185, 0, 0.38);
+}
+
+/* ── Feature of the Week — polish without breaking grid ── */
+.featureWeek {
+  margin: 2.5rem auto 3rem;
+  max-width: 1120px;
+  padding: 0 1.25rem;
+}
+
+.featureWeekInner {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(246, 199, 95, 0.3);
+  box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background:
+    radial-gradient(
+      ellipse 80% 60% at var(--velvet-x, 15%) var(--velvet-y, 20%),
+      rgba(255, 215, 0, calc(0.1 + var(--energy) * 0.12)),
+      transparent 55%
+    ),
+    radial-gradient(ellipse 70% 50% at 90% 80%, rgba(139, 0, 0, calc(0.12 + (1 - var(--warmth)) * 0.2)), transparent 50%),
+    linear-gradient(160deg, rgba(18, 12, 8, 0.96), rgba(8, 6, 4, 0.98));
+  transition: filter 0.55s ease, box-shadow 0.35s ease;
+}
+
+html[data-velvet-scene='remix'] .featureWeekInner {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at var(--velvet-x, 50%) var(--velvet-y, 30%),
+      rgba(255, 60, 40, 0.16),
+      transparent 55%
+    ),
+    radial-gradient(ellipse 60% 40% at 10% 90%, rgba(255, 120, 40, 0.1), transparent 50%),
+    linear-gradient(160deg, rgba(22, 8, 6, 0.97), rgba(10, 4, 4, 0.99));
+  border-color: rgba(255, 100, 70, 0.35);
+}
+
+.featureArtStage {
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 215, 0, calc(0.14 + var(--beat) * 0.2));
+}
+
+.featureArtImg {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+  filter: brightness(calc(0.94 + var(--beat) * 0.12));
+}
+
+/* ── Velvet Stage (single frame) ── */
+.velvetStage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #05040a;
+  border: 1px solid rgba(246, 231, 176, 0.22);
+  box-shadow: var(--shadow-deep), 0 0 0 1px rgba(255, 215, 0, calc(0.06 + var(--beat) * 0.15));
+}
+
+.velvetStage.is-live {
+  border-color: rgba(220, 38, 38, 0.55);
+  box-shadow:
+    var(--shadow-deep),
+    0 0 40px rgba(220, 38, 38, 0.22);
+}
+
+.velvetStageInner {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.velvetStage .streamFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  min-height: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: hidden;
+}
+
+.velvetStage .standbyStage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.velvetStage .streamVideo,
+.velvetStage .streamIframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: 0;
+  background: #000;
+}
+
+.velvetSoon,
+.streamMarquee {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+}
+
+/* ── Stream public panel ── */
+.streamPublicPanel {
+  max-width: 1120px;
+  margin: 0 auto 3rem;
+  padding: 0 1.25rem;
+}
+
+.streamPublicPanel .velvetStage {
+  width: 100%;
+}
+
+/* ── Motion safety (never pure black / invisible) ── */
+.heroCopy,
+.vipPageHero,
+.featureWeek,
+.featureWeekInner,
+.vipMain,
+.vipHeader,
+.globalPlayer,
+.redCarpetHero,
+.velvetStage,
+.standbyStage {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Soft force — avoid !important war with intentional fades on non-critical UI */
+.heroCopy,
+.vipPageHero {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.heroCopy > *,
+.vipPageHero > * {
+  opacity: 1 !important;
+}
+
+/* ── Footer ── */
+.vipFooter {
+  border-top: 1px solid var(--panel-border);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.35));
+}
+
+/* ── Mobile ── */
+@media (max-width: 900px) {
+  .globalPlayer {
+    top: 52px;
+  }
+
+  .velvetStage {
+    min-height: 220px;
+    border-radius: 16px;
+  }
+
+  .featureWeekInner {
+    padding: 1.15rem;
+  }
+
+  .standbyCover,
+  .standbyCoverFallback {
+    max-width: min(58%, 200px);
+  }
+
+  .standbyDesc {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .vipHeader {
+    padding: 0.65rem 0.85rem;
+  }
+
+  .heroCopy {
+    padding: 1.25rem 1rem;
+  }
+
+  .streamPublicPanel,
+  .featureWeek,
+  .vipSection {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .featureArtImg,
+  .standbyCover,
+  .metallicText,
+  .vipWallpaper span,
+  .streamMarqueeTrack,
+  .velvetStageInner.wipe-in {
+    animation: none !important;
+    transition: none !important;
+  }
+}
