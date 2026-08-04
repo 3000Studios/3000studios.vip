@@ -13,8 +13,9 @@ const DEFAULT_LIVE_INPUT_ID = '654382980fc1896d6e16b1e66a299bd6';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.58, ease } },
+  // Never opacity 0 — prevents pure-black sections if animation stalls
+  hidden: { opacity: 1, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
 };
 const stagger: Variants = {
   hidden: {},
