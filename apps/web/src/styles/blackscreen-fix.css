@@ -1,13 +1,23 @@
-/* Prevent pure-black homepage when motion/animation fails or cache is stale */
+/* Prevent pure-black pages when motion/animation fails or cache is stale */
 .heroCopy,
 .vipPageHero,
 .beatGoldTitle,
 .featureWeek,
 .vipMain,
 .globalPlayer,
-.vipHeader {
+.vipHeader,
+.featureWeekInner,
+.standbyStage,
+.velvetStage,
+.streamPublicPanel {
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+/* Framer motion children can stick at opacity 0 — force readable text */
+.heroCopy *,
+.vipPageHero * {
+  opacity: 1 !important;
 }
 
 .beatGoldTitle {
@@ -15,7 +25,8 @@
   text-shadow: 0 4px 30px rgba(255, 215, 0, 0.4);
 }
 
-.heroCopy p {
+.heroCopy p,
+.vipPageHero p {
   color: rgba(244, 239, 231, 0.92) !important;
 }
 
@@ -26,12 +37,33 @@
 
 .vipSite {
   color: #f4efe7;
+  min-height: 100vh;
 }
 
-/* Keep sticky chrome readable on dark video */
 .vipHeader {
   background: rgba(2, 4, 5, 0.88) !important;
 }
+
 .globalPlayer {
   background: rgba(0, 0, 0, 0.88) !important;
+}
+
+/* Standby fills the single VelvetStage correctly */
+.velvetStage .standbyStage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.velvetStage .streamVideo,
+.velvetStage .streamIframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  border: 0;
 }
