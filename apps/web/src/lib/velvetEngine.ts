@@ -181,16 +181,27 @@ export function initVelvetMachine() {
   };
   window.addEventListener('pointermove', onMove, { passive: true });
 
-  // Auto-attach first playing audio on the page
+  // Feature morph / track plays drive full-site scene grade
+  window.addEventListener('3000-play-track', ((e: CustomEvent<{ src?: string; title?: string }>) => {
+    const title = (e.detail?.title || '').toLowerCase();
+    const src = (e.detail?.src || '').toLowerCase();
+    if (title.includes('remix') || src.includes('remix')) setScene('remix');
+    else if (title.includes('jazz') || src.includes('jazz')) setScene('jazz');
+  }) as EventListener);
+
   const tryAttach = () => {
     const audios = Array.from(document.querySelectorAll('audio')) as HTMLAudioElement[];
     const playing = audios.find((a) => !a.paused && !a.muted);
     if (playing) beatEngine.attach(playing);
   };
-  document.addEventListener('play', (e) => {
-    const t = e.target;
-    if (t instanceof HTMLAudioElement) beatEngine.attach(t);
-  }, true);
+  document.addEventListener(
+    'play',
+    (e) => {
+      const t = e.target;
+      if (t instanceof HTMLAudioElement) beatEngine.attach(t);
+    },
+    true,
+  );
   window.setInterval(tryAttach, 4000);
   tryAttach();
 }
