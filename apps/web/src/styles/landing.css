@@ -1315,6 +1315,86 @@ button, input, select, textarea { font: inherit; }
 
 /* ── Live / Standby stream window (public + admin) ── */
 .streamPublicPanel { max-width: 1120px; margin: 0 auto 3rem; padding: 0 1.25rem; }
+
+/* Cloudflare Stream Player embed shell */
+.cfStreamEmbed {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 215, 0, 0.22);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+.cfStreamIframe {
+  border: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.cfStreamOpenLink {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  color: #ffd700;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.cfStreamOpenLink:hover {
+  background: rgba(255, 215, 0, 0.15);
+}
+.cfStreamShell {
+  border-radius: 16px;
+  overflow: hidden;
+}
+.streamMetaCard {
+  margin-top: 1.25rem;
+}
+.streamMetaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+.streamMetaList li {
+  display: grid;
+  gap: 0.2rem;
+}
+.streamMetaList a,
+.streamMetaList code {
+  word-break: break-all;
+  color: rgba(244, 239, 231, 0.85);
+  font-size: 0.85rem;
+}
+.streamMetaList strong {
+  color: #ffd700;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.videoGrid--stream {
+  display: grid;
+  gap: 1.25rem;
+}
+.videoStreamSlot {
+  grid-column: 1 / -1;
+}
+.videoStreamSlot .cfStreamEmbed {
+  margin-top: 0.75rem;
+}
+
 .streamFrame {
   position: relative;
   aspect-ratio: 16 / 9;

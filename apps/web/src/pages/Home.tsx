@@ -5,6 +5,7 @@ import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSo
 import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
 import { ScrollFX } from '../components/ScrollFX';
+import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -811,12 +812,20 @@ export function VideoPage() {
           </motion.span>
           <motion.h1 variants={fadeUp}>High-definition rollout visuals for music, creators, and sponsors.</motion.h1>
         </motion.section>
-        <section className="videoGrid">
+        <section className="videoGrid videoGrid--stream">
+          <div className="videoStreamSlot vipCard">
+            <h2>Cloudflare Stream Player</h2>
+            <p>Hosted embed from Stream — primary video destination for VIP viewers.</p>
+            <CloudflareStreamPlayer title="3000 Studios featured stream" />
+          </div>
           <video className="featureVideo" src={INTRO_VIDEO} controls playsInline preload="metadata" />
           <div className="vipCard">
             <h2>Opening video</h2>
-            <p>This real site asset loads as the first impression on the homepage and remains available here as the official featured video slot.</p>
-            <StudioButton to="/sponsors">Sponsor A Video</StudioButton>
+            <p>Site intro asset for the homepage red-carpet hero. Stream Player above is the Cloudflare-hosted feed.</p>
+            <StudioButton to="/live">Watch on /live</StudioButton>
+            <StudioButton to="/sponsors" variant="secondary">
+              Sponsor A Video
+            </StudioButton>
           </div>
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
@@ -826,11 +835,6 @@ export function VideoPage() {
 }
 
 export function LivePage() {
-  const configured = Boolean(import.meta.env.VITE_STREAM_CUSTOMER_CODE && import.meta.env.VITE_STREAM_LIVE_INPUT_ID);
-  const embedUrl = configured
-    ? `https://customer-${import.meta.env.VITE_STREAM_CUSTOMER_CODE}.cloudflarestream.com/${import.meta.env.VITE_STREAM_LIVE_INPUT_ID}/iframe`
-    : null;
-
   return (
     <PublicLayout variant="blackhole">
       <main className="vipMain">
@@ -840,8 +844,8 @@ export function LivePage() {
           </motion.span>
           <motion.h1 variants={fadeUp}>Watch 3000 Studios live when the broadcast is active.</motion.h1>
           <motion.p variants={fadeUp}>
-            Public playback is powered by Cloudflare Stream. When you go live from the owner admin console and OBS,
-            this page plays the broadcast automatically. Stream keys stay in Cloudflare and OBS only.
+            Public playback is powered by Cloudflare&apos;s hosted Stream Player. When you go live from the owner admin
+            console or OBS, this embed serves the Stream feed. Stream keys stay in Cloudflare and OBS only.
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
             <StudioButton to={ADMIN_PATH}>Owner Admin Console</StudioButton>
@@ -851,26 +855,9 @@ export function LivePage() {
           </motion.div>
         </motion.section>
         <section className="streamPublicPanel">
-          {embedUrl ? (
-            <div style={{ position: 'relative', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,211,106,0.22)', boxShadow: '0 24px 70px rgba(0,0,0,0.45)' }}>
-              <iframe
-                title="3000 Studios live stream"
-                src={embedUrl}
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          ) : (
-            <div className="vipCard">
-              <h2>Stream setup required</h2>
-              <p>
-                Add <code>VITE_STREAM_CUSTOMER_CODE</code> and <code>VITE_STREAM_LIVE_INPUT_ID</code> in Cloudflare Pages
-                after creating the Stream live input. Then open the passcode-protected admin at{' '}
-                <Link to="/admin">/admin</Link> to run the go-live checklist.
-              </p>
-            </div>
-          )}
+          <div className="cfStreamShell">
+            <CloudflareStreamPlayer title="3000 Studios live stream" />
+          </div>
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_LIVE_SLOT} />
       </main>

@@ -1,19 +1,22 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { PublicLayout } from './Home';
 import { StandbyMusicWindow, StreamFrame } from '../components/StreamViewWindow';
-import { WhepPlayer, buildWhepUrl, STREAM_MODE_KEY } from '../lib/webrtcStream';
+import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
+import {
+  STREAM_CUSTOMER_CODE,
+  STREAM_LIVE_INPUT_ID,
+  STREAM_PLAYER_UID,
+  STREAM_PLAYER_URL,
+  buildStreamPlayerUrl,
+} from '../lib/streamConfig';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const ADMIN_PATH = '/admin';
 
-const DEFAULT_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
-const DEFAULT_LIVE_INPUT_ID = '654382980fc1896d6e16b1e66a299bd6';
-
 const ease = [0.22, 1, 0.36, 1] as const;
 const fadeUp: Variants = {
-  // Never opacity 0 — prevents pure-black sections if animation stalls
   hidden: { opacity: 1, y: 12 },
   show: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
 };
@@ -23,73 +26,8 @@ const stagger: Variants = {
 };
 
 export function LiveStreamPage() {
-  const customerCode =
-    import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() || DEFAULT_CUSTOMER_CODE;
-  const liveInputId =
-    import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() || DEFAULT_LIVE_INPUT_ID;
-  const configured = Boolean(customerCode && liveInputId);
-  const embedUrl = configured
-    ? `https://customer-${customerCode}.cloudflarestream.com/${liveInputId}/iframe`
-    : null;
-  const whepUrl = configured ? buildWhepUrl(customerCode, liveInputId) : null;
-
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const playerRef = useRef<WhepPlayer | null>(null);
-  const [mode, setMode] = useState<'whep' | 'hls'>('whep');
-  const [status, setStatus] = useState<'connecting' | 'live' | 'idle' | 'error'>('connecting');
-  const isLive = status === 'live';
-
-  const tryConnect = useCallback(async () => {
-    if (!whepUrl || !videoRef.current) {
-      setStatus('idle');
-      setMode('hls');
-      return;
-    }
-    setStatus('connecting');
-    try {
-      await playerRef.current?.stop();
-      const player = new WhepPlayer(whepUrl);
-      playerRef.current = player;
-      await player.start(videoRef.current);
-      setStatus('live');
-      setMode('whep');
-      try {
-        localStorage.setItem(STREAM_MODE_KEY, 'webrtc');
-      } catch {
-        /* ignore */
-      }
-    } catch {
-      setStatus('idle');
-      setMode('hls');
-    }
-  }, [whepUrl]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      if (cancelled) return;
-      await tryConnect();
-    })();
-
-    const poll = window.setInterval(() => {
-      if (cancelled) return;
-      if (status !== 'live') void tryConnect();
-    }, 20000);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(poll);
-      void playerRef.current?.stop();
-      playerRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tryConnect]);
-
-  const statusLabel = useMemo(() => {
-    if (isLive) return '● Live · low-latency WebRTC';
-    if (status === 'connecting') return 'Checking for live broadcast…';
-    return 'Standby · VIP catalog with cover art until go-live';
-  }, [isLive, status]);
+  const [showStandby, setShowStandby] = useState(false);
+  const playerUrl = useMemo(() => buildStreamPlayerUrl(STREAM_PLAYER_UID, STREAM_CUSTOMER_CODE), []);
 
   return (
     <PublicLayout variant="blackhole">
@@ -98,11 +36,10 @@ export function LiveStreamPage() {
           <motion.span className="vipKicker" variants={fadeUp}>
             Live stream
           </motion.span>
-          <motion.h1 variants={fadeUp}>Watch 3000 Studios live.</motion.h1>
+          <motion.h1 variants={fadeUp}>Watch 3000 Studios on Cloudflare Stream.</motion.h1>
           <motion.p variants={fadeUp}>
-            Until the owner goes live, this window rotates the VIP catalog with cover art and a
-            STREAMING SOON ticker. When the broadcast starts from the admin console, the live feed
-            takes over automatically.
+            Public playback uses Cloudflare&apos;s hosted Stream Player. When the owner broadcasts from the admin
+            console (phone WHIP or OBS), this player serves the Stream feed globally.
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
             <Link className="studioButton primary" to={ADMIN_PATH}>
@@ -114,56 +51,75 @@ export function LiveStreamPage() {
             >
               Stream Inquiry
             </a>
+            <a className="studioButton ghost" href={playerUrl} target="_blank" rel="noreferrer">
+              Open Stream Player
+            </a>
           </motion.div>
         </motion.section>
 
         <section className="streamPublicPanel">
-          <StreamFrame isLive={isLive}>
-            <video
-              ref={videoRef}
-              playsInline
-              autoPlay
-              controls={isLive}
-              className="streamVideo"
-              style={{ display: isLive && mode === 'whep' ? 'block' : 'none' }}
-            />
-
-            {isLive && mode === 'hls' && embedUrl ? (
-              <iframe
-                title="3000 Studios live stream"
-                src={embedUrl}
-                className="streamIframe"
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
+          <StreamFrame isLive={!showStandby} className="streamFrame--cf">
+            {!showStandby ? (
+              <CloudflareStreamPlayer
+                uid={STREAM_PLAYER_UID}
+                title="3000 Studios Cloudflare Stream Player"
+                autoplay
+                muted
               />
-            ) : null}
-
-            {!isLive ? <StandbyMusicWindow /> : null}
+            ) : (
+              <StandbyMusicWindow />
+            )}
           </StreamFrame>
 
           <div className="streamToolbar">
-            <span className="streamStatus">{statusLabel}</span>
+            <span className="streamStatus">
+              {showStandby
+                ? 'Standby catalog · Stream Player paused'
+                : '● Cloudflare Stream Player · hosted embed'}
+            </span>
             <div className="streamToolbarActions">
-              {!isLive ? (
-                <button
-                  type="button"
-                  className="studioButton secondary"
-                  style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
-                  onClick={() => void tryConnect()}
-                >
-                  Check for live now
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="studioButton secondary"
-                  style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
-                  onClick={() => setMode((m) => (m === 'whep' ? 'hls' : 'whep'))}
-                >
-                  Switch to {mode === 'whep' ? 'HLS player' : 'WebRTC player'}
-                </button>
-              )}
+              <button
+                type="button"
+                className="studioButton secondary"
+                style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
+                onClick={() => setShowStandby((v) => !v)}
+              >
+                {showStandby ? 'Show Stream Player' : 'Show music standby'}
+              </button>
+              <a
+                className="studioButton secondary"
+                style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
+                href={STREAM_PLAYER_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Full player
+              </a>
             </div>
+          </div>
+
+          <div className="vipCard streamMetaCard">
+            <h2>Stream details</h2>
+            <ul className="streamMetaList">
+              <li>
+                <strong>Player URL</strong>
+                <a href={STREAM_PLAYER_URL} target="_blank" rel="noreferrer">
+                  {STREAM_PLAYER_URL}
+                </a>
+              </li>
+              <li>
+                <strong>Asset UID</strong>
+                <code>{STREAM_PLAYER_UID}</code>
+              </li>
+              <li>
+                <strong>Customer</strong>
+                <code>customer-{STREAM_CUSTOMER_CODE}</code>
+              </li>
+              <li>
+                <strong>Live input (ingest)</strong>
+                <code>{STREAM_LIVE_INPUT_ID}</code>
+              </li>
+            </ul>
           </div>
         </section>
       </main>

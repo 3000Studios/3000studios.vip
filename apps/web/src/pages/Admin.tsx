@@ -8,22 +8,24 @@ import {
 } from '../lib/webrtcStream';
 import { StandbyMusicWindow, StreamFrame } from '../components/StreamViewWindow';
 import { StreamStudioPanel } from '../components/StreamStudioPanel';
+import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
+import {
+  STREAM_CUSTOMER_CODE,
+  STREAM_LIVE_INPUT_ID,
+  STREAM_PLAYER_UID,
+  STREAM_PLAYER_URL,
+} from '../lib/streamConfig';
 
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
 const LIVE_FLAG_KEY = '3000-stream-live-v1';
 
-const DEFAULT_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
-const DEFAULT_LIVE_INPUT_ID = '654382980fc1896d6e16b1e66a299bd6';
-
 const OBS_SERVER = 'rtmps://live.cloudflare.com:443/live/';
 const CF_LIVE_INPUTS_URL = 'https://dash.cloudflare.com/?to=/:account/stream/inputs';
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 
-const customerCode =
-  import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() || DEFAULT_CUSTOMER_CODE;
-const liveInputId =
-  import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() || DEFAULT_LIVE_INPUT_ID;
+const customerCode = STREAM_CUSTOMER_CODE;
+const liveInputId = STREAM_LIVE_INPUT_ID;
 const envWhipUrl = import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() || '';
 
 type DeviceKind = 'phone' | 'laptop';
@@ -64,9 +66,6 @@ export function Admin() {
   );
 
   const isConfigured = Boolean(customerCode && liveInputId);
-  const embedUrl = isConfigured
-    ? `https://customer-${customerCode}.cloudflarestream.com/${liveInputId}/iframe`
-    : null;
   const whepUrl = isConfigured ? buildWhepUrl(customerCode, liveInputId) : null;
   const whipCheck = validateWhipUrl(whipUrl, liveInputId);
   const whipReady = whipCheck.ok;
@@ -351,8 +350,7 @@ export function Admin() {
                       <div className="adminLivePublicNote">
                         <strong>You are live (WHIP)</strong>
                         <p>
-                          Viewers should use the WebRTC player on /live (WHEP). HLS iframe may stay idle during
-                          WebRTC beta.
+                          Public site uses the Cloudflare hosted Stream Player. Open /live for the embed viewers see.
                         </p>
                         <a className="cBtn primary" href="/live" target="_blank" rel="noreferrer">
                           Open /live
@@ -360,11 +358,18 @@ export function Admin() {
                       </div>
                     ) : (
                       <div className="adminStandbyWrap">
-                        <StandbyMusicWindow compact muted />
-                        <p className="adminStandbyNote">
-                          Offline on purpose until you press <strong>Go Live with looks</strong>. This panel is not
-                          the camera preview — use Stream studio on the left.
+                        <p className="adminStandbyNote" style={{ marginBottom: 10 }}>
+                          Public Cloudflare Stream Player (what viewers get on /live &amp; /video):
                         </p>
+                        <CloudflareStreamPlayer title="Public Stream Player preview" muted autoplay />
+                        <p className="adminStandbyNote">
+                          Player UID <code>{STREAM_PLAYER_UID}</code> ·{' '}
+                          <a href={STREAM_PLAYER_URL} target="_blank" rel="noreferrer">
+                            Open player URL
+                          </a>
+                          . Camera preview is on the left — press <strong>Go Live with looks</strong> to publish.
+                        </p>
+                        <StandbyMusicWindow compact muted />
                       </div>
                     )}
                   </StreamFrame>
@@ -404,17 +409,15 @@ export function Admin() {
                     <span>{liveInputId}</span>
                   </div>
                 </div>
-                {embedUrl ? (
-                  <p className="cMuted" style={{ marginTop: 12, fontSize: 12, wordBreak: 'break-all' }}>
-                    HLS: {embedUrl}
-                    {whepUrl ? (
-                      <>
-                        <br />
-                        WHEP: {whepUrl}
-                      </>
-                    ) : null}
-                  </p>
-                ) : null}
+                <p className="cMuted" style={{ marginTop: 12, fontSize: 12, wordBreak: 'break-all' }}>
+                  Stream Player: {STREAM_PLAYER_URL}
+                  {whepUrl ? (
+                    <>
+                      <br />
+                      WHEP: {whepUrl}
+                    </>
+                  ) : null}
+                </p>
               </div>
             </section>
           </div>
