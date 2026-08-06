@@ -86,7 +86,15 @@ export class StreamStudio {
     return this.canvas;
   }
 
-  getOutputStream(fps = 30): MediaStream {
+  /** Always rebuild so audio follows the current camera and canvas is capturing. */
+  getOutputStream(fps = 30, forceNew = false): MediaStream {
+    if (forceNew && this.outStream) {
+      this.outStream.getTracks().forEach((t) => {
+        // Do not stop canvas capture track until replaced — stop old clones only
+        if (t.kind === 'audio') t.stop();
+      });
+      this.outStream = null;
+    }
     if (!this.outStream) {
       const drawn = this.canvas.captureStream(fps);
       const audio = this.camStream?.getAudioTracks() ?? [];
@@ -94,18 +102,44 @@ export class StreamStudio {
         ...drawn.getVideoTracks(),
         ...audio.map((t) => t.clone()),
       ]);
+    } else {
+      // Refresh audio clones if camera changed
+      const existingAudio = this.outStream.getAudioTracks();
+      const liveAudio = this.camStream?.getAudioTracks() ?? [];
+      if (liveAudio.length && (!existingAudio.length || existingAudio[0].id !== liveAudio[0].id && existingAudio[0].label !== liveAudio[0].label)) {
+        existingAudio.forEach((t) => {
+          this.outStream!.removeTrack(t);
+          t.stop();
+        });
+        liveAudio.forEach((t) => this.outStream!.addTrack(t.clone()));
+      }
     }
     return this.outStream;
   }
 
   async openCamera(deviceId?: string, facingMode: 'user' | 'environment' = 'user') {
     this.camStream?.getTracks().forEach((t) => t.stop());
-    this.camStream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true },
-      video: deviceId
-        ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
-        : { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-    });
+
+    const videoConstraint: MediaTrackConstraints = deviceId
+      ? { deviceId: { ideal: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      : { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } };
+
+    try {
+      this.camStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true },
+        video: videoConstraint,
+      });
+    } catch (first) {
+      // Fallback: video-only, then retry without exact device
+      try {
+        this.camStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: deviceId ? { deviceId: { ideal: deviceId } } : true,
+        });
+      } catch {
+        throw first;
+      }
+    }
     this.video.srcObject = this.camStream;
     await this.video.play().catch(() => undefined);
 

@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { WHIP_URL_STORAGE_KEY, STREAM_MODE_KEY, buildWhepUrl } from '../lib/webrtcStream';
+import {
+  WHIP_URL_STORAGE_KEY,
+  STREAM_MODE_KEY,
+  buildWhepUrl,
+  validateWhipUrl,
+} from '../lib/webrtcStream';
 import { StandbyMusicWindow, StreamFrame } from '../components/StreamViewWindow';
 import { StreamStudioPanel } from '../components/StreamStudioPanel';
 
@@ -63,7 +68,8 @@ export function Admin() {
     ? `https://customer-${customerCode}.cloudflarestream.com/${liveInputId}/iframe`
     : null;
   const whepUrl = isConfigured ? buildWhepUrl(customerCode, liveInputId) : null;
-  const whipReady = Boolean(whipUrl.trim().includes('/webRTC/publish'));
+  const whipCheck = validateWhipUrl(whipUrl, liveInputId);
+  const whipReady = whipCheck.ok;
 
   const refreshDevice = useCallback(() => setDevice(detectDevice()), []);
 
@@ -182,7 +188,7 @@ export function Admin() {
             <section className="easyStatusStrip">
               <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>{deviceBadge}</div>
               <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>
-                Phone WHIP: {whipReady ? 'saved' : 'needed once'}
+                Phone WHIP: {whipReady ? 'ready' : whipUrl.trim() ? 'invalid URL' : 'needed once'}
               </div>
               <div className="easyChip info">Viewers: {PUBLIC_LIVE_URL}</div>
             </section>
@@ -214,25 +220,65 @@ export function Admin() {
 
                 {path === 'phone' ? (
                   <div className="easyGuide">
-                    <h3>Phone path</h3>
+                    <h3>Browser / phone studio (WHIP)</h3>
                     <ol className="easySteps">
-                      <li>Paste WHIP URL once (from Cloudflare WebRTC publish).</li>
-                      <li>Pick camera, overlays, and a lens filter in the studio below.</li>
-                      <li>Tap <strong>Go Live with looks</strong> — filters are burned into the stream.</li>
+                      <li>
+                        In Cloudflare → Live Inputs → input <code>{liveInputId.slice(0, 8)}…</code> → copy{' '}
+                        <strong>WebRTC publish URL</strong> (<code>webRTC.url</code>).
+                      </li>
+                      <li>
+                        It must look like{' '}
+                        <code>https://customer-…cloudflarestream.com/&lt;SECRET&gt;/webRTC/publish</code> — the
+                        secret is <em>not</em> the live input id.
+                      </li>
+                      <li>Allow Camera + Mic when prompted (Logi C615 or Integrated Camera).</li>
+                      <li>
+                        Pick looks below, then <strong>Go Live with looks</strong> — that sends the WHIP{' '}
+                        <code>POST</code> (SDP). Ignore the offline viewer panel until it says live.
+                      </li>
                     </ol>
                     <label className="easyField">
-                      <span>WHIP publish URL (secret — this device only)</span>
+                      <span>WHIP publish URL (secret — stays on this device only)</span>
                       <input
                         type="url"
                         value={whipUrl}
                         onChange={(e) => saveWhipUrl(e.target.value)}
-                        placeholder="https://customer-….cloudflarestream.com/…/webRTC/publish"
+                        placeholder="https://customer-….cloudflarestream.com/<SECRET>/webRTC/publish"
+                        spellCheck={false}
+                        autoComplete="off"
                       />
                     </label>
+                    {whipUrl.trim() ? (
+                      <p className={whipReady ? 'easyWhipOk' : 'adminError'}>
+                        {whipReady
+                          ? whipCheck.ok
+                            ? whipCheck.hint
+                            : 'WHIP URL ready.'
+                          : !whipCheck.ok
+                            ? whipCheck.reason
+                            : 'Invalid WHIP URL'}
+                      </p>
+                    ) : (
+                      <p className="cMuted easyHint">
+                        405 errors almost always mean the wrong URL was pasted (input id, /play, or iframe). Use the
+                        full secret publish link from the dashboard. No separate Bearer header is required when the
+                        secret is in the path.
+                      </p>
+                    )}
                     <div className="easyBtnRow">
                       <a className="cBtn ghost" href={CF_LIVE_INPUTS_URL} target="_blank" rel="noreferrer">
                         Open Cloudflare Live Inputs
                       </a>
+                      {whepUrl ? (
+                        <button
+                          type="button"
+                          className="cBtn sm ghost"
+                          onClick={() => void handleCopy('whep', whepUrl)}
+                          title="Viewer WHEP URL (not for Go Live)"
+                        >
+                          {copied === 'whep' ? 'Copied WHEP' : 'Copy WHEP (viewers)'}
+                        </button>
+                      ) : null}
                     </div>
                     {studioError ? <p className="adminError">{studioError}</p> : null}
                   </div>
@@ -287,6 +333,7 @@ export function Admin() {
                   <StreamStudioPanel
                     whipUrl={whipUrl}
                     whipReady={whipReady}
+                    liveInputId={liveInputId}
                     onLiveChange={onStudioLive}
                     onError={setStudioError}
                   />
@@ -302,14 +349,23 @@ export function Admin() {
                   <StreamFrame isLive={broadcasting} className="adminPublicPreview">
                     {broadcasting ? (
                       <div className="adminLivePublicNote">
-                        <strong>You are live</strong>
-                        <p>Viewers receive your composited camera + overlays on /live.</p>
+                        <strong>You are live (WHIP)</strong>
+                        <p>
+                          Viewers should use the WebRTC player on /live (WHEP). HLS iframe may stay idle during
+                          WebRTC beta.
+                        </p>
                         <a className="cBtn primary" href="/live" target="_blank" rel="noreferrer">
                           Open /live
                         </a>
                       </div>
                     ) : (
-                      <StandbyMusicWindow compact muted />
+                      <div className="adminStandbyWrap">
+                        <StandbyMusicWindow compact muted />
+                        <p className="adminStandbyNote">
+                          Offline on purpose until you press <strong>Go Live with looks</strong>. This panel is not
+                          the camera preview — use Stream studio on the left.
+                        </p>
+                      </div>
                     )}
                   </StreamFrame>
                 </div>

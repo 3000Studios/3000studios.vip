@@ -1,4 +1,53 @@
 /* Admin Go Live — simple guided UI */
+
+.studioPermBanner {
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  background: rgba(255, 180, 0, 0.1);
+  margin-bottom: 0.85rem;
+}
+.studioPermBanner strong {
+  display: block;
+  color: #ffd700;
+  margin-bottom: 0.35rem;
+}
+.studioPermBanner p {
+  margin: 0 0 0.65rem;
+  color: rgba(244, 239, 231, 0.82);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+.studioHelp {
+  font-size: 12px;
+  margin-top: 10px;
+  line-height: 1.45;
+}
+.easyWhipOk {
+  margin: 0.45rem 0 0;
+  color: #1ef078;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.adminStandbyWrap {
+  position: relative;
+}
+.adminStandbyNote {
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 215, 0, 0.18);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(244, 239, 231, 0.78);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+.easyGuide code {
+  font-size: 0.78em;
+  color: #ffd700;
+  word-break: break-all;
+}
+
 .adminEasyShell .adminCodeModal {
   max-width: 420px;
   display: grid;

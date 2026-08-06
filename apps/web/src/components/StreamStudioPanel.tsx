@@ -7,16 +7,17 @@ import {
   type LensFilterId,
   type OverlayId,
 } from '../lib/streamStudio';
-import { WhipPublisher } from '../lib/webrtcStream';
+import { WhipPublisher, describeCameraError, validateWhipUrl } from '../lib/webrtcStream';
 
 type Props = {
   whipUrl: string;
   whipReady: boolean;
+  liveInputId?: string;
   onLiveChange?: (live: boolean) => void;
   onError?: (msg: string | null) => void;
 };
 
-export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }: Props) {
+export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChange, onError }: Props) {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const studioRef = useRef<StreamStudio | null>(null);
   const publisherRef = useRef<WhipPublisher | null>(null);
@@ -29,6 +30,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }:
   const [lowerSub, setLowerSub] = useState('Live · VIP broadcast');
   const [status, setStatus] = useState<'idle' | 'preview' | 'starting' | 'live' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [permHint, setPermHint] = useState(false);
 
   const ensureStudio = useCallback(() => {
     if (!studioRef.current) {
@@ -55,10 +57,20 @@ export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }:
     }
   }, [ensureStudio]);
 
+  const refreshCameraList = useCallback(async () => {
+    const cams = await listCameras();
+    setCameras(cams);
+    setCameraId((prev) => {
+      if (prev && cams.some((c) => c.deviceId === prev)) return prev;
+      return cams[0]?.deviceId || '';
+    });
+  }, []);
+
   const startPreview = useCallback(
     async (deviceId?: string) => {
       setError(null);
       onError?.(null);
+      setPermHint(false);
       try {
         const studio = ensureStudio();
         studio.setFilter(filter);
@@ -68,18 +80,18 @@ export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }:
         await studio.openCamera(deviceId || cameraId || undefined, 'user');
         studio.start();
         mountCanvas();
-        const cams = await listCameras();
-        setCameras(cams);
-        if (!cameraId && cams[0]?.deviceId) setCameraId(cams[0].deviceId);
+        // Labels only appear after permission
+        await refreshCameraList();
         setStatus((s) => (s === 'live' ? 'live' : 'preview'));
       } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Camera failed';
+        const msg = describeCameraError(err);
         setError(msg);
         onError?.(msg);
         setStatus('error');
+        setPermHint(true);
       }
     },
-    [cameraId, ensureStudio, filter, overlays, lowerTitle, lowerSub, mountCanvas, onError],
+    [cameraId, ensureStudio, filter, overlays, lowerTitle, lowerSub, mountCanvas, onError, refreshCameraList],
   );
 
   useEffect(() => {
@@ -110,38 +122,63 @@ export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }:
     setCameraId(id);
     await startPreview(id);
     if (status === 'live' && publisherRef.current && studioRef.current) {
-      const out = studioRef.current.getOutputStream();
+      const out = studioRef.current.getOutputStream(30, true);
       const v = out.getVideoTracks()[0];
       if (v) await publisherRef.current.replaceVideoTrack(v);
     }
   }
 
   async function goLive() {
+    const check = validateWhipUrl(whipUrl, liveInputId);
+    if (!check.ok) {
+      setError(check.reason);
+      onError?.(check.reason);
+      setStatus('error');
+      return;
+    }
     if (!whipReady) {
-      const msg = 'Paste WHIP publish URL in the Phone path section first.';
+      const msg = 'Paste a valid WHIP publish URL (…/<SECRET>/webRTC/publish) in the Phone path section first.';
       setError(msg);
       onError?.(msg);
       setStatus('error');
       return;
     }
+
     setStatus('starting');
     setError(null);
     onError?.(null);
+
     try {
+      // End any previous WHIP session cleanly
+      await publisherRef.current?.stop();
+      publisherRef.current = null;
+
       const studio = ensureStudio();
-      if (status !== 'preview' && status !== 'live') {
-        await studio.openCamera(cameraId || undefined, 'user');
-        studio.start();
-        mountCanvas();
-      }
+      // Always ensure camera is open before WHIP — do not rely on idle preview window
+      await studio.openCamera(cameraId || undefined, 'user');
+      studio.start();
+      mountCanvas();
       studio.setFilter(filter);
       studio.overlays = new Set(overlays);
-      const out = studio.getOutputStream(30);
-      const publisher = new WhipPublisher(whipUrl.trim());
+      studio.lowerThirdTitle = lowerTitle;
+      studio.lowerThirdSub = lowerSub;
+
+      // Give the canvas a couple frames so captureStream is not black
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      const out = studio.getOutputStream(30, true);
+      if (!out.getVideoTracks().length) {
+        throw new Error('Canvas has no video track. Allow camera, then try Go Live again.');
+      }
+
+      const publisher = new WhipPublisher(check.endpoint);
       publisherRef.current = publisher;
+      // This POSTs application/sdp to Cloudflare WHIP (the WebRTC handshake)
       await publisher.startWithStream(out);
+
       setStatus('live');
       onLiveChange?.(true);
+      await refreshCameraList();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not go live';
       setError(msg);
@@ -150,6 +187,8 @@ export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }:
       onLiveChange?.(false);
       await publisherRef.current?.stop();
       publisherRef.current = null;
+      // Keep local preview if possible
+      void startPreview(cameraId);
     }
   }
 
@@ -164,13 +203,27 @@ export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }:
     <div className="studioPanel">
       <div className="adminCameraFrame studioPreviewFrame">
         <div ref={mountRef} className="studioCanvasMount" />
-        {status === 'live' ? <div className="streamLiveBadge">● LIVE</div> : null}
-        {status === 'idle' || status === 'error' ? (
+        {status === 'live' ? <div className="streamLiveBadge">● LIVE · WHIP</div> : null}
+        {status === 'starting' ? <div className="adminCameraOverlay">Connecting WHIP (POST SDP)…</div> : null}
+        {status === 'idle' || (status === 'error' && !mountRef.current?.firstChild) ? (
           <div className="adminCameraOverlay">{error || 'Starting camera preview…'}</div>
         ) : null}
       </div>
 
       <div className="studioControls">
+        {permHint ? (
+          <div className="studioPermBanner">
+            <strong>Camera access needed</strong>
+            <p>
+              Allow <em>Camera</em> and <em>Microphone</em> for this site (Logi C615 or Integrated Camera). Then tap
+              Allow &amp; preview.
+            </p>
+            <button type="button" className="cBtn primary" onClick={() => void startPreview(cameraId)}>
+              Allow &amp; preview
+            </button>
+          </div>
+        ) : null}
+
         <label className="easyField">
           <span>Camera</span>
           <select
@@ -248,15 +301,16 @@ export function StreamStudioPanel({ whipUrl, whipReady, onLiveChange, onError }:
               disabled={status === 'starting'}
               onClick={() => void goLive()}
             >
-              {status === 'starting' ? 'Connecting…' : 'Go Live with looks'}
+              {status === 'starting' ? 'WHIP connecting…' : 'Go Live with looks'}
             </button>
           )}
         </div>
 
         {error ? <p className="adminError">{error}</p> : null}
-        <p className="cMuted" style={{ fontSize: 12, marginTop: 8 }}>
-          Filters + overlays are burned into the stream viewers receive. Switch camera anytime;
-          while live it hot-swaps the video track.
+        <p className="cMuted studioHelp">
+          <strong>Do not wait for the right-hand “viewers” window while offline</strong> — that panel only goes live
+          after WHIP succeeds. Flow: allow camera → set filters/overlays → paste correct WHIP URL →{' '}
+          <strong>Go Live with looks</strong> (sends POST application/sdp to Cloudflare).
         </p>
       </div>
     </div>
