@@ -7,7 +7,10 @@
  *  - WebRTC WHEP (sub-second browser playback)
  *  - SRT / RTMPS (pro apps: OBS, ffplay, vMix — not browsers)
  *
- * Live ingest (WHIP publish / RTMPS publish) uses STREAM_LIVE_INPUT_ID separately.
+ * Publish (browser ultra-low latency):
+ *  - WebRTC WHIP publish URL (secret path — for admin /phone studio only)
+ *
+ * Live input id is still used for some RTMPS publish workflows.
  */
 
 /** customer-*.cloudflarestream.com subdomain code */
@@ -27,6 +30,16 @@ export const STREAM_PLAYER_UID =
 export const STREAM_LIVE_INPUT_ID =
   import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() ||
   '654382980fc1896d6e16b1e66a299bd6';
+
+/**
+ * Browser ultra-low latency **publish** (WHIP).
+ * Secret is embedded in the path (not the public asset UID alone).
+ * Dashboard → Stream → WebRTC (WHIP) URL.
+ * Override with VITE_STREAM_WHIP_URL if keys rotate.
+ */
+export const STREAM_WHIP_PUBLISH_URL =
+  import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() ||
+  'https://customer-wx8j23tjjjpkb37k.cloudflarestream.com/5f0434b0002330a4a4c794b407b59186k3f100cf1895b63cf27b748c69c8ba10c/webRTC/publish';
 
 // ─── URL builders ─────────────────────────────────────────────
 
@@ -106,6 +119,7 @@ export const STREAM_DASH_URL = buildStreamManifestDash();
 export const STREAM_WHEP_URL = buildStreamWhepUrl();
 export const STREAM_SRT_PLAYBACK_URL = buildStreamSrtPlaybackUrl();
 export const STREAM_RTMPS_PLAYBACK_KEY = buildStreamRtmpsPlaybackKey();
+export const STREAM_WHIP_URL = STREAM_WHIP_PUBLISH_URL;
 
 export const STREAM_PLAYER_EMBED_SRC = streamPlayerIframeSrc({
   autoplay: true,

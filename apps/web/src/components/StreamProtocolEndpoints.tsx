@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   STREAM_PLAYER_UID,
+  STREAM_WHIP_PUBLISH_URL,
   getStreamPlaybackEndpoints,
   type StreamProtocolEndpoint,
 } from '../lib/streamConfig';
@@ -31,13 +32,36 @@ export function StreamProtocolEndpoints({ uid = STREAM_PLAYER_UID }: { uid?: str
 
   return (
     <div className="streamProtocolBlock">
-      <h2>Protocol-specific playback</h2>
+      <h2>Protocol-specific endpoints</h2>
       <p className="cMuted">
-        Use the endpoint that matches your player. Browsers: Stream Player, HLS, DASH, or WHEP. Pro tools: SRT or
-        RTMPS (not playable in Chrome/Safari).
+        Playback for viewers · WHIP for browser ultra-low latency publish (owner only). SRT/RTMPS are for pro tools,
+        not Chrome/Safari.
       </p>
 
-      <h3 className="streamProtocolSub">Web / in-app</h3>
+      <h3 className="streamProtocolSub">Publish · browser (WHIP)</h3>
+      <ul className="streamMetaList">
+        <EndpointRow
+          ep={{
+            id: 'whip',
+            label: 'WebRTC (WHIP) URL',
+            value: STREAM_WHIP_PUBLISH_URL,
+            kind: 'url',
+            clients: 'Best for browser-based ultra low latency publishing · admin Go Live',
+            browser: true,
+          }}
+          copied={copied === 'whip'}
+          onCopy={() =>
+            void copyText(STREAM_WHIP_PUBLISH_URL).then((ok) => {
+              if (ok) {
+                setCopied('whip');
+                window.setTimeout(() => setCopied(null), 1600);
+              }
+            })
+          }
+        />
+      </ul>
+
+      <h3 className="streamProtocolSub">Playback · web / in-app</h3>
       <ul className="streamMetaList">
         {browser.map((ep) => (
           <EndpointRow key={ep.id} ep={ep} copied={copied === ep.id} onCopy={() => void onCopy(ep)} />

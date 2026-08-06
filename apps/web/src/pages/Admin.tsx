@@ -14,6 +14,8 @@ import {
   STREAM_LIVE_INPUT_ID,
   STREAM_PLAYER_UID,
   STREAM_PLAYER_URL,
+  STREAM_WHIP_PUBLISH_URL,
+  STREAM_WHEP_URL,
 } from '../lib/streamConfig';
 
 const ADMIN_PASSCODE = '3000';
@@ -26,7 +28,20 @@ const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 
 const customerCode = STREAM_CUSTOMER_CODE;
 const liveInputId = STREAM_LIVE_INPUT_ID;
-const envWhipUrl = import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() || '';
+
+/** Prefer valid stored URL; otherwise use dashboard WHIP publish default. */
+function loadInitialWhipUrl(): string {
+  try {
+    const stored = localStorage.getItem(WHIP_URL_STORAGE_KEY)?.trim() || '';
+    if (stored) {
+      const check = validateWhipUrl(stored, liveInputId);
+      if (check.ok) return stored;
+    }
+  } catch {
+    /* ignore */
+  }
+  return STREAM_WHIP_PUBLISH_URL;
+}
 
 type DeviceKind = 'phone' | 'laptop';
 type PathMode = 'phone' | 'laptop';
@@ -61,14 +76,23 @@ export function Admin() {
   const [isLive, setIsLive] = useState(() => localStorage.getItem(LIVE_FLAG_KEY) === '1');
   const [broadcasting, setBroadcasting] = useState(false);
   const [studioError, setStudioError] = useState<string | null>(null);
-  const [whipUrl, setWhipUrl] = useState(
-    () => localStorage.getItem(WHIP_URL_STORAGE_KEY) || envWhipUrl || '',
-  );
+  const [whipUrl, setWhipUrl] = useState(() => loadInitialWhipUrl());
 
   const isConfigured = Boolean(customerCode && liveInputId);
-  const whepUrl = isConfigured ? buildWhepUrl(customerCode, liveInputId) : null;
+  const whepUrl = STREAM_WHEP_URL || (isConfigured ? buildWhepUrl(customerCode, STREAM_PLAYER_UID) : null);
   const whipCheck = validateWhipUrl(whipUrl, liveInputId);
   const whipReady = whipCheck.ok;
+
+  // Persist default WHIP once so Go Live works without manual paste
+  useEffect(() => {
+    if (whipReady && whipUrl) {
+      try {
+        localStorage.setItem(WHIP_URL_STORAGE_KEY, whipUrl.trim());
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [whipReady, whipUrl]);
 
   const refreshDevice = useCallback(() => setDevice(detectDevice()), []);
 
@@ -219,30 +243,25 @@ export function Admin() {
 
                 {path === 'phone' ? (
                   <div className="easyGuide">
-                    <h3>Browser / phone studio (WHIP)</h3>
+                    <h3>Browser ultra-low latency (WHIP)</h3>
                     <ol className="easySteps">
                       <li>
-                        In Cloudflare → Live Inputs → input <code>{liveInputId.slice(0, 8)}…</code> → copy{' '}
-                        <strong>WebRTC publish URL</strong> (<code>webRTC.url</code>).
-                      </li>
-                      <li>
-                        It must look like{' '}
-                        <code>https://customer-…cloudflarestream.com/&lt;SECRET&gt;/webRTC/publish</code> — the
-                        secret is <em>not</em> the live input id.
+                        Best for browser publishing — WebRTC WHIP is preloaded from your Stream dashboard URL
+                        (secret path, not the public asset UID alone).
                       </li>
                       <li>Allow Camera + Mic when prompted (Logi C615 or Integrated Camera).</li>
                       <li>
-                        Pick looks below, then <strong>Go Live with looks</strong> — that sends the WHIP{' '}
-                        <code>POST</code> (SDP). Ignore the offline viewer panel until it says live.
+                        Pick looks in the studio, then <strong>Go Live with looks</strong> — POSTs the SDP offer to
+                        WHIP. Viewers use WHEP / HLS / Stream Player on /live.
                       </li>
                     </ol>
                     <label className="easyField">
-                      <span>WHIP publish URL (secret — stays on this device only)</span>
+                      <span>WebRTC (WHIP) publish URL</span>
                       <input
                         type="url"
                         value={whipUrl}
                         onChange={(e) => saveWhipUrl(e.target.value)}
-                        placeholder="https://customer-….cloudflarestream.com/<SECRET>/webRTC/publish"
+                        placeholder={STREAM_WHIP_PUBLISH_URL}
                         spellCheck={false}
                         autoComplete="off"
                       />
@@ -251,23 +270,28 @@ export function Admin() {
                       <p className={whipReady ? 'easyWhipOk' : 'adminError'}>
                         {whipReady
                           ? whipCheck.ok
-                            ? whipCheck.hint
+                            ? whipCheck.hint || 'WHIP ready — ultra low latency browser publish.'
                             : 'WHIP URL ready.'
                           : !whipCheck.ok
                             ? whipCheck.reason
                             : 'Invalid WHIP URL'}
                       </p>
-                    ) : (
-                      <p className="cMuted easyHint">
-                        405 errors almost always mean the wrong URL was pasted (input id, /play, or iframe). Use the
-                        full secret publish link from the dashboard. No separate Bearer header is required when the
-                        secret is in the path.
-                      </p>
-                    )}
+                    ) : null}
                     <div className="easyBtnRow">
-                      <a className="cBtn ghost" href={CF_LIVE_INPUTS_URL} target="_blank" rel="noreferrer">
-                        Open Cloudflare Live Inputs
-                      </a>
+                      <button
+                        type="button"
+                        className="cBtn sm ghost"
+                        onClick={() => saveWhipUrl(STREAM_WHIP_PUBLISH_URL)}
+                      >
+                        Reset to dashboard WHIP
+                      </button>
+                      <button
+                        type="button"
+                        className="cBtn sm ghost"
+                        onClick={() => void handleCopy('whip', whipUrl || STREAM_WHIP_PUBLISH_URL)}
+                      >
+                        {copied === 'whip' ? 'Copied WHIP' : 'Copy WHIP'}
+                      </button>
                       {whepUrl ? (
                         <button
                           type="button"
@@ -278,6 +302,17 @@ export function Admin() {
                           {copied === 'whep' ? 'Copied WHEP' : 'Copy WHEP (viewers)'}
                         </button>
                       ) : null}
+                      <a className="cBtn ghost" href={CF_LIVE_INPUTS_URL} target="_blank" rel="noreferrer">
+                        Cloudflare Live Inputs
+                      </a>
+                      <a
+                        className="cBtn ghost"
+                        href="https://developers.cloudflare.com/stream/webrtc-beta/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Learn more · WebRTC
+                      </a>
                     </div>
                     {studioError ? <p className="adminError">{studioError}</p> : null}
                   </div>
