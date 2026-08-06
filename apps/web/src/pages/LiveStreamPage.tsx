@@ -5,6 +5,8 @@ import { PublicLayout } from './Home';
 import { StandbyMusicWindow, StreamFrame } from '../components/StreamViewWindow';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { ManifestUrlList, StreamManifestPlayer, type ManifestMode } from '../components/StreamManifestPlayer';
+import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
+import { StreamProtocolEndpoints } from '../components/StreamProtocolEndpoints';
 import {
   STREAM_CUSTOMER_CODE,
   STREAM_DASH_URL,
@@ -12,6 +14,10 @@ import {
   STREAM_LIVE_INPUT_ID,
   STREAM_PLAYER_UID,
   STREAM_PLAYER_URL,
+  STREAM_RTMPS_PLAYBACK_KEY,
+  STREAM_RTMPS_PLAYBACK_SERVER,
+  STREAM_SRT_PLAYBACK_URL,
+  STREAM_WHEP_URL,
   buildStreamPlayerUrl,
 } from '../lib/streamConfig';
 
@@ -28,7 +34,7 @@ const stagger: Variants = {
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.06 } },
 };
 
-type ViewMode = 'hosted' | 'hls' | 'dash' | 'standby';
+type ViewMode = 'hosted' | 'whep' | 'hls' | 'dash' | 'standby';
 
 export function LiveStreamPage() {
   const [view, setView] = useState<ViewMode>('hosted');
@@ -43,9 +49,11 @@ export function LiveStreamPage() {
       ? 'Standby catalog · Stream paused'
       : view === 'hosted'
         ? '● Cloudflare Stream Player · hosted embed'
-        : view === 'hls'
-          ? `● Custom HLS · ${playback}`
-          : `● Custom DASH · ${playback}`;
+        : view === 'whep'
+          ? `● WebRTC WHEP · ${playback}`
+          : view === 'hls'
+            ? `● Custom HLS · ${playback}`
+            : `● Custom DASH · ${playback}`;
 
   return (
     <PublicLayout variant="blackhole">
@@ -54,10 +62,10 @@ export function LiveStreamPage() {
           <motion.span className="vipKicker" variants={fadeUp}>
             Live stream
           </motion.span>
-          <motion.h1 variants={fadeUp}>Watch 3000 Studios on Cloudflare Stream.</motion.h1>
+          <motion.h1 variants={fadeUp}>Protocol-specific Cloudflare Stream playback.</motion.h1>
           <motion.p variants={fadeUp}>
-            Playback options: Cloudflare hosted player, or bring-your-own player via HLS / DASH manifests (hls.js,
-            dash.js, Safari native, mobile SDKs).
+            Hosted player, sub-second WHEP, HLS/DASH for web libraries, plus SRT and RTMPS endpoints for pro apps
+            (OBS, ffplay, vMix).
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
             <Link className="studioButton primary" to={ADMIN_PATH}>
@@ -80,8 +88,9 @@ export function LiveStreamPage() {
             {(
               [
                 ['hosted', 'Stream Player'],
-                ['hls', 'HLS (custom)'],
-                ['dash', 'DASH (custom)'],
+                ['whep', 'WHEP (WebRTC)'],
+                ['hls', 'HLS'],
+                ['dash', 'DASH'],
                 ['standby', 'Music standby'],
               ] as const
             ).map(([id, label]) => (
@@ -107,6 +116,15 @@ export function LiveStreamPage() {
                 muted
               />
             ) : null}
+            {view === 'whep' ? (
+              <WhepStreamPlayer
+                uid={STREAM_PLAYER_UID}
+                title="3000 Studios WHEP playback"
+                muted
+                autoplay
+                onStatus={(s) => setPlayback(s)}
+              />
+            ) : null}
             {view === 'hls' || view === 'dash' ? (
               <StreamManifestPlayer
                 uid={STREAM_PLAYER_UID}
@@ -126,11 +144,20 @@ export function LiveStreamPage() {
               <a
                 className="studioButton secondary"
                 style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
+                href={STREAM_WHEP_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                WHEP
+              </a>
+              <a
+                className="studioButton secondary"
+                style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
                 href={STREAM_HLS_URL}
                 target="_blank"
                 rel="noreferrer"
               >
-                HLS .m3u8
+                HLS
               </a>
               <a
                 className="studioButton secondary"
@@ -139,7 +166,7 @@ export function LiveStreamPage() {
                 target="_blank"
                 rel="noreferrer"
               >
-                DASH .mpd
+                DASH
               </a>
               <a
                 className="studioButton secondary"
@@ -154,18 +181,12 @@ export function LiveStreamPage() {
           </div>
 
           <div className="vipCard streamMetaCard">
-            <h2>Bring your own player</h2>
-            <p className="cMuted" style={{ marginTop: 0 }}>
-              Use these Cloudflare Stream manifests with any HLS/DASH library or native mobile player.
-            </p>
-            <ManifestUrlList uid={STREAM_PLAYER_UID} />
-            <ul className="streamMetaList" style={{ marginTop: '1rem' }}>
-              <li>
-                <strong>Stream Player URL</strong>
-                <a href={STREAM_PLAYER_URL} target="_blank" rel="noreferrer">
-                  {STREAM_PLAYER_URL}
-                </a>
-              </li>
+            <StreamProtocolEndpoints uid={STREAM_PLAYER_UID} />
+          </div>
+
+          <div className="vipCard streamMetaCard">
+            <h2>Quick reference</h2>
+            <ul className="streamMetaList">
               <li>
                 <strong>Asset UID</strong>
                 <code>{STREAM_PLAYER_UID}</code>
@@ -175,10 +196,30 @@ export function LiveStreamPage() {
                 <code>customer-{STREAM_CUSTOMER_CODE}</code>
               </li>
               <li>
-                <strong>Live input (ingest)</strong>
+                <strong>WHEP</strong>
+                <code>{STREAM_WHEP_URL}</code>
+              </li>
+              <li>
+                <strong>SRT</strong>
+                <code>{STREAM_SRT_PLAYBACK_URL}</code>
+              </li>
+              <li>
+                <strong>RTMPS server</strong>
+                <code>{STREAM_RTMPS_PLAYBACK_SERVER}</code>
+              </li>
+              <li>
+                <strong>RTMPS key</strong>
+                <code>{STREAM_RTMPS_PLAYBACK_KEY}</code>
+              </li>
+              <li>
+                <strong>Live input (ingest only)</strong>
                 <code>{STREAM_LIVE_INPUT_ID}</code>
               </li>
             </ul>
+            <div style={{ marginTop: '1rem' }}>
+              <h3 className="streamProtocolSub">HLS / DASH shortcuts</h3>
+              <ManifestUrlList uid={STREAM_PLAYER_UID} />
+            </div>
           </div>
         </section>
       </main>

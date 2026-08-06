@@ -7,7 +7,9 @@ import { MouseFX } from '../components/MouseFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { ManifestUrlList, StreamManifestPlayer } from '../components/StreamManifestPlayer';
-import { STREAM_DASH_URL, STREAM_HLS_URL } from '../lib/streamConfig';
+import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
+import { StreamProtocolEndpoints } from '../components/StreamProtocolEndpoints';
+import { STREAM_DASH_URL, STREAM_HLS_URL, STREAM_WHEP_URL } from '../lib/streamConfig';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -805,7 +807,7 @@ export function MusicShowcase() {
 }
 
 export function VideoPage() {
-  const [videoMode, setVideoMode] = useState<'hosted' | 'hls' | 'dash'>('hosted');
+  const [videoMode, setVideoMode] = useState<'hosted' | 'whep' | 'hls' | 'dash'>('hosted');
 
   return (
     <PublicLayout variant="electric">
@@ -819,11 +821,12 @@ export function VideoPage() {
         <section className="videoGrid videoGrid--stream">
           <div className="videoStreamSlot vipCard">
             <h2>Cloudflare Stream</h2>
-            <p>Hosted player or custom HLS/DASH (bring your own player libraries).</p>
+            <p>Hosted player, WHEP (WebRTC), or custom HLS/DASH — plus SRT/RTMPS for pro tools.</p>
             <div className="streamModeTabs" role="tablist" aria-label="Video player mode">
               {(
                 [
                   ['hosted', 'Stream Player'],
+                  ['whep', 'WHEP'],
                   ['hls', 'HLS'],
                   ['dash', 'DASH'],
                 ] as const
@@ -839,9 +842,13 @@ export function VideoPage() {
               ))}
             </div>
             {videoMode === 'hosted' ? <CloudflareStreamPlayer title="3000 Studios featured stream" /> : null}
+            {videoMode === 'whep' ? <WhepStreamPlayer title="WHEP WebRTC playback" /> : null}
             {videoMode === 'hls' ? <StreamManifestPlayer mode="hls" title="HLS custom player" /> : null}
             {videoMode === 'dash' ? <StreamManifestPlayer mode="dash" title="DASH custom player" /> : null}
             <div className="streamManifestMini">
+              <a href={STREAM_WHEP_URL} target="_blank" rel="noreferrer">
+                WHEP
+              </a>
               <a href={STREAM_HLS_URL} target="_blank" rel="noreferrer">
                 HLS .m3u8
               </a>
@@ -860,8 +867,11 @@ export function VideoPage() {
             </StudioButton>
           </div>
           <div className="vipCard videoStreamSlot">
-            <h2>Manifest URLs (BYO player)</h2>
-            <ManifestUrlList />
+            <StreamProtocolEndpoints />
+            <div style={{ marginTop: '1rem' }}>
+              <h3 className="streamProtocolSub">Manifest shortcuts</h3>
+              <ManifestUrlList />
+            </div>
           </div>
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />

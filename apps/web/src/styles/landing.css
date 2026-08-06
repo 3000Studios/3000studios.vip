@@ -1514,6 +1514,58 @@ button, input, select, textarea { font: inherit; }
   font-size: 0.72rem;
 }
 
+.streamProtocolBlock h2 {
+  margin: 0 0 0.5rem;
+  color: #f6e7b0;
+}
+.streamProtocolSub {
+  margin: 1.1rem 0 0.55rem;
+  color: #ffd700;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.streamEndpointRow {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+}
+.streamEndpointHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+.streamCopyBtn {
+  appearance: none;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.streamCopyBtn:hover {
+  background: rgba(255, 215, 0, 0.2);
+}
+.streamEndpointValue {
+  display: block;
+  word-break: break-all;
+  color: rgba(244, 239, 231, 0.88);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+.cfWhepPlayer .cfManifestMeta span:first-child {
+  background: rgba(30, 240, 120, 0.15);
+  border-color: rgba(30, 240, 120, 0.4);
+  color: #1ef078;
+}
+
 .streamFrame {
   position: relative;
   aspect-ratio: 16 / 9;
