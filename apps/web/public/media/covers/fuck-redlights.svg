@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="hsl(248 85% 42%)"/>
+      <stop offset="55%" stop-color="hsl(297 70% 18%)"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd700"/>
+      <stop offset="100%" stop-color="#f0a500"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#g)"/>
+  <circle cx="49%" cy="64%" r="62" fill="hsl(248 80% 55%)" opacity="0.24" />
+  <circle cx="48%" cy="9%" r="61" fill="hsl(276 80% 55%)" opacity="0.28" />
+  <circle cx="47%" cy="44%" r="60" fill="hsl(304 80% 55%)" opacity="0.32" />
+  <circle cx="46%" cy="79%" r="59" fill="hsl(332 80% 55%)" opacity="0.36" />
+  <circle cx="53%" cy="13%" r="66" fill="hsl(0 80% 55%)" opacity="0.38" />
+  <circle cx="52%" cy="48%" r="65" fill="hsl(28 80% 55%)" opacity="0.12" />
+  <circle cx="51%" cy="84%" r="64" fill="hsl(56 80% 55%)" opacity="0.16" />
+  <circle cx="50%" cy="29%" r="63" fill="hsl(84 80% 55%)" opacity="0.20" />
+  <path d="M40,320 C140,120 360,120 470,320 S360,460 256,400 S40,460 40,320 Z" fill="hsl(297 70% 48%)" opacity="0.3" />
+  <rect x="18" y="18" width="476" height="476" rx="28" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.75"/>
+  <text x="50%" y="12%" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="4" fill="#ffd700" opacity="0.9">3000 STUDIOS</text>
+  <text x="50%" y="68%" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="28" fill="#fff8e7" stroke="rgba(0,0,0,0.55)" stroke-width="1.2" paint-order="stroke">Fuck Redlights</text>
+  <text x="50%" y="92%" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="rgba(255,215,0,0.75)" letter-spacing="3">#15 · VIP CATALOG</text>
+</svg>

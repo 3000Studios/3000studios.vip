@@ -102,9 +102,49 @@ html {
   .glowText,
   .hostGlow,
   .wavePin,
-  .equalizer span {
+  .equalizer span,
+  .shimmerText,
+  .logoWordmark,
+  .liveWallpaperScan,
+  .globalPlayerCover,
+  .songHeroCover,
+  .glitchText::before,
+  .glitchText::after {
     animation: none !important;
   }
+  .mouseFx { display: none !important; }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .mouseFx { display: none !important; }
+}
+
+/* Parallax-ish hero depth tied to scroll + pointer */
+.redCarpetHero .heroCopy {
+  transform: translate3d(
+    calc((var(--mx) - 0.5) * 12px),
+    calc((var(--my) - 0.5) * 10px - var(--scroll) * 24px),
+    0
+  );
+  transition: transform 80ms linear;
+}
+
+.vipCard,
+.trackCard,
+.blogCard {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s ease, box-shadow 0.28s ease;
+}
+.vipCard:hover,
+.trackCard:hover,
+.blogCard:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--theme-gold) 45%, transparent);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), 0 0 30px color-mix(in srgb, var(--theme-a) 12%, transparent);
 }
 
 .console .cScroll {

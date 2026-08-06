@@ -1,0 +1,402 @@
+{
+  "lick-my-balls-jazz": {
+    "cover": "/media/covers/lick-my-balls-jazz.jpg",
+    "palette": {
+      "a": "hsl(268 80% 55%)",
+      "b": "hsl(116 75% 48%)",
+      "c": "hsl(3 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "lick-my-balls-remix": {
+    "cover": "/media/covers/lick-my-balls-remix.jpg",
+    "palette": {
+      "a": "hsl(34 80% 55%)",
+      "b": "hsl(260 75% 48%)",
+      "c": "hsl(120 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "glitch"
+  },
+  "always-late": {
+    "cover": "/media/covers/always-late.svg",
+    "palette": {
+      "a": "hsl(359 80% 55%)",
+      "b": "hsl(302 75% 48%)",
+      "c": "hsl(323 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "ocean"
+  },
+  "am-i-wrong-good": {
+    "cover": "/media/covers/am-i-wrong-good.svg",
+    "palette": {
+      "a": "hsl(121 80% 55%)",
+      "b": "hsl(105 75% 48%)",
+      "c": "hsl(153 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "vortex"
+  },
+  "am-i-wrong-stp": {
+    "cover": "/media/covers/am-i-wrong-stp.svg",
+    "palette": {
+      "a": "hsl(265 80% 55%)",
+      "b": "hsl(204 75% 48%)",
+      "c": "hsl(179 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "vortex"
+  },
+  "betty-boom-boom": {
+    "cover": "/media/covers/betty-boom-boom.jpg",
+    "palette": {
+      "a": "hsl(47 80% 55%)",
+      "b": "hsl(38 75% 48%)",
+      "c": "hsl(309 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "ocean"
+  },
+  "click-clack-3000-studios-original": {
+    "cover": "/media/covers/click-clack-3000-studios-original.svg",
+    "palette": {
+      "a": "hsl(4 80% 55%)",
+      "b": "hsl(338 75% 48%)",
+      "c": "hsl(125 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "clogged-up-toilet-blues": {
+    "cover": "/media/covers/clogged-up-toilet-blues.svg",
+    "palette": {
+      "a": "hsl(196 80% 55%)",
+      "b": "hsl(138 75% 48%)",
+      "c": "hsl(353 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "code-red": {
+    "cover": "/media/covers/code-red.svg",
+    "palette": {
+      "a": "hsl(106 80% 55%)",
+      "b": "hsl(163 75% 48%)",
+      "c": "hsl(87 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "glitch"
+  },
+  "dad": {
+    "cover": "/media/covers/dad.svg",
+    "palette": {
+      "a": "hsl(110 80% 55%)",
+      "b": "hsl(198 75% 48%)",
+      "c": "hsl(175 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "electric"
+  },
+  "do-ya-think-my-shits-messy": {
+    "cover": "/media/covers/do-ya-think-my-shits-messy.jpg",
+    "palette": {
+      "a": "hsl(241 80% 55%)",
+      "b": "hsl(218 75% 48%)",
+      "c": "hsl(315 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "vortex"
+  },
+  "everlong-pretender": {
+    "cover": "/media/covers/everlong-pretender.svg",
+    "palette": {
+      "a": "hsl(301 80% 55%)",
+      "b": "hsl(186 75% 48%)",
+      "c": "hsl(260 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "vortex"
+  },
+  "figgity-fa-kit": {
+    "cover": "/media/covers/figgity-fa-kit.jpg",
+    "palette": {
+      "a": "hsl(277 80% 55%)",
+      "b": "hsl(96 75% 48%)",
+      "c": "hsl(260 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "vortex"
+  },
+  "fix-your-lane": {
+    "cover": "/media/covers/fix-your-lane.jpg",
+    "palette": {
+      "a": "hsl(193 80% 55%)",
+      "b": "hsl(26 75% 48%)",
+      "c": "hsl(29 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "vortex"
+  },
+  "fuck-redlights": {
+    "cover": "/media/covers/fuck-redlights.svg",
+    "palette": {
+      "a": "hsl(177 80% 55%)",
+      "b": "hsl(263 75% 48%)",
+      "c": "hsl(9 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "inferno"
+  },
+  "go-the-other-way-player": {
+    "cover": "/media/covers/go-the-other-way-player.svg",
+    "palette": {
+      "a": "hsl(358 80% 55%)",
+      "b": "hsl(229 75% 48%)",
+      "c": "hsl(59 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "glitch"
+  },
+  "i-always-feel-like-someones": {
+    "cover": "/media/covers/i-always-feel-like-someones.jpg",
+    "palette": {
+      "a": "hsl(155 80% 55%)",
+      "b": "hsl(200 75% 48%)",
+      "c": "hsl(242 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "ocean"
+  },
+  "i-always-feel-like": {
+    "cover": "/media/covers/i-always-feel-like.jpg",
+    "palette": {
+      "a": "hsl(19 80% 55%)",
+      "b": "hsl(331 75% 48%)",
+      "c": "hsl(290 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "chrome"
+  },
+  "i-bet-you-crooner": {
+    "cover": "/media/covers/i-bet-you-crooner.svg",
+    "palette": {
+      "a": "hsl(249 80% 55%)",
+      "b": "hsl(269 75% 48%)",
+      "c": "hsl(176 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "inferno"
+  },
+  "i-grind-big-hustle": {
+    "cover": "/media/covers/i-grind-big-hustle.jpg",
+    "palette": {
+      "a": "hsl(256 80% 55%)",
+      "b": "hsl(176 75% 48%)",
+      "c": "hsl(113 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "just-do-you-boo": {
+    "cover": "/media/covers/just-do-you-boo.jpg",
+    "palette": {
+      "a": "hsl(196 80% 55%)",
+      "b": "hsl(19 75% 48%)",
+      "c": "hsl(247 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "late-night-porkchops-paige": {
+    "cover": "/media/covers/late-night-porkchops-paige.jpg",
+    "palette": {
+      "a": "hsl(119 80% 55%)",
+      "b": "hsl(176 75% 48%)",
+      "c": "hsl(191 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "ocean"
+  },
+  "let-me-be": {
+    "cover": "/media/covers/let-me-be.svg",
+    "palette": {
+      "a": "hsl(235 80% 55%)",
+      "b": "hsl(356 75% 48%)",
+      "c": "hsl(202 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "chrome"
+  },
+  "lets-hear-it-for-king-j": {
+    "cover": "/media/covers/lets-hear-it-for-king-j.jpg",
+    "palette": {
+      "a": "hsl(165 80% 55%)",
+      "b": "hsl(10 75% 48%)",
+      "c": "hsl(171 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "inferno"
+  },
+  "make-em-say-uhh-bathroom-edition": {
+    "cover": "/media/covers/make-em-say-uhh-bathroom-edition.svg",
+    "palette": {
+      "a": "hsl(110 80% 55%)",
+      "b": "hsl(204 75% 48%)",
+      "c": "hsl(242 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "electric"
+  },
+  "meltdown-miestro": {
+    "cover": "/media/covers/meltdown-miestro.svg",
+    "palette": {
+      "a": "hsl(223 80% 55%)",
+      "b": "hsl(154 75% 48%)",
+      "c": "hsl(137 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "chrome"
+  },
+  "my-neck-remix": {
+    "cover": "/media/covers/my-neck-remix.svg",
+    "palette": {
+      "a": "hsl(73 80% 55%)",
+      "b": "hsl(334 75% 48%)",
+      "c": "hsl(269 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "vortex"
+  },
+  "oooo-weee": {
+    "cover": "/media/covers/oooo-weee.jpg",
+    "palette": {
+      "a": "hsl(306 80% 55%)",
+      "b": "hsl(12 75% 48%)",
+      "c": "hsl(12 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "nebula"
+  },
+  "outkast-3000-studios-style": {
+    "cover": "/media/covers/outkast-3000-studios-style.jpg",
+    "palette": {
+      "a": "hsl(194 80% 55%)",
+      "b": "hsl(35 75% 48%)",
+      "c": "hsl(90 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "electric"
+  },
+  "ride-smooth": {
+    "cover": "/media/covers/ride-smooth.jpg",
+    "palette": {
+      "a": "hsl(112 80% 55%)",
+      "b": "hsl(172 75% 48%)",
+      "c": "hsl(146 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "simp-bitch": {
+    "cover": "/media/covers/simp-bitch.svg",
+    "palette": {
+      "a": "hsl(221 80% 55%)",
+      "b": "hsl(349 75% 48%)",
+      "c": "hsl(223 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "goldwave"
+  },
+  "so-fresh-so-cosmic": {
+    "cover": "/media/covers/so-fresh-so-cosmic.jpg",
+    "palette": {
+      "a": "hsl(244 80% 55%)",
+      "b": "hsl(275 75% 48%)",
+      "c": "hsl(179 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "squash-that-mother": {
+    "cover": "/media/covers/squash-that-mother.svg",
+    "palette": {
+      "a": "hsl(10 80% 55%)",
+      "b": "hsl(275 75% 48%)",
+      "c": "hsl(223 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "glitch"
+  },
+  "subwoofer-pressure-2": {
+    "cover": "/media/covers/subwoofer-pressure-2.svg",
+    "palette": {
+      "a": "hsl(100 80% 55%)",
+      "b": "hsl(288 75% 48%)",
+      "c": "hsl(39 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "pulse"
+  },
+  "subwoofer-pressure": {
+    "cover": "/media/covers/subwoofer-pressure.svg",
+    "palette": {
+      "a": "hsl(327 80% 55%)",
+      "b": "hsl(5 75% 48%)",
+      "c": "hsl(33 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "blackhole"
+  },
+  "sunset-and-bliss-jnp": {
+    "cover": "/media/covers/sunset-and-bliss-jnp.svg",
+    "palette": {
+      "a": "hsl(188 80% 55%)",
+      "b": "hsl(82 75% 48%)",
+      "c": "hsl(266 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "aurora"
+  },
+  "the-opera-v1": {
+    "cover": "/media/covers/the-opera-v1.svg",
+    "palette": {
+      "a": "hsl(180 80% 55%)",
+      "b": "hsl(197 75% 48%)",
+      "c": "hsl(54 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "spiral"
+  },
+  "waynes-world-laid-back-weezy-mix": {
+    "cover": "/media/covers/waynes-world-laid-back-weezy-mix.jpg",
+    "palette": {
+      "a": "hsl(272 80% 55%)",
+      "b": "hsl(3 75% 48%)",
+      "c": "hsl(7 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "aurora"
+  },
+  "waynes-world": {
+    "cover": "/media/covers/waynes-world.jpg",
+    "palette": {
+      "a": "hsl(359 80% 55%)",
+      "b": "hsl(139 75% 48%)",
+      "c": "hsl(281 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "ocean"
+  },
+  "wi-fi-fridge": {
+    "cover": "/media/covers/wi-fi-fridge.jpg",
+    "palette": {
+      "a": "hsl(125 80% 55%)",
+      "b": "hsl(316 75% 48%)",
+      "c": "hsl(290 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "goldwave"
+  }
+}

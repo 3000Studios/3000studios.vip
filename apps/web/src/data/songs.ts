@@ -1,33 +1,41 @@
+import { rolloutSongs, type CatalogSong } from './music';
+
 export interface Song {
   id: string;
   slug: string;
   title: string;
   artist: string;
   description: string;
-  fullAudio: string;      // path to full track
-  previewAudio?: string;  // optional shorter preview
+  fullAudio: string;
+  previewAudio?: string;
   coverImage: string;
   duration: string;
   genre: string;
   vibe: string;
   unlockType: 'daily' | 'vip' | 'unlocked';
+  wallpaper: string;
+  palette: CatalogSong['palette'];
 }
 
-export const songs: Song[] = [
-  {
-    id: 's1',
-    slug: 'always-feel-like',
-    title: 'Always Feel Like',
+function toSong(track: CatalogSong): Song {
+  return {
+    id: track.id,
+    slug: track.slug,
+    title: track.title,
     artist: '3000 Studios',
-    description: 'The signature track for the VIP rollout. Emotional, driving, cinematic.',
-    fullAudio: '/media/always-feel-like.mp3',
-    previewAudio: '/media/always-feel-like.mp3',
-    coverImage: '/favicon.svg',
-    duration: '3:26',
-    genre: 'Cinematic Electronic',
-    vibe: 'Introspective • Driving',
+    description: track.description,
+    fullAudio: track.src,
+    previewAudio: track.src,
+    coverImage: track.cover,
+    duration: '—',
+    genre: '3000 Studios Original',
+    vibe: 'VIP · Sound-reactive · Catalog',
     unlockType: 'unlocked',
-  },
-];
+    wallpaper: track.wallpaper,
+    palette: track.palette,
+  };
+}
 
-export const getSongBySlug = (slug: string) => songs.find(s => s.slug === slug);
+export const songs: Song[] = rolloutSongs.map(toSong);
+
+export const getSongBySlug = (slug: string) => songs.find((s) => s.slug === slug);

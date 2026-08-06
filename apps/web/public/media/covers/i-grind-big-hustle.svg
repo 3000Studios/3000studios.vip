@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="hsl(186 85% 42%)"/>
+      <stop offset="55%" stop-color="hsl(169 70% 18%)"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd700"/>
+      <stop offset="100%" stop-color="#f0a500"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#g)"/>
+  <circle cx="42%" cy="13%" r="55" fill="hsl(186 80% 55%)" opacity="0.19" />
+  <circle cx="43%" cy="68%" r="56" fill="hsl(214 80% 55%)" opacity="0.15" />
+  <circle cx="44%" cy="33%" r="57" fill="hsl(242 80% 55%)" opacity="0.41" />
+  <circle cx="45%" cy="88%" r="58" fill="hsl(270 80% 55%)" opacity="0.37" />
+  <circle cx="46%" cy="53%" r="59" fill="hsl(298 80% 55%)" opacity="0.33" />
+  <circle cx="47%" cy="17%" r="60" fill="hsl(326 80% 55%)" opacity="0.29" />
+  <circle cx="48%" cy="72%" r="61" fill="hsl(354 80% 55%)" opacity="0.25" />
+  <circle cx="49%" cy="37%" r="62" fill="hsl(22 80% 55%)" opacity="0.21" />
+  <polygon points="256,40 470,430 42,430" fill="hsl(312 85% 50%)" opacity="0.22" />
+  <rect x="18" y="18" width="476" height="476" rx="28" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.75"/>
+  <text x="50%" y="12%" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="4" fill="#ffd700" opacity="0.9">3000 STUDIOS</text>
+  <text x="50%" y="68%" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="28" fill="#fff8e7" stroke="rgba(0,0,0,0.55)" stroke-width="1.2" paint-order="stroke">I Grind Big Hustle</text>
+  <text x="50%" y="92%" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="rgba(255,215,0,0.75)" letter-spacing="3">#20 · VIP CATALOG</text>
+</svg>

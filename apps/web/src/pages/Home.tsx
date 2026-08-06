@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { featureSong, rolloutSongs } from '../data/music';
+import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSong, type SongPalette } from '../data/music';
+import { LiveWallpaper } from '../components/LiveWallpaper';
+import { MouseFX } from '../components/MouseFX';
+import { ScrollFX } from '../components/ScrollFX';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -147,15 +150,16 @@ function StudioButton({
   );
 }
 
-function AudioReactiveWallpaper({ variant = 'spiral' }: { variant?: string }) {
-  return (
-    <div className={`vipWallpaper ${variant}`} aria-hidden="true">
-      <span />
-      <span />
-      <span />
-      <span />
-    </div>
-  );
+function AudioReactiveWallpaper({
+  variant = 'spiral',
+  palette,
+  coverUrl,
+}: {
+  variant?: string;
+  palette?: SongPalette;
+  coverUrl?: string;
+}) {
+  return <LiveWallpaper variant={variant} palette={palette} coverUrl={coverUrl} />;
 }
 
 function BeatDancingTitle({ text }: { text: string }) {
@@ -209,13 +213,38 @@ function useStoredList<T>(key: string, fallback: T[]) {
   return [items, setItems] as const;
 }
 
+function applySongTheme(song?: CatalogSong | null, wallpaperOverride?: string) {
+  if (!song) return;
+  const root = document.documentElement;
+  root.style.setProperty('--theme-a', song.palette.a);
+  root.style.setProperty('--theme-b', song.palette.b);
+  root.style.setProperty('--theme-c', song.palette.c);
+  root.style.setProperty('--theme-gold', song.palette.gold);
+  root.dataset.songWallpaper = wallpaperOverride || song.wallpaper;
+  root.dataset.songSlug = song.slug;
+  window.dispatchEvent(
+    new CustomEvent('3000-song-theme', {
+      detail: {
+        slug: song.slug,
+        title: song.title,
+        cover: song.cover,
+        palette: song.palette,
+        wallpaper: wallpaperOverride || song.wallpaper,
+        src: song.src,
+      },
+    }),
+  );
+}
+
 function MusicController() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const rafRef = useRef<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
+  const defaultSong = rolloutSongs[0];
   const [activeTitle, setActiveTitle] = useState(`${featureSong.title} — ${featureSong.jazz.label}`);
+  const [activeCover, setActiveCover] = useState(defaultSong.cover);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -229,10 +258,11 @@ function MusicController() {
   }, [muted]);
 
   useEffect(() => {
+    applySongTheme(defaultSong);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [defaultSong]);
 
   const connectAnalyzer = useCallback(() => {
     const audio = audioRef.current;
@@ -265,6 +295,11 @@ function MusicController() {
       audio.currentTime = 0;
     }
     audio.muted = muted;
+    const song = getSongBySrc(src) || getSongByTitle(title);
+    if (song) {
+      setActiveCover(song.cover);
+      applySongTheme(song);
+    }
     void audio.play().then(() => {
       setActiveTitle(title);
       setIsPlaying(true);
@@ -296,9 +331,10 @@ function MusicController() {
   return (
     <div className="globalPlayer" aria-label="Site music player">
       <audio ref={audioRef} src={DEFAULT_TRACK} preload="auto" loop />
-      <div>
+      <img className="globalPlayerCover" src={activeCover} alt="" width={40} height={40} />
+      <div className="globalPlayerMeta">
         <span>Now playing</span>
-        <strong>{activeTitle}</strong>
+        <strong className="shimmerText">{activeTitle}</strong>
       </div>
       <button type="button" onClick={togglePlay}>
         {isPlaying ? 'Pause' : 'Play'}
@@ -387,7 +423,7 @@ function FeatureOfTheWeek() {
             Play {version.label}
           </button>
         </div>
-        <button type="button" className="featureArtStage" onClick={morph} aria-label={`Morph to ${other.label}`}>
+        <button type="button" className="featureArtStage magnetic" onClick={morph} aria-label={`Morph to ${other.label}`}>
           <img
             key={version.cover}
             className="featureArtImg"
@@ -404,14 +440,45 @@ function FeatureOfTheWeek() {
 
 export function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState<{
+    wallpaper: string;
+    cover?: string;
+    palette?: SongPalette;
+  }>({ wallpaper: variant });
+
+  useEffect(() => {
+    setTheme((prev) => ({ ...prev, wallpaper: variant }));
+  }, [variant]);
+
+  useEffect(() => {
+    const onTheme = (e: Event) => {
+      const detail = (e as CustomEvent).detail as {
+        wallpaper?: string;
+        cover?: string;
+        palette?: SongPalette;
+      };
+      setTheme((prev) => ({
+        wallpaper: detail.wallpaper || prev.wallpaper || variant,
+        cover: detail.cover || prev.cover,
+        palette: detail.palette || prev.palette,
+      }));
+    };
+    window.addEventListener('3000-song-theme', onTheme as EventListener);
+    return () => window.removeEventListener('3000-song-theme', onTheme as EventListener);
+  }, [variant]);
+
+  const wallpaperVariant = theme.wallpaper || variant;
+
   return (
-    <div className={`vipSite vipSite-${variant}`}>
-      <AudioReactiveWallpaper variant={variant} />
+    <div className={`vipSite vipSite-${variant} vipSite-live`} data-page-wallpaper={variant} data-song-wallpaper={wallpaperVariant}>
+      <AudioReactiveWallpaper variant={wallpaperVariant} palette={theme.palette} coverUrl={theme.cover} />
+      <MouseFX />
+      <ScrollFX />
+      <div className="scrollProgress" aria-hidden="true" />
       <header className="vipHeader">
-        <AudioReactiveWallpaper variant="global" />
         <Link className="vipLogo" to="/" onClick={() => setOpen(false)} aria-label="3000 Studios VIP home">
           <span className="logoOrb">3000</span>
-          <strong>3000 Studios</strong>
+          <strong className="logoWordmark">3000 Studios</strong>
         </Link>
         <span className="ownerTag">Owner/artist = {OWNER_EMAIL}</span>
         <nav className={open ? 'vipNav open' : 'vipNav'} aria-label="Primary navigation">
@@ -429,7 +496,6 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
       {children}
       <div className="vipEnergyDivider" aria-hidden="true" />
       <footer className="vipFooter">
-        <AudioReactiveWallpaper variant="global" />
         <div className="footerBrand">
           <strong>3000 Studios</strong>
           <p>Music, cinematic video content, live streams, sponsorships, song requests, and private creator operations.</p>
@@ -595,11 +661,17 @@ export function MusicShowcase() {
                   type="button"
                   className={`itunesItem ${slot}`}
                   key={song.src}
-                  onClick={() => selectSong(index)}
+                  onClick={() => {
+                    selectSong(index);
+                    window.dispatchEvent(
+                      new CustomEvent('3000-play-track', { detail: { src: song.src, title: song.title } }),
+                    );
+                  }}
                   aria-current={index === activeIndex ? 'true' : undefined}
                   aria-label={`Play ${song.title}`}
                 >
-                  <span className="itunesCover">
+                  <span className="itunesCover" style={{ backgroundImage: `url(${song.cover})` }}>
+                    <img src={song.cover} alt="" className="itunesCoverImg" loading="lazy" />
                     <span className="itunesRank">#{song.rank}</span>
                     <strong>{song.title}</strong>
                     <small>3000 Studios Original</small>
@@ -609,24 +681,43 @@ export function MusicShowcase() {
             })}
           </div>
           <div className="itunesNowPlaying">
+            <img className="itunesNowArt" src={activeSong.cover} alt="" width={72} height={72} />
             <div>
               <span>Now selected</span>
               <strong>{activeSong.title}</strong>
+              <Link className="songDeepLink" to={`/song/${activeSong.slug}`}>
+                Open song page
+              </Link>
             </div>
             <audio ref={selectedAudioRef} key={activeSong.src} src={activeSong.src} controls preload="auto" />
           </div>
         </section>
         <motion.section className="vipSection trackList" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
           {rolloutSongs.map((song) => (
-            <motion.article className="trackCard" key={song.title} variants={fadeUp} data-active={song.src === activeSong.src ? 'true' : undefined}>
+            <motion.article className="trackCard" key={song.title} variants={fadeUp} data-active={song.src === activeSong.src ? 'true' : undefined} data-reveal>
+              <img className="trackCardArt" src={song.cover} alt="" width={64} height={64} loading="lazy" />
               <span>#{song.rank}</span>
               <div>
                 <h2>{song.title}</h2>
                 <p>{song.description}</p>
               </div>
-              <button type="button" className="trackSelectButton" onClick={() => selectSong(song.rank - 1)}>
-                Play Full Song
-              </button>
+              <div className="trackCardActions">
+                <button
+                  type="button"
+                  className="trackSelectButton"
+                  onClick={() => {
+                    selectSong(song.rank - 1);
+                    window.dispatchEvent(
+                      new CustomEvent('3000-play-track', { detail: { src: song.src, title: song.title } }),
+                    );
+                  }}
+                >
+                  Play Full Song
+                </button>
+                <Link className="trackSelectButton secondaryLink" to={`/song/${song.slug}`}>
+                  Art + Page
+                </Link>
+              </div>
             </motion.article>
           ))}
         </motion.section>

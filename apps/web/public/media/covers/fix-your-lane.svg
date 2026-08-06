@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="hsl(47 85% 42%)"/>
+      <stop offset="55%" stop-color="hsl(174 70% 18%)"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd700"/>
+      <stop offset="100%" stop-color="#f0a500"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#g)"/>
+  <circle cx="53%" cy="77%" r="66" fill="hsl(47 80% 55%)" opacity="0.19" />
+  <circle cx="52%" cy="22%" r="65" fill="hsl(75 80% 55%)" opacity="0.23" />
+  <circle cx="51%" cy="57%" r="64" fill="hsl(103 80% 55%)" opacity="0.27" />
+  <circle cx="50%" cy="92%" r="63" fill="hsl(131 80% 55%)" opacity="0.31" />
+  <circle cx="57%" cy="26%" r="70" fill="hsl(159 80% 55%)" opacity="0.33" />
+  <circle cx="56%" cy="61%" r="69" fill="hsl(187 80% 55%)" opacity="0.37" />
+  <circle cx="55%" cy="6%" r="68" fill="hsl(215 80% 55%)" opacity="0.41" />
+  <circle cx="54%" cy="41%" r="67" fill="hsl(243 80% 55%)" opacity="0.15" />
+  <rect x="40" y="120" width="18" height="80" rx="9" fill="hsl(47 75% 60%)" opacity="0.45" />
+  <rect x="76" y="160" width="18" height="98" rx="9" fill="hsl(59 75% 60%)" opacity="0.45" />
+  <rect x="112" y="200" width="18" height="116" rx="9" fill="hsl(71 75% 60%)" opacity="0.45" />
+  <rect x="148" y="120" width="18" height="134" rx="9" fill="hsl(83 75% 60%)" opacity="0.45" />
+  <rect x="184" y="160" width="18" height="152" rx="9" fill="hsl(95 75% 60%)" opacity="0.45" />
+  <rect x="220" y="200" width="18" height="170" rx="9" fill="hsl(107 75% 60%)" opacity="0.45" />
+  <rect x="256" y="120" width="18" height="188" rx="9" fill="hsl(119 75% 60%)" opacity="0.45" />
+  <rect x="292" y="160" width="18" height="206" rx="9" fill="hsl(131 75% 60%)" opacity="0.45" />
+  <rect x="328" y="200" width="18" height="224" rx="9" fill="hsl(143 75% 60%)" opacity="0.45" />
+  <rect x="364" y="120" width="18" height="242" rx="9" fill="hsl(155 75% 60%)" opacity="0.45" />
+  <rect x="400" y="160" width="18" height="260" rx="9" fill="hsl(167 75% 60%)" opacity="0.45" />
+  <rect x="436" y="200" width="18" height="278" rx="9" fill="hsl(179 75% 60%)" opacity="0.45" />
+  <rect x="18" y="18" width="476" height="476" rx="28" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.75"/>
+  <text x="50%" y="12%" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="4" fill="#ffd700" opacity="0.9">3000 STUDIOS</text>
+  <text x="50%" y="68%" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="28" fill="#fff8e7" stroke="rgba(0,0,0,0.55)" stroke-width="1.2" paint-order="stroke">Fix Your Lane</text>
+  <text x="50%" y="92%" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="rgba(255,215,0,0.75)" letter-spacing="3">#14 · VIP CATALOG</text>
+</svg>

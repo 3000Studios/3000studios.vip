@@ -1,3 +1,49 @@
+import coverMap from './coverMap.json';
+
+export type SongPalette = {
+  a: string;
+  b: string;
+  c: string;
+  gold: string;
+};
+
+export type CatalogSong = {
+  rank: number;
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  src: string;
+  cover: string;
+  palette: SongPalette;
+  wallpaper: string;
+};
+
+function enrich(
+  rank: number,
+  slug: string,
+  title: string,
+  description: string,
+  src: string,
+): CatalogSong {
+  const meta = (coverMap as Record<string, { cover: string; palette: SongPalette; wallpaper: string }>)[slug] ?? {
+    cover: `/media/covers/${slug}.svg`,
+    palette: { a: '#1ef078', b: '#236dff', c: '#ffd700', gold: '#ffd700' },
+    wallpaper: 'spiral',
+  };
+  return {
+    rank,
+    id: slug,
+    slug,
+    title,
+    description,
+    src,
+    cover: meta.cover,
+    palette: meta.palette,
+    wallpaper: meta.wallpaper,
+  };
+}
+
 /** Feature of the week — dual version (Jazz default + Remix morph) */
 export const featureSong = {
   title: 'Lick My Balls, and Die in a Fire',
@@ -8,258 +54,72 @@ export const featureSong = {
     label: 'Jazz Edition',
     description: 'Sultry jazz festival energy · Marilyn stage · Feature of the week.',
     src: '/media/lick-my-balls-jazz.mp3',
-    cover: '/media/lick-my-balls-jazz-cover.jpg',
+    cover: '/media/covers/lick-my-balls-jazz.jpg',
+    wallpaper: 'goldwave',
   },
   remix: {
     id: 'lick-my-balls-remix',
     label: 'Remix',
     description: 'Infernal DJ remix · devil on the decks · same anthem, harder cut.',
     src: '/media/lick-my-balls-remix.mp3',
-    cover: '/media/lick-my-balls-remix-cover.jpg',
+    cover: '/media/covers/lick-my-balls-remix.jpg',
+    wallpaper: 'inferno',
   },
 } as const;
 
-export const rolloutSongs = [
-  {
-    rank: 1,
-    title: 'Lick My Balls, and Die in a Fire — Jazz Edition',
-    description: 'Feature song of the week · Jazz edition · 3000 Studios original.',
-    src: '/media/lick-my-balls-jazz.mp3',
-  },
-  {
-    rank: 2,
-    title: 'Lick My Balls, and Die in a Fire — Remix',
-    description: 'Feature song remix · Devil DJ cut · 3000 Studios original.',
-    src: '/media/lick-my-balls-remix.mp3',
-  },
-  {
-    rank: 3,
-    title: 'Always Late',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/always-late.mp3',
-  },
-  {
-    rank: 4,
-    title: 'Am I Wrong Good',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/am-i-wrong-good.mp3',
-  },
-  {
-    rank: 5,
-    title: 'Am I Wrong STP',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/am-i-wrong-stp.mp3',
-  },
-  {
-    rank: 6,
-    title: 'Betty Boom Boom',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/betty-boom-boom.mp3',
-  },
-  {
-    rank: 7,
-    title: 'Click Clack - 3000 Studios Original',
-    description: 'Hard-hitting original with premium 3000 Studios energy.',
-    src: '/media/click-clack-3000-studios-original.mp3',
-  },
-  {
-    rank: 8,
-    title: 'Clogged Up (Toilet Blues)',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/clogged-up-toilet-blues.mp3',
-  },
-  {
-    rank: 9,
-    title: 'CODE RED',
-    description: 'High-energy original ready for the red carpet stage.',
-    src: '/media/code-red.mp3',
-  },
-  {
-    rank: 10,
-    title: 'DAD',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/dad.mp3',
-  },
-  {
-    rank: 11,
-    title: "Do Ya Think My Shit's Messy",
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/do-ya-think-my-shits-messy.mp3',
-  },
-  {
-    rank: 12,
-    title: 'Everlong Pretender',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/everlong-pretender.mp3',
-  },
-  {
-    rank: 13,
-    title: 'FIGGITY FA KIT',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/figgity-fa-kit.mp3',
-  },
-  {
-    rank: 14,
-    title: 'FIx Your Lane',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/fix-your-lane.mp3',
-  },
-  {
-    rank: 15,
-    title: 'Fuck Redlights',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/fuck-redlights.mp3',
-  },
-  {
-    rank: 16,
-    title: 'Go the Other Way, Player',
-    description: 'Abstract bars and outcast energy from the 3000 vault.',
-    src: '/media/go-the-other-way-player.mp3',
-  },
-  {
-    rank: 17,
-    title: "I Always Feel Like Someone's",
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/i-always-feel-like-someones.mp3',
-  },
-  {
-    rank: 18,
-    title: 'I Always Feel Like',
-    description: 'Signature cinematic energy for the VIP rollout.',
-    src: '/media/i-always-feel-like.mp3',
-  },
-  {
-    rank: 19,
-    title: 'I Bet You Crooner',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/i-bet-you-crooner.mp3',
-  },
-  {
-    rank: 20,
-    title: 'I Grind Big Hustle',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/i-grind-big-hustle.mp3',
-  },
-  {
-    rank: 21,
-    title: 'Just Do You Boo',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/just-do-you-boo.mp3',
-  },
-  {
-    rank: 22,
-    title: 'Late Night Porkchops & Paige',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/late-night-porkchops-paige.mp3',
-  },
-  {
-    rank: 23,
-    title: 'LET ME BE!!',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/let-me-be.mp3',
-  },
-  {
-    rank: 24,
-    title: 'Lets Hear It For King J',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/lets-hear-it-for-king-j.mp3',
-  },
-  {
-    rank: 25,
-    title: 'Make Em Say Uhh (Bathroom Edition)',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/make-em-say-uhh-bathroom-edition.mp3',
-  },
-  {
-    rank: 26,
-    title: 'Meltdown Miestro',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/meltdown-miestro.mp3',
-  },
-  {
-    rank: 27,
-    title: 'My Neck Remix',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/my-neck-remix.mp3',
-  },
-  {
-    rank: 28,
-    title: 'OOoo Weee',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/oooo-weee.mp3',
-  },
-  {
-    rank: 29,
-    title: 'OUTKAST 3000 Studios Style',
-    description: '3000 Studios reinterpretation with Atlanta heat.',
-    src: '/media/outkast-3000-studios-style.mp3',
-  },
-  {
-    rank: 30,
-    title: 'Ride Smooth',
-    description: 'Laid-back glide for the velvet rope after-party.',
-    src: '/media/ride-smooth.mp3',
-  },
-  {
-    rank: 31,
-    title: 'Simp Bitch',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/simp-bitch.mp3',
-  },
-  {
-    rank: 32,
-    title: 'So Fresh, So Cosmic',
-    description: 'Cosmic bounce built for creators who move different.',
-    src: '/media/so-fresh-so-cosmic.mp3',
-  },
-  {
-    rank: 33,
-    title: 'Squash That Mother',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/squash-that-mother.mp3',
-  },
-  {
-    rank: 34,
-    title: 'SUBWOOFER PRESSURE 2',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/subwoofer-pressure-2.mp3',
-  },
-  {
-    rank: 35,
-    title: 'SUBWOOFER PRESSURE',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/subwoofer-pressure.mp3',
-  },
-  {
-    rank: 36,
-    title: 'Sunset and Bliss (JnP)',
-    description: 'Smooth JnP vibes for late-night VIP lounges.',
-    src: '/media/sunset-and-bliss-jnp.mp3',
-  },
-  {
-    rank: 37,
-    title: 'The Opera v1',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/the-opera-v1.mp3',
-  },
-  {
-    rank: 38,
-    title: 'Waynes World (Laid-Back Weezy Mix)',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/waynes-world-laid-back-weezy-mix.mp3',
-  },
-  {
-    rank: 39,
-    title: 'Waynes World',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/waynes-world.mp3',
-  },
-  {
-    rank: 40,
-    title: 'Wi-Fi Fridge',
-    description: '3000 Studios original from the VIP music vault.',
-    src: '/media/wi-fi-fridge.mp3',
-  },
+export const rolloutSongs: CatalogSong[] = [
+  enrich(1, 'lick-my-balls-jazz', 'Lick My Balls, and Die in a Fire — Jazz Edition', 'Feature song of the week · Jazz edition · 3000 Studios original.', '/media/lick-my-balls-jazz.mp3'),
+  enrich(2, 'lick-my-balls-remix', 'Lick My Balls, and Die in a Fire — Remix', 'Feature song remix · Devil DJ cut · 3000 Studios original.', '/media/lick-my-balls-remix.mp3'),
+  enrich(3, 'always-late', 'Always Late', '3000 Studios original from the VIP music vault.', '/media/always-late.mp3'),
+  enrich(4, 'am-i-wrong-good', 'Am I Wrong Good', '3000 Studios original from the VIP music vault.', '/media/am-i-wrong-good.mp3'),
+  enrich(5, 'am-i-wrong-stp', 'Am I Wrong STP', '3000 Studios original from the VIP music vault.', '/media/am-i-wrong-stp.mp3'),
+  enrich(6, 'betty-boom-boom', 'Betty Boom Boom', '3000 Studios original from the VIP music vault.', '/media/betty-boom-boom.mp3'),
+  enrich(7, 'click-clack-3000-studios-original', 'Click Clack - 3000 Studios Original', 'Hard-hitting original with premium 3000 Studios energy.', '/media/click-clack-3000-studios-original.mp3'),
+  enrich(8, 'clogged-up-toilet-blues', 'Clogged Up (Toilet Blues)', '3000 Studios original from the VIP music vault.', '/media/clogged-up-toilet-blues.mp3'),
+  enrich(9, 'code-red', 'CODE RED', 'High-energy original ready for the red carpet stage.', '/media/code-red.mp3'),
+  enrich(10, 'dad', 'DAD', '3000 Studios original from the VIP music vault.', '/media/dad.mp3'),
+  enrich(11, 'do-ya-think-my-shits-messy', "Do Ya Think My Shit's Messy", '3000 Studios original from the VIP music vault.', '/media/do-ya-think-my-shits-messy.mp3'),
+  enrich(12, 'everlong-pretender', 'Everlong Pretender', '3000 Studios original from the VIP music vault.', '/media/everlong-pretender.mp3'),
+  enrich(13, 'figgity-fa-kit', 'FIGGITY FA KIT', '3000 Studios original from the VIP music vault.', '/media/figgity-fa-kit.mp3'),
+  enrich(14, 'fix-your-lane', 'FIx Your Lane', '3000 Studios original from the VIP music vault.', '/media/fix-your-lane.mp3'),
+  enrich(15, 'fuck-redlights', 'Fuck Redlights', '3000 Studios original from the VIP music vault.', '/media/fuck-redlights.mp3'),
+  enrich(16, 'go-the-other-way-player', 'Go the Other Way, Player', 'Abstract bars and outcast energy from the 3000 vault.', '/media/go-the-other-way-player.mp3'),
+  enrich(17, 'i-always-feel-like-someones', "I Always Feel Like Someone's", '3000 Studios original from the VIP music vault.', '/media/i-always-feel-like-someones.mp3'),
+  enrich(18, 'i-always-feel-like', 'I Always Feel Like', 'Signature cinematic energy for the VIP rollout.', '/media/i-always-feel-like.mp3'),
+  enrich(19, 'i-bet-you-crooner', 'I Bet You Crooner', '3000 Studios original from the VIP music vault.', '/media/i-bet-you-crooner.mp3'),
+  enrich(20, 'i-grind-big-hustle', 'I Grind Big Hustle', '3000 Studios original from the VIP music vault.', '/media/i-grind-big-hustle.mp3'),
+  enrich(21, 'just-do-you-boo', 'Just Do You Boo', '3000 Studios original from the VIP music vault.', '/media/just-do-you-boo.mp3'),
+  enrich(22, 'late-night-porkchops-paige', 'Late Night Porkchops & Paige', '3000 Studios original from the VIP music vault.', '/media/late-night-porkchops-paige.mp3'),
+  enrich(23, 'let-me-be', 'LET ME BE!!', '3000 Studios original from the VIP music vault.', '/media/let-me-be.mp3'),
+  enrich(24, 'lets-hear-it-for-king-j', 'Lets Hear It For King J', '3000 Studios original from the VIP music vault.', '/media/lets-hear-it-for-king-j.mp3'),
+  enrich(25, 'make-em-say-uhh-bathroom-edition', 'Make Em Say Uhh (Bathroom Edition)', '3000 Studios original from the VIP music vault.', '/media/make-em-say-uhh-bathroom-edition.mp3'),
+  enrich(26, 'meltdown-miestro', 'Meltdown Miestro', '3000 Studios original from the VIP music vault.', '/media/meltdown-miestro.mp3'),
+  enrich(27, 'my-neck-remix', 'My Neck Remix', '3000 Studios original from the VIP music vault.', '/media/my-neck-remix.mp3'),
+  enrich(28, 'oooo-weee', 'OOoo Weee', '3000 Studios original from the VIP music vault.', '/media/oooo-weee.mp3'),
+  enrich(29, 'outkast-3000-studios-style', 'OUTKAST 3000 Studios Style', '3000 Studios reinterpretation with Atlanta heat.', '/media/outkast-3000-studios-style.mp3'),
+  enrich(30, 'ride-smooth', 'Ride Smooth', 'Laid-back glide for the velvet rope after-party.', '/media/ride-smooth.mp3'),
+  enrich(31, 'simp-bitch', 'Simp Bitch', '3000 Studios original from the VIP music vault.', '/media/simp-bitch.mp3'),
+  enrich(32, 'so-fresh-so-cosmic', 'So Fresh, So Cosmic', 'Cosmic bounce built for creators who move different.', '/media/so-fresh-so-cosmic.mp3'),
+  enrich(33, 'squash-that-mother', 'Squash That Mother', '3000 Studios original from the VIP music vault.', '/media/squash-that-mother.mp3'),
+  enrich(34, 'subwoofer-pressure-2', 'SUBWOOFER PRESSURE 2', '3000 Studios original from the VIP music vault.', '/media/subwoofer-pressure-2.mp3'),
+  enrich(35, 'subwoofer-pressure', 'SUBWOOFER PRESSURE', '3000 Studios original from the VIP music vault.', '/media/subwoofer-pressure.mp3'),
+  enrich(36, 'sunset-and-bliss-jnp', 'Sunset and Bliss (JnP)', 'Smooth JnP vibes for late-night VIP lounges.', '/media/sunset-and-bliss-jnp.mp3'),
+  enrich(37, 'the-opera-v1', 'The Opera v1', '3000 Studios original from the VIP music vault.', '/media/the-opera-v1.mp3'),
+  enrich(38, 'waynes-world-laid-back-weezy-mix', 'Waynes World (Laid-Back Weezy Mix)', '3000 Studios original from the VIP music vault.', '/media/waynes-world-laid-back-weezy-mix.mp3'),
+  enrich(39, 'waynes-world', 'Waynes World', '3000 Studios original from the VIP music vault.', '/media/waynes-world.mp3'),
+  enrich(40, 'wi-fi-fridge', 'Wi-Fi Fridge', '3000 Studios original from the VIP music vault.', '/media/wi-fi-fridge.mp3'),
 ];
+
+export function getSongBySrc(src: string) {
+  return rolloutSongs.find((s) => s.src === src);
+}
+
+export function getSongBySlug(slug: string) {
+  return rolloutSongs.find((s) => s.slug === slug);
+}
+
+export function getSongByTitle(title: string) {
+  return rolloutSongs.find((s) => s.title === title);
+}
 
 export const timedLyrics: Array<{ time: number; duration: number; text: string }> = [];
