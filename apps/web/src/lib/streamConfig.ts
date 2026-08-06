@@ -1,7 +1,9 @@
 /**
  * Cloudflare Stream configuration for 3000 Studios VIP.
  *
- * Playback uses the hosted Stream Player (iframe).
+ * Playback options:
+ *  - Hosted Stream Player (iframe)
+ *  - HLS / DASH manifests for custom players (hls.js, dash.js, native Safari)
  * Live ingest (WHIP/RTMPS) still uses the live input id separately.
  */
 
@@ -11,7 +13,7 @@ export const STREAM_CUSTOMER_CODE =
 
 /**
  * Hosted Stream Player video / asset UID (from Stream dashboard → Embed).
- * This is what the public iframe plays.
+ * This is what the public iframe and manifests use.
  */
 export const STREAM_PLAYER_UID =
   import.meta.env.VITE_STREAM_PLAYER_UID?.toString().trim() ||
@@ -31,11 +33,17 @@ export function buildStreamWatchUrl(uid = STREAM_PLAYER_UID, customer = STREAM_C
   return `https://customer-${customer}.cloudflarestream.com/${uid}/watch`;
 }
 
+/** HLS manifest for custom web / mobile players */
 export function buildStreamManifestHls(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
   return `https://customer-${customer}.cloudflarestream.com/${uid}/manifest/video.m3u8`;
 }
 
-/** Hosted Stream Player iframe (responsive 16:9 shell provided by StreamFrame / CSS). */
+/** DASH manifest for custom web / mobile players */
+export function buildStreamManifestDash(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
+  return `https://customer-${customer}.cloudflarestream.com/${uid}/manifest/video.mpd`;
+}
+
+/** Hosted Stream Player iframe (responsive 16:9 shell). */
 export function streamPlayerIframeSrc(opts?: {
   uid?: string;
   autoplay?: boolean;
@@ -54,6 +62,8 @@ export function streamPlayerIframeSrc(opts?: {
 }
 
 export const STREAM_PLAYER_URL = buildStreamPlayerUrl();
+export const STREAM_HLS_URL = buildStreamManifestHls();
+export const STREAM_DASH_URL = buildStreamManifestDash();
 export const STREAM_PLAYER_EMBED_SRC = streamPlayerIframeSrc({
   autoplay: true,
   muted: true,

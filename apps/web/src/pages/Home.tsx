@@ -6,6 +6,8 @@ import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
+import { ManifestUrlList, StreamManifestPlayer } from '../components/StreamManifestPlayer';
+import { STREAM_DASH_URL, STREAM_HLS_URL } from '../lib/streamConfig';
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -803,6 +805,8 @@ export function MusicShowcase() {
 }
 
 export function VideoPage() {
+  const [videoMode, setVideoMode] = useState<'hosted' | 'hls' | 'dash'>('hosted');
+
   return (
     <PublicLayout variant="electric">
       <main className="vipMain">
@@ -814,9 +818,37 @@ export function VideoPage() {
         </motion.section>
         <section className="videoGrid videoGrid--stream">
           <div className="videoStreamSlot vipCard">
-            <h2>Cloudflare Stream Player</h2>
-            <p>Hosted embed from Stream — primary video destination for VIP viewers.</p>
-            <CloudflareStreamPlayer title="3000 Studios featured stream" />
+            <h2>Cloudflare Stream</h2>
+            <p>Hosted player or custom HLS/DASH (bring your own player libraries).</p>
+            <div className="streamModeTabs" role="tablist" aria-label="Video player mode">
+              {(
+                [
+                  ['hosted', 'Stream Player'],
+                  ['hls', 'HLS'],
+                  ['dash', 'DASH'],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`streamModeTab ${videoMode === id ? 'active' : ''}`}
+                  onClick={() => setVideoMode(id)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {videoMode === 'hosted' ? <CloudflareStreamPlayer title="3000 Studios featured stream" /> : null}
+            {videoMode === 'hls' ? <StreamManifestPlayer mode="hls" title="HLS custom player" /> : null}
+            {videoMode === 'dash' ? <StreamManifestPlayer mode="dash" title="DASH custom player" /> : null}
+            <div className="streamManifestMini">
+              <a href={STREAM_HLS_URL} target="_blank" rel="noreferrer">
+                HLS .m3u8
+              </a>
+              <a href={STREAM_DASH_URL} target="_blank" rel="noreferrer">
+                DASH .mpd
+              </a>
+            </div>
           </div>
           <video className="featureVideo" src={INTRO_VIDEO} controls playsInline preload="metadata" />
           <div className="vipCard">
@@ -826,6 +858,10 @@ export function VideoPage() {
             <StudioButton to="/sponsors" variant="secondary">
               Sponsor A Video
             </StudioButton>
+          </div>
+          <div className="vipCard videoStreamSlot">
+            <h2>Manifest URLs (BYO player)</h2>
+            <ManifestUrlList />
           </div>
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />

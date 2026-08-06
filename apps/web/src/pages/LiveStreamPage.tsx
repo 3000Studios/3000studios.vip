@@ -4,8 +4,11 @@ import { Link } from 'react-router-dom';
 import { PublicLayout } from './Home';
 import { StandbyMusicWindow, StreamFrame } from '../components/StreamViewWindow';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
+import { ManifestUrlList, StreamManifestPlayer, type ManifestMode } from '../components/StreamManifestPlayer';
 import {
   STREAM_CUSTOMER_CODE,
+  STREAM_DASH_URL,
+  STREAM_HLS_URL,
   STREAM_LIVE_INPUT_ID,
   STREAM_PLAYER_UID,
   STREAM_PLAYER_URL,
@@ -25,9 +28,24 @@ const stagger: Variants = {
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.06 } },
 };
 
+type ViewMode = 'hosted' | 'hls' | 'dash' | 'standby';
+
 export function LiveStreamPage() {
-  const [showStandby, setShowStandby] = useState(false);
+  const [view, setView] = useState<ViewMode>('hosted');
+  const [playback, setPlayback] = useState<string>('idle');
   const playerUrl = useMemo(() => buildStreamPlayerUrl(STREAM_PLAYER_UID, STREAM_CUSTOMER_CODE), []);
+
+  const isLiveChrome = view !== 'standby';
+  const manifestMode: ManifestMode = view === 'dash' ? 'dash' : 'hls';
+
+  const statusLabel =
+    view === 'standby'
+      ? 'Standby catalog · Stream paused'
+      : view === 'hosted'
+        ? '● Cloudflare Stream Player · hosted embed'
+        : view === 'hls'
+          ? `● Custom HLS · ${playback}`
+          : `● Custom DASH · ${playback}`;
 
   return (
     <PublicLayout variant="blackhole">
@@ -38,8 +56,8 @@ export function LiveStreamPage() {
           </motion.span>
           <motion.h1 variants={fadeUp}>Watch 3000 Studios on Cloudflare Stream.</motion.h1>
           <motion.p variants={fadeUp}>
-            Public playback uses Cloudflare&apos;s hosted Stream Player. When the owner broadcasts from the admin
-            console (phone WHIP or OBS), this player serves the Stream feed globally.
+            Playback options: Cloudflare hosted player, or bring-your-own player via HLS / DASH manifests (hls.js,
+            dash.js, Safari native, mobile SDKs).
           </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
             <Link className="studioButton primary" to={ADMIN_PATH}>
@@ -58,34 +76,71 @@ export function LiveStreamPage() {
         </motion.section>
 
         <section className="streamPublicPanel">
-          <StreamFrame isLive={!showStandby} className="streamFrame--cf">
-            {!showStandby ? (
+          <div className="streamModeTabs" role="tablist" aria-label="Player mode">
+            {(
+              [
+                ['hosted', 'Stream Player'],
+                ['hls', 'HLS (custom)'],
+                ['dash', 'DASH (custom)'],
+                ['standby', 'Music standby'],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={view === id}
+                className={`streamModeTab ${view === id ? 'active' : ''}`}
+                onClick={() => setView(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <StreamFrame isLive={isLiveChrome} className="streamFrame--cf">
+            {view === 'hosted' ? (
               <CloudflareStreamPlayer
                 uid={STREAM_PLAYER_UID}
                 title="3000 Studios Cloudflare Stream Player"
                 autoplay
                 muted
               />
-            ) : (
-              <StandbyMusicWindow />
-            )}
+            ) : null}
+            {view === 'hls' || view === 'dash' ? (
+              <StreamManifestPlayer
+                uid={STREAM_PLAYER_UID}
+                mode={manifestMode}
+                autoplay
+                muted
+                title={`3000 Studios ${manifestMode.toUpperCase()} player`}
+                onStatus={(s) => setPlayback(s)}
+              />
+            ) : null}
+            {view === 'standby' ? <StandbyMusicWindow /> : null}
           </StreamFrame>
 
           <div className="streamToolbar">
-            <span className="streamStatus">
-              {showStandby
-                ? 'Standby catalog · Stream Player paused'
-                : '● Cloudflare Stream Player · hosted embed'}
-            </span>
+            <span className="streamStatus">{statusLabel}</span>
             <div className="streamToolbarActions">
-              <button
-                type="button"
+              <a
                 className="studioButton secondary"
                 style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
-                onClick={() => setShowStandby((v) => !v)}
+                href={STREAM_HLS_URL}
+                target="_blank"
+                rel="noreferrer"
               >
-                {showStandby ? 'Show Stream Player' : 'Show music standby'}
-              </button>
+                HLS .m3u8
+              </a>
+              <a
+                className="studioButton secondary"
+                style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
+                href={STREAM_DASH_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                DASH .mpd
+              </a>
               <a
                 className="studioButton secondary"
                 style={{ minHeight: 40, padding: '0 14px', fontSize: 12 }}
@@ -99,10 +154,14 @@ export function LiveStreamPage() {
           </div>
 
           <div className="vipCard streamMetaCard">
-            <h2>Stream details</h2>
-            <ul className="streamMetaList">
+            <h2>Bring your own player</h2>
+            <p className="cMuted" style={{ marginTop: 0 }}>
+              Use these Cloudflare Stream manifests with any HLS/DASH library or native mobile player.
+            </p>
+            <ManifestUrlList uid={STREAM_PLAYER_UID} />
+            <ul className="streamMetaList" style={{ marginTop: '1rem' }}>
               <li>
-                <strong>Player URL</strong>
+                <strong>Stream Player URL</strong>
                 <a href={STREAM_PLAYER_URL} target="_blank" rel="noreferrer">
                   {STREAM_PLAYER_URL}
                 </a>
