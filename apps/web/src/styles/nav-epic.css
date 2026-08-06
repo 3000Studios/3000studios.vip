@@ -1,0 +1,750 @@
+/* ═══════════════════════════════════════════════════════════════
+   3000 Studios — EPIC NAV + SITEWIDE CSS FINISH
+   Loads last. Unifies public chrome, cooler menu, polish.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --nav-h: 64px;
+  --player-h: 56px;
+  --panel: rgba(8, 6, 4, 0.72);
+  --panel-strong: rgba(4, 3, 2, 0.92);
+  --gold-line: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.55), transparent);
+  --ease-vip: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Body lock when mobile menu open ── */
+body.vip-nav-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* ── Header shell ── */
+.vipHeader.vipHeader--epic {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  min-height: var(--nav-h);
+  padding: 0.55rem 1rem 0.55rem 1.1rem;
+  background:
+    linear-gradient(180deg, rgba(6, 4, 2, 0.94), rgba(2, 3, 4, 0.82)) !important;
+  border-bottom: 1px solid transparent;
+  border-image: var(--gold-line) 1;
+  backdrop-filter: blur(20px) saturate(1.25);
+  -webkit-backdrop-filter: blur(20px) saturate(1.25);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 215, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.vipHeader--epic .vipLogo {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  z-index: 2;
+}
+
+.vipHeader--epic .logoStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  min-width: 0;
+}
+
+.vipHeader--epic .logoWordmark {
+  font-size: 0.98rem;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.vipHeader--epic .logoSub {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--theme-gold, #ffd700) 75%, white);
+  opacity: 0.72;
+  white-space: nowrap;
+}
+
+.vipHeader--epic .logoOrb {
+  width: 2.35rem;
+  height: 2.35rem;
+  font-size: 0.68rem;
+  flex-shrink: 0;
+  animation: orbPulse 2.8s ease-in-out infinite;
+}
+
+.vipHeader--epic .ownerTag {
+  display: none;
+}
+
+/* ── Desktop nav rail (pill cluster) ── */
+.vipNav.vipNav--rail {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  z-index: 2;
+}
+
+.vipNavMobileHead,
+.vipNavMobileFoot {
+  display: none;
+}
+
+.vipNavTrack {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  max-width: 100%;
+  padding: 0.28rem;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.25));
+  border: 1px solid rgba(255, 215, 0, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 10px 28px rgba(0, 0, 0, 0.28);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vipNavTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.vipNavLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  flex: 0 0 auto;
+  min-height: 2.35rem;
+  padding: 0.35rem 0.72rem;
+  border-radius: 999px;
+  color: rgba(244, 239, 231, 0.78);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  isolation: isolate;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s var(--ease-vip),
+    box-shadow 0.22s ease;
+}
+
+.vipNavLink::after {
+  display: none !important;
+}
+
+.vipNavIcon {
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  font-size: 0.78rem;
+  line-height: 1;
+  opacity: 0.85;
+  transition: transform 0.25s var(--ease-spring), color 0.2s ease;
+}
+
+.vipNavCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.vipNavLabel {
+  line-height: 1.1;
+}
+
+.vipNavHint {
+  display: none;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  opacity: 0.55;
+}
+
+.vipNavGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 120%, rgba(255, 215, 0, 0.35), transparent 65%);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.vipNavLink:hover {
+  color: #fff6d0;
+  background: rgba(255, 215, 0, 0.1);
+  transform: translateY(-1px);
+  text-shadow: 0 0 18px rgba(255, 215, 0, 0.35);
+}
+
+.vipNavLink:hover .vipNavIcon {
+  transform: scale(1.12) rotate(-6deg);
+  color: var(--theme-gold, #ffd700);
+}
+
+.vipNavLink:hover .vipNavGlow {
+  opacity: 1;
+}
+
+.vipNavLink.is-active {
+  color: #1a1005;
+  background: linear-gradient(135deg, #fff1a8, #ffd700 45%, #e8a800);
+  box-shadow:
+    0 8px 22px rgba(255, 185, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.vipNavLink.is-active .vipNavIcon {
+  color: #1a1005;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.vipNavLink.is-active .vipNavGlow {
+  opacity: 0.4;
+}
+
+/* Live pulse on Live item */
+.vipNavLink[href='/live'] .vipNavIcon {
+  color: #ff4d4d;
+  animation: liveDot 1.4s ease-in-out infinite;
+}
+
+.vipNavLink[href='/live'].is-active .vipNavIcon {
+  color: #8b0000;
+}
+
+@keyframes liveDot {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+/* ── Hamburger ── */
+.vipMenu {
+  display: none;
+  z-index: 3;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.85rem 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  background:
+    linear-gradient(180deg, rgba(255, 215, 0, 0.14), rgba(0, 0, 0, 0.35));
+  color: #f6e7b0;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vipMenu:hover {
+  border-color: #ffd700;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(255, 185, 0, 0.22);
+}
+
+.vipMenuBars {
+  display: grid;
+  gap: 4px;
+  width: 18px;
+}
+
+.vipMenuBars i {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #ffd700, #fff4b0);
+  transition: transform 0.28s var(--ease-vip), opacity 0.2s ease, width 0.2s ease;
+  transform-origin: center;
+}
+
+.vipMenuBars i:nth-child(2) {
+  width: 70%;
+}
+
+.vipMenu.is-open .vipMenuBars i:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.vipMenu.is-open .vipMenuBars i:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.vipMenu.is-open .vipMenuBars i:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Backdrop */
+.vipNavBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(255, 215, 0, 0.12), transparent 40%),
+    rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+  cursor: pointer;
+}
+
+/* ── Player chrome polish ── */
+.globalPlayer {
+  top: var(--nav-h);
+  z-index: 55;
+  min-height: var(--player-h);
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.94), rgba(10, 6, 0, 0.9)) !important;
+  border-bottom: 1px solid rgba(255, 215, 0, calc(0.16 + var(--beat, 0) * 0.35));
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+
+.globalPlayerCover {
+  border-radius: 10px;
+}
+
+.globalPlayer button,
+.globalPlayer select {
+  min-height: 2.1rem;
+  border-radius: 999px;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.globalPlayer button:hover,
+.globalPlayer select:hover {
+  transform: translateY(-1px);
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.18);
+}
+
+/* ── Sitewide surfaces ── */
+.vipMain {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 2rem;
+}
+
+.vipSection,
+.itunesScrollerSection,
+.streamPublicPanel,
+.videoGrid,
+.vipPageHero {
+  position: relative;
+  z-index: 1;
+}
+
+.vipCard,
+.trackCard,
+.blogCard,
+.messageCard,
+.networkCard,
+.featureWeekInner,
+.itunesNowPlaying,
+.playerSection,
+.songDescription,
+.streamPublicPanel > div,
+.conceptCard,
+.conceptBuildNotes,
+.conceptHeroPanel {
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 215, 0, 0.16) !important;
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.28)),
+    rgba(8, 6, 4, 0.55) !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+}
+
+.vipCard:hover,
+.trackCard:hover,
+.blogCard:hover,
+.networkCard:hover {
+  border-color: rgba(255, 215, 0, 0.38) !important;
+  box-shadow:
+    0 22px 56px rgba(0, 0, 0, 0.42),
+    0 0 32px rgba(255, 215, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.vipKicker {
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.08);
+}
+
+.studioButton {
+  position: relative;
+  overflow: hidden;
+}
+
+.studioButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.28), transparent 80%);
+  transform: translateX(-120%);
+  transition: transform 0.55s var(--ease-vip);
+}
+
+.studioButton:hover::before {
+  transform: translateX(120%);
+}
+
+.studioButton.primary {
+  box-shadow:
+    0 12px 32px rgba(255, 185, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.studioButton.secondary:hover,
+.studioButton.ghost:hover {
+  border-color: rgba(255, 215, 0, 0.55);
+  color: #ffd700;
+}
+
+/* Forms */
+.vipForm input,
+.vipForm textarea,
+.vipForm select,
+.globalPlayer select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.vipForm input:focus,
+.vipForm textarea:focus,
+.vipForm select:focus {
+  outline: none;
+  border-color: rgba(255, 215, 0, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.12);
+}
+
+/* Footer */
+.vipFooter {
+  gap: 1.5rem;
+  padding: 2.4rem 1.25rem 3.2rem;
+  background:
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.35));
+  border-top: 1px solid rgba(255, 215, 0, 0.12);
+}
+
+.vipFooter .footerLinks a {
+  position: relative;
+  padding: 0.2rem 0;
+  opacity: 0.72;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.vipFooter .footerLinks a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #ffd700, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s var(--ease-vip);
+}
+
+.vipFooter .footerLinks a:hover {
+  opacity: 1;
+  color: #ffd700;
+}
+
+.vipFooter .footerLinks a:hover::after {
+  transform: scaleX(1);
+}
+
+.vipEnergyDivider {
+  height: 2px;
+  margin: 0 1.25rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--theme-a, #1ef078) 50%, #ffd700),
+    #ffd700,
+    color-mix(in srgb, var(--theme-b, #236dff) 50%, #ffd700),
+    transparent
+  );
+  opacity: 0.7;
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.25);
+}
+
+/* Legal / secondary pages */
+.legalShell,
+.songPanel {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 215, 0, 0.16);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* Ads */
+.adsenseSlot {
+  max-width: 1120px;
+  margin: 1.5rem auto;
+  padding: 0.75rem 1.25rem;
+  border-radius: 14px;
+  border: 1px dashed rgba(255, 215, 0, 0.18);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(244, 239, 231, 0.45);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+/* Selection */
+::selection {
+  background: rgba(255, 215, 0, 0.35);
+  color: #0a0804;
+}
+
+/* ── Mobile / tablet: full immersive menu ── */
+@media (max-width: 1080px) {
+  .vipHeader.vipHeader--epic {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .vipMenu {
+    display: inline-flex;
+    justify-self: end;
+  }
+
+  .vipNav.vipNav--rail {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(22rem, 88vw);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 1.1rem 1rem 1.25rem;
+    margin: 0;
+    background:
+      radial-gradient(ellipse 80% 40% at 80% 0%, rgba(255, 215, 0, 0.14), transparent 55%),
+      radial-gradient(ellipse 60% 35% at 10% 100%, rgba(30, 240, 120, 0.08), transparent 50%),
+      linear-gradient(165deg, rgba(12, 8, 4, 0.98), rgba(2, 3, 4, 0.98));
+    border-left: 1px solid rgba(255, 215, 0, 0.22);
+    box-shadow: -24px 0 60px rgba(0, 0, 0, 0.55);
+    transform: translateX(104%);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.42s var(--ease-vip),
+      opacity 0.3s ease;
+    z-index: 4;
+    overflow: hidden;
+  }
+
+  .vipNav.vipNav--rail.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .vipNavMobileHead,
+  .vipNavMobileFoot {
+    display: block;
+  }
+
+  .vipNavMobileHead {
+    padding: 0.35rem 0.4rem 1rem;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.12);
+    margin-bottom: 0.75rem;
+  }
+
+  .vipNavMobileKicker {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #ffd700;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+  }
+
+  .vipNavMobileHead strong {
+    font-size: 1.25rem;
+    background: linear-gradient(110deg, #fff8e7, #ffd700, #1ef078);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .vipNavTrack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    max-width: none;
+    padding: 0.2rem;
+    border-radius: 18px;
+    overflow: auto;
+    flex: 1;
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  .vipNavLink {
+    width: 100%;
+    min-height: 3.15rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  .vipNav.vipNav--rail.open .vipNavLink {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.35s ease calc(var(--nav-i, 0) * 35ms + 80ms),
+      transform 0.4s var(--ease-vip) calc(var(--nav-i, 0) * 35ms + 80ms),
+      color 0.2s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .vipNavHint {
+    display: block;
+  }
+
+  .vipNavIcon {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 10px;
+    background: rgba(255, 215, 0, 0.08);
+    border: 1px solid rgba(255, 215, 0, 0.14);
+    font-size: 0.9rem;
+  }
+
+  .vipNavLink.is-active .vipNavIcon {
+    background: rgba(26, 16, 5, 0.15);
+    border-color: transparent;
+  }
+
+  .vipNavMobileFoot {
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(255, 215, 0, 0.12);
+  }
+
+  .vipNavCta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.85rem;
+    border-radius: 999px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    color: #1a1005;
+    background: linear-gradient(135deg, #fff1a8, #ffd700, #e8a800);
+    box-shadow: 0 12px 28px rgba(255, 185, 0, 0.3);
+  }
+
+  .vipNavBackdrop {
+    display: block;
+  }
+
+  .vipNavBackdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .globalPlayer {
+    top: 56px;
+  }
+}
+
+@media (max-width: 640px) {
+  .vipHeader--epic .logoSub {
+    display: none;
+  }
+
+  .vipHeader--epic .logoWordmark {
+    font-size: 0.9rem;
+  }
+
+  .globalPlayer {
+    flex-wrap: wrap;
+  }
+
+  .globalPlayerMeta strong {
+    max-width: 58vw;
+  }
+
+  .trackCard {
+    grid-template-columns: auto 1fr !important;
+  }
+
+  .trackCard > span:nth-of-type(1),
+  .trackCardActions {
+    grid-column: 1 / -1;
+  }
+
+  .trackCardActions {
+    justify-content: stretch;
+  }
+
+  .trackCardActions .trackSelectButton,
+  .trackCardActions .secondaryLink {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vipNavLink,
+  .vipNav.vipNav--rail,
+  .vipNavBackdrop,
+  .vipMenuBars i,
+  .studioButton::before,
+  .vipNavLink[href='/live'] .vipNavIcon {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .vipNav.vipNav--rail.open .vipNavLink {
+    opacity: 1;
+    transform: none;
+  }
+}

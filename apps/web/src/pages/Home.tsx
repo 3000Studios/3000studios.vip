@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSong, type SongPalette } from '../data/music';
 import { LiveWallpaper } from '../components/LiveWallpaper';
@@ -25,17 +25,22 @@ const stagger: Variants = {
 };
 
 const navItems = [
-  { to: '/', label: 'Home' },
-  { to: '/music', label: 'Music' },
-  { to: '/video', label: 'Video' },
-  { to: '/live', label: 'Live' },
-  { to: '/community', label: 'Chat' },
-  { to: '/requests', label: 'Requests' },
-  { to: '/blog', label: 'Blog' },
-  { to: '/sponsors', label: 'Sponsors' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
-];
+  { to: '/', label: 'Home', icon: '⌂', hint: 'VIP lobby' },
+  { to: '/music', label: 'Music', icon: '♪', hint: 'Full catalog' },
+  { to: '/video', label: 'Video', icon: '▶', hint: 'Visuals' },
+  { to: '/live', label: 'Live', icon: '●', hint: 'Broadcast' },
+  { to: '/community', label: 'Chat', icon: '◎', hint: 'Community' },
+  { to: '/requests', label: 'Requests', icon: '✦', hint: 'Song ideas' },
+  { to: '/blog', label: 'Blog', icon: '◈', hint: 'Editorial' },
+  { to: '/sponsors', label: 'Sponsors', icon: '◆', hint: 'Partners' },
+  { to: '/about', label: 'About', icon: '◇', hint: 'The studio' },
+  { to: '/contact', label: 'Contact', icon: '✉', hint: 'Book us' },
+] as const;
+
+function navIsActive(pathname: string, to: string) {
+  if (to === '/') return pathname === '/';
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
 
 const blogSeeds = [
   {
@@ -439,6 +444,7 @@ function FeatureOfTheWeek() {
 }
 
 export function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<{
     wallpaper: string;
@@ -449,6 +455,15 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
   useEffect(() => {
     setTheme((prev) => ({ ...prev, wallpaper: variant }));
   }, [variant]);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.classList.toggle('vip-nav-open', open);
+    return () => document.body.classList.remove('vip-nav-open');
+  }, [open]);
 
   useEffect(() => {
     const onTheme = (e: Event) => {
@@ -470,34 +485,93 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
   const wallpaperVariant = theme.wallpaper || variant;
 
   return (
-    <div className={`vipSite vipSite-${variant} vipSite-live`} data-page-wallpaper={variant} data-song-wallpaper={wallpaperVariant}>
+    <div
+      className={`vipSite vipSite-${variant} vipSite-live${open ? ' is-nav-open' : ''}`}
+      data-page-wallpaper={variant}
+      data-song-wallpaper={wallpaperVariant}
+    >
       <AudioReactiveWallpaper variant={wallpaperVariant} palette={theme.palette} coverUrl={theme.cover} />
       <MouseFX />
       <ScrollFX />
       <div className="scrollProgress" aria-hidden="true" />
-      <header className="vipHeader">
+      <header className="vipHeader vipHeader--epic">
         <Link className="vipLogo" to="/" onClick={() => setOpen(false)} aria-label="3000 Studios VIP home">
           <span className="logoOrb">3000</span>
-          <strong className="logoWordmark">3000 Studios</strong>
+          <span className="logoStack">
+            <strong className="logoWordmark">3000 Studios</strong>
+            <small className="logoSub">VIP Media · Live · Music</small>
+          </span>
         </Link>
-        <span className="ownerTag">Owner/artist = {OWNER_EMAIL}</span>
-        <nav className={open ? 'vipNav open' : 'vipNav'} aria-label="Primary navigation">
-          {navItems.map((item) => (
-            <Link key={item.to} to={item.to} onClick={() => setOpen(false)}>
-              {item.label}
-            </Link>
-          ))}
+
+        <nav id="vip-primary-nav" className={open ? 'vipNav vipNav--rail open' : 'vipNav vipNav--rail'} aria-label="Primary navigation">
+          <div className="vipNavMobileHead">
+            <span className="vipNavMobileKicker">Navigate the VIP</span>
+            <strong>3000 Studios</strong>
+          </div>
+          <div className="vipNavTrack">
+            {navItems.map((item, index) => {
+              const active = navIsActive(location.pathname, item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={active ? 'vipNavLink is-active' : 'vipNavLink'}
+                  data-active={active ? 'true' : undefined}
+                  style={{ '--nav-i': index } as CSSProperties}
+                  onClick={() => {
+                    playPop();
+                    setOpen(false);
+                  }}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <span className="vipNavIcon" aria-hidden="true">
+                    {item.icon}
+                  </span>
+                  <span className="vipNavCopy">
+                    <span className="vipNavLabel">{item.label}</span>
+                    <span className="vipNavHint">{item.hint}</span>
+                  </span>
+                  <span className="vipNavGlow" aria-hidden="true" />
+                </Link>
+              );
+            })}
+          </div>
+          <div className="vipNavMobileFoot">
+            <a href={`mailto:${OWNER_EMAIL}`} className="vipNavCta">
+              Book / License
+            </a>
+          </div>
         </nav>
-        <button className="vipMenu" type="button" onClick={() => setOpen((value) => !value)}>
-          {open ? 'Close' : 'Menu'}
+
+        <button
+          className={open ? 'vipMenu is-open' : 'vipMenu'}
+          type="button"
+          aria-expanded={open}
+          aria-controls="vip-primary-nav"
+          onClick={() => setOpen((value) => !value)}
+        >
+          <span className="vipMenuBars" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="vipMenuText">{open ? 'Close' : 'Menu'}</span>
         </button>
+
+        <button
+          type="button"
+          className={open ? 'vipNavBackdrop is-open' : 'vipNavBackdrop'}
+          aria-label="Close navigation"
+          tabIndex={open ? 0 : -1}
+          onClick={() => setOpen(false)}
+        />
       </header>
       <MusicController />
       {children}
       <div className="vipEnergyDivider" aria-hidden="true" />
       <footer className="vipFooter">
         <div className="footerBrand">
-          <strong>3000 Studios</strong>
+          <strong className="shimmerText">3000 Studios</strong>
           <p>Music, cinematic video content, live streams, sponsorships, song requests, and private creator operations.</p>
         </div>
         <div className="footerLinks">
