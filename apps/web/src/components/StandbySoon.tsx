@@ -11,17 +11,30 @@ function resolveCover(src: string): string {
 
 const playlist = rolloutSongs.map((s) => ({ ...s, cover: resolveCover(s.src) }));
 
-/** Viewer standby: music art + admin-styled “live soon” message (no controls). */
-export function StandbySoon({ scene }: { scene: StreamScene }) {
+type Props = {
+  scene: StreamScene;
+  /** Viewer mode: no play/prev controls (always true for public) */
+  hideControls?: boolean;
+  onAudioElement?: (el: HTMLAudioElement | null) => void;
+};
+
+/** Viewer standby: music art + admin-styled “live soon” message. */
+export function StandbySoon({ scene, hideControls = true, onAudioElement }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [index, setIndex] = useState(0);
   const song = playlist[index] ?? playlist[0];
   const st = scene.standby;
 
   useEffect(() => {
+    onAudioElement?.(audioRef.current);
+    return () => onAudioElement?.(null);
+  }, [onAudioElement]);
+
+  useEffect(() => {
     if (!scene.standbyMusic) return;
     const audio = audioRef.current;
     if (!audio) return;
+    audio.crossOrigin = 'anonymous';
     audio.src = song.src;
     audio.volume = 0.45;
     void audio.play().catch(() => undefined);
@@ -49,10 +62,17 @@ export function StandbySoon({ scene }: { scene: StreamScene }) {
   };
 
   return (
-    <div className="standbySoon" aria-label="Stream will be live soon">
-      {scene.standbyMusic ? <audio ref={audioRef} preload="auto" loop={false} /> : null}
+    <div className="standbySoon" aria-label={st.text || 'Stream will be live soon'}>
+      {scene.standbyMusic ? <audio ref={audioRef} preload="auto" loop={false} crossOrigin="anonymous" /> : null}
       <div className="standbySoonBg">
-        <img className="standbySoonCover" src={song.cover} alt="" onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.2'; }} />
+        <img
+          className="standbySoonCover"
+          src={song.cover}
+          alt=""
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.opacity = '0.2';
+          }}
+        />
         <div className="standbySoonVignette" />
       </div>
       <div className="standbySoonTicker" aria-hidden="true">
@@ -61,12 +81,16 @@ export function StandbySoon({ scene }: { scene: StreamScene }) {
       <div className="standbySoonCopy" style={textStyle}>
         <div className="standbySoonMain">{st.text}</div>
         {st.subtext ? (
-          <div className="standbySoonSub" style={{ color: st.subColor, fontSize: '0.45em', marginTop: '0.55em', fontWeight: 600 }}>
+          <div
+            className="standbySoonSub"
+            style={{ color: st.subColor, fontSize: '0.45em', marginTop: '0.55em', fontWeight: 600 }}
+          >
             {st.subtext}
           </div>
         ) : null}
       </div>
       {st.customCss ? <style>{st.customCss}</style> : null}
+      {!hideControls ? null : null}
     </div>
   );
 }
