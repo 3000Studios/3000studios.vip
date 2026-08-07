@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { PublicLayout } from './Home';
-import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { StandbySoon } from '../components/StandbySoon';
 import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
-import { STREAM_PLAYER_UID } from '../lib/streamConfig';
+import { STREAM_PLAYER_UID, STREAM_WHEP_URL } from '../lib/streamConfig';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
 
@@ -12,12 +11,14 @@ const INQUIRY_EMAIL = 'Team@3000studios.vip';
 const TITLE = '3000 Studios.vip LIVE STREAM';
 
 /**
- * Public /live — site nav always on top, stream window + gold title + inquiry.
+ * Public /live — nav + gold title + stream window + inquiry.
+ * WHIP publish requires WHEP playback (Cloudflare WebRTC beta).
  */
 export function LiveStreamPage() {
   const [scene, setScene] = useState<StreamScene>(() => loadStreamScene());
   const [live, setLive] = useState(false);
-  const [preferWhep, setPreferWhep] = useState(true);
+  const [whepKey, setWhepKey] = useState(0);
+  const [whepStatus, setWhepStatus] = useState<'connecting' | 'live' | 'error' | 'idle'>('idle');
   const beatCleanup = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -32,17 +33,40 @@ export function LiveStreamPage() {
       if (!cancelled) setLive(state.live);
     };
     void poll();
-    const id = window.setInterval(poll, 8000);
+    // Fast poll so Go Live appears quickly for viewers
+    const id = window.setInterval(poll, 2000);
     const unsub = subscribeHostLive((flag) => {
-      if (flag) setLive(true);
-      else void poll();
+      setLive(flag);
+      if (flag) {
+        // Force WHEP remount to renegotiate after publish starts
+        setWhepKey((k) => k + 1);
+      }
     });
+    const onHost = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { live?: boolean };
+      if (typeof detail?.live === 'boolean') {
+        setLive(detail.live);
+        if (detail.live) setWhepKey((k) => k + 1);
+      }
+    };
+    window.addEventListener('3000-host-live', onHost);
     return () => {
       cancelled = true;
       window.clearInterval(id);
       unsub();
+      window.removeEventListener('3000-host-live', onHost);
     };
   }, []);
+
+  // Retry WHEP while marked live but not connected yet
+  useEffect(() => {
+    if (!live) return;
+    if (whepStatus === 'live') return;
+    const id = window.setInterval(() => {
+      setWhepKey((k) => k + 1);
+    }, 4000);
+    return () => window.clearInterval(id);
+  }, [live, whepStatus]);
 
   useEffect(() => {
     if (live) {
@@ -89,24 +113,22 @@ export function LiveStreamPage() {
             {live ? (
               <>
                 <div className="liveOnlyFeed">
-                  {preferWhep ? (
-                    <WhepStreamPlayer
-                      uid={STREAM_PLAYER_UID}
-                      title="3000 Studios Live"
-                      muted={false}
-                      autoplay
-                      onStatus={(s) => {
-                        if (s === 'error') setPreferWhep(false);
-                      }}
-                    />
-                  ) : (
-                    <CloudflareStreamPlayer
-                      uid={STREAM_PLAYER_UID}
-                      title="3000 Studios Live"
-                      autoplay
-                      muted={false}
-                    />
-                  )}
+                  {/* Cloudflare WebRTC beta: WHIP publish must pair with WHEP play (not HLS iframe). */}
+                  <WhepStreamPlayer
+                    key={whepKey}
+                    uid={STREAM_PLAYER_UID}
+                    whepUrl={STREAM_WHEP_URL}
+                    title="3000 Studios Live"
+                    muted={false}
+                    autoplay
+                    onStatus={(s) => setWhepStatus(s)}
+                  />
+                  {whepStatus !== 'live' ? (
+                    <div className="liveConnectingOverlay" aria-live="polite">
+                      <strong>Connecting to live feed…</strong>
+                      <span>Waiting for host WebRTC (WHEP). Keep this tab open.</span>
+                    </div>
+                  ) : null}
                 </div>
                 <StreamOverlayLayers layers={scene.layers} />
               </>

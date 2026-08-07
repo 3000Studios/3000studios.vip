@@ -388,6 +388,28 @@
   position: absolute;
   inset: 0;
 }
+.liveConnectingOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-content: center;
+  gap: 0.4rem;
+  text-align: center;
+  padding: 1.25rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: #f6e7b0;
+  pointer-events: none;
+}
+.liveConnectingOverlay strong {
+  color: #ffd700;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+.liveConnectingOverlay span {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
 .liveOnlyFeed .cfStreamEmbed,
 .liveOnlyFeed .cfManifestPlayer,
 .liveOnlyFeed .cfWhepPlayer {

@@ -45,13 +45,25 @@ export function WhepStreamPlayer({
         await playerRef.current?.stop();
         const player = new WhepPlayer(endpoint);
         playerRef.current = player;
-        video.muted = muted;
+        // Autoplay policies: start muted then unmute after play if requested
+        video.muted = true;
         await player.start(video);
         if (cancelled) {
           await player.stop();
           return;
         }
-        if (autoplay) void video.play().catch(() => undefined);
+        if (autoplay) {
+          await video.play().catch(() => undefined);
+        }
+        if (!muted) {
+          video.muted = false;
+          await video.play().catch(() => {
+            // If unmute blocks play, keep muted so picture still shows
+            video.muted = true;
+          });
+        } else {
+          video.muted = true;
+        }
         setStatus('live');
         onStatus?.('live');
       } catch (err) {

@@ -160,10 +160,21 @@ export function newOverlayLayer(partial?: Partial<StreamOverlayLayer>): StreamOv
 export function setHostLiveFlag(live: boolean) {
   localStorage.setItem(STREAM_LIVE_FLAG_KEY, live ? '1' : '0');
   localStorage.setItem(STREAM_MODE_KEY, live ? 'webrtc' : 'off');
+  // Also mirror legacy key used elsewhere
+  try {
+    localStorage.setItem('3000-stream-live-v1', live ? '1' : '0');
+  } catch {
+    /* ignore */
+  }
   try {
     const ch = new BroadcastChannel(STREAM_SCENE_CHANNEL);
     ch.postMessage({ type: 'live', live });
     ch.close();
+  } catch {
+    /* ignore */
+  }
+  try {
+    window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live } }));
   } catch {
     /* ignore */
   }

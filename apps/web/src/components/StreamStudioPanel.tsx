@@ -192,6 +192,8 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     setStatus('starting');
     setError(null);
     onError?.(null);
+    // Flip public /live off standby immediately (host flag + BroadcastChannel)
+    onLiveChange?.(true);
 
     try {
       await publisherRef.current?.stop();
