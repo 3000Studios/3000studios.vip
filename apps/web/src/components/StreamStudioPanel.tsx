@@ -4,6 +4,7 @@ import {
   PREMADE_OVERLAYS,
   StreamStudio,
   listCameras,
+  type CameraRotation,
   type LensFilterId,
   type OverlayId,
 } from '../lib/streamStudio';
@@ -17,6 +18,13 @@ type Props = {
   onError?: (msg: string | null) => void;
 };
 
+const ROTATIONS: { value: CameraRotation; label: string }[] = [
+  { value: 0, label: '0°' },
+  { value: 90, label: '90°' },
+  { value: 180, label: '180°' },
+  { value: 270, label: '270°' },
+];
+
 export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChange, onError }: Props) {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const studioRef = useRef<StreamStudio | null>(null);
@@ -28,9 +36,19 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const [overlays, setOverlays] = useState<OverlayId[]>(['liveBadge', 'watermark', 'lowerThird']);
   const [lowerTitle, setLowerTitle] = useState('3000 Studios');
   const [lowerSub, setLowerSub] = useState('Live · VIP broadcast');
+  const [rotation, setRotation] = useState<CameraRotation>(0);
+  const [flipH, setFlipH] = useState(false);
+  const [flipV, setFlipV] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
   const [status, setStatus] = useState<'idle' | 'preview' | 'starting' | 'live' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [permHint, setPermHint] = useState(false);
+
+  const applyFraming = useCallback((studio: StreamStudio) => {
+    studio.setCameraFraming({ rotation, flipH, flipV, zoom, panX, panY });
+  }, [rotation, flipH, flipV, zoom, panX, panY]);
 
   const ensureStudio = useCallback(() => {
     if (!studioRef.current) {
@@ -39,10 +57,16 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         overlays,
         lowerThirdTitle: lowerTitle,
         lowerThirdSub: lowerSub,
+        rotation,
+        flipH,
+        flipV,
+        zoom,
+        panX,
+        panY,
       });
     }
     return studioRef.current;
-  }, [filter, overlays, lowerTitle, lowerSub]);
+  }, [filter, overlays, lowerTitle, lowerSub, rotation, flipH, flipV, zoom, panX, panY]);
 
   const mountCanvas = useCallback(() => {
     const studio = ensureStudio();
@@ -77,10 +101,10 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         studio.overlays = new Set(overlays);
         studio.lowerThirdTitle = lowerTitle;
         studio.lowerThirdSub = lowerSub;
+        applyFraming(studio);
         await studio.openCamera(deviceId || cameraId || undefined, 'user');
         studio.start();
         mountCanvas();
-        // Labels only appear after permission
         await refreshCameraList();
         setStatus((s) => (s === 'live' ? 'live' : 'preview'));
       } catch (err) {
@@ -91,7 +115,18 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         setPermHint(true);
       }
     },
-    [cameraId, ensureStudio, filter, overlays, lowerTitle, lowerSub, mountCanvas, onError, refreshCameraList],
+    [
+      cameraId,
+      ensureStudio,
+      filter,
+      overlays,
+      lowerTitle,
+      lowerSub,
+      applyFraming,
+      mountCanvas,
+      onError,
+      refreshCameraList,
+    ],
   );
 
   useEffect(() => {
@@ -112,10 +147,20 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     studio.overlays = new Set(overlays);
     studio.lowerThirdTitle = lowerTitle;
     studio.lowerThirdSub = lowerSub;
-  }, [filter, overlays, lowerTitle, lowerSub]);
+    applyFraming(studio);
+  }, [filter, overlays, lowerTitle, lowerSub, applyFraming]);
 
   function toggleOverlay(id: OverlayId) {
     setOverlays((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
+  function resetFraming() {
+    setRotation(0);
+    setFlipH(false);
+    setFlipV(false);
+    setZoom(1);
+    setPanX(0);
+    setPanY(0);
   }
 
   async function switchCamera(id: string) {
@@ -149,12 +194,10 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     onError?.(null);
 
     try {
-      // End any previous WHIP session cleanly
       await publisherRef.current?.stop();
       publisherRef.current = null;
 
       const studio = ensureStudio();
-      // Always ensure camera is open before WHIP — do not rely on idle preview window
       await studio.openCamera(cameraId || undefined, 'user');
       studio.start();
       mountCanvas();
@@ -162,8 +205,8 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       studio.overlays = new Set(overlays);
       studio.lowerThirdTitle = lowerTitle;
       studio.lowerThirdSub = lowerSub;
+      applyFraming(studio);
 
-      // Give the canvas a couple frames so captureStream is not black
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       const out = studio.getOutputStream(30, true);
@@ -173,7 +216,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
       const publisher = new WhipPublisher(check.endpoint);
       publisherRef.current = publisher;
-      // This POSTs application/sdp to Cloudflare WHIP (the WebRTC handshake)
       await publisher.startWithStream(out);
 
       setStatus('live');
@@ -187,7 +229,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       onLiveChange?.(false);
       await publisherRef.current?.stop();
       publisherRef.current = null;
-      // Keep local preview if possible
       void startPreview(cameraId);
     }
   }
@@ -208,6 +249,11 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         {status === 'idle' || (status === 'error' && !mountRef.current?.firstChild) ? (
           <div className="adminCameraOverlay">{error || 'Starting camera preview…'}</div>
         ) : null}
+        <div className="studioFramingBadge" aria-hidden="true">
+          {rotation}° · {zoom.toFixed(1)}x
+          {flipH ? ' · ↔' : ''}
+          {flipV ? ' · ↕' : ''}
+        </div>
       </div>
 
       <div className="studioControls">
@@ -239,6 +285,79 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
             ))}
           </select>
         </label>
+
+        <div className="studioBlock">
+          <span className="studioBlockLabel">Rotate &amp; crop</span>
+          <div className="studioChipRow">
+            {ROTATIONS.map((r) => (
+              <button
+                key={r.value}
+                type="button"
+                className={`studioChip ${rotation === r.value ? 'active' : ''}`}
+                onClick={() => setRotation(r.value)}
+              >
+                {r.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              className={`studioChip ${flipH ? 'active' : ''}`}
+              onClick={() => setFlipH((v) => !v)}
+            >
+              Flip H
+            </button>
+            <button
+              type="button"
+              className={`studioChip ${flipV ? 'active' : ''}`}
+              onClick={() => setFlipV((v) => !v)}
+            >
+              Flip V
+            </button>
+            <button type="button" className="studioChip" onClick={resetFraming}>
+              Reset frame
+            </button>
+          </div>
+          <div className="studioSliders">
+            <label className="studioSlider">
+              <span>Zoom / crop {zoom.toFixed(2)}×</span>
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.05}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+              />
+            </label>
+            <label className="studioSlider">
+              <span>Pan X {panX.toFixed(2)}</span>
+              <input
+                type="range"
+                min={-1}
+                max={1}
+                step={0.02}
+                value={panX}
+                disabled={zoom <= 1.01}
+                onChange={(e) => setPanX(Number(e.target.value))}
+              />
+            </label>
+            <label className="studioSlider">
+              <span>Pan Y {panY.toFixed(2)}</span>
+              <input
+                type="range"
+                min={-1}
+                max={1}
+                step={0.02}
+                value={panY}
+                disabled={zoom <= 1.01}
+                onChange={(e) => setPanY(Number(e.target.value))}
+              />
+            </label>
+          </div>
+          <p className="cMuted" style={{ fontSize: 11, margin: '6px 0 0' }}>
+            Zoom in to crop, then pan. Rotation and flips are burned into the WHIP feed viewers receive.
+          </p>
+        </div>
 
         <div className="studioBlock">
           <span className="studioBlockLabel">Lens filters</span>
@@ -308,9 +427,8 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
         {error ? <p className="adminError">{error}</p> : null}
         <p className="cMuted studioHelp">
-          <strong>Do not wait for the right-hand “viewers” window while offline</strong> — that panel only goes live
-          after WHIP succeeds. Flow: allow camera → set filters/overlays → paste correct WHIP URL →{' '}
-          <strong>Go Live with looks</strong> (sends POST application/sdp to Cloudflare).
+          Left = your composited camera (what you publish). Right = public /live monitor with sound so you can hear
+          what viewers get. Framing + looks are burned into the WHIP stream.
         </p>
       </div>
     </div>

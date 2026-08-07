@@ -38,6 +38,9 @@ export const PREMADE_OVERLAYS: { id: OverlayId; label: string; hint: string }[] 
   { id: 'ticker', label: 'Ticker bar', hint: 'Scrolling bottom strip' },
 ];
 
+/** Degrees clockwise */
+export type CameraRotation = 0 | 90 | 180 | 270;
+
 export type StreamStudioOptions = {
   width?: number;
   height?: number;
@@ -46,6 +49,14 @@ export type StreamStudioOptions = {
   lowerThirdTitle?: string;
   lowerThirdSub?: string;
   tickerText?: string;
+  rotation?: CameraRotation;
+  flipH?: boolean;
+  flipV?: boolean;
+  /** 1 = cover fit, up to ~3 = tight crop */
+  zoom?: number;
+  /** -1..1 pan after zoom (crop position) */
+  panX?: number;
+  panY?: number;
 };
 
 export class StreamStudio {
@@ -63,6 +74,12 @@ export class StreamStudio {
   lowerThirdTitle = '3000 Studios';
   lowerThirdSub = 'Live · VIP broadcast';
   tickerText = '3000 STUDIOS LIVE · STREAMING NOW · 3000STUDIOS.VIP · ';
+  rotation: CameraRotation = 0;
+  flipH = false;
+  flipV = false;
+  zoom = 1;
+  panX = 0;
+  panY = 0;
 
   constructor(opts: StreamStudioOptions = {}) {
     const w = opts.width ?? 1280;
@@ -80,6 +97,12 @@ export class StreamStudio {
     if (opts.lowerThirdTitle) this.lowerThirdTitle = opts.lowerThirdTitle;
     if (opts.lowerThirdSub) this.lowerThirdSub = opts.lowerThirdSub;
     if (opts.tickerText) this.tickerText = opts.tickerText;
+    if (opts.rotation !== undefined) this.rotation = opts.rotation;
+    if (opts.flipH !== undefined) this.flipH = opts.flipH;
+    if (opts.flipV !== undefined) this.flipV = opts.flipV;
+    if (opts.zoom !== undefined) this.zoom = opts.zoom;
+    if (opts.panX !== undefined) this.panX = opts.panX;
+    if (opts.panY !== undefined) this.panY = opts.panY;
   }
 
   getCanvas(): HTMLCanvasElement {
@@ -176,14 +199,61 @@ export class StreamStudio {
     this.filter = id;
   }
 
+  setCameraFraming(opts: {
+    rotation?: CameraRotation;
+    flipH?: boolean;
+    flipV?: boolean;
+    zoom?: number;
+    panX?: number;
+    panY?: number;
+  }) {
+    if (opts.rotation !== undefined) this.rotation = opts.rotation;
+    if (opts.flipH !== undefined) this.flipH = opts.flipH;
+    if (opts.flipV !== undefined) this.flipV = opts.flipV;
+    if (opts.zoom !== undefined) this.zoom = Math.min(3, Math.max(1, opts.zoom));
+    if (opts.panX !== undefined) this.panX = Math.min(1, Math.max(-1, opts.panX));
+    if (opts.panY !== undefined) this.panY = Math.min(1, Math.max(-1, opts.panY));
+  }
+
   toggleOverlay(id: OverlayId, on?: boolean) {
     const next = on ?? !this.overlays.has(id);
     if (next) this.overlays.add(id);
     else this.overlays.delete(id);
   }
 
-  private drawFrame() {
+  private drawCameraFrame() {
     const { ctx, canvas, video } = this;
+    if (video.readyState < 2) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    const vw = video.videoWidth || w;
+    const vh = video.videoHeight || h;
+    const rad = (this.rotation * Math.PI) / 180;
+    const cos = Math.abs(Math.cos(rad));
+    const sin = Math.abs(Math.sin(rad));
+    // Axis-aligned bounds of the rotated video
+    const boundW = vw * cos + vh * sin;
+    const boundH = vw * sin + vh * cos;
+    const zoom = this.zoom;
+    const scale = Math.max(w / boundW, h / boundH) * zoom;
+    const dw = vw * scale;
+    const dh = vh * scale;
+    const maxPanX = Math.max(0, (boundW * scale - w) / 2);
+    const maxPanY = Math.max(0, (boundH * scale - h) / 2);
+    const ox = this.panX * maxPanX;
+    const oy = this.panY * maxPanY;
+
+    ctx.save();
+    ctx.translate(w / 2 + ox, h / 2 + oy);
+    ctx.rotate(rad);
+    ctx.scale(this.flipH ? -1 : 1, this.flipV ? -1 : 1);
+    ctx.drawImage(video, -dw / 2, -dh / 2, dw, dh);
+    ctx.restore();
+  }
+
+  private drawFrame() {
+    const { ctx, canvas } = this;
     const w = canvas.width;
     const h = canvas.height;
     ctx.save();
@@ -192,18 +262,7 @@ export class StreamStudio {
 
     const filterCss = LENS_FILTERS.find((f) => f.id === this.filter)?.css ?? 'none';
     ctx.filter = filterCss;
-
-    if (video.readyState >= 2) {
-      // cover-fit
-      const vw = video.videoWidth || w;
-      const vh = video.videoHeight || h;
-      const scale = Math.max(w / vw, h / vh);
-      const dw = vw * scale;
-      const dh = vh * scale;
-      const dx = (w - dw) / 2;
-      const dy = (h - dh) / 2;
-      ctx.drawImage(video, dx, dy, dw, dh);
-    }
+    this.drawCameraFrame();
     ctx.filter = 'none';
 
     // Soft vignette for most non-clean looks

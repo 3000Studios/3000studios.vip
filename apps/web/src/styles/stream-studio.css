@@ -59,3 +59,92 @@
   display: grid;
   gap: 8px;
 }
+
+.studioFramingBadge {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 3;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  color: #ffd700;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+.studioSliders {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.studioSlider {
+  display: grid;
+  gap: 4px;
+}
+
+.studioSlider span {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(226, 232, 240, 0.75);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.studioSlider input[type='range'] {
+  width: 100%;
+  accent-color: #ffd700;
+}
+
+.studioSlider input[type='range']:disabled {
+  opacity: 0.35;
+}
+
+/* Live page monitor (admin right column) */
+.liveSiteMonitor {
+  display: grid;
+  gap: 10px;
+}
+
+.liveSiteMonitorBar {
+  display: grid;
+  gap: 8px;
+}
+
+.liveSiteMonitorActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.liveSiteMonitorStage {
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.liveSiteMonitorHint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.liveSiteMonitorHint a {
+  color: #ffd700;
+}
+
+.adminPublicPreview .cfStreamEmbed,
+.adminPublicPreview .cfManifestPlayer {
+  border-radius: 12px;
+}
+
+@media (min-width: 1100px) {
+  .adminStreamGrid {
+    align-items: start;
+  }
+}

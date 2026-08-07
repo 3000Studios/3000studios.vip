@@ -6,9 +6,9 @@ import {
   buildWhepUrl,
   validateWhipUrl,
 } from '../lib/webrtcStream';
-import { StandbyMusicWindow, StreamFrame } from '../components/StreamViewWindow';
+import { StreamFrame } from '../components/StreamViewWindow';
 import { StreamStudioPanel } from '../components/StreamStudioPanel';
-import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
+import { LiveSiteMonitor } from '../components/LiveSiteMonitor';
 import {
   STREAM_CUSTOMER_CODE,
   STREAM_LIVE_INPUT_ID,
@@ -385,7 +385,7 @@ export function Admin() {
               <div className="cPanel">
                 <div className="cPanelHead">
                   <h2>Stream studio</h2>
-                  <span className="cSub">Camera · premade overlays · lens filters</span>
+                  <span className="cSub">Camera · crop · rotate · looks</span>
                 </div>
                 <div className="cPanelBody">
                   <StreamStudioPanel
@@ -400,38 +400,27 @@ export function Admin() {
 
               <div className="cPanel">
                 <div className="cPanelHead">
-                  <h2>What viewers see</h2>
-                  <span className="cSub">{PUBLIC_LIVE_URL}</span>
+                  <h2>Live page monitor</h2>
+                  <span className="cSub">Exact /live feed · watch &amp; listen</span>
                 </div>
                 <div className="cPanelBody">
                   <StreamFrame isLive={broadcasting} className="adminPublicPreview">
-                    {broadcasting ? (
-                      <div className="adminLivePublicNote">
-                        <strong>You are live (WHIP)</strong>
-                        <p>
-                          Public site uses the Cloudflare hosted Stream Player. Open /live for the embed viewers see.
-                        </p>
-                        <a className="cBtn primary" href="/live" target="_blank" rel="noreferrer">
-                          Open /live
-                        </a>
-                      </div>
-                    ) : (
-                      <div className="adminStandbyWrap">
-                        <p className="adminStandbyNote" style={{ marginBottom: 10 }}>
-                          Public Cloudflare Stream Player (what viewers get on /live &amp; /video):
-                        </p>
-                        <CloudflareStreamPlayer title="Public Stream Player preview" muted autoplay />
-                        <p className="adminStandbyNote">
-                          Player UID <code>{STREAM_PLAYER_UID}</code> ·{' '}
-                          <a href={STREAM_PLAYER_URL} target="_blank" rel="noreferrer">
-                            Open player URL
-                          </a>
-                          . Camera preview is on the left — press <strong>Go Live with looks</strong> to publish.
-                        </p>
-                        <StandbyMusicWindow compact muted />
-                      </div>
-                    )}
+                    <LiveSiteMonitor broadcasting={broadcasting} />
                   </StreamFrame>
+                  {broadcasting ? (
+                    <p className="adminStandbyNote" style={{ marginTop: 10 }}>
+                      You are publishing via WHIP. Use the monitor above (Sound on) to hear what /live plays. Open{' '}
+                      <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
+                        /live
+                      </a>{' '}
+                      in another tab if needed.
+                    </p>
+                  ) : (
+                    <p className="adminStandbyNote" style={{ marginTop: 10 }}>
+                      Offline until you Go Live. The monitor uses the same Stream Player / WHEP / HLS endpoints as the
+                      public site. UID <code>{STREAM_PLAYER_UID}</code>.
+                    </p>
+                  )}
                 </div>
               </div>
             </section>
