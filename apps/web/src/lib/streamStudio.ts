@@ -8,7 +8,20 @@ export type LensFilterId =
   | 'coolBlue'
   | 'vintage'
   | 'vivid'
-  | 'soft';
+  | 'soft'
+  | 'beauty'
+  | 'smooth'
+  | 'glowUp'
+  | 'doggo'
+  | 'sparkle'
+  | 'neon'
+  | 'heat'
+  | 'icy'
+  | 'popArt'
+  | 'vhs'
+  | 'chrome'
+  | 'blush'
+  | 'greenScreen';
 
 export type OverlayId =
   | 'liveBadge'
@@ -18,15 +31,28 @@ export type OverlayId =
   | 'vipCorner'
   | 'ticker';
 
-export const LENS_FILTERS: { id: LensFilterId; label: string; css: string }[] = [
-  { id: 'none', label: 'Clean', css: 'none' },
-  { id: 'cinematic', label: 'Cinematic', css: 'contrast(1.15) saturate(0.9) brightness(0.96)' },
-  { id: 'noir', label: 'Noir', css: 'grayscale(1) contrast(1.25) brightness(0.95)' },
-  { id: 'warmGold', label: 'Warm Gold', css: 'sepia(0.35) saturate(1.2) contrast(1.05)' },
-  { id: 'coolBlue', label: 'Cool Blue', css: 'saturate(0.85) hue-rotate(15deg) brightness(1.02)' },
-  { id: 'vintage', label: 'Vintage', css: 'sepia(0.45) contrast(1.1) brightness(0.98)' },
-  { id: 'vivid', label: 'Vivid', css: 'saturate(1.45) contrast(1.12)' },
-  { id: 'soft', label: 'Soft', css: 'brightness(1.05) contrast(0.92) saturate(1.05)' },
+export const LENS_FILTERS: { id: LensFilterId; label: string; css: string; group?: string }[] = [
+  { id: 'none', label: 'Clean', css: 'none', group: 'base' },
+  { id: 'beauty', label: 'Beauty', css: 'contrast(1.05) saturate(1.08) brightness(1.06) blur(0.35px)', group: 'face' },
+  { id: 'smooth', label: 'Smooth skin', css: 'contrast(0.98) brightness(1.08) saturate(1.05) blur(0.55px)', group: 'face' },
+  { id: 'glowUp', label: 'Glow up', css: 'brightness(1.12) contrast(1.08) saturate(1.2) blur(0.25px)', group: 'face' },
+  { id: 'blush', label: 'Blush', css: 'sepia(0.15) saturate(1.25) hue-rotate(-8deg) brightness(1.05)', group: 'face' },
+  { id: 'cinematic', label: 'Cinematic', css: 'contrast(1.15) saturate(0.9) brightness(0.96)', group: 'look' },
+  { id: 'noir', label: 'Noir', css: 'grayscale(1) contrast(1.25) brightness(0.95)', group: 'look' },
+  { id: 'warmGold', label: 'Warm Gold', css: 'sepia(0.35) saturate(1.2) contrast(1.05)', group: 'look' },
+  { id: 'coolBlue', label: 'Cool Blue', css: 'saturate(0.85) hue-rotate(15deg) brightness(1.02)', group: 'look' },
+  { id: 'vintage', label: 'Vintage', css: 'sepia(0.45) contrast(1.1) brightness(0.98)', group: 'look' },
+  { id: 'vivid', label: 'Vivid', css: 'saturate(1.45) contrast(1.12)', group: 'look' },
+  { id: 'soft', label: 'Soft', css: 'brightness(1.05) contrast(0.92) saturate(1.05)', group: 'look' },
+  { id: 'neon', label: 'Neon', css: 'contrast(1.25) saturate(1.6) hue-rotate(280deg) brightness(1.05)', group: 'fun' },
+  { id: 'heat', label: 'Heat map', css: 'hue-rotate(300deg) saturate(2) contrast(1.3)', group: 'fun' },
+  { id: 'icy', label: 'Icy', css: 'hue-rotate(180deg) saturate(0.85) brightness(1.1) contrast(1.1)', group: 'fun' },
+  { id: 'popArt', label: 'Pop art', css: 'contrast(1.5) saturate(2) hue-rotate(40deg)', group: 'fun' },
+  { id: 'vhs', label: 'VHS', css: 'contrast(1.2) saturate(0.7) sepia(0.2) blur(0.4px)', group: 'fun' },
+  { id: 'chrome', label: 'Chrome', css: 'grayscale(0.3) contrast(1.4) brightness(1.1) saturate(0.5)', group: 'fun' },
+  { id: 'doggo', label: 'Doggo tint', css: 'sepia(0.25) hue-rotate(25deg) saturate(1.3) contrast(1.05)', group: 'fun' },
+  { id: 'sparkle', label: 'Sparkle', css: 'brightness(1.15) contrast(1.1) saturate(1.35)', group: 'fun' },
+  { id: 'greenScreen', label: 'Chroma key', css: 'none', group: 'fx' },
 ];
 
 export const PREMADE_OVERLAYS: { id: OverlayId; label: string; hint: string }[] = [
@@ -80,6 +106,9 @@ export class StreamStudio {
   zoom = 1;
   panX = 0;
   panY = 0;
+  /** 0–1 strength for chroma key (green screen) */
+  chromaKey = 0.55;
+  chromaSmooth = true;
 
   constructor(opts: StreamStudioOptions = {}) {
     const w = opts.width ?? 1280;
@@ -232,7 +261,6 @@ export class StreamStudio {
     const rad = (this.rotation * Math.PI) / 180;
     const cos = Math.abs(Math.cos(rad));
     const sin = Math.abs(Math.sin(rad));
-    // Axis-aligned bounds of the rotated video
     const boundW = vw * cos + vh * sin;
     const boundH = vw * sin + vh * cos;
     const zoom = this.zoom;
@@ -244,12 +272,47 @@ export class StreamStudio {
     const ox = this.panX * maxPanX;
     const oy = this.panY * maxPanY;
 
+    const useChroma = this.filter === 'greenScreen';
+    const filterCss = useChroma ? 'none' : LENS_FILTERS.find((f) => f.id === this.filter)?.css ?? 'none';
+
     ctx.save();
     ctx.translate(w / 2 + ox, h / 2 + oy);
     ctx.rotate(rad);
     ctx.scale(this.flipH ? -1 : 1, this.flipV ? -1 : 1);
+    ctx.filter = filterCss;
     ctx.drawImage(video, -dw / 2, -dh / 2, dw, dh);
+    ctx.filter = 'none';
+
+    if (useChroma) {
+      // Sample after transform into screen space via getImageData of full canvas later
+    }
     ctx.restore();
+
+    if (useChroma) {
+      this.applyChromaKey();
+    }
+  }
+
+  /** Simple green-screen removal (approximation of background removal). */
+  private applyChromaKey() {
+    const { ctx, canvas } = this;
+    const w = canvas.width;
+    const h = canvas.height;
+    const img = ctx.getImageData(0, 0, w, h);
+    const d = img.data;
+    const thr = 0.35 + this.chromaKey * 0.45;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i] / 255;
+      const g = d[i + 1] / 255;
+      const b = d[i + 2] / 255;
+      // Green dominance
+      const greenish = g > r + 0.12 && g > b + 0.12 && g > thr * 0.55;
+      if (greenish) {
+        const edge = this.chromaSmooth ? Math.min(1, (g - Math.max(r, b)) * 3) : 1;
+        d[i + 3] = Math.max(0, Math.floor(d[i + 3] * (1 - edge)));
+      }
+    }
+    ctx.putImageData(img, 0, 0);
   }
 
   private drawFrame() {
@@ -257,13 +320,11 @@ export class StreamStudio {
     const w = canvas.width;
     const h = canvas.height;
     ctx.save();
+    // Solid black under chroma so removed green becomes black on stream (not checker noise)
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, w, h);
 
-    const filterCss = LENS_FILTERS.find((f) => f.id === this.filter)?.css ?? 'none';
-    ctx.filter = filterCss;
     this.drawCameraFrame();
-    ctx.filter = 'none';
 
     // Soft vignette for most non-clean looks
     if (this.filter !== 'none') {

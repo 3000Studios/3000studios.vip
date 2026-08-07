@@ -9,6 +9,7 @@ import {
 import { StreamFrame } from '../components/StreamViewWindow';
 import { StreamStudioPanel } from '../components/StreamStudioPanel';
 import { LiveSiteMonitor } from '../components/LiveSiteMonitor';
+import { StreamSceneEditor } from '../components/StreamSceneEditor';
 import {
   STREAM_CUSTOMER_CODE,
   STREAM_LIVE_INPUT_ID,
@@ -17,6 +18,7 @@ import {
   STREAM_WHIP_PUBLISH_URL,
   STREAM_WHEP_URL,
 } from '../lib/streamConfig';
+import { setHostLiveFlag } from '../lib/streamScene';
 
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
@@ -142,6 +144,7 @@ export function Admin() {
     setIsLive(live);
     localStorage.setItem(LIVE_FLAG_KEY, live ? '1' : '0');
     localStorage.setItem(STREAM_MODE_KEY, live ? 'webrtc' : 'off');
+    setHostLiveFlag(live);
   }
 
   const deviceBadge = useMemo(
@@ -385,7 +388,7 @@ export function Admin() {
               <div className="cPanel">
                 <div className="cPanelHead">
                   <h2>Stream studio</h2>
-                  <span className="cSub">Camera · crop · rotate · looks</span>
+                  <span className="cSub">Camera · crop · rotate · filters · Go Live</span>
                 </div>
                 <div className="cPanelBody">
                   <StreamStudioPanel
@@ -401,27 +404,31 @@ export function Admin() {
               <div className="cPanel">
                 <div className="cPanelHead">
                   <h2>Live page monitor</h2>
-                  <span className="cSub">Exact /live feed · watch &amp; listen</span>
+                  <span className="cSub">What viewers see &amp; hear on /live</span>
                 </div>
                 <div className="cPanelBody">
                   <StreamFrame isLive={broadcasting} className="adminPublicPreview">
                     <LiveSiteMonitor broadcasting={broadcasting} />
                   </StreamFrame>
-                  {broadcasting ? (
-                    <p className="adminStandbyNote" style={{ marginTop: 10 }}>
-                      You are publishing via WHIP. Use the monitor above (Sound on) to hear what /live plays. Open{' '}
-                      <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
-                        /live
-                      </a>{' '}
-                      in another tab if needed.
-                    </p>
-                  ) : (
-                    <p className="adminStandbyNote" style={{ marginTop: 10 }}>
-                      Offline until you Go Live. The monitor uses the same Stream Player / WHEP / HLS endpoints as the
-                      public site. UID <code>{STREAM_PLAYER_UID}</code>.
-                    </p>
-                  )}
+                  <p className="adminStandbyNote" style={{ marginTop: 10 }}>
+                    {broadcasting
+                      ? 'You are live. Swap WHEP/Player and turn Sound on to monitor the public feed.'
+                      : 'Viewers only see “live soon” / music standby until you Go Live — then only the stream window.'}{' '}
+                    <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
+                      Open /live
+                    </a>
+                  </p>
                 </div>
+              </div>
+            </section>
+
+            <section className="cPanel">
+              <div className="cPanelHead">
+                <h2>Standby text · CSS overlays · layers</h2>
+                <span className="cSub">Edit public /live offline look and live DOM overlays</span>
+              </div>
+              <div className="cPanelBody">
+                <StreamSceneEditor />
               </div>
             </section>
 
