@@ -211,10 +211,34 @@ export function Admin() {
             <section className="easyStatusStrip">
               <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>{deviceBadge}</div>
               <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>
-                Phone WHIP: {whipReady ? 'ready' : whipUrl.trim() ? 'invalid URL' : 'needed once'}
+                WHIP: {whipReady ? 'ready · ultra low latency' : whipUrl.trim() ? 'invalid URL' : 'needed once'}
               </div>
               <div className="easyChip info">Viewers: {PUBLIC_LIVE_URL}</div>
             </section>
+
+            {whipReady && !broadcasting ? (
+              <section className="cPanel easyWhipReadyBanner">
+                <div className="cPanelBody">
+                  <strong>Browser WHIP is ready</strong>
+                  <p>
+                    Ultra-low-latency WebRTC publish is configured. Open <em>Phone studio</em>, allow camera/mic,
+                    then press <strong>Go Live with looks</strong> in Stream studio. Viewers watch on{' '}
+                    <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
+                      /live
+                    </a>{' '}
+                    (WHEP / HLS / Stream Player).
+                  </p>
+                  <div className="easyBtnRow">
+                    <button type="button" className="cBtn primary" onClick={() => setPath('phone')}>
+                      Open phone studio
+                    </button>
+                    <a className="cBtn ghost" href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
+                      Open viewer /live
+                    </a>
+                  </div>
+                </div>
+              </section>
+            ) : null}
 
             <section className="cPanel easyPathPanel">
               <div className="cPanelHead">

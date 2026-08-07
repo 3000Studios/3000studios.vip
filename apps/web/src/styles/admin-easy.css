@@ -1,5 +1,27 @@
 /* Admin Go Live — simple guided UI */
 
+.easyWhipReadyBanner {
+  border: 1px solid rgba(30, 240, 120, 0.35) !important;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(30, 240, 120, 0.12), transparent 55%),
+    rgba(0, 0, 0, 0.35) !important;
+}
+.easyWhipReadyBanner strong {
+  display: block;
+  color: #1ef078;
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
+}
+.easyWhipReadyBanner p {
+  margin: 0 0 0.75rem;
+  color: rgba(244, 239, 231, 0.82);
+  line-height: 1.45;
+  font-size: 0.9rem;
+}
+.easyWhipReadyBanner a {
+  color: #ffd700;
+}
+
 .studioPermBanner {
   padding: 0.85rem 1rem;
   border-radius: 14px;
