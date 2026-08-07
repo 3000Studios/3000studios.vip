@@ -109,7 +109,10 @@ html {
   .globalPlayerCover,
   .songHeroCover,
   .glitchText::before,
-  .glitchText::after {
+  .glitchText::after,
+  .globalPlayerLiveBg span,
+  .sponsorMarqueeTrack,
+  .live3dLetter {
     animation: none !important;
   }
   .mouseFx { display: none !important; }
@@ -117,6 +120,36 @@ html {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+  }
+}
+
+/* Mobile stability — reduce flicker from layered fixed effects */
+@media (max-width: 900px) {
+  .mouseFx { display: none !important; }
+  .liveWallpaperCanvas {
+    opacity: 0.85;
+  }
+  .liveWallpaperScan {
+    animation: none !important;
+    opacity: 0.25;
+  }
+  .vipSite::before {
+    animation: none !important;
+  }
+  .scrollProgress {
+    display: none;
+  }
+  /* Avoid transform flicker on sticky chrome */
+  .vipHeader--epic,
+  .globalPlayer--pro {
+    transform: none !important;
+    will-change: auto;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
   }
 }
 

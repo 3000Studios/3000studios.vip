@@ -23,6 +23,7 @@ import { LiveStreamPage } from './pages/LiveStreamPage';
 import { ConceptBoard } from './pages/ConceptBoard';
 import { AuthProvider } from './lib/auth';
 import { initVelvetMachine } from './lib/velvetEngine';
+import { GlobalMusicProvider } from './components/GlobalMusic';
 
 const Shell = lazy(() => import('./components/Shell').then((module) => ({ default: module.Shell })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.Dashboard })));
@@ -96,7 +97,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <AuthProvider>
-        <RouterProvider router={router} />
+        <GlobalMusicProvider>
+          <RouterProvider router={router} />
+        </GlobalMusicProvider>
       </AuthProvider>
     </ErrorBoundary>
   </StrictMode>,

@@ -1,0 +1,29 @@
+# Daily site touch so blog day-seed rotates and Pages rebuilds.
+# Content itself is generated client-side in apps/web/src/data/blog.ts from the calendar day.
+name: Daily blog refresh
+
+on:
+  schedule:
+    - cron: '15 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump daily stamp
+        run: |
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > apps/web/public/blog-daily.stamp
+          echo "Daily blog rotation marker for client-side getDailyBlogPosts()" >> apps/web/public/blog-daily.stamp
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/blog-daily.stamp
+          git diff --staged --quiet && echo "No change" && exit 0
+          git commit -m "chore(blog): daily rotation stamp $(date -u +%F)"
+          git push

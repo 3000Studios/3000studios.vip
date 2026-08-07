@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { PublicLayout } from './Home';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { StandbySoon } from '../components/StandbySoon';
@@ -19,7 +19,6 @@ export function LiveStreamPage() {
   const [live, setLive] = useState(false);
   const [whepKey, setWhepKey] = useState(0);
   const [whepStatus, setWhepStatus] = useState<'connecting' | 'live' | 'error' | 'idle'>('idle');
-  const beatCleanup = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     setScene(loadStreamScene());
@@ -68,26 +67,6 @@ export function LiveStreamPage() {
     return () => window.clearInterval(id);
   }, [live, whepStatus]);
 
-  useEffect(() => {
-    if (live) {
-      let t = 0;
-      const id = window.setInterval(() => {
-        t += 0.08;
-        const soft = 0.12 + Math.sin(t) * 0.06 + Math.sin(t * 2.3) * 0.04;
-        document.documentElement.style.setProperty('--beat', soft.toFixed(3));
-      }, 50);
-      return () => window.clearInterval(id);
-    }
-    return undefined;
-  }, [live]);
-
-  useEffect(() => {
-    return () => {
-      beatCleanup.current?.();
-      beatCleanup.current = null;
-    };
-  }, []);
-
   const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}&body=${encodeURIComponent('Hi 3000 Studios team,\n\n')}`;
 
   return (
@@ -133,18 +112,7 @@ export function LiveStreamPage() {
                 <StreamOverlayLayers layers={scene.layers} />
               </>
             ) : (
-              <StandbySoon
-                scene={scene}
-                hideControls
-                forceMusic
-                shuffle
-                onAudioElement={(el) => {
-                  beatCleanup.current?.();
-                  beatCleanup.current = null;
-                  if (!el) return;
-                  beatCleanup.current = attachBeatAnalyser(el);
-                }}
-              />
+              <StandbySoon scene={scene} hideControls forceMusic={false} shuffle />
             )}
           </div>
         </main>
@@ -157,44 +125,4 @@ export function LiveStreamPage() {
       </div>
     </PublicLayout>
   );
-}
-
-function attachBeatAnalyser(audio: HTMLAudioElement): () => void {
-  let raf = 0;
-  let ctx: AudioContext | null = null;
-  try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return () => undefined;
-    ctx = new AudioCtx();
-    const source = ctx.createMediaElementSource(audio);
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 64;
-    source.connect(analyser);
-    analyser.connect(ctx.destination);
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    const tick = () => {
-      analyser.getByteFrequencyData(data);
-      const avg = data.reduce((s, v) => s + v, 0) / data.length / 255;
-      document.documentElement.style.setProperty('--beat', Math.max(0.05, avg).toFixed(3));
-      raf = requestAnimationFrame(tick);
-    };
-    const resume = () => {
-      void ctx?.resume();
-    };
-    audio.addEventListener('play', resume);
-    tick();
-    return () => {
-      cancelAnimationFrame(raf);
-      audio.removeEventListener('play', resume);
-      try {
-        source.disconnect();
-        analyser.disconnect();
-        void ctx?.close();
-      } catch {
-        /* ignore */
-      }
-    };
-  } catch {
-    return () => undefined;
-  }
 }

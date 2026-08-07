@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSong, type SongPalette } from '../data/music';
+import { featureSong, rolloutSongs, type SongPalette } from '../data/music';
+import { getDailyBlogPosts } from '../data/blog';
 import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
 import { ScrollFX } from '../components/ScrollFX';
@@ -13,7 +14,6 @@ import { STREAM_DASH_URL, STREAM_HLS_URL, STREAM_WHEP_URL } from '../lib/streamC
 
 const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
-const DEFAULT_TRACK = featureSong.jazz.src;
 const ADMIN_PATH = '/admin';
 const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-5800977493749262';
 
@@ -46,24 +46,6 @@ function navIsActive(pathname: string, to: string) {
   if (to === '/') return pathname === '/';
   return pathname === to || pathname.startsWith(`${to}/`);
 }
-
-const blogSeeds = [
-  {
-    title: 'Independent Music Video Production Built For Search, Streams, And Sponsors',
-    keywords: 'independent music video production, cinematic artist branding, sponsor-ready video content, Atlanta creator rollout, premium music marketing',
-    summary: '3000 Studios VIP connects original music, cinematic video, sponsor inventory, and search-ready editorial into one conversion-focused media destination.',
-  },
-  {
-    title: 'How 3000 Studios Turns Music Releases Into A Full VIP Media Experience',
-    keywords: 'music release strategy, VIP music showcase, creator monetization, live streaming studio, fan engagement platform',
-    summary: 'A release should work as more than a song page. It should drive watch time, licensing interest, community activity, and direct buyer action.',
-  },
-  {
-    title: 'Live Streaming, Song Requests, And Community Chat For Modern Music Brands',
-    keywords: 'live music stream, song request board, community chat room, music fan engagement, Cloudflare Stream playback',
-    summary: 'The site gives fans a direct path to listen, watch, request new song ideas, and follow the next 3000 Studios live broadcast.',
-  },
-];
 
 const sponsors = [
   'Music video launch sponsor',
@@ -221,153 +203,6 @@ function useStoredList<T>(key: string, fallback: T[]) {
   }, [items, key]);
 
   return [items, setItems] as const;
-}
-
-function applySongTheme(song?: CatalogSong | null, wallpaperOverride?: string) {
-  if (!song) return;
-  const root = document.documentElement;
-  root.style.setProperty('--theme-a', song.palette.a);
-  root.style.setProperty('--theme-b', song.palette.b);
-  root.style.setProperty('--theme-c', song.palette.c);
-  root.style.setProperty('--theme-gold', song.palette.gold);
-  root.dataset.songWallpaper = wallpaperOverride || song.wallpaper;
-  root.dataset.songSlug = song.slug;
-  window.dispatchEvent(
-    new CustomEvent('3000-song-theme', {
-      detail: {
-        slug: song.slug,
-        title: song.title,
-        cover: song.cover,
-        palette: song.palette,
-        wallpaper: wallpaperOverride || song.wallpaper,
-        src: song.src,
-      },
-    }),
-  );
-}
-
-function MusicController() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const defaultSong = rolloutSongs[0];
-  const [activeTitle, setActiveTitle] = useState(`${featureSong.title} — ${featureSong.jazz.label}`);
-  const [activeCover, setActiveCover] = useState(defaultSong.cover);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.volume = 0.38;
-    audio.muted = muted;
-    const playAttempt = audio.play();
-    if (playAttempt) {
-      void playAttempt.then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
-    }
-  }, [muted]);
-
-  useEffect(() => {
-    applySongTheme(defaultSong);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [defaultSong]);
-
-  const connectAnalyzer = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio || analyserRef.current) return;
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const source = ctx.createMediaElementSource(audio);
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 64;
-    source.connect(analyser);
-    analyser.connect(ctx.destination);
-    analyserRef.current = analyser;
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    const tick = () => {
-      analyser.getByteFrequencyData(data);
-      const avg = data.reduce((sum, value) => sum + value, 0) / data.length / 255;
-      document.documentElement.style.setProperty('--beat', avg.toFixed(3));
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    tick();
-  }, []);
-
-  const playTrack = useCallback((src: string, title: string) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    connectAnalyzer();
-    if (!audio.src.endsWith(src)) {
-      audio.src = src;
-      audio.currentTime = 0;
-    }
-    audio.muted = muted;
-    const song = getSongBySrc(src) || getSongByTitle(title);
-    if (song) {
-      setActiveCover(song.cover);
-      applySongTheme(song);
-    }
-    void audio.play().then(() => {
-      setActiveTitle(title);
-      setIsPlaying(true);
-    });
-  }, [muted, connectAnalyzer]);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { src: string; title: string };
-      if (!detail?.src) return;
-      playTrack(detail.src, detail.title);
-    };
-    window.addEventListener('3000-play-track', handler as EventListener);
-    return () => window.removeEventListener('3000-play-track', handler as EventListener);
-  }, [playTrack]);
-
-  function togglePlay() {
-    const audio = audioRef.current;
-    if (!audio) return;
-    connectAnalyzer();
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-      return;
-    }
-    void audio.play().then(() => setIsPlaying(true));
-  }
-
-  return (
-    <div className="globalPlayer" aria-label="Site music player">
-      <audio ref={audioRef} src={DEFAULT_TRACK} preload="auto" loop />
-      <img className="globalPlayerCover" src={activeCover} alt="" width={40} height={40} />
-      <div className="globalPlayerMeta">
-        <span>Now playing</span>
-        <strong className="shimmerText">{activeTitle}</strong>
-      </div>
-      <button type="button" onClick={togglePlay}>
-        {isPlaying ? 'Pause' : 'Play'}
-      </button>
-      <button type="button" onClick={() => setMuted((current) => !current)}>
-        {muted ? 'Unmute' : 'Mute'}
-      </button>
-      <select
-        aria-label="Select track"
-        value={activeTitle}
-        onChange={(event) => {
-          const song = rolloutSongs.find((item) => item.title === event.target.value);
-          if (song) playTrack(song.src, song.title);
-        }}
-      >
-        {rolloutSongs.map((song) => (
-          <option key={song.title} value={song.title}>
-            {song.title}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
 }
 
 function FeatureOfTheWeek() {
@@ -571,7 +406,6 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
           onClick={() => setOpen(false)}
         />
       </header>
-      <MusicController />
       {children}
       <div className="vipEnergyDivider" aria-hidden="true" />
       <footer className="vipFooter">
@@ -1035,31 +869,36 @@ export function RequestsPage() {
 }
 
 export function BlogPage() {
-  const posts = useMemo(
-    () =>
-      blogSeeds.map((post, index) => ({
-        ...post,
-        date: new Date(Date.UTC(2026, 6, 13 - index)).toISOString(),
-      })),
-    [],
-  );
+  const posts = useMemo(() => getDailyBlogPosts(new Date()), []);
 
   return (
     <PublicLayout variant="nebula">
       <main className="vipMain">
         <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
           <motion.span className="vipKicker" variants={fadeUp}>
-            Automated SEO blog
+            Daily auto blog
           </motion.span>
           <motion.h1 variants={fadeUp}>Search-ready music, video, live stream, and sponsor content.</motion.h1>
+          <motion.p variants={fadeUp}>
+            Cards refresh once per day with site-update stories and SEO evergreen posts — including images and video
+            when available.
+          </motion.p>
         </motion.section>
-        <section className="blogGrid">
+        <section className="blogGrid blogGrid--media">
           {posts.map((post) => (
-            <article className="blogCard" key={post.title}>
-              <span>{safeDate(post.date)}</span>
+            <article className="blogCard blogCard--media" key={post.id} data-reveal>
+              <div className="blogMedia">
+                {post.video ? (
+                  <video src={post.video} muted playsInline loop autoPlay preload="metadata" poster={post.image} />
+                ) : (
+                  <img src={post.image} alt="" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.svg'; }} />
+                )}
+                <span className="blogCat">{post.category}</span>
+              </div>
+              <span className="blogDate">{safeDate(post.date)}</span>
               <h2>{post.title}</h2>
               <p>{post.summary}</p>
-              <strong>{post.keywords}</strong>
+              <strong className="blogKeywords">{post.keywords}</strong>
             </article>
           ))}
         </section>
@@ -1070,6 +909,7 @@ export function BlogPage() {
 }
 
 export function SponsorsPage() {
+  const loop = [...sponsors, ...sponsors];
   return (
     <PublicLayout variant="chrome">
       <main className="vipMain">
@@ -1085,13 +925,15 @@ export function SponsorsPage() {
             <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20sponsorship`}>Request Sponsor Package</StudioButton>
           </motion.div>
         </motion.section>
-        <section className="sponsorGrid">
-          {sponsors.map((item) => (
-            <article className="vipCard" key={item}>
-              <h2>{item}</h2>
-              <p>Available for approved partners only. Placement, usage, and disclosures are reviewed before publication.</p>
-            </article>
-          ))}
+        <section className="sponsorMarquee" aria-label="Sponsor inventory">
+          <div className="sponsorMarqueeTrack">
+            {loop.map((item, i) => (
+              <article className="vipCard sponsorMarqueeCard" key={`${item}-${i}`}>
+                <h2>{item}</h2>
+                <p>Available for approved partners only. Placement, usage, and disclosures are reviewed before publication.</p>
+              </article>
+            ))}
+          </div>
         </section>
       </main>
     </PublicLayout>
