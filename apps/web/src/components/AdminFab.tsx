@@ -11,12 +11,7 @@ export function AdminFab() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Hide owner chrome on admin/vault and the clean public live client
-  if (
-    location.pathname.startsWith('/admin') ||
-    location.pathname.startsWith('/vault') ||
-    location.pathname === '/live'
-  ) {
+  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/vault')) {
     return null;
   }
 

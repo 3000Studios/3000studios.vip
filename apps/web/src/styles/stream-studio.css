@@ -228,10 +228,23 @@
 
 /* Clean viewer layout: title · window · inquiry only */
 .livePublicClean {
+  display: grid;
   grid-template-rows: auto 1fr auto;
+  min-height: calc(100dvh - 7.5rem);
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 200, 40, 0.1), transparent 55%),
     linear-gradient(180deg, #0a0804 0%, #020202 40%, #000 100%);
+}
+/* Nested under site PublicLayout nav + optional global player */
+.liveWithNav {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100dvh - 8.5rem);
+}
+.vipSite:has(.liveWithNav) .vipMain,
+.vipSite .liveWithNav {
+  position: relative;
+  z-index: 1;
 }
 .livePublicHeader {
   position: relative;

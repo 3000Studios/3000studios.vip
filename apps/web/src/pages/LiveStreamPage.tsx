@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { PublicLayout } from './Home';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { StandbySoon } from '../components/StandbySoon';
@@ -11,8 +12,7 @@ const INQUIRY_EMAIL = 'Team@3000studios.vip';
 const TITLE = '3000 Studios.vip LIVE STREAM';
 
 /**
- * Public /live — viewer chrome only:
- * golden music-reactive title, stream window, Stream Inquiry mailto.
+ * Public /live — site nav always on top, stream window + gold title + inquiry.
  */
 export function LiveStreamPage() {
   const [scene, setScene] = useState<StreamScene>(() => loadStreamScene());
@@ -44,7 +44,6 @@ export function LiveStreamPage() {
     };
   }, []);
 
-  // Idle shimmer beat when no analyser is attached
   useEffect(() => {
     if (live) {
       let t = 0;
@@ -68,69 +67,73 @@ export function LiveStreamPage() {
   const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}&body=${encodeURIComponent('Hi 3000 Studios team,\n\n')}`;
 
   return (
-    <div className="liveOnlyShell livePublicClean" data-live={live ? '1' : '0'}>
-      <header className="livePublicHeader">
-        <h1 className="livePublicTitle beatGoldTitle live3dTitle" aria-label={TITLE}>
-          {Array.from(TITLE).map((char, index) => (
-            <span
-              key={`${char}-${index}`}
-              className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter live3dLetter'}
-              style={{ '--letter-index': index } as CSSProperties}
-              aria-hidden="true"
-            >
-              {char}
-            </span>
-          ))}
-        </h1>
-      </header>
+    <PublicLayout variant="blackhole">
+      <div className="livePublicClean liveWithNav" data-live={live ? '1' : '0'}>
+        <header className="livePublicHeader">
+          <h1 className="livePublicTitle beatGoldTitle live3dTitle" aria-label={TITLE}>
+            {Array.from(TITLE).map((char, index) => (
+              <span
+                key={`${char}-${index}`}
+                className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter live3dLetter'}
+                style={{ '--letter-index': index } as CSSProperties}
+                aria-hidden="true"
+              >
+                {char}
+              </span>
+            ))}
+          </h1>
+        </header>
 
-      <main className="livePublicMain">
-        <div className="liveOnlyStage livePublicStage">
-          {live ? (
-            <>
-              <div className="liveOnlyFeed">
-                {preferWhep ? (
-                  <WhepStreamPlayer
-                    uid={STREAM_PLAYER_UID}
-                    title="3000 Studios Live"
-                    muted={false}
-                    autoplay
-                    onStatus={(s) => {
-                      if (s === 'error') setPreferWhep(false);
-                    }}
-                  />
-                ) : (
-                  <CloudflareStreamPlayer
-                    uid={STREAM_PLAYER_UID}
-                    title="3000 Studios Live"
-                    autoplay
-                    muted={false}
-                  />
-                )}
-              </div>
-              <StreamOverlayLayers layers={scene.layers} />
-            </>
-          ) : (
-            <StandbySoon
-              scene={scene}
-              hideControls
-              onAudioElement={(el) => {
-                beatCleanup.current?.();
-                beatCleanup.current = null;
-                if (!el) return;
-                beatCleanup.current = attachBeatAnalyser(el);
-              }}
-            />
-          )}
-        </div>
-      </main>
+        <main className="livePublicMain">
+          <div className="liveOnlyStage livePublicStage">
+            {live ? (
+              <>
+                <div className="liveOnlyFeed">
+                  {preferWhep ? (
+                    <WhepStreamPlayer
+                      uid={STREAM_PLAYER_UID}
+                      title="3000 Studios Live"
+                      muted={false}
+                      autoplay
+                      onStatus={(s) => {
+                        if (s === 'error') setPreferWhep(false);
+                      }}
+                    />
+                  ) : (
+                    <CloudflareStreamPlayer
+                      uid={STREAM_PLAYER_UID}
+                      title="3000 Studios Live"
+                      autoplay
+                      muted={false}
+                    />
+                  )}
+                </div>
+                <StreamOverlayLayers layers={scene.layers} />
+              </>
+            ) : (
+              <StandbySoon
+                scene={scene}
+                hideControls
+                forceMusic
+                shuffle
+                onAudioElement={(el) => {
+                  beatCleanup.current?.();
+                  beatCleanup.current = null;
+                  if (!el) return;
+                  beatCleanup.current = attachBeatAnalyser(el);
+                }}
+              />
+            )}
+          </div>
+        </main>
 
-      <footer className="livePublicFooter">
-        <a className="liveInquiryBtn" href={inquiryHref}>
-          Stream Inquiry
-        </a>
-      </footer>
-    </div>
+        <footer className="livePublicFooter">
+          <a className="liveInquiryBtn" href={inquiryHref}>
+            Stream Inquiry
+          </a>
+        </footer>
+      </div>
+    </PublicLayout>
   );
 }
 

@@ -9,39 +9,84 @@ function resolveCover(src: string): string {
   return `/media/covers/${base}.jpg`;
 }
 
-const playlist = rolloutSongs.map((s) => ({ ...s, cover: resolveCover(s.src) }));
+function shuffleSongs<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const baseCatalog = rolloutSongs.map((s) => ({ ...s, cover: resolveCover(s.src) }));
 
 type Props = {
   scene: StreamScene;
-  /** Viewer mode: no play/prev controls (always true for public) */
   hideControls?: boolean;
+  /** Always play catalog music (ignore scene.standbyMusic off) */
+  forceMusic?: boolean;
+  /** Fresh random order every mount */
+  shuffle?: boolean;
   onAudioElement?: (el: HTMLAudioElement | null) => void;
 };
 
-/** Viewer standby: music art + admin-styled “live soon” message. */
-export function StandbySoon({ scene, hideControls = true, onAudioElement }: Props) {
+/** Viewer standby: random 3000 catalog + admin-styled “live soon” message. */
+export function StandbySoon({
+  scene,
+  hideControls = true,
+  forceMusic = false,
+  shuffle = false,
+  onAudioElement,
+}: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // New random order every mount (each page load / user visit)
+  const [playlist, setPlaylist] = useState(() => (shuffle ? shuffleSongs(baseCatalog) : baseCatalog));
   const [index, setIndex] = useState(0);
   const song = playlist[index] ?? playlist[0];
   const st = scene.standby;
+  const musicOn = forceMusic || scene.standbyMusic;
 
   useEffect(() => {
     onAudioElement?.(audioRef.current);
     return () => onAudioElement?.(null);
-  }, [onAudioElement]);
+  }, [onAudioElement, song.src]);
 
   useEffect(() => {
-    if (!scene.standbyMusic) return;
+    if (!musicOn || !song) return;
     const audio = audioRef.current;
     if (!audio) return;
     audio.crossOrigin = 'anonymous';
     audio.src = song.src;
-    audio.volume = 0.45;
-    void audio.play().catch(() => undefined);
-    const onEnded = () => setIndex((i) => (i + 1) % playlist.length);
+    audio.volume = 0.48;
+    const tryPlay = () => {
+      void audio.play().catch(() => undefined);
+    };
+    tryPlay();
+    const unlock = () => tryPlay();
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
+
+    const onEnded = () => {
+      setIndex((i) => {
+        const next = i + 1;
+        if (next >= playlist.length) {
+          if (shuffle) {
+            setPlaylist(shuffleSongs(baseCatalog));
+          }
+          return 0;
+        }
+        return next;
+      });
+    };
     audio.addEventListener('ended', onEnded);
-    return () => audio.removeEventListener('ended', onEnded);
-  }, [song.src, scene.standbyMusic]);
+    return () => {
+      audio.removeEventListener('ended', onEnded);
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+  }, [song?.src, musicOn, playlist.length, shuffle]);
 
   const textStyle: CSSProperties = {
     position: 'absolute',
@@ -63,11 +108,11 @@ export function StandbySoon({ scene, hideControls = true, onAudioElement }: Prop
 
   return (
     <div className="standbySoon" aria-label={st.text || 'Stream will be live soon'}>
-      {scene.standbyMusic ? <audio ref={audioRef} preload="auto" loop={false} crossOrigin="anonymous" /> : null}
+      {musicOn ? <audio ref={audioRef} preload="auto" loop={false} crossOrigin="anonymous" /> : null}
       <div className="standbySoonBg">
         <img
           className="standbySoonCover"
-          src={song.cover}
+          src={song?.cover}
           alt=""
           onError={(e) => {
             (e.target as HTMLImageElement).style.opacity = '0.2';
@@ -90,7 +135,7 @@ export function StandbySoon({ scene, hideControls = true, onAudioElement }: Prop
         ) : null}
       </div>
       {st.customCss ? <style>{st.customCss}</style> : null}
-      {!hideControls ? null : null}
+      {hideControls ? null : null}
     </div>
   );
 }
