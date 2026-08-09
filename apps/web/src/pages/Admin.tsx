@@ -31,7 +31,7 @@ const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 const customerCode = STREAM_CUSTOMER_CODE;
 const liveInputId = STREAM_LIVE_INPUT_ID;
 
-/** Prefer valid stored URL; otherwise use dashboard WHIP publish default. */
+/** Prefer valid stored URL; otherwise use Cloudflare Pages env if configured. */
 function loadInitialWhipUrl(): string {
   try {
     const stored = localStorage.getItem(WHIP_URL_STORAGE_KEY)?.trim() || '';
@@ -99,10 +99,13 @@ export function Admin() {
   const refreshDevice = useCallback(() => setDevice(detectDevice()), []);
 
   useEffect(() => {
-    refreshDevice();
+    const initial = window.setTimeout(refreshDevice, 0);
     const onResize = () => refreshDevice();
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    return () => {
+      window.clearTimeout(initial);
+      window.removeEventListener('resize', onResize);
+    };
   }, [refreshDevice]);
 
   async function handleCopy(label: string, value: string) {
@@ -229,7 +232,7 @@ export function Admin() {
                     <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
                       /live
                     </a>{' '}
-                    (WHEP / HLS / Stream Player).
+                    (WHEP playback for WHIP streams).
                   </p>
                   <div className="easyBtnRow">
                     <button type="button" className="cBtn primary" onClick={() => setPath('phone')}>
@@ -273,13 +276,13 @@ export function Admin() {
                     <h3>Browser ultra-low latency (WHIP)</h3>
                     <ol className="easySteps">
                       <li>
-                        Best for browser publishing — WebRTC WHIP is preloaded from your Stream dashboard URL
-                        (secret path, not the public asset UID alone).
+                        Best for browser publishing — WebRTC WHIP uses the full publish URL from Cloudflare
+                        Live Inputs (secret path, not the public asset UID alone).
                       </li>
                       <li>Allow Camera + Mic when prompted (Logi C615 or Integrated Camera).</li>
                       <li>
                         Pick looks in the studio, then <strong>Go Live with looks</strong> — POSTs the SDP offer to
-                        WHIP. Viewers use WHEP / HLS / Stream Player on /live.
+                        WHIP. Viewers use WHEP on /live for this browser path.
                       </li>
                     </ol>
                     <label className="easyField">
@@ -288,7 +291,7 @@ export function Admin() {
                         type="url"
                         value={whipUrl}
                         onChange={(e) => saveWhipUrl(e.target.value)}
-                        placeholder={STREAM_WHIP_PUBLISH_URL}
+                        placeholder="https://customer-….cloudflarestream.com/<SECRET>/webRTC/publish"
                         spellCheck={false}
                         autoComplete="off"
                       />
@@ -305,17 +308,20 @@ export function Admin() {
                       </p>
                     ) : null}
                     <div className="easyBtnRow">
+                      {STREAM_WHIP_PUBLISH_URL ? (
+                        <button
+                          type="button"
+                          className="cBtn sm ghost"
+                          onClick={() => saveWhipUrl(STREAM_WHIP_PUBLISH_URL)}
+                        >
+                          Reset to Cloudflare env WHIP
+                        </button>
+                      ) : null}
                       <button
                         type="button"
                         className="cBtn sm ghost"
-                        onClick={() => saveWhipUrl(STREAM_WHIP_PUBLISH_URL)}
-                      >
-                        Reset to dashboard WHIP
-                      </button>
-                      <button
-                        type="button"
-                        className="cBtn sm ghost"
-                        onClick={() => void handleCopy('whip', whipUrl || STREAM_WHIP_PUBLISH_URL)}
+                        disabled={!whipUrl.trim()}
+                        onClick={() => void handleCopy('whip', whipUrl)}
                       >
                         {copied === 'whip' ? 'Copied WHIP' : 'Copy WHIP'}
                       </button>
@@ -341,6 +347,12 @@ export function Admin() {
                         Learn more · WebRTC
                       </a>
                     </div>
+                    {!whipUrl.trim() ? (
+                      <p className="adminError">
+                        WHIP publish URL is not saved on this device and is not present in the web environment.
+                        Open Cloudflare Live Inputs, copy the WebRTC publish URL, and paste it here once.
+                      </p>
+                    ) : null}
                     {studioError ? <p className="adminError">{studioError}</p> : null}
                   </div>
                 ) : (

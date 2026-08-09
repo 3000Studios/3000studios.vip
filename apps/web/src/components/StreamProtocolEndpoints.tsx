@@ -20,6 +20,7 @@ export function StreamProtocolEndpoints({ uid = STREAM_PLAYER_UID }: { uid?: str
   const [copied, setCopied] = useState<string | null>(null);
 
   async function onCopy(ep: StreamProtocolEndpoint) {
+    if (!ep.value.trim() || ep.value.startsWith('Not configured:')) return;
     const ok = await copyText(ep.value);
     if (ok) {
       setCopied(ep.id);
@@ -27,8 +28,17 @@ export function StreamProtocolEndpoints({ uid = STREAM_PLAYER_UID }: { uid?: str
     }
   }
 
+  async function onCopyWhip() {
+    if (!STREAM_WHIP_PUBLISH_URL) return;
+    const ok = await copyText(STREAM_WHIP_PUBLISH_URL);
+    if (ok) {
+      setCopied('whip');
+      window.setTimeout(() => setCopied(null), 1600);
+    }
+  }
+
   const browser = endpoints.filter((e) => e.browser);
-  const pro = endpoints.filter((e) => !e.browser);
+  const pro = endpoints.filter((e) => !e.browser && e.value.trim());
 
   return (
     <div className="streamProtocolBlock">
@@ -44,20 +54,13 @@ export function StreamProtocolEndpoints({ uid = STREAM_PLAYER_UID }: { uid?: str
           ep={{
             id: 'whip',
             label: 'WebRTC (WHIP) URL',
-            value: STREAM_WHIP_PUBLISH_URL,
+            value: STREAM_WHIP_PUBLISH_URL || 'Not configured: paste the Cloudflare WebRTC publish URL in /admin',
             kind: 'url',
             clients: 'Best for browser-based ultra low latency publishing · admin Go Live',
             browser: true,
           }}
           copied={copied === 'whip'}
-          onCopy={() =>
-            void copyText(STREAM_WHIP_PUBLISH_URL).then((ok) => {
-              if (ok) {
-                setCopied('whip');
-                window.setTimeout(() => setCopied(null), 1600);
-              }
-            })
-          }
+          onCopy={() => void onCopyWhip()}
         />
       </ul>
 
@@ -68,12 +71,16 @@ export function StreamProtocolEndpoints({ uid = STREAM_PLAYER_UID }: { uid?: str
         ))}
       </ul>
 
-      <h3 className="streamProtocolSub">Pro / mobile native (SRT · RTMPS)</h3>
-      <ul className="streamMetaList">
-        {pro.map((ep) => (
-          <EndpointRow key={ep.id} ep={ep} copied={copied === ep.id} onCopy={() => void onCopy(ep)} />
-        ))}
-      </ul>
+      {pro.length ? (
+        <>
+          <h3 className="streamProtocolSub">Pro / mobile native (SRT · RTMPS)</h3>
+          <ul className="streamMetaList">
+            {pro.map((ep) => (
+              <EndpointRow key={ep.id} ep={ep} copied={copied === ep.id} onCopy={() => void onCopy(ep)} />
+            ))}
+          </ul>
+        </>
+      ) : null}
     </div>
   );
 }

@@ -30,6 +30,8 @@ type MusicApi = {
 
 const MusicContext = createContext<MusicApi | null>(null);
 
+// Shared hook lives with the provider so playback state stays centralized.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useGlobalMusic() {
   const ctx = useContext(MusicContext);
   if (!ctx) throw new Error('useGlobalMusic requires GlobalMusicProvider');

@@ -293,11 +293,15 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
   }>({ wallpaper: variant });
 
   useEffect(() => {
-    setTheme((prev) => ({ ...prev, wallpaper: variant }));
+    const id = window.setTimeout(() => {
+      setTheme((prev) => ({ ...prev, wallpaper: variant }));
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [variant]);
 
   useEffect(() => {
-    setOpen(false);
+    const id = window.setTimeout(() => setOpen(false), 0);
+    return () => window.clearTimeout(id);
   }, [location.pathname]);
 
   useEffect(() => {

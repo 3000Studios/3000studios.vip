@@ -423,11 +423,13 @@
   box-shadow: none !important;
 }
 .liveOnlyFeed .cfStreamIframe,
+.liveOnlyFeed .liveStreamIframe,
 .liveOnlyFeed .cfManifestVideo {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
+  border: 0;
   object-fit: contain;
 }
 .liveOnlyFeed .cfManifestMeta,

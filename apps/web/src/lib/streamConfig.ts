@@ -38,8 +38,7 @@ export const STREAM_LIVE_INPUT_ID =
  * Override with VITE_STREAM_WHIP_URL if keys rotate.
  */
 export const STREAM_WHIP_PUBLISH_URL =
-  import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() ||
-  'https://customer-wx8j23tjjjpkb37k.cloudflarestream.com/5f0434b0002330a4a4c794b407b59186k3f100cf1895b63cf27b748c69c8ba10c/webRTC/publish';
+  import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() || '';
 
 // ─── URL builders ─────────────────────────────────────────────
 
@@ -76,8 +75,8 @@ export function buildStreamWhepUrl(uid = STREAM_PLAYER_UID, customer = STREAM_CU
 export function buildStreamSrtPlaybackUrl(uid = STREAM_PLAYER_UID): string {
   const fromEnv = import.meta.env.VITE_STREAM_SRT_PLAYBACK_URL?.toString().trim();
   if (fromEnv) return fromEnv;
-  // Default from Cloudflare Stream dashboard for this asset
-  return `srt://live.cloudflare.com:778?passphrase=5c0492386ba0e6cd27816862ffa224b9k${uid}&streamid=play${uid}`;
+  void uid;
+  return '';
 }
 
 /** RTMPS playback server (pro tools). */
@@ -92,7 +91,8 @@ export const STREAM_RTMPS_PLAYBACK_SERVER =
 export function buildStreamRtmpsPlaybackKey(uid = STREAM_PLAYER_UID): string {
   const fromEnv = import.meta.env.VITE_STREAM_RTMPS_PLAYBACK_KEY?.toString().trim();
   if (fromEnv) return fromEnv;
-  return `82d36a917232837958c54f5e217b65e2k${uid}`;
+  void uid;
+  return '';
 }
 
 /** Hosted Stream Player iframe (responsive 16:9 shell). */

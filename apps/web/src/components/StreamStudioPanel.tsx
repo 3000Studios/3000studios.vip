@@ -45,6 +45,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const [status, setStatus] = useState<'idle' | 'preview' | 'starting' | 'live' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [permHint, setPermHint] = useState(false);
+  const [hasCanvas, setHasCanvas] = useState(false);
 
   const applyFraming = useCallback((studio: StreamStudio) => {
     studio.setCameraFraming({ rotation, flipH, flipV, zoom, panX, panY });
@@ -78,6 +79,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     if (mountRef.current && mountRef.current.firstChild !== canvas) {
       mountRef.current.innerHTML = '';
       mountRef.current.appendChild(canvas);
+      setHasCanvas(true);
     }
   }, [ensureStudio]);
 
@@ -130,12 +132,16 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   );
 
   useEffect(() => {
-    void startPreview();
+    const initial = window.setTimeout(() => {
+      void startPreview();
+    }, 0);
     return () => {
+      window.clearTimeout(initial);
       void publisherRef.current?.stop();
       publisherRef.current = null;
       studioRef.current?.stop();
       studioRef.current = null;
+      setHasCanvas(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -248,7 +254,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         <div ref={mountRef} className="studioCanvasMount" />
         {status === 'live' ? <div className="streamLiveBadge">● LIVE · WHIP</div> : null}
         {status === 'starting' ? <div className="adminCameraOverlay">Connecting WHIP (POST SDP)…</div> : null}
-        {status === 'idle' || (status === 'error' && !mountRef.current?.firstChild) ? (
+        {status === 'idle' || (status === 'error' && !hasCanvas) ? (
           <div className="adminCameraOverlay">{error || 'Starting camera preview…'}</div>
         ) : null}
         <div className="studioFramingBadge" aria-hidden="true">
