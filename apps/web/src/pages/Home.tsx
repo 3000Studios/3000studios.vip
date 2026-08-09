@@ -12,7 +12,7 @@ import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
 import { StreamProtocolEndpoints } from '../components/StreamProtocolEndpoints';
 import { STREAM_DASH_URL, STREAM_HLS_URL, STREAM_WHEP_URL } from '../lib/streamConfig';
 
-const OWNER_EMAIL = 'Mr.jwswain@gmail.com';
+const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
 const ADMIN_PATH = '/admin';
 const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-5800977493749262';
@@ -989,11 +989,27 @@ export function ContactPage() {
     <PublicLayout variant="pulse">
       <main className="vipMain">
         <section className="vipPageHero">
-          <span className="vipKicker">Contact</span>
+          <span className="vipKicker">Contact Us</span>
           <h1>Book music, video, sponsorship, licensing, or live stream support.</h1>
           <p>
-            Email <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a> with the release, budget, timeline, and rights needed.
+            Reach 3000 Studios directly by email for releases, budgets, timelines, rights, Spotify account access, and booking.
           </p>
+        </section>
+
+        <section className="contactEmailBlock" aria-label="Contact email">
+          <div className="contactEmailInner">
+            <p className="contactEmailLabel">Primary contact email</p>
+            <p className="contactEmailValue">
+              <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a>
+            </p>
+            <p className="contactEmailNote">
+              Owner / artist: 3000 Studios · Write to{' '}
+              <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a> with your project details.
+            </p>
+            <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20contact`}>
+              Email {OWNER_EMAIL}
+            </StudioButton>
+          </div>
         </section>
       </main>
     </PublicLayout>
