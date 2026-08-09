@@ -501,6 +501,97 @@ body {
   justify-content: center;
 }
 
+/* Spotify identity verification — high-visibility block for artist claim */
+.spotifyIdentityBlock {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2rem;
+  max-width: 920px;
+}
+.spotifyIdentityInner {
+  padding: 1.5rem 1.25rem 1.75rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(30, 215, 96, 0.45);
+  background:
+    linear-gradient(160deg, rgba(30, 215, 96, 0.12), rgba(2, 4, 5, 0.92) 45%, rgba(35, 109, 255, 0.08)),
+    rgba(8, 14, 12, 0.95);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.12),
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(30, 215, 96, 0.12);
+  text-align: center;
+}
+.spotifyIdentityKicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1ed760;
+}
+.spotifyIdentityTitle {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  color: #f6e7b0;
+  letter-spacing: 0.02em;
+}
+.spotifyIdentityLead {
+  margin: 0 auto 1.15rem;
+  max-width: 36rem;
+  color: rgba(244, 239, 231, 0.88);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+.spotifyEmbedWrap {
+  margin: 0 auto 1.25rem;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+.spotifyEmbedWrap iframe {
+  display: block;
+  width: 100%;
+  min-height: 352px;
+}
+.spotifyIdentityEmailLabel {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 215, 0, 0.9);
+}
+.spotifyIdentityEmail {
+  margin: 0 0 0.85rem;
+  font-size: clamp(1.75rem, 6.5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(30, 215, 96, 0.35);
+}
+.spotifyIdentityEmail a {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+  text-decoration-color: rgba(30, 215, 96, 0.75);
+}
+.spotifyIdentityEmail a:hover {
+  color: #1ed760;
+}
+.spotifyIdentityNote {
+  margin: 0 auto;
+  max-width: 34rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: rgba(244, 239, 231, 0.78);
+  font-weight: 600;
+}
+
 .studioButton {
   display: inline-flex;
   align-items: center;
