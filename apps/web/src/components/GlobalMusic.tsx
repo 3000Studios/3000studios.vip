@@ -8,7 +8,14 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useLocation } from 'react-router-dom';
 import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSong } from '../data/music';
+
+const MUSIC_BAR_COLLAPSE_KEY = '3000-music-bar-collapsed-admin';
+
+function isAdminDashboardPath(pathname: string) {
+  return pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/vault' || pathname.startsWith('/vault/');
+}
 
 type MusicApi = {
   isPlaying: boolean;
@@ -278,17 +285,68 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     <MusicContext.Provider value={api}>
       <audio ref={audioRef} preload="auto" playsInline crossOrigin="anonymous" />
       {children}
-      <GlobalMusicBar />
     </MusicContext.Provider>
   );
 }
 
-function GlobalMusicBar() {
+/** Mount inside a router layout so admin-route collapse can use useLocation. */
+export function GlobalMusicBar() {
   const m = useGlobalMusic();
+  const location = useLocation();
+  const onAdmin = isAdminDashboardPath(location.pathname);
   const cover = m.activeSong?.cover || '/favicon.svg';
 
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(MUSIC_BAR_COLLAPSE_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (!onAdmin) {
+      document.documentElement.classList.remove('music-bar-collapsed');
+      return;
+    }
+    document.documentElement.classList.toggle('music-bar-collapsed', collapsed);
+    return () => document.documentElement.classList.remove('music-bar-collapsed');
+  }, [onAdmin, collapsed]);
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(MUSIC_BAR_COLLAPSE_KEY, next ? '1' : '0');
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
+
+  if (onAdmin && collapsed) {
+    return (
+      <div className="globalPlayer globalPlayer--pro globalPlayer--collapsed" aria-label="Site music player collapsed">
+        <button type="button" className="gpCollapsedChip" onClick={toggleCollapsed} aria-expanded={false} title="Expand now playing bar">
+          <img className="globalPlayerCover gpCollapsedCover" src={cover} alt="" width={32} height={32} />
+          <span className="gpCollapsedCopy">
+            <span>{m.isPlaying ? 'Now playing' : 'Paused'}</span>
+            <strong className="shimmerText">{m.activeTitle}</strong>
+          </span>
+          <span className="gpCollapsedExpand" aria-hidden="true">
+            ▲
+          </span>
+        </button>
+        <button type="button" className="gpBtn gpPlay gpCollapsedPlay" onClick={m.toggle} aria-label={m.isPlaying ? 'Pause' : 'Play'}>
+          {m.isPlaying ? '❚❚' : '▶'}
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="globalPlayer globalPlayer--pro" aria-label="Site music player">
+    <div className={`globalPlayer globalPlayer--pro${onAdmin ? ' globalPlayer--admin' : ''}`} aria-label="Site music player">
       <div className="globalPlayerLiveBg" aria-hidden="true">
         <span />
         <span />
@@ -326,6 +384,18 @@ function GlobalMusicBar() {
       <button type="button" className="gpBtn gpMute" onClick={() => m.setMuted(!m.muted)} aria-label={m.muted ? 'Unmute' : 'Mute'}>
         {m.muted || m.volume === 0 ? 'Muted' : 'Mute'}
       </button>
+      {onAdmin ? (
+        <button
+          type="button"
+          className="gpBtn gpCollapseBtn"
+          onClick={toggleCollapsed}
+          aria-expanded
+          aria-label="Collapse now playing bar"
+          title="Collapse now playing bar"
+        >
+          ▼ Hide
+        </button>
+      ) : null}
     </div>
   );
 }
