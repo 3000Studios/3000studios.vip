@@ -318,6 +318,10 @@ body.vip-nav-open {
 }
 
 /* ── Player chrome polish ── */
+body {
+  padding-bottom: 0;
+}
+
 .globalPlayer {
   top: var(--nav-h);
   z-index: 55;
@@ -328,6 +332,19 @@ body.vip-nav-open {
     linear-gradient(180deg, rgba(0, 0, 0, 0.94), rgba(10, 6, 0, 0.9)) !important;
   border-bottom: 1px solid rgba(255, 215, 0, calc(0.16 + var(--beat, 0) * 0.35));
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+
+.globalPlayer.globalPlayer--pro {
+  position: fixed;
+  top: var(--nav-h);
+  bottom: auto;
+  border-top: none;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.22);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.vipSite-live .vipMain {
+  padding-top: calc(var(--player-h) + 0.85rem);
 }
 
 .globalPlayerCover {
