@@ -1723,9 +1723,22 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+/* Video page — clean layout (no protocol endpoint UI) */
+.videoPage .vipPageHero {
+  max-width: 920px;
+}
+.videoGrid {
+  grid-template-columns: 1fr;
+  max-width: 1120px;
+  margin: 0 auto 3rem;
+  padding: 0 1.25rem;
+}
 .videoGrid--stream {
   display: grid;
   gap: 1.25rem;
+  max-width: 1120px;
+  margin: 0 auto 3rem;
+  padding: 0 1.25rem;
 }
 .videoStreamSlot {
   grid-column: 1 / -1;
@@ -1733,6 +1746,90 @@ body {
 .videoStreamSlot .cfStreamEmbed,
 .videoStreamSlot .cfManifestPlayer {
   margin-top: 0.75rem;
+}
+.videoPageCard {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.35rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 215, 0, 0.22);
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(255, 215, 0, 0.08), transparent 55%),
+    linear-gradient(160deg, rgba(14, 12, 10, 0.96), rgba(6, 6, 8, 0.98));
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.4);
+}
+.videoPageCard h2 {
+  margin: 0;
+  color: #f6e7b0;
+  font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+}
+.videoPageCard > p {
+  margin: 0;
+  color: rgba(244, 239, 231, 0.78);
+  line-height: 1.5;
+}
+.videoPlayerFrame {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+.videoPlayerFrame .cfStreamEmbed {
+  display: block;
+  width: 100%;
+  margin: 0;
+  /* Keep Cloudflare player’s 16:9 padding-top ratio */
+  background: #000;
+}
+.videoPlayerFrame .cfStreamOpenLink {
+  z-index: 2;
+}
+.videoPlayerFrame .featureVideo,
+.videoPlayerFrame video.featureVideo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 200px;
+  object-fit: contain;
+  background: #000;
+  border: 0;
+  border-radius: 0;
+}
+.videoPageActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+.featureVideo {
+  width: 100%;
+  border-radius: 14px;
+  background: #000;
+}
+@media (min-width: 900px) {
+  .videoGrid--stream {
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: start;
+  }
+  .videoStreamSlot {
+    grid-column: auto;
+  }
+  .videoPageFeature {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+@media (max-width: 720px) {
+  .videoGrid--stream {
+    padding: 0 1rem;
+    gap: 1rem;
+  }
+  .videoPageCard {
+    padding: 1.1rem;
+  }
 }
 
 /* Custom HLS / DASH player */

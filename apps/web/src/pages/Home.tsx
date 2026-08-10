@@ -7,10 +7,6 @@ import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
-import { ManifestUrlList, StreamManifestPlayer } from '../components/StreamManifestPlayer';
-import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
-import { StreamProtocolEndpoints } from '../components/StreamProtocolEndpoints';
-import { STREAM_DASH_URL, STREAM_HLS_URL, STREAM_WHEP_URL } from '../lib/streamConfig';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -675,73 +671,43 @@ export function MusicShowcase() {
 }
 
 export function VideoPage() {
-  const [videoMode, setVideoMode] = useState<'hosted' | 'whep' | 'hls' | 'dash'>('hosted');
-
   return (
     <PublicLayout variant="electric">
-      <main className="vipMain">
+      <main className="vipMain videoPage">
         <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
           <motion.span className="vipKicker" variants={fadeUp}>
             Video content
           </motion.span>
           <motion.h1 variants={fadeUp}>High-definition rollout visuals for music, creators, and sponsors.</motion.h1>
+          <motion.p variants={fadeUp}>
+            Watch the Cloudflare Stream feed and the 3000 Studios opening video. Live broadcast tools stay on the Live page and owner console.
+          </motion.p>
         </motion.section>
-        <section className="videoGrid videoGrid--stream">
-          <div className="videoStreamSlot vipCard">
+
+        <section className="videoGrid videoGrid--stream" aria-label="Video content">
+          <article className="videoStreamSlot vipCard videoPageCard">
             <h2>Cloudflare Stream</h2>
-            <p>Hosted player, WHEP (WebRTC), or custom HLS/DASH — plus SRT/RTMPS for pro tools.</p>
-            <div className="streamModeTabs" role="tablist" aria-label="Video player mode">
-              {(
-                [
-                  ['hosted', 'Stream Player'],
-                  ['whep', 'WHEP'],
-                  ['hls', 'HLS'],
-                  ['dash', 'DASH'],
-                ] as const
-              ).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={`streamModeTab ${videoMode === id ? 'active' : ''}`}
-                  onClick={() => setVideoMode(id)}
-                >
-                  {label}
-                </button>
-              ))}
+            <p>Hosted Stream player for the featured 3000 Studios video feed.</p>
+            <div className="videoPlayerFrame">
+              <CloudflareStreamPlayer title="3000 Studios featured stream" />
             </div>
-            {videoMode === 'hosted' ? <CloudflareStreamPlayer title="3000 Studios featured stream" /> : null}
-            {videoMode === 'whep' ? <WhepStreamPlayer title="WHEP WebRTC playback" /> : null}
-            {videoMode === 'hls' ? <StreamManifestPlayer mode="hls" title="HLS custom player" /> : null}
-            {videoMode === 'dash' ? <StreamManifestPlayer mode="dash" title="DASH custom player" /> : null}
-            <div className="streamManifestMini">
-              <a href={STREAM_WHEP_URL} target="_blank" rel="noreferrer">
-                WHEP
-              </a>
-              <a href={STREAM_HLS_URL} target="_blank" rel="noreferrer">
-                HLS .m3u8
-              </a>
-              <a href={STREAM_DASH_URL} target="_blank" rel="noreferrer">
-                DASH .mpd
-              </a>
-            </div>
-          </div>
-          <video className="featureVideo" src={INTRO_VIDEO} controls playsInline preload="metadata" />
-          <div className="vipCard">
+          </article>
+
+          <article className="vipCard videoPageCard videoPageFeature">
             <h2>Opening video</h2>
-            <p>Site intro asset for the homepage red-carpet hero. Stream Player above is the Cloudflare-hosted feed.</p>
-            <StudioButton to="/live">Watch on /live</StudioButton>
-            <StudioButton to="/sponsors" variant="secondary">
-              Sponsor A Video
-            </StudioButton>
-          </div>
-          <div className="vipCard videoStreamSlot">
-            <StreamProtocolEndpoints />
-            <div style={{ marginTop: '1rem' }}>
-              <h3 className="streamProtocolSub">Manifest shortcuts</h3>
-              <ManifestUrlList />
+            <p>Site intro asset for the homepage red-carpet hero.</p>
+            <div className="videoPlayerFrame">
+              <video className="featureVideo" src={INTRO_VIDEO} controls playsInline preload="metadata" />
             </div>
-          </div>
+            <div className="videoPageActions">
+              <StudioButton to="/live">Watch Live</StudioButton>
+              <StudioButton to="/sponsors" variant="secondary">
+                Sponsor A Video
+              </StudioButton>
+            </div>
+          </article>
         </section>
+
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
       </main>
     </PublicLayout>
