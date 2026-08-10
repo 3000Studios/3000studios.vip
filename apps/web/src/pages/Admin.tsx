@@ -82,33 +82,6 @@ export function Admin() {
   const whipCheck = validateWhipUrl(whipUrl, liveInputId);
   const whipReady = whipCheck.ok;
 
-  useEffect(() => {
-    if (!authed || whipReady) return;
-    if (window.location.hostname !== '3000studios.vip') return;
-    let cancelled = false;
-    const loadRuntimeConfig = async () => {
-      try {
-        const res = await fetch('/api/stream-config', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ passcode: ADMIN_PASSCODE }),
-        });
-        if (!res.ok) return;
-        const data = (await res.json()) as { whipUrl?: string };
-        const candidate = data.whipUrl?.trim() || '';
-        if (cancelled || !candidate) return;
-        const check = validateWhipUrl(candidate, liveInputId);
-        if (check.ok) saveWhipUrl(candidate);
-      } catch {
-        /* Cloudflare Pages Function is only available in production. */
-      }
-    };
-    void loadRuntimeConfig();
-    return () => {
-      cancelled = true;
-    };
-  }, [authed, whipReady]);
-
   // Persist default WHIP once so Go Live works without manual paste
   useEffect(() => {
     if (whipReady && whipUrl) {
