@@ -13,7 +13,6 @@ import { StreamSceneEditor } from '../components/StreamSceneEditor';
 import {
   STREAM_CUSTOMER_CODE,
   STREAM_LIVE_INPUT_ID,
-  STREAM_PLAYER_UID,
   STREAM_PLAYER_URL,
   STREAM_WHIP_PUBLISH_URL,
   STREAM_WHEP_URL,
@@ -81,7 +80,7 @@ export function Admin() {
   const [whipUrl, setWhipUrl] = useState(() => loadInitialWhipUrl());
 
   const isConfigured = Boolean(customerCode && liveInputId);
-  const whepUrl = STREAM_WHEP_URL || (isConfigured ? buildWhepUrl(customerCode, STREAM_PLAYER_UID) : null);
+  const whepUrl = STREAM_WHEP_URL || (isConfigured ? buildWhepUrl(customerCode, liveInputId) : null);
   const whipCheck = validateWhipUrl(whipUrl, liveInputId);
   const whipReady = whipCheck.ok;
 

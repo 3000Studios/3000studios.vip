@@ -3,7 +3,7 @@ import { PublicLayout } from './Home';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { StandbySoon } from '../components/StandbySoon';
 import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
-import { STREAM_PLAYER_EMBED_SRC, STREAM_PLAYER_UID, STREAM_WHEP_URL } from '../lib/streamConfig';
+import { STREAM_LIVE_INPUT_ID, STREAM_PLAYER_EMBED_SRC, STREAM_WHEP_URL } from '../lib/streamConfig';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
 
@@ -102,7 +102,7 @@ export function LiveStreamPage() {
                   ) : (
                     <WhepStreamPlayer
                       key={whepKey}
-                      uid={STREAM_PLAYER_UID}
+                      uid={STREAM_LIVE_INPUT_ID}
                       whepUrl={STREAM_WHEP_URL}
                       title="3000 Studios Live"
                       muted={false}

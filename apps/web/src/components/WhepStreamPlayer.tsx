@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { WhepPlayer } from '../lib/webrtcStream';
-import { STREAM_WHEP_URL, buildStreamWhepUrl, STREAM_PLAYER_UID } from '../lib/streamConfig';
+import { STREAM_LIVE_INPUT_ID, STREAM_WHEP_URL, buildStreamWhepUrl } from '../lib/streamConfig';
 
 type Props = {
   uid?: string;
@@ -17,7 +17,7 @@ type Props = {
  * @see https://developers.cloudflare.com/stream/webrtc-beta/
  */
 export function WhepStreamPlayer({
-  uid = STREAM_PLAYER_UID,
+  uid = STREAM_LIVE_INPUT_ID,
   whepUrl,
   className = '',
   muted = true,

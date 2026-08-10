@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CloudflareStreamPlayer } from './CloudflareStreamPlayer';
 import { WhepStreamPlayer } from './WhepStreamPlayer';
 import { StreamManifestPlayer } from './StreamManifestPlayer';
-import { STREAM_PLAYER_UID } from '../lib/streamConfig';
+import { STREAM_LIVE_INPUT_ID, STREAM_PLAYER_UID } from '../lib/streamConfig';
 
 const LIVE_URL = 'https://3000studios.vip/live';
 
@@ -70,7 +70,7 @@ export function LiveSiteMonitor({ broadcasting = false, className = '' }: Props)
         ) : null}
         {mode === 'whep' ? (
           <WhepStreamPlayer
-            uid={STREAM_PLAYER_UID}
+            uid={STREAM_LIVE_INPUT_ID}
             title="Live page · WHEP"
             autoplay
             muted={!soundOn}

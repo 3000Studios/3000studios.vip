@@ -1,16 +1,16 @@
 /**
  * Cloudflare Stream configuration for 3000 Studios VIP.
  *
- * Playback protocols (asset UID):
+ * Playback protocols:
  *  - Hosted Stream Player (iframe)
  *  - HLS / DASH manifests (custom web/mobile players)
- *  - WebRTC WHEP (sub-second browser playback)
+ *  - WebRTC WHEP (sub-second browser playback from the live input)
  *  - SRT / RTMPS (pro apps: OBS, ffplay, vMix — not browsers)
  *
  * Publish (browser ultra-low latency):
  *  - WebRTC WHIP publish URL (secret path — for admin /phone studio only)
  *
- * Live input id is still used for some RTMPS publish workflows.
+ * Live input id is used for WHIP publish and WHEP browser playback.
  */
 
 /** customer-*.cloudflarestream.com subdomain code */
@@ -19,7 +19,7 @@ export const STREAM_CUSTOMER_CODE =
 
 /**
  * Hosted Stream Player video / asset UID (from Stream dashboard → Embed).
- * Used for iframe, HLS, DASH, WHEP, SRT, and RTMPS playback.
+ * Used for iframe, HLS, DASH, SRT, and RTMPS playback.
  */
 export const STREAM_PLAYER_UID =
   import.meta.env.VITE_STREAM_PLAYER_UID?.toString().trim() ||
@@ -61,11 +61,11 @@ export function buildStreamManifestDash(uid = STREAM_PLAYER_UID, customer = STRE
 }
 
 /**
- * WebRTC WHEP playback (sub-second). Browser-capable via WHIP/WHEP clients.
- * Dashboard: …/{uid}/webRTC/play
+ * WebRTC WHEP playback (sub-second). Use the live input id, not the hosted player asset UID.
+ * Dashboard: …/{liveInputId}/webRTC/play
  */
-export function buildStreamWhepUrl(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
-  return `https://customer-${customer}.cloudflarestream.com/${uid}/webRTC/play`;
+export function buildStreamWhepUrl(liveInputId = STREAM_LIVE_INPUT_ID, customer = STREAM_CUSTOMER_CODE): string {
+  return `https://customer-${customer}.cloudflarestream.com/${liveInputId}/webRTC/play`;
 }
 
 /**
@@ -116,7 +116,7 @@ export function streamPlayerIframeSrc(opts?: {
 export const STREAM_PLAYER_URL = buildStreamPlayerUrl();
 export const STREAM_HLS_URL = buildStreamManifestHls();
 export const STREAM_DASH_URL = buildStreamManifestDash();
-export const STREAM_WHEP_URL = buildStreamWhepUrl();
+export const STREAM_WHEP_URL = buildStreamWhepUrl(STREAM_LIVE_INPUT_ID);
 export const STREAM_SRT_PLAYBACK_URL = buildStreamSrtPlaybackUrl();
 export const STREAM_RTMPS_PLAYBACK_KEY = buildStreamRtmpsPlaybackKey();
 export const STREAM_WHIP_URL = STREAM_WHIP_PUBLISH_URL;
@@ -136,15 +136,15 @@ export type StreamProtocolEndpoint = {
   browser: boolean;
 };
 
-/** All protocol-specific playback endpoints for the featured asset. */
+/** All protocol-specific playback endpoints for the featured asset and live input. */
 export function getStreamPlaybackEndpoints(uid = STREAM_PLAYER_UID): StreamProtocolEndpoint[] {
   return [
     {
       id: 'whep',
       label: 'WebRTC (WHEP) Playback URL',
-      value: buildStreamWhepUrl(uid),
+      value: STREAM_WHEP_URL,
       kind: 'url',
-      clients: 'Browser WHEP clients · low-latency WebRTC',
+      clients: 'Browser WHEP clients · low-latency WebRTC from the live input',
       browser: true,
     },
     {
