@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { Link } from 'react-router-dom';
 import {
   WHIP_URL_STORAGE_KEY,
-  STREAM_MODE_KEY,
   buildWhepUrl,
   validateWhipUrl,
 } from '../lib/webrtcStream';
@@ -17,11 +16,10 @@ import {
   STREAM_WHIP_PUBLISH_URL,
   STREAM_WHEP_URL,
 } from '../lib/streamConfig';
-import { setHostLiveFlag } from '../lib/streamScene';
+import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
 
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
-const LIVE_FLAG_KEY = '3000-stream-live-v1';
 
 const OBS_SERVER = 'rtmps://live.cloudflare.com:443/live/';
 const CF_LIVE_INPUTS_URL = 'https://dash.cloudflare.com/?to=/:account/stream/inputs';
@@ -74,7 +72,7 @@ export function Admin() {
   const [device, setDevice] = useState<DeviceKind>(() => detectDevice());
   const [path, setPath] = useState<PathMode>(() => (detectDevice() === 'phone' ? 'phone' : 'laptop'));
   const [copied, setCopied] = useState<string | null>(null);
-  const [isLive, setIsLive] = useState(() => localStorage.getItem(LIVE_FLAG_KEY) === '1');
+  const [isLive, setIsLive] = useState(() => readHostLiveFlag());
   const [broadcasting, setBroadcasting] = useState(false);
   const [studioError, setStudioError] = useState<string | null>(null);
   const [whipUrl, setWhipUrl] = useState(() => loadInitialWhipUrl());
@@ -86,6 +84,7 @@ export function Admin() {
 
   useEffect(() => {
     if (!authed || whipReady) return;
+    if (window.location.hostname !== '3000studios.vip') return;
     let cancelled = false;
     const loadRuntimeConfig = async () => {
       try {
@@ -158,8 +157,7 @@ export function Admin() {
     sessionStorage.removeItem(AUTH_KEY);
     setAuthed(false);
     setBroadcasting(false);
-    localStorage.setItem(LIVE_FLAG_KEY, '0');
-    localStorage.setItem(STREAM_MODE_KEY, 'off');
+    setHostLiveFlag(false);
   }
 
   function saveWhipUrl(value: string) {
@@ -170,10 +168,15 @@ export function Admin() {
   function onStudioLive(live: boolean) {
     setBroadcasting(live);
     setIsLive(live);
-    localStorage.setItem(LIVE_FLAG_KEY, live ? '1' : '0');
-    localStorage.setItem(STREAM_MODE_KEY, live ? 'webrtc' : 'off');
     setHostLiveFlag(live);
   }
+
+  useEffect(() => {
+    if (!broadcasting) return undefined;
+    setHostLiveFlag(true);
+    const id = window.setInterval(() => setHostLiveFlag(true), 10_000);
+    return () => window.clearInterval(id);
+  }, [broadcasting]);
 
   const deviceBadge = useMemo(
     () => (device === 'phone' ? '📱 Phone detected' : '💻 Laptop / desktop detected'),

@@ -49,11 +49,23 @@
       }
     </script>
     <title>3000 Studios VIP</title>
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
-      crossorigin="anonymous"
-    ></script>
+    <script>
+      (function () {
+        var path = window.location.pathname || "/";
+        var isOwnerRoute =
+          path === "/admin" ||
+          path.indexOf("/admin/") === 0 ||
+          path === "/vault" ||
+          path.indexOf("/vault/") === 0 ||
+          path === "/live";
+        if (isOwnerRoute) return;
+        var script = document.createElement("script");
+        script.async = true;
+        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262";
+        script.crossOrigin = "anonymous";
+        document.head.appendChild(script);
+      })();
+    </script>
 </head>
   <body>
     <div id="root"></div>

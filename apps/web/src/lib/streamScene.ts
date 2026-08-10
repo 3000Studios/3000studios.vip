@@ -3,7 +3,9 @@
 export const STREAM_SCENE_KEY = '3000-stream-scene-v2';
 export const STREAM_SCENE_CHANNEL = '3000-stream-scene';
 export const STREAM_LIVE_FLAG_KEY = '3000-stream-live-v1';
+export const STREAM_LIVE_FLAG_TS_KEY = '3000-stream-live-ts-v1';
 export const STREAM_MODE_KEY = '3000-stream-mode-v1';
+const STREAM_LIVE_FLAG_MAX_AGE_MS = 30_000;
 
 export type OverlayLayerType = 'css' | 'html' | 'image' | 'iframe' | 'ticker';
 
@@ -160,6 +162,11 @@ export function newOverlayLayer(partial?: Partial<StreamOverlayLayer>): StreamOv
 export function setHostLiveFlag(live: boolean) {
   localStorage.setItem(STREAM_LIVE_FLAG_KEY, live ? '1' : '0');
   localStorage.setItem(STREAM_MODE_KEY, live ? 'webrtc' : 'off');
+  if (live) {
+    localStorage.setItem(STREAM_LIVE_FLAG_TS_KEY, String(Date.now()));
+  } else {
+    localStorage.removeItem(STREAM_LIVE_FLAG_TS_KEY);
+  }
   // Also mirror legacy key used elsewhere
   try {
     localStorage.setItem('3000-stream-live-v1', live ? '1' : '0');
@@ -181,5 +188,11 @@ export function setHostLiveFlag(live: boolean) {
 }
 
 export function readHostLiveFlag(): boolean {
-  return localStorage.getItem(STREAM_LIVE_FLAG_KEY) === '1';
+  if (localStorage.getItem(STREAM_LIVE_FLAG_KEY) !== '1') return false;
+  const ts = Number(localStorage.getItem(STREAM_LIVE_FLAG_TS_KEY) || 0);
+  if (!Number.isFinite(ts) || Date.now() - ts > STREAM_LIVE_FLAG_MAX_AGE_MS) {
+    setHostLiveFlag(false);
+    return false;
+  }
+  return true;
 }

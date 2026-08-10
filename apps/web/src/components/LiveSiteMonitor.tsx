@@ -38,6 +38,8 @@ export function LiveSiteMonitor({ broadcasting = false, className = '' }: Props)
               key={id}
               type="button"
               className={`streamModeTab ${mode === id ? 'active' : ''}`}
+              disabled={id === 'whep' && !broadcasting}
+              title={id === 'whep' && !broadcasting ? 'WHEP starts after Go Live succeeds in this browser.' : undefined}
               onClick={() => setMode(id)}
             >
               {label}
@@ -68,7 +70,7 @@ export function LiveSiteMonitor({ broadcasting = false, className = '' }: Props)
             muted={!soundOn}
           />
         ) : null}
-        {mode === 'whep' ? (
+        {mode === 'whep' && broadcasting ? (
           <WhepStreamPlayer
             uid={STREAM_LIVE_INPUT_ID}
             title="Live page · WHEP"
@@ -76,6 +78,17 @@ export function LiveSiteMonitor({ broadcasting = false, className = '' }: Props)
             muted={!soundOn}
             onStatus={(s) => setStatus(s)}
           />
+        ) : null}
+        {mode === 'whep' && !broadcasting ? (
+          <div className="cfManifestPlayer cfWhepPlayer">
+            <div className="cfManifestVideo cfManifestVideo--standby" role="status" aria-live="polite">
+              Waiting for Go Live to succeed before opening WHEP.
+            </div>
+            <div className="cfManifestMeta" aria-hidden="true">
+              <span>WHEP</span>
+              <span>idle</span>
+            </div>
+          </div>
         ) : null}
         {mode === 'hls' ? (
           <StreamManifestPlayer
