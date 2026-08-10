@@ -383,8 +383,8 @@ button, input, select, textarea { font: inherit; }
   gap: 0.35rem;
 }
 
-/* Admin dashboard: collapsible now-playing bar */
-.globalPlayer--admin .gpCollapseBtn {
+/* Site-wide collapsible now-playing bar */
+.globalPlayer--collapsible .gpCollapseBtn {
   margin-left: auto;
   white-space: nowrap;
   font-size: 0.72rem;
@@ -469,7 +469,7 @@ html.music-bar-collapsed body {
     bottom: 0.55rem;
     max-width: calc(100vw - 1rem);
   }
-  .globalPlayer--admin .gpCollapseBtn {
+  .globalPlayer--collapsible .gpCollapseBtn {
     width: 100%;
     margin-left: 0;
   }
