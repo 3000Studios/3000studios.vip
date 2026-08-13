@@ -28,7 +28,14 @@ export function LiveStreamPage() {
     let cancelled = false;
     const poll = async () => {
       const state = await detectIsLive();
-      if (!cancelled) setLive(state.live);
+      if (!cancelled) {
+        setLive(state.live);
+        if (state.live) {
+          setWhepStatus((s) => (s === 'idle' || s === 'error' ? 'connecting' : s));
+        } else {
+          setWhepStatus('idle');
+        }
+      }
     };
     void poll();
     // Fast poll so Go Live appears quickly for viewers
@@ -56,14 +63,21 @@ export function LiveStreamPage() {
     };
   }, []);
 
-  // Retry WHEP while marked live but not connected yet
+  // Retry WHEP while marked live but not connected yet; hard-fail to iframe after ~8s
   useEffect(() => {
     if (!live) return;
     if (whepStatus === 'live') return;
-    const id = window.setInterval(() => {
+    if (whepStatus === 'error') return;
+    const retry = window.setInterval(() => {
       setWhepKey((k) => k + 1);
     }, 4000);
-    return () => window.clearInterval(id);
+    const failSafe = window.setTimeout(() => {
+      setWhepStatus('error');
+    }, 8000);
+    return () => {
+      window.clearInterval(retry);
+      window.clearTimeout(failSafe);
+    };
   }, [live, whepStatus]);
 
   const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}&body=${encodeURIComponent('Hi 3000 Studios team,\n\n')}`;
@@ -87,7 +101,7 @@ export function LiveStreamPage() {
         </header>
 
         <main className="livePublicMain">
-          <div className="liveOnlyStage livePublicStage">
+          <div className="liveOnlyStage livePublicStage mobileSafe">
             {live ? (
               <>
                 <div className="liveOnlyFeed">
@@ -96,7 +110,7 @@ export function LiveStreamPage() {
                       title="3000 Studios Live"
                       src={STREAM_PLAYER_EMBED_SRC}
                       className="liveStreamIframe"
-                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
                       allowFullScreen
                     />
                   ) : (
