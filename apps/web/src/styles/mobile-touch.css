@@ -180,3 +180,75 @@
     padding: 0 14px 0 12px;
   }
 }
+
+/* Compact expanded global player on phones (when user expands the chip) */
+@media (max-width: 720px) {
+  .globalPlayer--pro.globalPlayer--collapsible {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "cover meta controls"
+      "mute mute volume"
+      "hide hide hide";
+    gap: 0.45rem 0.55rem;
+    padding: 0.55rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+    min-height: 0;
+    align-items: center;
+  }
+  .globalPlayer--pro.globalPlayer--collapsible .globalPlayerCover {
+    grid-area: cover;
+    width: 36px;
+    height: 36px;
+  }
+  .globalPlayer--pro.globalPlayer--collapsible .globalPlayerMeta {
+    grid-area: meta;
+    min-width: 0;
+  }
+  .globalPlayer--pro.globalPlayer--collapsible .globalPlayerMeta strong {
+    max-width: min(48vw, 200px);
+    font-size: 0.9rem;
+  }
+  .globalPlayer--pro.globalPlayer--collapsible .globalPlayerControls {
+    grid-area: controls;
+  }
+  .globalPlayer--pro.globalPlayer--collapsible .gpVolume {
+    grid-area: volume;
+    max-width: none;
+    min-width: 0;
+  }
+  .globalPlayer--pro.globalPlayer--collapsible .gpMute {
+    grid-area: mute;
+    justify-self: start;
+  }
+  .globalPlayer--pro.globalPlayer--collapsible .gpCollapseBtn {
+    grid-area: hide;
+    width: 100%;
+    margin-left: 0;
+  }
+  .globalPlayer--collapsed {
+    bottom: calc(0.55rem + env(safe-area-inset-bottom, 0px));
+    right: 0.55rem;
+    z-index: 85;
+  }
+  .adminFab {
+    bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+    right: 12px;
+  }
+  .liveOnlyFeed,
+  .livePublicStage.mobileSafe .liveOnlyFeed {
+    min-height: min(62vh, 520px);
+  }
+  .liveStreamIframe,
+  .liveOnlyFeed .cfManifestVideo,
+  .liveOnlyFeed .cfWhepPlayer {
+    width: 100%;
+    height: 100%;
+    min-height: min(55vh, 420px);
+  }
+  body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+  html.music-bar-collapsed body {
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+}
