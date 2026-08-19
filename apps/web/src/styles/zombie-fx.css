@@ -1,0 +1,196 @@
+/* ── Zombie wallpaper interaction ── */
+
+.zombieFxLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Host must allow absolute hands */
+.zombie-hand-host {
+  position: relative;
+  overflow: visible !important;
+}
+
+.zombieHands {
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.zombieHand {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.65));
+  animation: zombieClaw 0.55s ease-in-out infinite alternate;
+  opacity: 0.92;
+}
+
+.zombieHand svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.zombieHand--tl { top: -6px; left: -8px; transform: rotate(-35deg); animation-delay: 0ms; }
+.zombieHand--tr { top: -6px; right: -8px; transform: rotate(35deg) scaleX(-1); animation-delay: 80ms; }
+.zombieHand--bl { bottom: -8px; left: -6px; transform: rotate(-120deg); animation-delay: 120ms; }
+.zombieHand--br { bottom: -8px; right: -6px; transform: rotate(120deg) scaleX(-1); animation-delay: 40ms; }
+
+@keyframes zombieClaw {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(3px, 4px) scale(1.08); }
+}
+
+.zombieHand--tl { animation-name: zombieClawTL; }
+.zombieHand--tr { animation-name: zombieClawTR; }
+.zombieHand--bl { animation-name: zombieClawBL; }
+.zombieHand--br { animation-name: zombieClawBR; }
+
+@keyframes zombieClawTL {
+  from { transform: rotate(-35deg) translate(0, 0); }
+  to { transform: rotate(-28deg) translate(4px, 5px); }
+}
+@keyframes zombieClawTR {
+  from { transform: rotate(35deg) scaleX(-1) translate(0, 0); }
+  to { transform: rotate(28deg) scaleX(-1) translate(4px, 5px); }
+}
+@keyframes zombieClawBL {
+  from { transform: rotate(-120deg) translate(0, 0); }
+  to { transform: rotate(-112deg) translate(3px, -4px); }
+}
+@keyframes zombieClawBR {
+  from { transform: rotate(120deg) scaleX(-1) translate(0, 0); }
+  to { transform: rotate(112deg) scaleX(-1) translate(3px, -4px); }
+}
+
+/* Suck into wallpaper */
+.zombie-sucking {
+  z-index: 130 !important;
+  animation: zombieSuck 0.72s cubic-bezier(0.55, 0.05, 0.85, 0.2) forwards !important;
+  pointer-events: none !important;
+  will-change: transform, filter, opacity;
+}
+
+@keyframes zombieSuck {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0) rotate(0deg);
+    filter: blur(0) brightness(1);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.08) translate3d(0, -6px, 0) rotate(-3deg);
+    filter: blur(0) brightness(1.15) saturate(1.2);
+    opacity: 1;
+  }
+  55% {
+    transform: scale(0.55) translate3d(calc(var(--suck-x, 0px) * 0.45), calc(var(--suck-y, 0px) * 0.45), 0) rotate(8deg);
+    filter: blur(3px) brightness(0.85) sepia(0.3);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(0.04) translate3d(var(--suck-x, 0px), var(--suck-y, 0px), 0) rotate(18deg);
+    filter: blur(12px) brightness(0.4) sepia(0.6);
+    opacity: 0;
+  }
+}
+
+.zombie-vanished {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: none !important;
+}
+
+/* Dust cloud particles */
+.zombieDustCloud {
+  position: fixed;
+  width: 0;
+  height: 0;
+  z-index: 125;
+  pointer-events: none;
+}
+
+.zombieDustParticle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size, 8px);
+  height: var(--size, 8px);
+  margin: calc(var(--size, 8px) / -2) 0 0 calc(var(--size, 8px) / -2);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(180, 170, 140, 0.95), rgba(60, 50, 30, 0.5) 55%, transparent 70%);
+  box-shadow: 0 0 8px rgba(120, 100, 60, 0.35);
+  animation: zombieDustFly 1.1s ease-out forwards;
+  animation-delay: var(--delay, 0ms);
+  opacity: 0;
+}
+
+@keyframes zombieDustFly {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.4);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(var(--dx), var(--dy), 0) scale(0.15);
+    opacity: 0;
+  }
+}
+
+/* Wallpaper dust warp pulse */
+html.zombie-dust-warp .liveWallpaper,
+html.zombie-dust-warp .vipWallpaper,
+html.zombie-dust-warp .liveWallpaperCanvas {
+  animation: zombieWarp 0.9s ease-in-out;
+  filter: contrast(1.15) brightness(0.85) sepia(0.25);
+}
+
+html.zombie-dust-warp body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(80, 60, 20, 0.35), transparent 42%),
+    radial-gradient(circle at 40% 55%, rgba(40, 30, 10, 0.25), transparent 35%);
+  animation: zombieVignette 0.9s ease-out forwards;
+  mix-blend-mode: multiply;
+}
+
+@keyframes zombieWarp {
+  0% { transform: scale(1); filter: none; }
+  40% { transform: scale(1.04) rotate(0.4deg); filter: contrast(1.25) brightness(0.7) sepia(0.4); }
+  100% { transform: scale(1); filter: none; }
+}
+
+@keyframes zombieVignette {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Pop-back when restored */
+.studioButton:not(.zombie-vanished):not(.zombie-sucking),
+.vipNavLink:not(.zombie-vanished):not(.zombie-sucking) {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zombieHands,
+  .zombie-sucking,
+  .zombieDustCloud,
+  html.zombie-dust-warp .liveWallpaper {
+    animation: none !important;
+  }
+}
