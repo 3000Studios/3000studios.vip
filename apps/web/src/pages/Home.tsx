@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { featureSong, rolloutSongs, type SongPalette } from '../data/music';
+import { rolloutSongs, type SongPalette } from '../data/music';
 import { getDailyBlogPosts } from '../data/blog';
 import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
@@ -202,46 +202,6 @@ function useStoredList<T>(key: string, fallback: T[]) {
   return [items, setItems] as const;
 }
 
-function FeatureOfTheWeek() {
-  const [mode, setMode] = useState<'jazz' | 'remix'>('jazz');
-  const version = mode === 'jazz' ? featureSong.jazz : featureSong.remix;
-  const other = mode === 'jazz' ? featureSong.remix : featureSong.jazz;
-
-  function morph() {
-    playPop();
-    const next = mode === 'jazz' ? 'remix' : 'jazz';
-    setMode(next);
-    const v = next === 'jazz' ? featureSong.jazz : featureSong.remix;
-    window.dispatchEvent(new CustomEvent('3000-play-track', { detail: { src: v.src, title: `${featureSong.title} — ${v.label}` } }));
-  }
-
-  return (
-    <section className="featureWeek" aria-labelledby="feature-week-title">
-      <div className="featureWeekInner">
-        <div className="featureWeekCopy">
-          <span className="vipKicker">{featureSong.weekLabel}</span>
-          <h2 id="feature-week-title">{featureSong.title}</h2>
-          <p className="featureWeekArtist">{featureSong.artist}</p>
-          <p>{version.description}</p>
-          <div className="featureMorphToggle" role="group" aria-label="Switch Jazz or Remix">
-            <button type="button" className={mode === 'jazz' ? 'morphBtn active' : 'morphBtn'} onClick={() => { if (mode !== 'jazz') morph(); }}>Jazz Edition</button>
-            <button type="button" className="morphSwitch" onClick={morph} aria-label={`Switch to ${other.label}`}>
-              <span className={mode === 'remix' ? 'morphKnob remix' : 'morphKnob'} />
-            </button>
-            <button type="button" className={mode === 'remix' ? 'morphBtn active' : 'morphBtn'} onClick={() => { if (mode !== 'remix') morph(); }}>Remix</button>
-          </div>
-          <button type="button" className="studioButton primary featurePlayBtn" onClick={() => window.dispatchEvent(new CustomEvent('3000-play-track', { detail: { src: version.src, title: `${featureSong.title} — ${version.label}` } }))}>Play {version.label}</button>
-        </div>
-        <button type="button" className="featureArtStage magnetic" onClick={morph} aria-label={`Morph to ${other.label}`}>
-          <img key={version.cover} className="featureArtImg" src={version.cover} alt={`${featureSong.title} — ${version.label} artwork`} />
-          <span className="featureArtBadge">{version.label}</span>
-          <span className="featureArtHint">Tap art to morph · Jazz ↔ Remix</span>
-        </button>
-      </div>
-    </section>
-  );
-}
-
 export function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -378,7 +338,6 @@ export function Home() {
         </section>
 
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
-        <FeatureOfTheWeek />
 
         <motion.section className="vipSection featureRail" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
           {[['Music Showcase', 'Original tracks, playable previews, direct purchase and licensing paths.'], ['Live Stream', 'Cloudflare Stream-ready playback plus a protected owner stream console.'], ['Community Chat', 'Visitor chat and song ideas that can upgrade to Firebase or D1 persistence.'], ['Sponsor Inventory', 'Clear placements for launch partners, video sponsors, and creator tools.']].map(([title, copy]) => (
