@@ -323,20 +323,6 @@ export function Home() {
           </motion.div>
         </section>
 
-        <section className="spotifyIdentityBlock" aria-label="Spotify artist identity verification">
-          <div className="spotifyIdentityInner">
-            <p className="spotifyIdentityKicker">Official Spotify catalog · Identity confirmation</p>
-            <h2 className="spotifyIdentityTitle">3000 Studios on Spotify</h2>
-            <p className="spotifyIdentityLead">This page publicly confirms ownership of the 3000 Studios artist account for Spotify verification.</p>
-            <div className="spotifyEmbedWrap">
-              <iframe data-testid="embed-iframe" title="3000 Studios Spotify album embed" style={{ borderRadius: 12, border: 0 }} src="https://open.spotify.com/embed/album/2SuGi2KfJ2oG5KN2PN4ka4?utm_source=generator&si=d4d8ad82bf904a9a" width="100%" height={352} allowFullScreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" />
-            </div>
-            <p className="spotifyIdentityEmailLabel">Account owner email</p>
-            <p className="spotifyIdentityEmail"><a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a></p>
-            <p className="spotifyIdentityNote">Artist / rights holder: 3000 Studios · Contact for Spotify access and catalog claims: {OWNER_EMAIL}</p>
-          </div>
-        </section>
-
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
 
         <motion.section className="vipSection featureRail" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
@@ -613,8 +599,7 @@ export function BlogPage() {
                 <span className="blogCat">{post.category}</span>
               </div>
               <span className="blogDate">{safeDate(post.date)}</span>
-              <h2>{post.title}</h2>
-              <p>{post.summary}</p>
+              <h2>{post.title}</h2><p>{post.summary}</p>
               <strong className="blogKeywords">{post.keywords}</strong>
             </article>
           ))}
