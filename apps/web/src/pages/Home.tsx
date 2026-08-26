@@ -311,14 +311,23 @@ export function Home() {
         <section className="redCarpetHero">
           <video src={INTRO_VIDEO} autoPlay muted loop playsInline preload="auto" />
           <div className="carpetDepth" aria-hidden="true" />
-          <motion.div className="heroCopy" initial="hidden" animate="show" variants={stagger}>
-            <motion.span className="vipKicker" variants={fadeUp}>Music video content live stream</motion.span>
+          <motion.div className="heroCopy heroCopy--yt" initial="hidden" animate="show" variants={stagger}>
+            <motion.span className="vipKicker" variants={fadeUp}>YouTube · DistroKid · Official artist</motion.span>
             <BeatDancingTitle text="3000 Studios" />
-            <motion.p variants={fadeUp}>A premium music and video destination with live streaming, animated sound-reactive wallpapers, sponsor-ready pages, community requests, and VIP creator operations.</motion.p>
+            <motion.p variants={fadeUp}>Official music videos and DistroKid releases. Subscribe so YouTube actually puts the next drop in your feed.</motion.p>
+            <motion.div className="heroFeature" variants={fadeUp}>
+              <a className="heroFeatureCard" href="https://www.youtube.com/watch?v=tIY1WU9N_RU" target="_blank" rel="noreferrer">
+                <img src="/media/covers/not-giving-up-tonight.jpg" alt="Not Giving Up Tonight official video" />
+                <span>
+                  <small>Live on DistroKid + YouTube</small>
+                  <strong>Not Giving Up Tonight</strong>
+                </span>
+              </a>
+            </motion.div>
             <motion.div className="heroActions" variants={fadeUp}>
-              <StudioButton href="https://www.youtube.com/@3000Studio?sub_confirmation=1">Subscribe on YouTube</StudioButton>
-              <StudioButton to="/music" variant="secondary">Hear Music</StudioButton>
-              <StudioButton to="/live" variant="ghost">Watch Live</StudioButton>
+              <a className="studioButton ytCta" href="https://www.youtube.com/@3000Studio?sub_confirmation=1" target="_blank" rel="noreferrer">Subscribe on YouTube</a>
+              <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">Watch the video</StudioButton>
+              <StudioButton to="/music" variant="ghost">Full catalog</StudioButton>
               <StudioButton href={checkoutHref} variant="ghost">Buy Or Book</StudioButton>
             </motion.div>
           </motion.div>

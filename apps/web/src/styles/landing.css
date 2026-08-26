@@ -524,10 +524,56 @@ body {
 
 .redCarpetHero {
   position: relative;
-  min-height: min(78vh, 720px);
+  min-height: min(62vh, 640px);
   display: grid;
   place-items: center;
   overflow: hidden;
+}
+.heroFeature {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 1.15rem;
+}
+.heroFeatureCard {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: 420px;
+  padding: 0.45rem 0.85rem 0.45rem 0.45rem;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: rgba(8, 6, 4, 0.72);
+  text-align: left;
+}
+.heroFeatureCard img {
+  width: 112px;
+  height: 63px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.heroFeatureCard small {
+  display: block;
+  color: #d4af37;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+.heroFeatureCard strong {
+  display: block;
+  font-size: 1.05rem;
+  color: #fff7e6;
+}
+.studioButton.ytCta {
+  background: #ff0033;
+  color: #fff;
+  border: 0;
+  box-shadow: 0 0 24px rgba(255, 0, 51, 0.35);
+  font-weight: 800;
+}
+.studioButton.ytCta:hover {
+  filter: brightness(1.08);
 }
 .redCarpetHero video {
   position: absolute;
