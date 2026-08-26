@@ -514,7 +514,7 @@ html.music-bar-collapsed body {
   border: 0;
 }
 body {
-  padding-bottom: 72px;
+  padding-bottom: 0;
 }
 .vipHeader.vipHeader--epic {
   top: 0;
@@ -2408,6 +2408,141 @@ body {
   margin: 0 0 1rem;
   color: rgba(244, 239, 231, 0.82);
   max-width: 46rem;
+}
+
+.vipSite:has(.dkMusicPage) .liveWallpaper,
+.vipSite:has(.dkMusicPage) .vipWallpaper {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+.dkMusicPage {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+.dkArtFill {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.15);
+  transform: scale(1.06);
+  transition: background-image 0.45s ease;
+}
+.dkArtDim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(4, 3, 2, 0.35) 0%, rgba(4, 3, 2, 0.55) 45%, rgba(4, 3, 2, 0.78) 100%);
+}
+.dkMusicPage .dkStage {
+  position: relative;
+  z-index: 3;
+  min-height: calc(100dvh - 88px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7rem 1.25rem 2.5rem;
+}
+.dkKicker { margin-bottom: 1.25rem; }
+.dkDock {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  width: min(920px, 100%);
+}
+.dkHero {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) 1fr;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 28px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(8, 6, 4, 0.55);
+  backdrop-filter: blur(10px);
+  animation: dkPulse 4.5s ease-in-out infinite;
+}
+@keyframes dkPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.12); }
+  50% { box-shadow: 0 0 40px 0 rgba(212, 175, 55, 0.28); }
+}
+.dkCoverWrap {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.dkCover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 18px;
+}
+.dkPlayBadge {
+  position: absolute;
+  inset: auto 12px 12px auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ff0033;
+  color: #fff;
+  font-size: 1.15rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.dkMeta h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.4rem);
+  color: #fff6e4;
+}
+.dkMeta p { margin: 0 0 1rem; color: #d4af37; }
+.dkActions { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+.dkArrow {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 246, 228, 0.25);
+  background: rgba(8, 6, 4, 0.5);
+  color: #fff6e4;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.dkArrow:disabled { opacity: 0.25; cursor: default; }
+.dkStrip {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.dkChip {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.85rem 0.35rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: rgba(8, 6, 4, 0.55);
+  color: #fff6e4;
+  cursor: pointer;
+}
+.dkChip img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.dkChip.is-on { border-color: #ff0033; box-shadow: 0 0 0 2px rgba(255, 0, 51, 0.35); }
+@media (max-width: 760px) {
+  .dkDock { grid-template-columns: 1fr; }
+  .dkHero { grid-template-columns: 1fr; }
+  .dkArrow { display: none; }
 }
 
 @media (max-width: 900px) {

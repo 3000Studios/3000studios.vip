@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { rolloutSongs, type SongPalette } from '../data/music';
+import { distrokidSongs, type SongPalette } from '../data/music';
 import { getDailyBlogPosts } from '../data/blog';
 import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
@@ -372,101 +372,75 @@ export function Home() {
 }
 
 export function MusicShowcase() {
+  const catalog = distrokidSongs;
   const [activeIndex, setActiveIndex] = useState(0);
-  const [shouldPlaySelected, setShouldPlaySelected] = useState(false);
-  const selectedAudioRef = useRef<HTMLAudioElement | null>(null);
-  const activeSong = rolloutSongs[activeIndex] ?? rolloutSongs[0];
+  const [playing, setPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const activeSong = catalog[activeIndex] ?? catalog[0];
+  const artBg = `/media/covers/${activeSong.slug}-bg.jpg`;
 
   useEffect(() => {
-    const audio = selectedAudioRef.current;
-    if (!audio || !shouldPlaySelected) return;
-    audio.currentTime = 0;
-    void audio.play().catch(() => undefined);
-  }, [activeSong.src, shouldPlaySelected]);
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.src = activeSong.src;
+    if (playing) void audio.play().catch(() => setPlaying(false));
+  }, [activeSong.src, playing]);
 
-  const selectSong = (index: number) => {
-    playPop();
-    setShouldPlaySelected(true);
-    if (index === activeIndex && selectedAudioRef.current) {
-      selectedAudioRef.current.currentTime = 0;
-      void selectedAudioRef.current.play().catch(() => undefined);
-    }
-    setActiveIndex(index);
-  };
-
-  const moveCarousel = (direction: -1 | 1) => {
-    const nextIndex = (activeIndex + direction + rolloutSongs.length) % rolloutSongs.length;
-    selectSong(nextIndex);
-  };
-
-  const getCarouselSlot = (index: number) => {
-    const length = rolloutSongs.length;
-    const rawOffset = index - activeIndex;
-    const wrappedOffset = rawOffset > length / 2 ? rawOffset - length : rawOffset < -length / 2 ? rawOffset + length : rawOffset;
-    if (wrappedOffset === 0) return 'middle';
-    if (wrappedOffset === -1) return 'left';
-    if (wrappedOffset === 1) return 'right';
-    if (wrappedOffset < -1) return 'left-hidden';
-    return 'right-hidden';
+  const pick = (index: number, autoplay = true) => {
+    const next = ((index % catalog.length) + catalog.length) % catalog.length;
+    setActiveIndex(next);
+    if (autoplay) setPlaying(true);
   };
 
   return (
     <PublicLayout variant="vortex">
-      <main className="vipMain">
-        <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Music showcase</motion.span>
-          <motion.h1 variants={fadeUp}>Original tracks with sound-reactive motion.</motion.h1>
-          <motion.p variants={fadeUp}>Play the current 3000 Studios catalog, open the featured song page, and route purchases or licensing inquiries through real contact and payment paths.</motion.p>
-        </motion.section>
-        <section className="itunesScrollerSection" aria-label="3000 Studios song carousel">
-          <div className="itunesScrollerHeader">
-            <span className="vipKicker">CodePen-inspired cover flow</span>
-            <h2>{activeSong.title}</h2>
-            <p>{activeSong.description}</p>
-          </div>
-          <div className="itunesScroller" role="region" aria-roledescription="carousel" aria-label="Original song carousel">
-            <div className="itunesNav" aria-label="Carousel controls">
-              <button type="button" className="prev" onClick={() => moveCarousel(-1)} aria-label="Previous song">&laquo;</button>
-              <button type="button" className="next" onClick={() => moveCarousel(1)} aria-label="Next song">&raquo;</button>
+      <main className="vipMain dkMusicPage">
+        <div className="dkArtFill" style={{ backgroundImage: `url(${artBg}), url(${activeSong.cover})` }} aria-hidden="true" />
+        <div className="dkArtDim" aria-hidden="true" />
+        <section className="dkStage" aria-label="DistroKid releases">
+          <p className="vipKicker dkKicker">DistroKid · Live catalog</p>
+          <div className="dkDock">
+            <button type="button" className="dkArrow" onClick={() => pick(activeIndex - 1)} aria-label="Previous release" disabled={catalog.length < 2}>
+              ‹
+            </button>
+            <div className="dkHero">
+              <button type="button" className="dkCoverWrap" onClick={() => setPlaying((p) => !p)} aria-label={playing ? 'Pause' : 'Play'}>
+                <img className="dkCover" src={activeSong.cover} alt={`${activeSong.title} artwork`} />
+                <span className="dkPlayBadge">{playing ? '❚❚' : '▶'}</span>
+              </button>
+              <div className="dkMeta">
+                <h1>{activeSong.title}</h1>
+                <p>3000 Studios · DistroKid</p>
+                <div className="dkActions">
+                  <button type="button" className="studioButton ytCta" onClick={() => setPlaying((p) => !p)}>
+                    {playing ? 'Pause' : 'Play'}
+                  </button>
+                  <a className="studioButton secondary" href="https://www.youtube.com/watch?v=tIY1WU9N_RU" target="_blank" rel="noreferrer">
+                    Watch video
+                  </a>
+                </div>
+                <audio ref={audioRef} preload="auto" onEnded={() => pick(activeIndex + 1)} />
+              </div>
             </div>
-            {rolloutSongs.map((song, index) => {
-              const slot = getCarouselSlot(index);
-              return (
-                <button type="button" className={`itunesItem ${slot}`} key={song.src} onClick={() => { selectSong(index); window.dispatchEvent(new CustomEvent('3000-play-track', { detail: { src: song.src, title: song.title } })); }} aria-current={index === activeIndex ? 'true' : undefined} aria-label={`Play ${song.title}`}>
-                  <span className="itunesCover" style={{ backgroundImage: `url(${song.cover})` }}>
-                    <img src={song.cover} alt="" className="itunesCoverImg" loading="lazy" />
-                    <span className="itunesRank">#{song.rank}</span>
-                    <strong>{song.title}</strong>
-                    <small>3000 Studios Original</small>
-                  </span>
-                </button>
-              );
-            })}
+            <button type="button" className="dkArrow" onClick={() => pick(activeIndex + 1)} aria-label="Next release" disabled={catalog.length < 2}>
+              ›
+            </button>
           </div>
-          <div className="itunesNowPlaying">
-            <img className="itunesNowArt" src={activeSong.cover} alt="" width={72} height={72} />
-            <div>
-              <span>Now selected</span>
-              <strong>{activeSong.title}</strong>
-              <Link className="songDeepLink" to={`/song/${activeSong.slug}`}>Open song page</Link>
-            </div>
-            <audio ref={selectedAudioRef} key={activeSong.src} src={activeSong.src} controls preload="auto" />
+          <div className="dkStrip" role="list">
+            {catalog.map((song, index) => (
+              <button
+                type="button"
+                role="listitem"
+                key={song.slug}
+                className={index === activeIndex ? 'dkChip is-on' : 'dkChip'}
+                onClick={() => pick(index)}
+              >
+                <img src={song.cover} alt="" />
+                <span>{song.title}</span>
+              </button>
+            ))}
           </div>
         </section>
-        <motion.section className="vipSection trackList" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
-          {rolloutSongs.map((song) => (
-            <motion.article className="trackCard" key={song.title} variants={fadeUp} data-active={song.src === activeSong.src ? 'true' : undefined} data-reveal>
-              <img className="trackCardArt" src={song.cover} alt="" width={64} height={64} loading="lazy" />
-              <span>#{song.rank}</span>
-              <div><h2>{song.title}</h2><p>{song.description}</p></div>
-              <div className="trackCardActions">
-                <button type="button" className="trackSelectButton" onClick={() => { selectSong(song.rank - 1); window.dispatchEvent(new CustomEvent('3000-play-track', { detail: { src: song.src, title: song.title } })); }}>Play Full Song</button>
-                <Link className="trackSelectButton secondaryLink" to={`/song/${song.slug}`}>Art + Page</Link>
-              </div>
-            </motion.article>
-          ))}
-        </motion.section>
-        <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_MUSIC_SLOT} />
       </main>
     </PublicLayout>
   );

@@ -1,6 +1,7 @@
 {
   "not-giving-up-tonight": {
     "cover": "/media/covers/not-giving-up-tonight.jpg",
+    "art": "/media/covers/not-giving-up-tonight-bg.jpg",
     "palette": {
       "a": "hsl(45 80% 50%)",
       "b": "hsl(12 75% 42%)",

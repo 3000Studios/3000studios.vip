@@ -10,7 +10,6 @@ import {
 } from 'react';
 import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSong } from '../data/music';
 
-const MUSIC_BAR_COLLAPSE_KEY = '3000-music-bar-collapsed';
 
 type MusicApi = {
   isPlaying: boolean;
@@ -284,131 +283,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/** Mount inside a router layout. Collapse works site-wide. */
+/** Now-playing bar removed — playback lives on /music. */
 export function GlobalMusicBar() {
-  const m = useGlobalMusic();
-  const cover = m.activeSong?.cover || '/favicon.svg';
-
-  const [collapsed, setCollapsed] = useState(() => {
-    try {
-      const next = localStorage.getItem(MUSIC_BAR_COLLAPSE_KEY);
-      if (next === '1' || next === '0') return next === '1';
-      if (localStorage.getItem('3000-music-bar-collapsed-admin') === '1') return true;
-    } catch {
-      /* ignore */
-    }
-    // Default collapsed on phones so the bar never eats the viewport
-    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches) {
-      return true;
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('music-bar-collapsed', collapsed);
-    return () => document.documentElement.classList.remove('music-bar-collapsed');
-  }, [collapsed]);
-
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(MUSIC_BAR_COLLAPSE_KEY) !== null) return;
-    } catch {
-      return;
-    }
-    const mq = window.matchMedia('(max-width: 720px)');
-    const onChange = () => {
-      try {
-        if (localStorage.getItem(MUSIC_BAR_COLLAPSE_KEY) !== null) return;
-      } catch {
-        return;
-      }
-      setCollapsed(mq.matches);
-    };
-    mq.addEventListener?.('change', onChange);
-    return () => mq.removeEventListener?.('change', onChange);
-  }, []);
-
-  function toggleCollapsed() {
-    setCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(MUSIC_BAR_COLLAPSE_KEY, next ? '1' : '0');
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  }
-
-  if (collapsed) {
-    return (
-      <div className="globalPlayer globalPlayer--pro globalPlayer--collapsed" aria-label="Site music player collapsed">
-        <button type="button" className="gpCollapsedChip" onClick={toggleCollapsed} aria-expanded={false} title="Expand now playing bar">
-          <img className="globalPlayerCover gpCollapsedCover" src={cover} alt="" width={32} height={32} />
-          <span className="gpCollapsedCopy">
-            <span>{m.isPlaying ? 'Now playing' : 'Paused'}</span>
-            <strong className="shimmerText">{m.activeTitle}</strong>
-          </span>
-          <span className="gpCollapsedExpand" aria-hidden="true">
-            ▲
-          </span>
-        </button>
-        <button type="button" className="gpBtn gpPlay gpCollapsedPlay" onClick={m.toggle} aria-label={m.isPlaying ? 'Pause' : 'Play'}>
-          {m.isPlaying ? '❚❚' : '▶'}
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="globalPlayer globalPlayer--pro globalPlayer--collapsible" aria-label="Site music player">
-      <div className="globalPlayerLiveBg" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-        <span />
-      </div>
-      <img className="globalPlayerCover" src={cover} alt="" width={44} height={44} />
-      <div className="globalPlayerMeta">
-        <span>Now playing</span>
-        <strong className="shimmerText">{m.activeTitle}</strong>
-      </div>
-      <div className="globalPlayerControls">
-        <button type="button" className="gpBtn" onClick={m.prev} aria-label="Previous song">
-          ‹‹
-        </button>
-        <button type="button" className="gpBtn gpPlay" onClick={m.toggle} aria-label={m.isPlaying ? 'Pause' : 'Play'}>
-          {m.isPlaying ? '❚❚' : '▶'}
-        </button>
-        <button type="button" className="gpBtn" onClick={m.next} aria-label="Next song">
-          ››
-        </button>
-      </div>
-      <label className="gpVolume">
-        <span className="srOnly">Volume</span>
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={m.muted ? 0 : m.volume}
-          onChange={(e) => m.setVolume(Number(e.target.value))}
-          aria-label="Volume"
-        />
-      </label>
-      <button type="button" className="gpBtn gpMute" onClick={() => m.setMuted(!m.muted)} aria-label={m.muted ? 'Unmute' : 'Mute'}>
-        {m.muted || m.volume === 0 ? 'Muted' : 'Mute'}
-      </button>
-      <button
-        type="button"
-        className="gpBtn gpCollapseBtn"
-        onClick={toggleCollapsed}
-        aria-expanded
-        aria-label="Collapse now playing bar"
-        title="Collapse now playing bar"
-      >
-        ▼ Hide
-      </button>
-    </div>
-  );
+  return null;
 }
