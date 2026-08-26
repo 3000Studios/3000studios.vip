@@ -68,6 +68,7 @@ export const featureSong = {
 } as const;
 
 export const rolloutSongs: CatalogSong[] = [
+  enrich(0, 'not-giving-up-tonight', 'Not Giving Up Tonight', 'DistroKid live · Official music video on YouTube @3000Studio.', '/media/always-feel-like.mp3'),
   enrich(1, 'lick-my-balls-jazz', 'Lick My Balls, and Die in a Fire — Jazz Edition', 'Feature song of the week · Jazz edition · 3000 Studios original.', '/media/lick-my-balls-jazz.mp3'),
   enrich(2, 'lick-my-balls-remix', 'Lick My Balls, and Die in a Fire — Remix', 'Feature song remix · Devil DJ cut · 3000 Studios original.', '/media/lick-my-balls-remix.mp3'),
   enrich(3, 'always-late', 'Always Late', '3000 Studios original from the VIP music vault.', '/media/always-late.mp3'),

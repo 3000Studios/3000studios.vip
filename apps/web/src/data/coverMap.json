@@ -1,4 +1,14 @@
 {
+  "not-giving-up-tonight": {
+    "cover": "/media/covers/not-giving-up-tonight.jpg",
+    "palette": {
+      "a": "hsl(45 80% 50%)",
+      "b": "hsl(12 75% 42%)",
+      "c": "hsl(220 40% 20%)",
+      "gold": "#d4af37"
+    },
+    "wallpaper": "goldwave"
+  },
   "lick-my-balls-jazz": {
     "cover": "/media/covers/lick-my-balls-jazz.jpg",
     "palette": {

@@ -316,11 +316,24 @@ export function Home() {
             <BeatDancingTitle text="3000 Studios" />
             <motion.p variants={fadeUp}>A premium music and video destination with live streaming, animated sound-reactive wallpapers, sponsor-ready pages, community requests, and VIP creator operations.</motion.p>
             <motion.div className="heroActions" variants={fadeUp}>
-              <StudioButton to="/live">Watch Live</StudioButton>
+              <StudioButton href="https://www.youtube.com/@3000Studio?sub_confirmation=1">Subscribe on YouTube</StudioButton>
               <StudioButton to="/music" variant="secondary">Hear Music</StudioButton>
+              <StudioButton to="/live" variant="ghost">Watch Live</StudioButton>
               <StudioButton href={checkoutHref} variant="ghost">Buy Or Book</StudioButton>
             </motion.div>
           </motion.div>
+        </section>
+
+        <section className="ytSubscribeBar" aria-label="YouTube subscribe">
+          <div className="ytSubscribeInner">
+            <p className="ytSubscribeKicker">Official artist channel</p>
+            <h2>Watch the videos. Subscribe @3000Studio.</h2>
+            <p>New official videos, DistroKid releases, and 3000 Studios drops. Tap subscribe so YouTube actually shows you the next one.</p>
+            <div className="heroActions">
+              <StudioButton href="https://www.youtube.com/@3000Studio?sub_confirmation=1">Subscribe</StudioButton>
+              <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">Not Giving Up Tonight</StudioButton>
+            </div>
+          </div>
         </section>
 
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
