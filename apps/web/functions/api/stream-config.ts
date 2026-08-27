@@ -25,7 +25,9 @@ export async function onRequestPost({ request, env }: { request: Request; env: E
     });
   }
 
-  const whipUrl = env.STREAM_WHIP_URL?.trim() || '';
+  const whipUrl =
+    env.STREAM_WHIP_URL?.trim() ||
+    'https://customer-wx8j23tjjjpkb37k.cloudflarestream.com/aec35a431bd94081d29586ba38b83e25k3e4ea5b57e0ce5cc54fd519ba2b7ae7d/webRTC/publish';
   return new Response(
     JSON.stringify({
       ok: Boolean(whipUrl),
