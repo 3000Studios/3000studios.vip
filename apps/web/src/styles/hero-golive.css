@@ -1,0 +1,106 @@
+/* Homepage feature player + phone go-live */
+.heroPlayer {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  max-width: 560px;
+  margin: 18px auto 0;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(12,10,8,.72), rgba(8,6,4,.88));
+  border: 1px solid rgba(212,175,55,.45);
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  text-align: left;
+}
+.heroPlayerArt {
+  width: 88px;
+  height: 88px;
+  border-radius: 16px;
+  object-fit: cover;
+  background: #1a1208;
+}
+.heroPlayerMeta { min-width: 0; flex: 1; }
+.heroPlayerMeta small {
+  display: block;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #d4af37;
+  font-size: 11px;
+}
+.heroPlayerMeta strong {
+  display: block;
+  margin: 4px 0 10px;
+  font-size: 20px;
+  color: #fff7d6;
+}
+.heroPlayerControls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.heroPlayBtn {
+  min-width: 84px;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffd700;
+  color: #160d00;
+  font-weight: 800;
+  cursor: pointer;
+}
+.heroVol { display: flex; align-items: center; gap: 8px; color: #f3e6b4; font-size: 12px; }
+.heroVol input { width: 120px; accent-color: #ffd700; }
+
+.phoneGoLive {
+  min-height: 100dvh;
+  background: #070605;
+  color: #fff7d6;
+  display: flex;
+  flex-direction: column;
+}
+.phoneGoLiveLock { align-items: center; justify-content: center; padding: 24px; }
+.phoneGoLiveCard {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(212,175,55,.4);
+  background: #120e09;
+}
+.phoneGoLiveCard input, .phoneGoLiveCard button {
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid rgba(212,175,55,.35);
+}
+.phoneGoLiveCard button { background: #ffd700; color: #160d00; font-weight: 800; }
+.phoneGoLiveBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+}
+.phoneGoLiveBar a { color: #ffd700; }
+.phoneGoLiveVideo {
+  flex: 1;
+  width: 100%;
+  background: #000;
+  object-fit: cover;
+  min-height: 48vh;
+}
+.phoneGoLiveDock { padding: 16px 16px calc(20px + env(safe-area-inset-bottom)); text-align: center; }
+.phoneGoLiveDock .is-live { color: #ff4d4d; font-weight: 800; letter-spacing: .08em; }
+.phoneGoLiveActions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+.phoneGoLiveStart, .phoneGoLiveStop, .phoneGoLiveFlip {
+  min-width: 140px;
+  height: 52px;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.phoneGoLiveStart { background: #e10600; color: #fff; }
+.phoneGoLiveStop { background: #222; color: #fff; border: 1px solid #666; }
+.phoneGoLiveFlip { background: transparent; color: #ffd700; border: 1px solid rgba(212,175,55,.45); }
+.phoneGoLiveErr { color: #ff8a8a; }
+
+@media (max-width: 720px) {
+  .heroPlayer { flex-direction: column; text-align: center; }
+  .heroPlayerControls { justify-content: center; }
+}
