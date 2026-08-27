@@ -24,12 +24,12 @@ export const STREAM_CUSTOMER_CODE =
 export const STREAM_PLAYER_UID =
   import.meta.env.VITE_STREAM_PLAYER_UID?.toString().trim() ||
   import.meta.env.VITE_STREAM_VIDEO_UID?.toString().trim() ||
-  '3f100cf1895b63cf27b748c69c8ba10c';
+  '3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
 
-/** Live input for WHIP/RTMPS *publish* (admin go-live). Different from player UID. */
+/** Live input for WHIP/RTMPS publish and WHEP playback (phone + admin). */
 export const STREAM_LIVE_INPUT_ID =
   import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() ||
-  '654382980fc1896d6e16b1e66a299bd6';
+  '3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
 
 /**
  * Browser ultra-low latency **publish** (WHIP).
@@ -38,9 +38,15 @@ export const STREAM_LIVE_INPUT_ID =
  * Override with VITE_STREAM_WHIP_URL if keys rotate.
  */
 export const STREAM_WHIP_PUBLISH_URL =
-  import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() || '';
+  import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() ||
+  'https://customer-wx8j23tjjjpkb37k.cloudflarestream.com/aec35a431bd94081d29586ba38b83e25k3e4ea5b57e0ce5cc54fd519ba2b7ae7d/webRTC/publish';
 
-// ─── URL builders ─────────────────────────────────────────────
+/** OBS / encoder stream key for the same live input. */
+export const STREAM_RTMPS_PUBLISH_KEY =
+  import.meta.env.VITE_STREAM_RTMPS_PUBLISH_KEY?.toString().trim() ||
+  '75c893f2c0aedfe17eb91d2761a54d45k3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
+
+// ─── URL builders ─────────────────────────────
 
 export function buildStreamPlayerUrl(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
   return `https://customer-${customer}.cloudflarestream.com/${uid}/iframe`;

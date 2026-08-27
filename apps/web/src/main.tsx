@@ -20,6 +20,7 @@ import {
   VideoPage,
 } from './pages/Home';
 import { LiveStreamPage } from './pages/LiveStreamPage';
+import { PhoneGoLive } from './pages/PhoneGoLive';
 import { ConceptBoard } from './pages/ConceptBoard';
 import { AuthProvider } from './lib/auth';
 import { initVelvetMachine } from './lib/velvetEngine';
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
       { path: '/music', element: <MusicShowcase /> },
       { path: '/video', element: <VideoPage /> },
       { path: '/live', element: <LiveStreamPage /> },
+      { path: '/go-live', element: <PhoneGoLive /> },
       { path: '/concepts', element: <ConceptBoard /> },
       { path: '/community', element: <CommunityPage /> },
       { path: '/requests', element: <RequestsPage /> },
