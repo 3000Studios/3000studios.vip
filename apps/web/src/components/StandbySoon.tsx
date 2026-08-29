@@ -86,7 +86,7 @@ export function StandbySoon({
       window.removeEventListener('touchstart', unlock);
       window.removeEventListener('keydown', unlock);
     };
-  }, [song?.src, musicOn, playlist.length, shuffle]);
+  }, [song, musicOn, playlist.length, shuffle]);
 
   const textStyle: CSSProperties = {
     position: 'absolute',

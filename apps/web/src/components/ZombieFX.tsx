@@ -120,8 +120,6 @@ function detachHands(el: HTMLElement) {
 export function ZombieFX() {
   const navigate = useNavigate();
   const busy = useRef(new WeakSet<Element>());
-  const navigateRef = useRef(navigate);
-  navigateRef.current = navigate;
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
@@ -183,7 +181,7 @@ export function ZombieFX() {
         document.documentElement.classList.remove('zombie-dust-warp');
 
         if (isInternal && href) {
-          navigateRef.current(href);
+          navigate(href);
         } else if (isExternal && href) {
           if (href.startsWith('mailto:')) {
             window.location.href = href;
@@ -211,7 +209,7 @@ export function ZombieFX() {
       document.removeEventListener('click', onClick, true);
       document.documentElement.classList.remove('zombie-dust-warp');
     };
-  }, []);
+  }, [navigate]);
 
   return <div className="zombieFxLayer" aria-hidden="true" />;
 }

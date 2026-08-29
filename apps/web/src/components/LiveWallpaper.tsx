@@ -200,7 +200,7 @@ export function LiveWallpaper({
       window.removeEventListener('pointermove', onPointer);
       window.removeEventListener('touchmove', onTouch);
     };
-  }, [variant, palette.a, palette.b, palette.c, palette.gold, intensity]);
+  }, [variant, palette, intensity]);
 
   return (
     <div className={`liveWallpaper liveWallpaper-${variant}`} aria-hidden="true">
