@@ -2588,7 +2588,55 @@ body {
 .officialVideoGrid small { color: rgba(244,239,231,.68); }
 @media (max-width: 980px) { .officialCinemaFeature { grid-template-columns: 1fr; } .officialVideoGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 700px) { .dkOfficialEmbed,.officialCinemaFeature iframe { min-height: 220px; } .officialVideoGrid { grid-template-columns: 1fr; } }
+
+.releaseCarousel {
+  --carousel-radius: clamp(330px, 35vw, 520px);
+  position: relative;
+  min-height: 460px;
+  margin-top: clamp(1.5rem, 5vw, 4rem);
+  overflow: hidden;
+  border-block: 1px solid rgba(246,199,95,.18);
+  outline: none;
+  touch-action: pan-y;
+  user-select: none;
+}
+.releaseCarousel:focus-visible { box-shadow: inset 0 0 0 3px rgba(255,255,255,.9); }
+.releaseCarouselHint { margin: 1rem 0 0; color: rgba(255,246,228,.72); text-align: center; font-size: .83rem; letter-spacing: .12em; text-transform: uppercase; }
+.releaseCarouselViewport { height: 360px; perspective: 1100px; perspective-origin: 50% 44%; }
+.releaseCarouselRing { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .75s cubic-bezier(.2,.75,.2,1); }
+.releaseCarouselCard {
+  position: absolute;
+  top: 64px;
+  left: 50%;
+  width: clamp(164px, 19vw, 230px);
+  min-height: 190px;
+  margin-left: clamp(-115px, -9.5vw, -82px);
+  padding: 0 0 .8rem;
+  overflow: hidden;
+  border: 1px solid rgba(246,199,95,.32);
+  border-radius: 14px;
+  background: rgba(3,7,10,.96);
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  backface-visibility: hidden;
+  box-shadow: 0 18px 44px rgba(0,0,0,.42);
+  transition: border-color .25s ease, box-shadow .25s ease, opacity .25s ease;
+}
+.releaseCarouselCard:hover,.releaseCarouselCard:focus-visible { border-color: #fff; box-shadow: 0 22px 50px rgba(0,0,0,.58),0 0 24px rgba(246,199,95,.32); outline: none; }
+.releaseCarouselCard.is-playing { border-color: #1ef078; box-shadow: 0 0 0 2px rgba(30,240,120,.22),0 22px 54px rgba(0,0,0,.55); }
+.releaseCarouselCard .releasePreviewTitle { display: block; min-height: 2.3em; padding-top: .7rem; }
+.releaseCarouselControls { position: absolute; inset: auto 0 18px; display: flex; align-items: center; justify-content: center; gap: 1rem; z-index: 20; }
+.releaseCarouselControls button { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; background: rgba(3,7,10,.82); color: #fff; font-size: 1.8rem; cursor: pointer; }
+.releaseCarouselControls span { min-width: 4rem; color: #d4af37; text-align: center; font-weight: 900; }
+@media (max-width: 700px) {
+  .releaseCarousel { --carousel-radius: 245px; min-height: 400px; margin-inline: calc(50% - 50vw); }
+  .releaseCarouselViewport { height: 315px; perspective: 850px; }
+  .releaseCarouselCard { top: 58px; width: 164px; min-height: 164px; margin-left: -82px; }
+  .releaseCarouselHint { padding-inline: 1rem; font-size: .7rem; }
+}
 @media (prefers-reduced-motion: reduce) {
   .dkChip,.officialVideoGrid button,.releasePreviewArt img,.releasePreviewPlay { transition: none; }
   .dkChip:hover,.officialVideoGrid button:hover { transform: none; }
+  .releaseCarouselRing { transition: none; }
 }

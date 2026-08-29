@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { type SongPalette } from '../data/music';
@@ -378,10 +378,109 @@ export function Home() {
   );
 }
 
+function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number; onSelect: (index: number) => void }) {
+  const [frontIndex, setFrontIndex] = useState(activeIndex);
+  const [paused, setPaused] = useState(false);
+  const dragStart = useRef<number | null>(null);
+  const suppressClick = useRef(false);
+  const count = officialReleaseVideos.length;
+  const step = 360 / count;
+
+  useEffect(() => {
+    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setInterval(() => setFrontIndex((index) => (index + 1) % count), 2400);
+    return () => window.clearInterval(timer);
+  }, [count, paused]);
+
+  const move = (direction: number) => setFrontIndex((index) => (index + direction + count) % count);
+  const select = (index: number) => {
+    if (suppressClick.current) {
+      suppressClick.current = false;
+      return;
+    }
+    setFrontIndex(index);
+    onSelect(index);
+  };
+  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
+    dragStart.current = event.clientX;
+    suppressClick.current = false;
+    setPaused(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const endDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (dragStart.current === null) return;
+    const distance = event.clientX - dragStart.current;
+    dragStart.current = null;
+    if (Math.abs(distance) > 38) {
+      suppressClick.current = true;
+      move(distance < 0 ? 1 : -1);
+    }
+  };
+
+  return (
+    <div
+      className="releaseCarousel"
+      role="region"
+      aria-label="Official release preview carousel"
+      tabIndex={0}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false);
+      }}
+      onPointerDown={startDrag}
+      onPointerUp={endDrag}
+      onPointerCancel={() => { dragStart.current = null; }}
+      onKeyDown={(event) => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+          event.preventDefault();
+          move(event.key === 'ArrowRight' ? 1 : -1);
+        }
+      }}
+    >
+      <p className="releaseCarouselHint">Swipe or use arrows · Tap a thumbnail to play</p>
+      <div className="releaseCarouselViewport">
+        <div className="releaseCarouselRing" style={{ transform: `rotateY(${-frontIndex * step}deg)` }}>
+          {officialReleaseVideos.map((release, index) => (
+            <button
+              type="button"
+              key={release.videoId}
+              className={index === activeIndex ? 'releaseCarouselCard is-playing' : 'releaseCarouselCard'}
+              style={{ transform: `rotateY(${index * step}deg) translateZ(var(--carousel-radius))` }}
+              onClick={() => select(index)}
+              aria-label={`Play ${release.title} in the main player`}
+              aria-pressed={index === activeIndex}
+              tabIndex={index === frontIndex ? 0 : -1}
+            >
+              <span className="releasePreviewArt">
+                <img src={youtubeArtworkUrl(release.videoId)} alt={`${release.title} video thumbnail`} loading="lazy" draggable="false" />
+                <span className="releasePreviewPlay" aria-hidden="true">▶</span>
+                <small>{release.duration}</small>
+              </span>
+              <span className="releasePreviewTitle">{release.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="releaseCarouselControls">
+        <button type="button" onClick={() => move(-1)} aria-label="Previous release">‹</button>
+        <span>{frontIndex + 1} / {count}</span>
+        <button type="button" onClick={() => move(1)} aria-label="Next release">›</button>
+      </div>
+    </div>
+  );
+}
+
 export function MusicShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const playerRef = useRef<HTMLDivElement | null>(null);
   const activeSong = officialReleaseVideos[activeIndex] ?? officialReleaseVideos[0];
   const pick = (index: number) => setActiveIndex(((index % officialReleaseVideos.length) + officialReleaseVideos.length) % officialReleaseVideos.length);
+  const preview = (index: number) => {
+    pick(index);
+    window.setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
+  };
 
   return (
     <PublicLayout variant="vortex">
@@ -390,7 +489,7 @@ export function MusicShowcase() {
         <div className="dkArtDim" aria-hidden="true" />
         <section className="dkStage" aria-label="DistroKid releases">
           <p className="vipKicker dkKicker">DistroKid · Official YouTube catalog</p>
-          <div className="dkDock">
+          <div className="dkDock" ref={playerRef}>
             <button type="button" className="dkArrow" onClick={() => pick(activeIndex - 1)} aria-label="Previous release">
               ‹
             </button>
@@ -409,26 +508,7 @@ export function MusicShowcase() {
               ›
             </button>
           </div>
-          <div className="dkStrip" role="list">
-            {officialReleaseVideos.map((song, index) => (
-              <button
-                type="button"
-                role="listitem"
-                key={song.videoId}
-                className={index === activeIndex ? 'dkChip is-on' : 'dkChip'}
-                onClick={() => pick(index)}
-                aria-label={`Preview ${song.title}`}
-                aria-pressed={index === activeIndex}
-              >
-                <span className="releasePreviewArt">
-                  <img src={youtubeArtworkUrl(song.videoId)} alt={`${song.title} video thumbnail`} loading="lazy" />
-                  <span className="releasePreviewPlay" aria-hidden="true">▶</span>
-                  <small>{song.duration}</small>
-                </span>
-                <span className="releasePreviewTitle">{song.title}</span>
-              </button>
-            ))}
-          </div>
+          <ReleaseCarousel key={`music-${activeIndex}`} activeIndex={activeIndex} onSelect={preview} />
         </section>
       </main>
     </PublicLayout>
@@ -437,7 +517,13 @@ export function MusicShowcase() {
 
 export function VideoPage() {
   const [featuredVideoId, setFeaturedVideoId] = useState(officialReleaseVideos[0].videoId);
+  const playerRef = useRef<HTMLDivElement | null>(null);
   const featured = officialReleaseVideos.find((video) => video.videoId === featuredVideoId) ?? officialReleaseVideos[0];
+  const activeIndex = officialReleaseVideos.findIndex((video) => video.videoId === featured.videoId);
+  const preview = (index: number) => {
+    setFeaturedVideoId(officialReleaseVideos[index].videoId);
+    window.setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
+  };
   return (
     <PublicLayout variant="electric">
       <main className="vipMain videoPage">
@@ -447,13 +533,11 @@ export function VideoPage() {
           <motion.p variants={fadeUp}>Only DistroKid-confirmed releases matched to the Official Artist Channel are included.</motion.p>
         </motion.section>
         <section className="officialCinema">
-          <div className="officialCinemaFeature">
+          <div className="officialCinemaFeature" ref={playerRef}>
             <iframe src={youtubeEmbedUrl(featured.videoId)} title={`${featured.title} official music video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
             <div><span className="vipKicker">Now screening</span><h2>{featured.title}</h2><p>{featured.release} · {featured.duration}</p><a className="studioButton secondary" href={youtubeWatchUrl(featured.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a></div>
           </div>
-          <div className="officialVideoGrid">
-            {officialReleaseVideos.map((video) => <button key={video.videoId} type="button" onClick={() => setFeaturedVideoId(video.videoId)} aria-current={video.videoId === featured.videoId ? 'true' : undefined} aria-label={`Preview ${video.title}`}><span className="releasePreviewArt"><img src={youtubeArtworkUrl(video.videoId)} alt={`${video.title} video thumbnail`} loading="lazy" /><span className="releasePreviewPlay" aria-hidden="true">▶</span><small>{video.duration}</small></span><span>{video.title}</span><small>{video.release}</small></button>)}
-          </div>
+          <ReleaseCarousel key={`video-${activeIndex}`} activeIndex={activeIndex} onSelect={preview} />
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
       </main>
