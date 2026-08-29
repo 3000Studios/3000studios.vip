@@ -49,6 +49,8 @@ export const featureSong = {
   title: 'Lick My Balls, and Die in a Fire',
   artist: '3000 Studios',
   weekLabel: 'Feature Song of the Week',
+  src: '/media/lick-my-balls-jazz.mp3',
+  cover: '/media/covers/lick-my-balls-jazz.jpg',
   jazz: {
     id: 'lick-my-balls-jazz',
     label: 'Jazz Edition',

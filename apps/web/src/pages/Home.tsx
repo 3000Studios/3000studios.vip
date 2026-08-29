@@ -1,7 +1,14 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { distrokidSongs, type SongPalette } from '../data/music';
+import { type SongPalette } from '../data/music';
+import {
+  OFFICIAL_YOUTUBE_CHANNEL_URL,
+  officialReleaseVideos,
+  youtubeArtworkUrl,
+  youtubeEmbedUrl,
+  youtubeWatchUrl,
+} from '../data/officialReleases';
 import { getDailyBlogPosts } from '../data/blog';
 import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
@@ -372,70 +379,46 @@ export function Home() {
 }
 
 export function MusicShowcase() {
-  const catalog = distrokidSongs;
   const [activeIndex, setActiveIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const activeSong = catalog[activeIndex] ?? catalog[0];
-  const artBg = `/media/covers/${activeSong.slug}-bg.jpg`;
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.src = activeSong.src;
-    if (playing) void audio.play().catch(() => setPlaying(false));
-  }, [activeSong.src, playing]);
-
-  const pick = (index: number, autoplay = true) => {
-    const next = ((index % catalog.length) + catalog.length) % catalog.length;
-    setActiveIndex(next);
-    if (autoplay) setPlaying(true);
-  };
+  const activeSong = officialReleaseVideos[activeIndex] ?? officialReleaseVideos[0];
+  const pick = (index: number) => setActiveIndex(((index % officialReleaseVideos.length) + officialReleaseVideos.length) % officialReleaseVideos.length);
 
   return (
     <PublicLayout variant="vortex">
       <main className="vipMain dkMusicPage">
-        <div className="dkArtFill" style={{ backgroundImage: `url(${artBg}), url(${activeSong.cover})` }} aria-hidden="true" />
+        <div className="dkArtFill" style={{ backgroundImage: `url(${youtubeArtworkUrl(activeSong.videoId)})` }} aria-hidden="true" />
         <div className="dkArtDim" aria-hidden="true" />
         <section className="dkStage" aria-label="DistroKid releases">
-          <p className="vipKicker dkKicker">DistroKid · Live catalog</p>
+          <p className="vipKicker dkKicker">DistroKid · Official YouTube catalog</p>
           <div className="dkDock">
-            <button type="button" className="dkArrow" onClick={() => pick(activeIndex - 1)} aria-label="Previous release" disabled={catalog.length < 2}>
+            <button type="button" className="dkArrow" onClick={() => pick(activeIndex - 1)} aria-label="Previous release">
               ‹
             </button>
             <div className="dkHero">
-              <button type="button" className="dkCoverWrap" onClick={() => setPlaying((p) => !p)} aria-label={playing ? 'Pause' : 'Play'}>
-                <img className="dkCover" src={activeSong.cover} alt={`${activeSong.title} artwork`} />
-                <span className="dkPlayBadge">{playing ? '❚❚' : '▶'}</span>
-              </button>
+              <iframe className="dkOfficialEmbed" src={youtubeEmbedUrl(activeSong.videoId)} title={`${activeSong.title} official video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
               <div className="dkMeta">
                 <h1>{activeSong.title}</h1>
-                <p>3000 Studios · DistroKid</p>
+                <p>3000 Studios · {activeSong.release} · {activeSong.duration}</p>
                 <div className="dkActions">
-                  <button type="button" className="studioButton ytCta" onClick={() => setPlaying((p) => !p)}>
-                    {playing ? 'Pause' : 'Play'}
-                  </button>
-                  <a className="studioButton secondary" href="https://www.youtube.com/watch?v=tIY1WU9N_RU" target="_blank" rel="noreferrer">
-                    Watch video
-                  </a>
+                  <a className="studioButton ytCta" href={youtubeWatchUrl(activeSong.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a>
+                  <a className="studioButton secondary" href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">Official channel</a>
                 </div>
-                <audio ref={audioRef} preload="auto" onEnded={() => pick(activeIndex + 1)} />
               </div>
             </div>
-            <button type="button" className="dkArrow" onClick={() => pick(activeIndex + 1)} aria-label="Next release" disabled={catalog.length < 2}>
+            <button type="button" className="dkArrow" onClick={() => pick(activeIndex + 1)} aria-label="Next release">
               ›
             </button>
           </div>
           <div className="dkStrip" role="list">
-            {catalog.map((song, index) => (
+            {officialReleaseVideos.map((song, index) => (
               <button
                 type="button"
                 role="listitem"
-                key={song.slug}
+                key={song.videoId}
                 className={index === activeIndex ? 'dkChip is-on' : 'dkChip'}
                 onClick={() => pick(index)}
               >
-                <img src={song.cover} alt="" />
+                <img src={youtubeArtworkUrl(song.videoId)} alt="" loading="lazy" />
                 <span>{song.title}</span>
               </button>
             ))}
@@ -447,29 +430,24 @@ export function MusicShowcase() {
 }
 
 export function VideoPage() {
+  const [featuredVideoId, setFeaturedVideoId] = useState(officialReleaseVideos[0].videoId);
+  const featured = officialReleaseVideos.find((video) => video.videoId === featuredVideoId) ?? officialReleaseVideos[0];
   return (
     <PublicLayout variant="electric">
       <main className="vipMain videoPage">
         <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Video content</motion.span>
-          <motion.h1 variants={fadeUp}>High-definition rollout visuals for music, creators, and sponsors.</motion.h1>
-          <motion.p variants={fadeUp}>Watch the Cloudflare Stream feed and the 3000 Studios opening video. Live broadcast tools stay on the Live page and owner console.</motion.p>
+          <motion.span className="vipKicker" variants={fadeUp}>Official music videos</motion.span>
+          <motion.h1 variants={fadeUp}>Watch here. Support the official 3000 Studios channel.</motion.h1>
+          <motion.p variants={fadeUp}>Only DistroKid-confirmed releases matched to the Official Artist Channel are included.</motion.p>
         </motion.section>
-        <section className="videoGrid videoGrid--stream" aria-label="Video content">
-          <article className="videoStreamSlot vipCard videoPageCard">
-            <h2>Cloudflare Stream</h2>
-            <p>Hosted Stream player for the featured 3000 Studios video feed.</p>
-            <div className="videoPlayerFrame"><CloudflareStreamPlayer title="3000 Studios featured stream" /></div>
-          </article>
-          <article className="vipCard videoPageCard videoPageFeature">
-            <h2>Opening video</h2>
-            <p>Site intro asset for the homepage red-carpet hero.</p>
-            <div className="videoPlayerFrame"><video className="featureVideo" src={INTRO_VIDEO} controls playsInline preload="metadata" /></div>
-            <div className="videoPageActions">
-              <StudioButton to="/live">Watch Live</StudioButton>
-              <StudioButton to="/sponsors" variant="secondary">Sponsor A Video</StudioButton>
-            </div>
-          </article>
+        <section className="officialCinema">
+          <div className="officialCinemaFeature">
+            <iframe src={youtubeEmbedUrl(featured.videoId)} title={`${featured.title} official music video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+            <div><span className="vipKicker">Now screening</span><h2>{featured.title}</h2><p>{featured.release} · {featured.duration}</p><a className="studioButton secondary" href={youtubeWatchUrl(featured.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a></div>
+          </div>
+          <div className="officialVideoGrid">
+            {officialReleaseVideos.map((video) => <button key={video.videoId} type="button" onClick={() => setFeaturedVideoId(video.videoId)} aria-current={video.videoId === featured.videoId ? 'true' : undefined}><img src={youtubeArtworkUrl(video.videoId)} alt="" loading="lazy" /><span>{video.title}</span><small>{video.duration} · {video.release}</small></button>)}
+          </div>
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
       </main>
