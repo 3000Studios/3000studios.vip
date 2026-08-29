@@ -417,9 +417,15 @@ export function MusicShowcase() {
                 key={song.videoId}
                 className={index === activeIndex ? 'dkChip is-on' : 'dkChip'}
                 onClick={() => pick(index)}
+                aria-label={`Preview ${song.title}`}
+                aria-pressed={index === activeIndex}
               >
-                <img src={youtubeArtworkUrl(song.videoId)} alt="" loading="lazy" />
-                <span>{song.title}</span>
+                <span className="releasePreviewArt">
+                  <img src={youtubeArtworkUrl(song.videoId)} alt={`${song.title} video thumbnail`} loading="lazy" />
+                  <span className="releasePreviewPlay" aria-hidden="true">▶</span>
+                  <small>{song.duration}</small>
+                </span>
+                <span className="releasePreviewTitle">{song.title}</span>
               </button>
             ))}
           </div>
@@ -446,7 +452,7 @@ export function VideoPage() {
             <div><span className="vipKicker">Now screening</span><h2>{featured.title}</h2><p>{featured.release} · {featured.duration}</p><a className="studioButton secondary" href={youtubeWatchUrl(featured.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a></div>
           </div>
           <div className="officialVideoGrid">
-            {officialReleaseVideos.map((video) => <button key={video.videoId} type="button" onClick={() => setFeaturedVideoId(video.videoId)} aria-current={video.videoId === featured.videoId ? 'true' : undefined}><img src={youtubeArtworkUrl(video.videoId)} alt="" loading="lazy" /><span>{video.title}</span><small>{video.duration} · {video.release}</small></button>)}
+            {officialReleaseVideos.map((video) => <button key={video.videoId} type="button" onClick={() => setFeaturedVideoId(video.videoId)} aria-current={video.videoId === featured.videoId ? 'true' : undefined} aria-label={`Preview ${video.title}`}><span className="releasePreviewArt"><img src={youtubeArtworkUrl(video.videoId)} alt={`${video.title} video thumbnail`} loading="lazy" /><span className="releasePreviewPlay" aria-hidden="true">▶</span><small>{video.duration}</small></span><span>{video.title}</span><small>{video.release}</small></button>)}
           </div>
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
