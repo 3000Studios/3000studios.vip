@@ -35,6 +35,7 @@ import {
   shouldPersistLearning,
   toDudeMessages,
 } from './dude';
+import { requireOwnerAccess } from './access';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -58,8 +59,8 @@ app.use('*', async (c, next) => {
       await next();
       return;
     }
-    const token = c.req.header('cf-access-jwt-assertion');
-    if (!token) return c.json({ error: 'unauthorized' }, 401);
+    const access = await requireOwnerAccess(c.req.raw, env);
+    if (!access.ok) return c.json({ error: access.error }, access.status as 401 | 403 | 503);
   }
   await next();
 });

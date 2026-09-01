@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">3000 Studios Agent</string>
+    <string name="accessibility_description">Allows the owner to ask the agent to perform visible actions. The service never enters payment codes or confirms email sends.</string>
+</resources>

@@ -15,6 +15,8 @@ type MusicApi = {
   isPlaying: boolean;
   muted: boolean;
   volume: number;
+  currentTime: number;
+  duration: number;
   activeIndex: number;
   activeSong: CatalogSong;
   activeTitle: string;
@@ -25,6 +27,7 @@ type MusicApi = {
   prev: () => void;
   setVolume: (v: number) => void;
   setMuted: (m: boolean) => void;
+  seekTo: (seconds: number) => void;
   playTrack: (src: string, title: string) => void;
   playIndex: (i: number) => void;
 };
@@ -62,13 +65,6 @@ function applySongTheme(song?: CatalogSong | null) {
   );
 }
 
-function shuffleIndex(max: number, avoid?: number) {
-  if (max <= 1) return 0;
-  let i = Math.floor(Math.random() * max);
-  if (avoid !== undefined && i === avoid) i = (i + 1) % max;
-  return i;
-}
-
 /**
  * Persistent site-wide music — mounted once at app root so route changes never reset playback.
  */
@@ -79,11 +75,15 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
 
-  const startIndex = useMemo(() => shuffleIndex(rolloutSongs.length), []);
+  // The public player opens on the evidence-backed DistroKid release instead
+  // of a random local-vault item.
+  const startIndex = 0;
   const [activeIndex, setActiveIndex] = useState(startIndex);
   const [isPlaying, setIsPlaying] = useState(false);
   const [muted, setMutedState] = useState(false);
   const [volume, setVolumeState] = useState(0.42);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const activeSong = rolloutSongs[activeIndex] ?? rolloutSongs[0];
   const activeTitle = activeSong?.title ?? featureSong.title;
 
@@ -191,21 +191,20 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     if (audioRef.current) audioRef.current.muted = m;
   }, []);
 
-  // Initial load — start random track once
+  const seekTo = useCallback((seconds: number) => {
+    const audio = audioRef.current;
+    if (!audio || !Number.isFinite(seconds)) return;
+    audio.currentTime = Math.min(audio.duration || 0, Math.max(0, seconds));
+    setCurrentTime(audio.currentTime);
+  }, []);
+
+  // Load metadata only. Playback must always come from an explicit music control.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
     playIndex(startIndex);
-    const unlock = () => {
-      void ctxRef.current?.resume();
-      void audio.play().then(() => setIsPlaying(true)).catch(() => undefined);
-    };
-    window.addEventListener('pointerdown', unlock, { once: true });
-    window.addEventListener('touchstart', unlock, { once: true });
     return () => {
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('touchstart', unlock);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -217,6 +216,23 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     audio?.addEventListener('ended', onEnded);
     return () => audio?.removeEventListener('ended', onEnded);
   }, [activeIndex, playIndex]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const sync = () => {
+      setCurrentTime(audio.currentTime || 0);
+      setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
+    };
+    audio.addEventListener('timeupdate', sync);
+    audio.addEventListener('loadedmetadata', sync);
+    audio.addEventListener('durationchange', sync);
+    return () => {
+      audio.removeEventListener('timeupdate', sync);
+      audio.removeEventListener('loadedmetadata', sync);
+      audio.removeEventListener('durationchange', sync);
+    };
+  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -243,6 +259,8 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       isPlaying,
       muted,
       volume,
+      currentTime,
+      duration,
       activeIndex,
       activeSong,
       activeTitle,
@@ -253,6 +271,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       prev,
       setVolume,
       setMuted,
+      seekTo,
       playTrack,
       playIndex,
     }),
@@ -260,6 +279,8 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       isPlaying,
       muted,
       volume,
+      currentTime,
+      duration,
       activeIndex,
       activeSong,
       activeTitle,
@@ -270,6 +291,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       prev,
       setVolume,
       setMuted,
+      seekTo,
       playTrack,
       playIndex,
     ],
@@ -277,7 +299,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   return (
     <MusicContext.Provider value={api}>
-      <audio ref={audioRef} preload="auto" playsInline crossOrigin="anonymous" />
+      <audio ref={audioRef} preload="metadata" playsInline crossOrigin="anonymous" />
       {children}
     </MusicContext.Provider>
   );

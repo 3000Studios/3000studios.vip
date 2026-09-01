@@ -249,7 +249,7 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
       <div className="scrollProgress" aria-hidden="true" />
       <header className="vipHeader vipHeader--epic">
         <Link className="vipLogo" to="/" onClick={() => setOpen(false)} aria-label="3000 Studios VIP home">
-          <span className="logoOrb">3000</span>
+          <img className="officialProfileLogo" src="/media/official-3000-studios-profile.png" alt="" />
           <span className="logoStack">
             <strong className="logoWordmark">3000 Studios</strong>
             <small className="logoSub">VIP Media · Live · Music</small>
