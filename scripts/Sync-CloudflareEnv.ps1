@@ -76,7 +76,7 @@ function New-PagesEnvVar {
 
 $loaded = Import-GlobalEnv -Path $EnvFile
 
-$script:CloudflareToken = Get-EnvValue -Names @('CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_API_TOKEN') -Default $null
+$script:CloudflareToken = Get-EnvValue -Names @('CLOUDFLARE_API_ALL', 'CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_API_TOKEN') -Default $null
 $accountId = Get-EnvValue -Names @('CLOUDFLARE_ACCOUNT_ID') -Default $null
 $projectName = Get-EnvValue -Names @('CF_PAGES_PROJECT') -Default '3000studios-vip'
 if ($PagesProject) {
@@ -84,7 +84,7 @@ if ($PagesProject) {
 }
 
 if (-not $script:CloudflareToken) {
-  throw 'Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_API_TOKEN in global.env.'
+  throw 'Missing CLOUDFLARE_API_ALL, CLOUDFLARE_API_TOKEN, or CLOUDFLARE_ACCOUNT_API_TOKEN in global.env.'
 }
 if (-not $accountId) {
   throw 'Missing CLOUDFLARE_ACCOUNT_ID in global.env.'
@@ -116,7 +116,10 @@ $pagesValues = [ordered]@{
   VITE_VAULT_SECRET_ANSWER_SHA256 = $answerHash
   VITE_STREAM_CUSTOMER_CODE = Get-EnvValue -Names @('VITE_STREAM_CUSTOMER_CODE', 'STREAM_CUSTOMER_CODE') -Default $null
   VITE_STREAM_LIVE_INPUT_ID = Get-EnvValue -Names @('VITE_STREAM_LIVE_INPUT_ID', 'STREAM_LIVE_INPUT_ID') -Default $null
+  VITE_STREAM_PLAYER_UID = Get-EnvValue -Names @('VITE_STREAM_PLAYER_UID', 'STREAM_PLAYER_UID', 'STREAM_VIDEO_UID') -Default $null
   VITE_STREAM_TITLE = Get-EnvValue -Names @('VITE_STREAM_TITLE') -Default '3000 Studios Private Stream'
+  VITE_STRIPE_PAYMENT_LINK = Get-EnvValue -Names @('VITE_STRIPE_PAYMENT_LINK', 'STRIPE_PAYMENT_LINK_PRO') -Default $null
+  VITE_STRIPE_BASIC_LINK = Get-EnvValue -Names @('VITE_STRIPE_BASIC_LINK', 'STRIPE_PAYMENT_LINK_STARTER') -Default $null
   VITE_ADSENSE_CLIENT_ID = Get-EnvValue -Names @('VITE_ADSENSE_CLIENT_ID', 'ADSENSE_CLIENT_ID') -Default 'ca-pub-5800977493749262'
   VITE_ADSENSE_HOME_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_HOME_SLOT', 'ADSENSE_HOME_SLOT') -Default $null
   VITE_ADSENSE_MUSIC_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_MUSIC_SLOT', 'ADSENSE_MUSIC_SLOT') -Default $null
