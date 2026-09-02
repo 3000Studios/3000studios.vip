@@ -19,6 +19,10 @@ import {
 import { PublicLayout } from './Home';
 import '../styles/music-deck.css';
 
+const SPOTIFY_ARTIST = 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik';
+const APPLE_ARTIST = 'https://music.apple.com/us/artist/3000-studios/6802721597';
+const YT_MUSIC = 'https://music.youtube.com/channel/UCTQnEFZUIutrFuDlxGj9cDA';
+
 const normalized = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 function formatTime(value: number) {
@@ -154,7 +158,11 @@ export function MusicDeck() {
         </section>
 
         <nav className="platformLinks" aria-label="Official music platforms">
+          <a href={SPOTIFY_ARTIST} target="_blank" rel="noreferrer">Spotify</a>
+          <a href={APPLE_ARTIST} target="_blank" rel="noreferrer">Apple Music</a>
+          <a href={YT_MUSIC} target="_blank" rel="noreferrer">YouTube Music</a>
           <a href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">YouTube</a>
+          <a href="https://youtu.be/tIY1WU9N_RU" target="_blank" rel="noreferrer">Not Giving Up Tonight</a>
           <Link to="/video">Videos</Link>
           <Link to="/live">Live</Link>
           <Link to="/contact">License / Book</Link>
