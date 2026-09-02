@@ -18,6 +18,15 @@ type Props = {
   onError?: (msg: string | null) => void;
 };
 
+type MediaPermission = 'prompt' | 'granted' | 'denied' | 'unsupported';
+
+type PermissionSnapshot = {
+  camera: MediaPermission;
+  microphone: MediaPermission;
+};
+
+const INITIAL_PERMISSIONS: PermissionSnapshot = { camera: 'prompt', microphone: 'prompt' };
+
 const ROTATIONS: { value: CameraRotation; label: string }[] = [
   { value: 0, label: '0°' },
   { value: 90, label: '90°' },
@@ -46,9 +55,30 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const [error, setError] = useState<string | null>(null);
   const [permHint, setPermHint] = useState(false);
   const [hasCanvas, setHasCanvas] = useState(false);
+  const [permissions, setPermissions] = useState<PermissionSnapshot>(INITIAL_PERMISSIONS);
+  const [checkingAccess, setCheckingAccess] = useState(false);
 
   const canRequestMedia =
     typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia) && window.isSecureContext;
+
+  const refreshPermissions = useCallback(async () => {
+    if (!navigator.permissions?.query) {
+      setPermissions({ camera: 'unsupported', microphone: 'unsupported' });
+      return;
+    }
+
+    const read = async (name: 'camera' | 'microphone'): Promise<MediaPermission> => {
+      try {
+        const result = await navigator.permissions.query({ name } as PermissionDescriptor);
+        return result.state;
+      } catch {
+        return 'unsupported';
+      }
+    };
+
+    const [camera, microphone] = await Promise.all([read('camera'), read('microphone')]);
+    setPermissions({ camera, microphone });
+  }, []);
 
   const applyFraming = useCallback((studio: StreamStudio) => {
     studio.setCameraFraming({ rotation, flipH, flipV, zoom, panX, panY });
@@ -97,6 +127,15 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
   const startPreview = useCallback(
     async (deviceId?: string) => {
+      if (!canRequestMedia) {
+        const msg = 'Camera access requires HTTPS in Chrome. Open the secure 3000studios.vip page and try again.';
+        setError(msg);
+        onError?.(msg);
+        setStatus('error');
+        return false;
+      }
+
+      setCheckingAccess(true);
       setError(null);
       onError?.(null);
       setPermHint(false);
@@ -108,16 +147,28 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         studio.lowerThirdSub = lowerSub;
         applyFraming(studio);
         await studio.openCamera(deviceId || cameraId || undefined, 'user');
+        const preview = studio.getOutputStream(30, true);
+        const cameraTrack = preview.getVideoTracks()[0];
+        const microphoneTrack = preview.getAudioTracks()[0];
+        if (!cameraTrack || cameraTrack.readyState !== 'live' || !microphoneTrack || microphoneTrack.readyState !== 'live') {
+          throw new Error('Camera or microphone did not register. Check Chrome site permissions, then retry.');
+        }
         studio.start();
         mountCanvas();
         await refreshCameraList();
+        await refreshPermissions();
         setStatus((s) => (s === 'live' ? 'live' : 'preview'));
+        return true;
       } catch (err) {
         const msg = describeCameraError(err);
         setError(msg);
         onError?.(msg);
         setStatus('error');
         setPermHint(true);
+        await refreshPermissions();
+        return false;
+      } finally {
+        setCheckingAccess(false);
       }
     },
     [
@@ -130,9 +181,15 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       applyFraming,
       mountCanvas,
       onError,
+      canRequestMedia,
       refreshCameraList,
+      refreshPermissions,
     ],
   );
+
+  useEffect(() => {
+    void refreshPermissions();
+  }, [refreshPermissions]);
 
   useEffect(() => {
     return () => {
@@ -153,6 +210,13 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     studio.lowerThirdSub = lowerSub;
     applyFraming(studio);
   }, [filter, overlays, lowerTitle, lowerSub, applyFraming]);
+
+  const permissionSummary =
+    permissions.camera === 'granted' && permissions.microphone === 'granted'
+      ? 'Camera and microphone registered'
+      : permissions.camera === 'denied' || permissions.microphone === 'denied'
+        ? 'Chrome is blocking camera or microphone'
+        : 'Camera and microphone access not confirmed yet';
 
   function toggleOverlay(id: OverlayId) {
     setOverlays((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -269,13 +333,20 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
               This opens Chrome’s permission prompt for <em>3000studios.vip</em>. Choose <strong>Allow</strong>, then
               your preview starts automatically.
             </p>
+            <p className="cMuted" role="status">
+              {permissionSummary}
+            </p>
             <button
               type="button"
               className="cBtn primary"
-              disabled={!canRequestMedia}
+              disabled={!canRequestMedia || checkingAccess}
               onClick={() => void startPreview(cameraId)}
             >
-              {canRequestMedia ? 'Allow access & start preview' : 'Open this page in HTTPS Chrome'}
+              {!canRequestMedia
+                ? 'Open this page in HTTPS Chrome'
+                : checkingAccess
+                  ? 'Checking camera and mic…'
+                  : 'Check access & start preview'}
             </button>
           </section>
         ) : null}
@@ -286,8 +357,13 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
               In Chrome, tap the lock icon → Permissions → allow <em>Camera</em> and <em>Microphone</em> for this
               site. Then try again.
             </p>
-            <button type="button" className="cBtn primary" onClick={() => void startPreview(cameraId)}>
-              Retry camera access
+            <button
+              type="button"
+              className="cBtn primary"
+              disabled={checkingAccess}
+              onClick={() => void startPreview(cameraId)}
+            >
+              {checkingAccess ? 'Checking camera and mic…' : 'Check access again'}
             </button>
           </div>
         ) : null}
