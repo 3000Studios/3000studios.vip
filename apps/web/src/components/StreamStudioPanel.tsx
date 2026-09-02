@@ -188,7 +188,12 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   );
 
   useEffect(() => {
-    void refreshPermissions();
+    // Defer the read until after the effect commits so React does not treat the
+    // permission state update as a synchronous effect cascade.
+    const timer = window.setTimeout(() => {
+      void refreshPermissions();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [refreshPermissions]);
 
   useEffect(() => {
