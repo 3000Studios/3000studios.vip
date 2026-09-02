@@ -15,11 +15,11 @@ GitHub Actions is not required for production deployment. Cloudflare direct Git 
 
 ## global.env source
 
-Secrets stay outside Git. The sync/deploy scripts load the first existing file from:
+Secrets stay outside Git. The canonical global env file is:
 
-1. `C:\WorkSpaces\global.env`
-2. `C:\Users\Servi\.config\env\global.env`
-3. `C:\Users\Servi\OneDrive\Documents\global.env`
+`C:\Users\MrJws\Documents\global.env`
+
+Keep this file clean, organized, and deduplicated. Scripts may load values from it for trusted local commands and deployment injection, but they must print names/readiness only and never print, commit, screenshot, upload, or expose secret values.
 
 Run:
 

@@ -9,12 +9,14 @@
 @import './styles/mobile-touch.css';
 @import './styles/admin-easy.css';
 @import './styles/stream-studio.css';
+@import './styles/music-video-generator.css';
 @import './styles/blackscreen-fix.css';
 @import './styles/velvet-machine.css';
 @import './styles/site-polish.css';
 @import './styles/cinematic-vip.css';
 @import './styles/nav-epic.css';
 @import './styles/zombie-fx.css';
+@import './styles/dj-system.css';
 @import './styles/stream-studio.css';
 
 .routeLoader {

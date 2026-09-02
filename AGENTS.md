@@ -3,13 +3,13 @@
 - Workspace root: `C:\Users\MrJws\OneDrive\Workspaces\3000studios.vip`. Never work from temp directories.
 - Deploy exclusively through Cloudflare Pages auto-deploy. Every change: commit → push → auto-deploy. No manual wrangler deploys, no separate branches, no GitHub Actions.
 - One repo, one branch (`main`), one Cloudflare Pages project. After every change: commit, push, resolve all conflicts, then Cloudflare auto-deploy triggers.
-- Secrets & env vars: `C:\Documents2\global.env`. Read names only, never print/commit values.
+- Secrets & env vars: `C:\Users\MrJws\Documents\global.env` is the canonical global environment file. Keep it clean, organized, and deduplicated. Use it for required API access and safe secret injection only; never print, commit, screenshot, upload, or expose secret values.
 
 - Start by reading package.json, framework config, Firebase config, Cloudflare config, and env examples.
 - Default deployment target is Cloudflare Pages unless repo says otherwise.
 - Use Cloudflare Workers or Pages Functions for lightweight APIs.
 - Use Firebase Auth, Firestore, Storage, Functions, and App Check where useful.
-- Check C:\Users\Servi\.config\env\global.env for required variable names only.
+- Check `C:\Users\MrJws\Documents\global.env` for required variable names/readiness only. Use values only inside trusted local/deployment commands that need them, without echoing or logging secrets.
 - Never print, expose, commit, or invent secrets.
 - Do not rename env variables unless every reference is updated and documented.
 - Every site must be AdSense-review-ready when applicable.
@@ -24,7 +24,7 @@
   - Verify all buttons, links, and features work as designed
   - Confirm payment/Stripe links are correct
   - Sweep all API endpoints (Worker routes end-to-end)
-  - Audit all secrets and env vars — ensure they're set in Cloudflare (Pages + Worker) and match `C:\Documents2\global.env`
+  - Audit all secrets and env vars — ensure they're set in Cloudflare (Pages + Worker) and match `C:\Users\MrJws\Documents\global.env`
   - Optimize all graphics/images for quality and performance
   - Polish UI to look professional (high-contrast, accessible, smooth animations)
 - Final report must include files changed, commands run, issues fixed, and manual blockers.

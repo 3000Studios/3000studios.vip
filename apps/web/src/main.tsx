@@ -43,6 +43,9 @@ const Settings = lazy(() =>
 const StreamVault = lazy(() =>
   import('./pages/StreamVault').then((module) => ({ default: module.StreamVault })),
 );
+const MusicVideoGenerator = lazy(() =>
+  import('./pages/MusicVideoGenerator').then((module) => ({ default: module.MusicVideoGenerator })),
+);
 const SongPage = lazy(() =>
   import('./pages/SongPage').then((module) => ({ default: module.SongPage })),
 );
@@ -159,6 +162,14 @@ const router = createBrowserRouter([
                 element: (
                   <RouteLoader>
                     <StreamVault />
+                  </RouteLoader>
+                ),
+              },
+              {
+                path: 'music-video',
+                element: (
+                  <RouteLoader>
+                    <MusicVideoGenerator />
                   </RouteLoader>
                 ),
               },

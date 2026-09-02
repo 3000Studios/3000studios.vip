@@ -5,19 +5,12 @@ param(
 $ErrorActionPreference = 'Stop'
 
 function Get-DefaultGlobalEnvPath {
-  $candidates = @(
-    'C:\WorkSpaces\global.env',
-    'C:\Users\Servi\.config\env\global.env',
-    'C:\Users\Servi\OneDrive\Documents\global.env'
-  )
-
-  foreach ($candidate in $candidates) {
-    if (Test-Path -LiteralPath $candidate) {
-      return $candidate
-    }
+  $candidate = 'C:\Users\MrJws\Documents\global.env'
+  if (Test-Path -LiteralPath $candidate) {
+    return $candidate
   }
 
-  throw 'No global.env file was found in the supported machine locations.'
+  throw 'No global.env file was found at C:\Users\MrJws\Documents\global.env.'
 }
 
 function Import-GlobalEnv {

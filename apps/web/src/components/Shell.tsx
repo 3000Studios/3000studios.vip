@@ -9,6 +9,7 @@ const NAV = [
   { to: '/vault/sites', end: false, icon: '▦', label: 'Fleet', title: 'Fleet', sub: 'Every site under watch' },
   { to: '/vault/ops', end: false, icon: '⌘', label: 'Ops Console', title: 'Ops Console', sub: 'Commands, bridges, analytics' },
   { to: '/vault/stream', end: false, icon: '⦿', label: 'Stream Vault', title: 'Stream Vault', sub: 'Private stream control' },
+  { to: '/vault/music-video', end: false, icon: '▣', label: 'Video Maker', title: 'Music Video Generator', sub: 'Lyrics to AI video prompts' },
   { to: '/vault/settings', end: false, icon: '♪', label: 'Audio', title: 'Audio Console', sub: 'Ambient mix & SFX' },
 ];
 

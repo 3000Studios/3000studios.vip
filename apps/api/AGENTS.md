@@ -4,7 +4,7 @@
 - Default deployment target is Cloudflare Pages unless repo says otherwise.
 - Use Cloudflare Workers or Pages Functions for lightweight APIs.
 - Use Firebase Auth, Firestore, Storage, Functions, and App Check where useful.
-- Check C:\Users\Servi\.config\env\global.env for required variable names only.
+- Check `C:\Users\MrJws\Documents\global.env` for required variable names/readiness only. Keep it clean and organized. Use values only for safe local/deployment injection, and never print, commit, screenshot, upload, or expose secrets.
 - Never print, expose, commit, or invent secrets.
 - Do not rename env variables unless every reference is updated and documented.
 - Every site must be AdSense-review-ready when applicable.

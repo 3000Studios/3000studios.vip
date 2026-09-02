@@ -17,6 +17,7 @@
     "test": "turbo test",
     "lint": "turbo lint",
     "format": "turbo format",
+    "music-video:package": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Create-MusicVideoPackage.ps1",
     "env:sync": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Sync-CloudflareEnv.ps1",
     "deploy:cloudflare": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Deploy-Cloudflare.ps1",
     "hooks:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Install-GitDeployHooks.ps1"

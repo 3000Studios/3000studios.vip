@@ -1,0 +1,192 @@
+/* DJ System: a shared control-surface language for public, live, music and vault routes. */
+:root {
+  --dj-black: #05070c;
+  --dj-surface: rgba(11, 16, 27, 0.84);
+  --dj-surface-raised: rgba(18, 25, 39, 0.92);
+  --dj-line: rgba(134, 184, 255, 0.22);
+  --dj-blue: #4e9cff;
+  --dj-violet: #9b6cff;
+  --dj-lime: #b7ff4d;
+  --dj-hot: #ff5470;
+  --dj-grid: rgba(102, 159, 255, 0.065);
+}
+
+.vipSite,
+.console {
+  background-color: var(--dj-black);
+  background-image:
+    linear-gradient(var(--dj-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dj-grid) 1px, transparent 1px),
+    radial-gradient(circle at 12% -8%, rgba(78, 156, 255, 0.22), transparent 30%),
+    radial-gradient(circle at 95% 15%, rgba(155, 108, 255, 0.16), transparent 31%);
+  background-size: 28px 28px, 28px 28px, auto, auto;
+}
+
+.vipHeader,
+.vipHeader.vipHeader--epic,
+.cTopbar,
+.globalPlayer--pro {
+  border-color: var(--dj-line);
+  background: rgba(4, 7, 13, 0.86);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 -1px rgba(255, 255, 255, 0.035);
+}
+
+.vipHeader::after,
+.cTopbar::after {
+  content: '';
+  position: absolute;
+  right: 1.25rem;
+  bottom: -2px;
+  width: clamp(90px, 16vw, 210px);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--dj-blue), var(--dj-lime));
+  box-shadow: 0 0 14px var(--dj-blue);
+}
+
+.vipKicker,
+.cPill,
+.vipNavHint,
+.globalPlayer small,
+.queueHeading span {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.12em;
+}
+
+.vipKicker {
+  color: var(--dj-lime);
+  border-color: rgba(183, 255, 77, 0.42);
+  background: rgba(183, 255, 77, 0.07);
+}
+
+.logoWordmark,
+.shimmerText,
+.beatGoldTitle {
+  background: linear-gradient(115deg, #fff 5%, #9fd3ff 30%, var(--dj-blue) 50%, var(--dj-violet) 72%, #fff 96%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+.vipNavLink,
+.cNavLink {
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+
+.vipNavLink:hover,
+.vipNavLink.is-active,
+.cNavLink:hover,
+.cNavLink.active {
+  border-color: var(--dj-line);
+  background: linear-gradient(100deg, rgba(78, 156, 255, 0.13), rgba(155, 108, 255, 0.08));
+  box-shadow: inset 3px 0 var(--dj-lime), 0 0 18px rgba(78, 156, 255, 0.1);
+}
+
+.studioButton,
+.liveInquiryBtn,
+.phoneGoLiveStart,
+.phoneGoLiveStop,
+.gpBtn,
+.transportControls button {
+  position: relative;
+  border: 1px solid rgba(113, 175, 255, 0.55);
+  background: linear-gradient(135deg, rgba(78, 156, 255, 0.22), rgba(155, 108, 255, 0.22));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.16), 0 8px 20px rgba(0, 0, 0, 0.22);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.studioButton::before,
+.liveInquiryBtn::before,
+.phoneGoLiveStart::before {
+  content: '';
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background: var(--dj-lime);
+  box-shadow: 0 0 10px var(--dj-lime);
+}
+
+.studioButton:hover,
+.liveInquiryBtn:hover,
+.phoneGoLiveStart:hover {
+  transform: translateY(-2px);
+  border-color: var(--dj-lime);
+  box-shadow: 0 0 0 1px rgba(183, 255, 77, 0.2), 0 12px 26px rgba(0, 0, 0, 0.35);
+}
+
+.vipCard,
+.vipPageHero,
+.spotifyIdentityInner,
+.heroFeatureCard,
+.liveOnlyStage,
+.releaseTile,
+.turntableDeck,
+.phoneGoLiveCard,
+.cCard,
+.dashboardCard,
+.glassPanel {
+  border: 1px solid var(--dj-line);
+  background: linear-gradient(145deg, rgba(25, 34, 53, 0.82), var(--dj-surface));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06), 0 20px 48px rgba(0, 0, 0, 0.28);
+}
+
+.vipCard,
+.releaseTile,
+.turntableDeck,
+.liveOnlyStage {
+  border-radius: 14px;
+}
+
+.vipCard::after,
+.liveOnlyStage::after,
+.turntableDeck::after {
+  content: 'DJ SYSTEM · 3000';
+  position: absolute;
+  right: 0.8rem;
+  top: 0.55rem;
+  color: rgba(183, 255, 77, 0.6);
+  font: 700 0.58rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.13em;
+  pointer-events: none;
+}
+
+.vipCard,
+.liveOnlyStage,
+.turntableDeck { position: relative; }
+
+.redCarpetHero::after,
+.livePublicStage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(255, 255, 255, 0.025) 23px 24px);
+  mix-blend-mode: overlay;
+}
+
+.redCarpetHero video { filter: saturate(0.72) contrast(1.08) hue-rotate(166deg); }
+.carpetDepth { background: linear-gradient(180deg, rgba(3, 5, 11, 0.34), rgba(3, 6, 14, 0.88) 76%, var(--dj-black)); }
+
+.livePublicTitle { text-transform: uppercase; letter-spacing: 0.065em; }
+.livePublicClean[data-live='1'] .liveOnlyStage { border-color: rgba(183, 255, 77, 0.8); box-shadow: 0 0 0 1px rgba(183, 255, 77, 0.1), 0 0 44px rgba(78, 156, 255, 0.22); }
+.livePublicClean[data-live='1'] .liveOnlyStage::after { content: 'ON AIR · DJ SYSTEM · 3000'; color: var(--dj-lime); }
+
+.phoneGoLive { background: var(--dj-black); }
+.phoneGoLiveDock,
+.phoneGoLiveBar { border-color: var(--dj-line); background: rgba(5, 8, 15, 0.9); }
+.phoneGoLiveDock .is-live { color: var(--dj-lime); font-family: ui-monospace, monospace; letter-spacing: .13em; }
+
+@media (max-width: 720px) {
+  .vipHeader::after { right: 0.8rem; width: 92px; }
+  .studioButton, .liveInquiryBtn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .vipCard::after, .liveOnlyStage::after, .turntableDeck::after { font-size: .5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studioButton:hover, .liveInquiryBtn:hover, .phoneGoLiveStart:hover { transform: none; }
+}
