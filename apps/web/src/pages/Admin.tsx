@@ -223,6 +223,29 @@ export function Admin() {
               <div className="easyChip info">Viewers: {PUBLIC_LIVE_URL}</div>
             </section>
 
+            <section className="cPanel easyGoLiveFlow" aria-label="Phone go live flow">
+              <div className="cPanelBody">
+                <div className="easyFlowHead">
+                  <div>
+                    <span>Fast phone flow</span>
+                    <h2>Three steps to a verified live stream</h2>
+                  </div>
+                  <a className="cBtn primary" href="/go-live">
+                    Open phone studio
+                  </a>
+                </div>
+                <ol>
+                  <li><strong>Allow access.</strong> Tap the permission button below and allow Camera + Microphone in Chrome.</li>
+                  <li><strong>Preview.</strong> Confirm your camera appears, choose a look only if wanted, then tap Go Live.</li>
+                  <li><strong>Verify.</strong> Open the public viewer and wait for its moving video and audio—not just a green status.</li>
+                </ol>
+                <div className="easyBtnRow">
+                  <a className="cBtn ghost" href="/go-live">Phone controller</a>
+                  <a className="cBtn ghost" href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">Open public viewer</a>
+                </div>
+              </div>
+            </section>
+
             {whipReady && !broadcasting ? (
               <section className="cPanel easyWhipReadyBanner">
                 <div className="cPanelBody">

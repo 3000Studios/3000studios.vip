@@ -47,6 +47,9 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const [permHint, setPermHint] = useState(false);
   const [hasCanvas, setHasCanvas] = useState(false);
 
+  const canRequestMedia =
+    typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia) && window.isSecureContext;
+
   const applyFraming = useCallback((studio: StreamStudio) => {
     studio.setCameraFraming({ rotation, flipH, flipV, zoom, panX, panY });
   }, [rotation, flipH, flipV, zoom, panX, panY]);
@@ -132,18 +135,13 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   );
 
   useEffect(() => {
-    const initial = window.setTimeout(() => {
-      void startPreview();
-    }, 0);
     return () => {
-      window.clearTimeout(initial);
       void publisherRef.current?.stop();
       publisherRef.current = null;
       studioRef.current?.stop();
       studioRef.current = null;
       setHasCanvas(false);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -263,15 +261,33 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       </div>
 
       <div className="studioControls">
+        {status !== 'live' && !hasCanvas ? (
+          <section className="studioPermissionStep" aria-live="polite">
+            <span>Step 1 of 3</span>
+            <strong>Allow camera and microphone</strong>
+            <p>
+              This opens Chrome’s permission prompt for <em>3000studios.vip</em>. Choose <strong>Allow</strong>, then
+              your preview starts automatically.
+            </p>
+            <button
+              type="button"
+              className="cBtn primary"
+              disabled={!canRequestMedia}
+              onClick={() => void startPreview(cameraId)}
+            >
+              {canRequestMedia ? 'Allow access & start preview' : 'Open this page in HTTPS Chrome'}
+            </button>
+          </section>
+        ) : null}
         {permHint ? (
           <div className="studioPermBanner">
             <strong>Camera access needed</strong>
             <p>
-              Allow <em>Camera</em> and <em>Microphone</em> for this site (Logi C615 or Integrated Camera). Then tap
-              Allow &amp; preview.
+              In Chrome, tap the lock icon → Permissions → allow <em>Camera</em> and <em>Microphone</em> for this
+              site. Then try again.
             </p>
             <button type="button" className="cBtn primary" onClick={() => void startPreview(cameraId)}>
-              Allow &amp; preview
+              Retry camera access
             </button>
           </div>
         ) : null}
@@ -413,7 +429,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
         <div className="cBtnRow">
           <button type="button" className="cBtn ghost" onClick={() => void startPreview(cameraId)}>
-            Refresh preview
+            {hasCanvas ? 'Refresh preview' : 'Retry access'}
           </button>
           {status === 'live' ? (
             <button type="button" className="cBtn danger" onClick={() => void endLive()}>
