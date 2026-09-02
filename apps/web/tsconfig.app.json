@@ -23,5 +23,4 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
-  "exclude": ["src/**/*-RECORDING247.ts", "src/**/*-RECORDING247.tsx"]
 }
