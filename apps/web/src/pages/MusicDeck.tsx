@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowSquareOut,
   Pause,
   Play,
   SkipBack,
@@ -14,11 +13,9 @@ import { distrokidSongs, rolloutSongs } from '../data/music';
 import {
   OFFICIAL_YOUTUBE_CHANNEL_URL,
   officialReleaseVideos,
-  youtubeWatchUrl,
 } from '../data/officialReleases';
 import { PublicLayout } from './Home';
 import '../styles/music-deck.css';
-import '../styles/discover.css';
 
 const SPOTIFY_ARTIST = 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik';
 const APPLE_ARTIST = 'https://music.apple.com/us/artist/3000-studios/6802721597';
