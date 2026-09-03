@@ -64,7 +64,6 @@ export const PREMADE_OVERLAYS: { id: OverlayId; label: string; hint: string }[] 
   { id: 'ticker', label: 'Ticker bar', hint: 'Scrolling bottom strip' },
 ];
 
-/** Degrees clockwise */
 export type CameraRotation = 0 | 90 | 180 | 270;
 
 export type StreamStudioOptions = {
@@ -78,9 +77,7 @@ export type StreamStudioOptions = {
   rotation?: CameraRotation;
   flipH?: boolean;
   flipV?: boolean;
-  /** 1 = cover fit, up to ~3 = tight crop */
   zoom?: number;
-  /** -1..1 pan after zoom (crop position) */
   panX?: number;
   panY?: number;
 };
@@ -106,7 +103,6 @@ export class StreamStudio {
   zoom = 1;
   panX = 0;
   panY = 0;
-  /** 0–1 strength for chroma key (green screen) */
   chromaKey = 0.55;
   chromaSmooth = true;
 
@@ -120,6 +116,8 @@ export class StreamStudio {
     this.ctx = ctx;
     this.video.muted = true;
     this.video.playsInline = true;
+    this.video.setAttribute('playsinline', 'true');
+    this.video.setAttribute('webkit-playsinline', 'true');
     this.video.autoplay = true;
     if (opts.filter) this.filter = opts.filter;
     if (opts.overlays) this.overlays = new Set(opts.overlays);
@@ -138,11 +136,9 @@ export class StreamStudio {
     return this.canvas;
   }
 
-  /** Always rebuild so audio follows the current camera and canvas is capturing. */
   getOutputStream(fps = 30, forceNew = false): MediaStream {
     if (forceNew && this.outStream) {
       this.outStream.getTracks().forEach((t) => {
-        // Do not stop canvas capture track until replaced — stop old clones only
         if (t.kind === 'audio') t.stop();
       });
       this.outStream = null;
@@ -155,10 +151,9 @@ export class StreamStudio {
         ...audio.map((t) => t.clone()),
       ]);
     } else {
-      // Refresh audio clones if camera changed
       const existingAudio = this.outStream.getAudioTracks();
       const liveAudio = this.camStream?.getAudioTracks() ?? [];
-      if (liveAudio.length && (!existingAudio.length || existingAudio[0].id !== liveAudio[0].id && existingAudio[0].label !== liveAudio[0].label)) {
+      if (liveAudio.length && (!existingAudio.length || existingAudio[0].id !== liveAudio[0].id)) {
         existingAudio.forEach((t) => {
           this.outStream!.removeTrack(t);
           t.stop();
@@ -171,31 +166,39 @@ export class StreamStudio {
 
   async openCamera(deviceId?: string, facingMode: 'user' | 'environment' = 'user') {
     this.camStream?.getTracks().forEach((t) => t.stop());
+    this.camStream = null;
 
-    const videoConstraint: MediaTrackConstraints = deviceId
-      ? { deviceId: { ideal: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
-      : { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } };
-
-    try {
-      this.camStream = await navigator.mediaDevices.getUserMedia({
+    const attempts: MediaStreamConstraints[] = [];
+    if (deviceId) {
+      attempts.push({
         audio: { echoCancellation: true, noiseSuppression: true },
-        video: videoConstraint,
+        video: { deviceId: { exact: deviceId } },
       });
-    } catch (first) {
-      // Fallback: video-only, then retry without exact device
+      attempts.push({ audio: true, video: { deviceId: { ideal: deviceId } } });
+      attempts.push({ audio: false, video: { deviceId: { ideal: deviceId } } });
+    }
+    attempts.push({
+      audio: { echoCancellation: true, noiseSuppression: true },
+      video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } },
+    });
+    attempts.push({ audio: true, video: { facingMode } });
+    attempts.push({ audio: false, video: { facingMode } });
+    attempts.push({ audio: false, video: true });
+
+    let lastError: unknown = null;
+    for (const constraints of attempts) {
       try {
-        this.camStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: deviceId ? { deviceId: { ideal: deviceId } } : true,
-        });
-      } catch {
-        throw first;
+        this.camStream = await navigator.mediaDevices.getUserMedia(constraints);
+        break;
+      } catch (err) {
+        lastError = err;
       }
     }
+    if (!this.camStream) throw lastError || new Error('Camera did not start');
+
     this.video.srcObject = this.camStream;
     await this.video.play().catch(() => undefined);
 
-    // Rebuild output so audio tracks stay in sync after camera switch
     if (this.outStream) {
       this.outStream.getTracks().forEach((t) => t.stop());
       this.outStream = null;
@@ -253,7 +256,6 @@ export class StreamStudio {
   private drawCameraFrame() {
     const { ctx, canvas, video } = this;
     if (video.readyState < 2) return;
-
     const w = canvas.width;
     const h = canvas.height;
     const vw = video.videoWidth || w;
@@ -263,18 +265,15 @@ export class StreamStudio {
     const sin = Math.abs(Math.sin(rad));
     const boundW = vw * cos + vh * sin;
     const boundH = vw * sin + vh * cos;
-    const zoom = this.zoom;
-    const scale = Math.max(w / boundW, h / boundH) * zoom;
+    const scale = Math.max(w / boundW, h / boundH) * this.zoom;
     const dw = vw * scale;
     const dh = vh * scale;
     const maxPanX = Math.max(0, (boundW * scale - w) / 2);
     const maxPanY = Math.max(0, (boundH * scale - h) / 2);
     const ox = this.panX * maxPanX;
     const oy = this.panY * maxPanY;
-
     const useChroma = this.filter === 'greenScreen';
     const filterCss = useChroma ? 'none' : LENS_FILTERS.find((f) => f.id === this.filter)?.css ?? 'none';
-
     ctx.save();
     ctx.translate(w / 2 + ox, h / 2 + oy);
     ctx.rotate(rad);
@@ -282,30 +281,19 @@ export class StreamStudio {
     ctx.filter = filterCss;
     ctx.drawImage(video, -dw / 2, -dh / 2, dw, dh);
     ctx.filter = 'none';
-
-    if (useChroma) {
-      // Sample after transform into screen space via getImageData of full canvas later
-    }
     ctx.restore();
-
-    if (useChroma) {
-      this.applyChromaKey();
-    }
+    if (useChroma) this.applyChromaKey();
   }
 
-  /** Simple green-screen removal (approximation of background removal). */
   private applyChromaKey() {
     const { ctx, canvas } = this;
-    const w = canvas.width;
-    const h = canvas.height;
-    const img = ctx.getImageData(0, 0, w, h);
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const d = img.data;
     const thr = 0.35 + this.chromaKey * 0.45;
     for (let i = 0; i < d.length; i += 4) {
       const r = d[i] / 255;
       const g = d[i + 1] / 255;
       const b = d[i + 2] / 255;
-      // Green dominance
       const greenish = g > r + 0.12 && g > b + 0.12 && g > thr * 0.55;
       if (greenish) {
         const edge = this.chromaSmooth ? Math.min(1, (g - Math.max(r, b)) * 3) : 1;
@@ -320,13 +308,9 @@ export class StreamStudio {
     const w = canvas.width;
     const h = canvas.height;
     ctx.save();
-    // Solid black under chroma so removed green becomes black on stream (not checker noise)
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, w, h);
-
     this.drawCameraFrame();
-
-    // Soft vignette for most non-clean looks
     if (this.filter !== 'none') {
       const g = ctx.createRadialGradient(w / 2, h / 2, h * 0.25, w / 2, h / 2, h * 0.75);
       g.addColorStop(0, 'rgba(0,0,0,0)');
@@ -334,50 +318,33 @@ export class StreamStudio {
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
-
     if (this.overlays.has('goldFrame')) {
       ctx.strokeStyle = 'rgba(255, 215, 0, 0.75)';
       ctx.lineWidth = 6;
       ctx.strokeRect(14, 14, w - 28, h - 28);
-      ctx.strokeStyle = 'rgba(255, 215, 0, 0.25)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(22, 22, w - 44, h - 44);
     }
-
     if (this.overlays.has('liveBadge')) {
       const label = '● LIVE';
       ctx.font = 'bold 28px Inter, Arial, sans-serif';
       const tw = ctx.measureText(label).width;
-      const bx = 28;
-      const by = 28;
-      const bw = tw + 28;
-      const bh = 42;
       ctx.fillStyle = 'rgba(220, 38, 38, 0.92)';
-      roundRect(ctx, bx, by, bw, bh, 21);
+      roundRect(ctx, 28, 28, tw + 28, 42, 21);
       ctx.fill();
       ctx.fillStyle = '#fff';
       ctx.textBaseline = 'middle';
-      ctx.fillText(label, bx + 14, by + bh / 2 + 1);
+      ctx.fillText(label, 42, 50);
     }
-
     if (this.overlays.has('vipCorner')) {
-      const label = 'VIP';
       ctx.font = 'bold 22px Inter, Arial, sans-serif';
-      const tw = ctx.measureText(label).width;
+      const tw = ctx.measureText('VIP').width;
       const bx = w - tw - 52;
-      const by = 28;
       ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      roundRect(ctx, bx, by, tw + 28, 36, 10);
+      roundRect(ctx, bx, 28, tw + 28, 36, 10);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255,215,0,0.7)';
-      ctx.lineWidth = 1.5;
-      roundRect(ctx, bx, by, tw + 28, 36, 10);
-      ctx.stroke();
       ctx.fillStyle = '#ffd700';
       ctx.textBaseline = 'middle';
-      ctx.fillText(label, bx + 14, by + 19);
+      ctx.fillText('VIP', bx + 14, 47);
     }
-
     if (this.overlays.has('watermark')) {
       ctx.font = 'bold 26px Inter, Arial, sans-serif';
       ctx.fillStyle = 'rgba(255, 215, 0, 0.55)';
@@ -385,15 +352,10 @@ export class StreamStudio {
       ctx.fillText('3000 STUDIOS', w - 28, h - 28);
       ctx.textAlign = 'left';
     }
-
     if (this.overlays.has('lowerThird')) {
       const barH = 110;
       const gy = h - barH - 24;
-      const grad = ctx.createLinearGradient(0, gy, 0, gy + barH);
-      grad.addColorStop(0, 'rgba(0,0,0,0)');
-      grad.addColorStop(0.35, 'rgba(0,0,0,0.72)');
-      grad.addColorStop(1, 'rgba(0,0,0,0.88)');
-      ctx.fillStyle = grad;
+      ctx.fillStyle = 'rgba(0,0,0,0.78)';
       ctx.fillRect(0, gy, w, barH + 24);
       ctx.fillStyle = '#ffd700';
       ctx.fillRect(28, gy + 36, 6, 48);
@@ -404,30 +366,19 @@ export class StreamStudio {
       ctx.fillStyle = 'rgba(244,239,231,0.8)';
       ctx.fillText(this.lowerThirdSub, 48, gy + 88);
     }
-
     if (this.overlays.has('ticker')) {
-      const th = 40;
       ctx.fillStyle = 'rgba(20, 10, 0, 0.92)';
-      ctx.fillRect(0, h - th, w, th);
+      ctx.fillRect(0, h - 40, w, 40);
       ctx.fillStyle = '#ffd700';
       ctx.font = 'bold 18px Inter, Arial, sans-serif';
-      const text = (this.tickerText + this.tickerText).repeat(2);
       const offset = (this.tick * 1.6) % 800;
-      ctx.fillText(text, 20 - offset, h - 14);
+      ctx.fillText((this.tickerText + this.tickerText).repeat(2), 20 - offset, h - 14);
     }
-
     ctx.restore();
   }
 }
 
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-) {
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   const radius = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
