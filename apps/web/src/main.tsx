@@ -25,6 +25,7 @@ import { SampleGate } from './components/SampleGate';
 import { LiveStreamPage } from './pages/LiveStreamPage';
 import { PhoneGoLive } from './pages/PhoneGoLive';
 import { MusicDeck } from './pages/MusicDeck';
+import { ShopPage } from './pages/Shop';
 import { ConceptBoard } from './pages/ConceptBoard';
 import { AuthProvider } from './lib/auth';
 import { initVelvetMachine } from './lib/velvetEngine';
@@ -85,6 +86,7 @@ const router = createBrowserRouter([
       { path: '/music', element: <MusicDeck /> },
       { path: '/video', element: <VideoPage /> },
       { path: '/live', element: <LiveStreamPage /> },
+      { path: '/shop', element: <ShopPage /> },
       { path: '/go-live', element: <PhoneGoLive /> },
       { path: '/concepts', element: <ConceptBoard /> },
       { path: '/community', element: <CommunityPage /> },
