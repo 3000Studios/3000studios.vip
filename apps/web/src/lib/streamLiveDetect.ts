@@ -3,11 +3,33 @@ import { readHostLiveFlag, STREAM_LIVE_FLAG_KEY, STREAM_SCENE_CHANNEL } from './
 
 export type LiveDetectState = {
   live: boolean;
-  source: 'lifecycle' | 'host-flag' | 'unknown';
+  source: 'lifecycle' | 'host-flag' | 'server-flag' | 'unknown';
   raw?: unknown;
 };
 
-/** Cloudflare Stream lifecycle for a video or live-input id */
+export async function fetchServerLiveFlag(): Promise<boolean | null> {
+  try {
+    const res = await fetch('/api/live-flag', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { live?: boolean };
+    return typeof data.live === 'boolean' ? data.live : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function publishServerLiveFlag(live: boolean): Promise<void> {
+  try {
+    await fetch('/api/live-flag', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ live, passcode: '3000' }),
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
 export async function fetchStreamLifecycle(
   uid: string,
   customer = STREAM_CUSTOMER_CODE,
@@ -35,14 +57,13 @@ export async function fetchStreamLifecycle(
   }
 }
 
-/**
- * Host flag wins while true (admin Go Live).
- * Also treat either the Stream player asset OR live-input lifecycle as live.
- */
 export async function detectIsLive(): Promise<LiveDetectState> {
   if (readHostLiveFlag()) {
     return { live: true, source: 'host-flag' };
   }
+
+  const server = await fetchServerLiveFlag();
+  if (server === true) return { live: true, source: 'server-flag' };
 
   const [asset, input] = await Promise.all([
     fetchStreamLifecycle(STREAM_PLAYER_UID),
@@ -52,13 +73,12 @@ export async function detectIsLive(): Promise<LiveDetectState> {
   if (asset.live === true || input.live === true) {
     return { live: true, source: 'lifecycle', raw: { asset: asset.raw, input: input.raw } };
   }
-  if (asset.live === false && input.live === false) {
+  if (asset.live === false && input.live === false && server === false) {
     return { live: false, source: 'lifecycle', raw: { asset: asset.raw, input: input.raw } };
   }
-  return { live: false, source: 'unknown', raw: { asset: asset.raw, input: input.raw } };
+  return { live: false, source: 'unknown', raw: { asset: asset.raw, input: input.raw, server } };
 }
 
-/** Cross-tab + same-origin live flag subscription (storage + BroadcastChannel + poll). */
 export function subscribeHostLive(cb: (live: boolean) => void): () => void {
   let last = readHostLiveFlag();
 
@@ -84,7 +104,6 @@ export function subscribeHostLive(cb: (live: boolean) => void): () => void {
     /* ignore */
   }
 
-  // Same-tab + multi-tab safety net
   const poll = window.setInterval(() => {
     emit(readHostLiveFlag());
   }, 1000);
