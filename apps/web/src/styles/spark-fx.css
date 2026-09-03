@@ -1,0 +1,78 @@
+.sparkFxLayer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+}
+
+.sparkBurst {
+  position: fixed;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+}
+
+.sparkParticle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size, 5px);
+  height: var(--size, 5px);
+  border-radius: 1px;
+  background: var(--spark-color, #ffd36a);
+  box-shadow: 0 0 10px var(--spark-color, #ffd36a);
+  transform: rotate(var(--rot, 0deg));
+  animation: sparkFly 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sparkFly {
+  0% { opacity: 1; transform: translate(0, 0) rotate(var(--rot, 0deg)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(calc(var(--rot, 0deg) + 90deg)) scale(0.2); }
+}
+
+button,
+.studioButton,
+.vipNavLink,
+.vipNavCta,
+.ytCta,
+.vipMenu,
+.dkArrow,
+.trackSelectButton,
+.goldButton,
+.enterVipButton,
+.soundToggle {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, filter 0.22s ease, border-color 0.22s ease;
+}
+
+button:hover,
+.studioButton:hover,
+.vipNavCta:hover,
+.ytCta:hover,
+.vipMenu:hover,
+.dkArrow:hover,
+.trackSelectButton:hover,
+.goldButton:hover,
+.enterVipButton:hover,
+.soundToggle:hover {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.08);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.35),
+    0 0 22px color-mix(in srgb, var(--spark-cycle, #ffd36a) 45%, transparent);
+}
+
+button:active,
+.studioButton:active,
+.ytCta:active,
+.vipMenu:active,
+.dkArrow:active {
+  transform: translateY(0) scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkFxLayer { display: none !important; }
+  button:hover,
+  .studioButton:hover {
+    transform: none;
+  }
+}
