@@ -249,9 +249,10 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
   async function goLive() {
     const check = validateWhipUrl(whipUrl, liveInputId);
-    if (!check.ok) {
-      setError(check.reason);
-      onError?.(check.reason);
+    if (!check.ok || !whipReady) {
+      const reason = !check.ok ? check.reason : 'Stream path is not ready yet.';
+      setError(reason);
+      onError?.(reason);
       setStatus('error');
       return;
     }
@@ -370,7 +371,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         </label>
 
         <div className="studioBlock">
-          <span className="studioBlockLabel">Rotate &amp; crop</span>
+          <span className="studioBlockLabel">Rotate & crop</span>
           <div className="studioChipRow">
             {ROTATIONS.map((r) => (
               <button key={r.value} type="button" className={`studioChip ${rotation === r.value ? 'active' : ''}`} onClick={() => setRotation(r.value)}>
@@ -447,7 +448,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
               End live
             </button>
           ) : (
-            <button type="button" className="cBtn primary" disabled={status === 'starting'} onClick={() => void goLive()}>
+            <button type="button" className="cBtn primary" disabled={status === 'starting' || !whipReady} onClick={() => void goLive()}>
               {status === 'starting' ? 'Going live…' : 'Go Live'}
             </button>
           )}
