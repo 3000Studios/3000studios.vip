@@ -6,5 +6,8 @@
 /listen.html  /listen.html  200
 /listen  /listen.html  200
 
+# Pages Functions under /api must not fall through to the SPA
+/api/*  /api/:splat  200
+
 # SPA fallback for client routes only
 /*  /index.html  200
