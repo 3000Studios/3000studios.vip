@@ -7,6 +7,8 @@ import './index.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminFab } from './components/AdminFab';
+import { SparkClickFX } from './components/SparkClickFX';
+import { YouTubeSubscriberPerk } from './components/YouTubeSubscriberPerk';
 import {
   AboutPage,
   BlogPage,
@@ -63,6 +65,8 @@ function RouteLoader({ children }: { children: ReactNode }) {
 function RootLayout() {
   return (
     <>
+      <SparkClickFX />
+      <YouTubeSubscriberPerk />
       <Outlet />
       <AdminFab />
     </>
