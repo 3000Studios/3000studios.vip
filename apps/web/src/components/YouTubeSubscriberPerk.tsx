@@ -120,7 +120,7 @@ export function YouTubeSubscriberPerk() {
       return false;
     }
     try {
-      audio.src = FREE_TRACK.src;
+      if (!audio.src.endsWith(FREE_TRACK.src)) audio.src = FREE_TRACK.src;
       audio.muted = false;
       audio.volume = 0.9;
       await audio.play();
@@ -191,6 +191,18 @@ export function YouTubeSubscriberPerk() {
 
   return (
     <>
+      <audio
+        ref={audioRef}
+        className={showGift && open ? 'ytSubPlayer' : 'ytSubPlayer ytSubPlayerHidden'}
+        src={FREE_TRACK.src}
+        controls={showGift && open}
+        playsInline
+        preload="auto"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+      />
+
       {banner && showGift ? (
         <div className="ytSubBanner" role="status">
           <img src={FREE_TRACK.cover} alt="" />
@@ -226,17 +238,7 @@ export function YouTubeSubscriberPerk() {
                     <span>Official DistroKid release · free subscriber play</span>
                   </div>
                 </div>
-                <audio
-                  ref={audioRef}
-                  className="ytSubPlayer"
-                  src={FREE_TRACK.src}
-                  controls
-                  playsInline
-                  preload="auto"
-                  onPlay={() => setPlaying(true)}
-                  onPause={() => setPlaying(false)}
-                  onEnded={() => setPlaying(false)}
-                />
+                <div className="ytSubPlayerSlot" />
                 {error ? <p className="ytSubWarn">{error}</p> : null}
                 <div className="heroActions">
                   <button type="button" className="studioButton ytCta ytPerkSafe" onClick={() => void playDrop()}>
@@ -267,7 +269,6 @@ export function YouTubeSubscriberPerk() {
                     data-theme="dark"
                   />
                 </div>
-                <audio ref={audioRef} src={FREE_TRACK.src} preload="auto" playsInline hidden />
                 {status === 'need-sub' ? (
                   <p className="ytSubWarn">Google says this account is not subscribed yet. Hit subscribe, then verify again.</p>
                 ) : null}
