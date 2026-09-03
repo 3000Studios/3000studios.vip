@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { type SongPalette } from '../data/music';
@@ -15,6 +15,7 @@ import { MouseFX } from '../components/MouseFX';
 import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
+import { ReleaseCarousel } from '../components/ReleaseCarousel';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -378,100 +379,6 @@ export function Home() {
   );
 }
 
-function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number; onSelect: (index: number) => void }) {
-  const [frontIndex, setFrontIndex] = useState(activeIndex);
-  const [paused, setPaused] = useState(false);
-  const dragStart = useRef<number | null>(null);
-  const suppressClick = useRef(false);
-  const count = officialReleaseVideos.length;
-  const step = 360 / count;
-
-  useEffect(() => {
-    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = window.setInterval(() => setFrontIndex((index) => (index + 1) % count), 2400);
-    return () => window.clearInterval(timer);
-  }, [count, paused]);
-
-  const move = (direction: number) => setFrontIndex((index) => (index + direction + count) % count);
-  const select = (index: number) => {
-    if (suppressClick.current) {
-      suppressClick.current = false;
-      return;
-    }
-    setFrontIndex(index);
-    onSelect(index);
-  };
-  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
-    dragStart.current = event.clientX;
-    suppressClick.current = false;
-    setPaused(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-  const endDrag = (event: PointerEvent<HTMLDivElement>) => {
-    if (dragStart.current === null) return;
-    const distance = event.clientX - dragStart.current;
-    dragStart.current = null;
-    if (Math.abs(distance) > 38) {
-      suppressClick.current = true;
-      move(distance < 0 ? 1 : -1);
-    }
-  };
-
-  return (
-    <div
-      className="releaseCarousel"
-      role="region"
-      aria-label="Official release preview carousel"
-      tabIndex={0}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false);
-      }}
-      onPointerDown={startDrag}
-      onPointerUp={endDrag}
-      onPointerCancel={() => { dragStart.current = null; }}
-      onKeyDown={(event) => {
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-          event.preventDefault();
-          move(event.key === 'ArrowRight' ? 1 : -1);
-        }
-      }}
-    >
-      <p className="releaseCarouselHint">Swipe or use arrows · Tap a thumbnail to play</p>
-      <div className="releaseCarouselViewport">
-        <div className="releaseCarouselRing" style={{ transform: `rotateY(${-frontIndex * step}deg)` }}>
-          {officialReleaseVideos.map((release, index) => (
-            <button
-              type="button"
-              key={release.videoId}
-              className={index === activeIndex ? 'releaseCarouselCard is-playing' : 'releaseCarouselCard'}
-              style={{ transform: `rotateY(${index * step}deg) translateZ(var(--carousel-radius))` }}
-              onClick={() => select(index)}
-              aria-label={`Play ${release.title} in the main player`}
-              aria-pressed={index === activeIndex}
-              tabIndex={index === frontIndex ? 0 : -1}
-            >
-              <span className="releasePreviewArt">
-                <img src={youtubeArtworkUrl(release.videoId)} alt={`${release.title} video thumbnail`} loading="lazy" draggable="false" />
-                <span className="releasePreviewPlay" aria-hidden="true">▶</span>
-                <small>{release.duration}</small>
-              </span>
-              <span className="releasePreviewTitle">{release.title}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="releaseCarouselControls">
-        <button type="button" onClick={() => move(-1)} aria-label="Previous release">‹</button>
-        <span>{frontIndex + 1} / {count}</span>
-        <button type="button" onClick={() => move(1)} aria-label="Next release">›</button>
-      </div>
-    </div>
-  );
-}
-
 export function MusicShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
   const playerRef = useRef<HTMLDivElement | null>(null);
@@ -508,7 +415,7 @@ export function MusicShowcase() {
               ›
             </button>
           </div>
-          <ReleaseCarousel key={`music-${activeIndex}`} activeIndex={activeIndex} onSelect={preview} />
+          <ReleaseCarousel key="music-carousel" activeIndex={activeIndex} onSelect={preview} />
         </section>
       </main>
     </PublicLayout>
@@ -537,7 +444,7 @@ export function VideoPage() {
             <iframe src={youtubeEmbedUrl(featured.videoId)} title={`${featured.title} official music video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
             <div><span className="vipKicker">Now screening</span><h2>{featured.title}</h2><p>{featured.release} · {featured.duration}</p><a className="studioButton secondary" href={youtubeWatchUrl(featured.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a></div>
           </div>
-          <ReleaseCarousel key={`video-${activeIndex}`} activeIndex={activeIndex} onSelect={preview} />
+          <ReleaseCarousel key="video-carousel" activeIndex={activeIndex} onSelect={preview} />
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
       </main>
