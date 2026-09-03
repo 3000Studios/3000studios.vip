@@ -117,20 +117,32 @@
 .adminObs { display: grid; gap: 10px; }
 .adminObsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .adminObsCard { border: 1px solid rgba(212,175,55,.28); border-radius: 12px; padding: 12px; background: rgba(0,0,0,.28); }
-.adminObsCard.ok { box-shadow: inset 0 0 0 1px rgba(80,200,120,.35); }
-.adminObsCard.warn { box-shadow: inset 0 0 0 1px rgba(220,160,40,.45); }
-.adminObsCard.bad { box-shadow: inset 0 0 0 1px rgba(220,70,70,.45); }
 .shopGrid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 @media (min-width: 720px) { .shopGrid { grid-template-columns: 1fr 1fr; } }
 .shopCard { padding: 0 0 16px; overflow: hidden; }
-.shopArt { height: 120px; background-size: cover; background-position: center; }
+.shopArt { height: 140px; background-size: cover; background-position: center; }
 .shopKind { display: block; padding: 10px 14px 0; letter-spacing: .12em; text-transform: uppercase; font-size: 11px; color: #d4af37; }
 .shopCard h2, .shopCard p { margin: 6px 14px; }
 .shopCard .studioButton { margin: 8px 14px; }
+.advisorLog {
+  max-height: 280px;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.advisorYou, .advisorBot { margin: 0; color: #f3e6c4; }
+.advisorForm { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.advisorForm input {
+  background: #0b0b0d;
+  color: #f3e6c4;
+  border: 1px solid rgba(212,175,55,.35);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
 .liveWallpaper { background: #07070a; }
 @media (pointer: coarse), (max-width: 900px) {
   .liveWallpaperCanvas, .mouseFx, .scrollFx, .liveWallpaperScan { display: none !important; }
-  .vipSite { background: #07070a; }
 }
 @media (min-width: 980px) {
   .bottomDock { display: none; }

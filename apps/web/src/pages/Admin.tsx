@@ -13,6 +13,7 @@ import {
 import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { AdminObservability } from '../components/AdminObservability';
+import { MarketingAdvisor } from '../components/MarketingAdvisor';
 import '../styles/discover.css';
 
 const ADMIN_PASSCODE = '3000';
@@ -195,6 +196,7 @@ export function Admin() {
                 </p>
               </div>
             </section>
+            <MarketingAdvisor />
             <AdminObservability />
             <section className="cPanel">
               <div className="cPanelHead">
