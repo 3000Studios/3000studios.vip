@@ -9,6 +9,7 @@ import {
   type OverlayId,
 } from '../lib/streamStudio';
 import { WhipPublisher, describeCameraError, validateWhipUrl } from '../lib/webrtcStream';
+import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 
 type Props = {
   whipUrl: string;
@@ -17,15 +18,6 @@ type Props = {
   onLiveChange?: (live: boolean) => void;
   onError?: (msg: string | null) => void;
 };
-
-type MediaPermission = 'prompt' | 'granted' | 'denied' | 'unsupported';
-
-type PermissionSnapshot = {
-  camera: MediaPermission;
-  microphone: MediaPermission;
-};
-
-const INITIAL_PERMISSIONS: PermissionSnapshot = { camera: 'prompt', microphone: 'prompt' };
 
 const ROTATIONS: { value: CameraRotation; label: string }[] = [
   { value: 0, label: '0°' },
@@ -41,6 +33,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [cameraId, setCameraId] = useState('');
+  const [facing, setFacing] = useState<'user' | 'environment'>('user');
   const [filter, setFilter] = useState<LensFilterId>('warmGold');
   const [overlays, setOverlays] = useState<OverlayId[]>(['liveBadge', 'watermark', 'lowerThird']);
   const [lowerTitle, setLowerTitle] = useState('3000 Studios');
@@ -53,32 +46,11 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const [panY, setPanY] = useState(0);
   const [status, setStatus] = useState<'idle' | 'preview' | 'starting' | 'live' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [permHint, setPermHint] = useState(false);
   const [hasCanvas, setHasCanvas] = useState(false);
-  const [permissions, setPermissions] = useState<PermissionSnapshot>(INITIAL_PERMISSIONS);
   const [checkingAccess, setCheckingAccess] = useState(false);
 
   const canRequestMedia =
-    typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia) && window.isSecureContext;
-
-  const refreshPermissions = useCallback(async () => {
-    if (!navigator.permissions?.query) {
-      setPermissions({ camera: 'unsupported', microphone: 'unsupported' });
-      return;
-    }
-
-    const read = async (name: 'camera' | 'microphone'): Promise<MediaPermission> => {
-      try {
-        const result = await navigator.permissions.query({ name } as PermissionDescriptor);
-        return result.state;
-      } catch {
-        return 'unsupported';
-      }
-    };
-
-    const [camera, microphone] = await Promise.all([read('camera'), read('microphone')]);
-    setPermissions({ camera, microphone });
-  }, []);
+    typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia);
 
   const applyFraming = useCallback((studio: StreamStudio) => {
     studio.setCameraFraming({ rotation, flipH, flipV, zoom, panX, panY });
@@ -126,9 +98,9 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   }, []);
 
   const startPreview = useCallback(
-    async (deviceId?: string) => {
+    async (deviceId?: string, facingMode?: 'user' | 'environment') => {
       if (!canRequestMedia) {
-        const msg = 'Camera needs HTTPS. Stay on https://3000studios.vip/admin.';
+        const msg = 'Open this page in Safari or Chrome on https://3000studios.vip/admin and tap Access camera.';
         setError(msg);
         onError?.(msg);
         setStatus('error');
@@ -138,7 +110,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       setCheckingAccess(true);
       setError(null);
       onError?.(null);
-      setPermHint(false);
       try {
         const studio = ensureStudio();
         studio.setFilter(filter);
@@ -146,20 +117,15 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         studio.lowerThirdTitle = lowerTitle;
         studio.lowerThirdSub = lowerSub;
         applyFraming(studio);
-        await studio.openCamera(deviceId || cameraId || undefined, 'user');
+        await studio.openCamera(deviceId || cameraId || undefined, facingMode || facing);
         const preview = studio.getOutputStream(30, true);
         const cameraTrack = preview.getVideoTracks()[0];
-        const microphoneTrack = preview.getAudioTracks()[0];
-        if (!cameraTrack || cameraTrack.readyState !== 'live') {
-          throw new Error('Camera did not start. Tap Allow on the browser prompt.');
-        }
-        if (!microphoneTrack || microphoneTrack.readyState !== 'live') {
-          throw new Error('Microphone did not start. Allow mic, then tap Access camera again.');
+        if (!cameraTrack || cameraTrack.readyState === 'ended') {
+          throw new Error('Camera did not start. Tap Allow when the phone asks.');
         }
         studio.start();
         mountCanvas();
         await refreshCameraList();
-        await refreshPermissions();
         setStatus((s) => (s === 'live' ? 'live' : 'preview'));
         return true;
       } catch (err) {
@@ -167,8 +133,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         setError(msg);
         onError?.(msg);
         setStatus('error');
-        setPermHint(true);
-        await refreshPermissions();
         return false;
       } finally {
         setCheckingAccess(false);
@@ -176,6 +140,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     },
     [
       cameraId,
+      facing,
       ensureStudio,
       filter,
       overlays,
@@ -186,16 +151,8 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       onError,
       canRequestMedia,
       refreshCameraList,
-      refreshPermissions,
     ],
   );
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void refreshPermissions();
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, [refreshPermissions]);
 
   useEffect(() => {
     return () => {
@@ -217,13 +174,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     applyFraming(studio);
   }, [filter, overlays, lowerTitle, lowerSub, applyFraming]);
 
-  const permissionSummary =
-    permissions.camera === 'granted' && permissions.microphone === 'granted'
-      ? 'Camera and mic ready'
-      : permissions.camera === 'denied' || permissions.microphone === 'denied'
-        ? 'Browser is blocking camera or mic — tap the lock icon and Allow'
-        : 'Tap Access camera, then Allow';
-
   function toggleOverlay(id: OverlayId) {
     setOverlays((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
@@ -239,12 +189,19 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
   async function switchCamera(id: string) {
     setCameraId(id);
-    await startPreview(id);
+    await startPreview(id, facing);
     if (status === 'live' && publisherRef.current && studioRef.current) {
       const out = studioRef.current.getOutputStream(30, true);
       const v = out.getVideoTracks()[0];
       if (v) await publisherRef.current.replaceVideoTrack(v);
     }
+  }
+
+  async function flipFacing() {
+    const next = facing === 'user' ? 'environment' : 'user';
+    setFacing(next);
+    setCameraId('');
+    await startPreview(undefined, next);
   }
 
   async function goLive() {
@@ -266,7 +223,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       publisherRef.current = null;
 
       const studio = ensureStudio();
-      await studio.openCamera(cameraId || undefined, 'user');
+      await studio.openCamera(cameraId || undefined, facing);
       studio.start();
       mountCanvas();
       studio.setFilter(filter);
@@ -288,6 +245,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
       setStatus('live');
       onLiveChange?.(true);
+      void publishServerLiveFlag(true);
       window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: true } }));
       await refreshCameraList();
     } catch (err) {
@@ -296,9 +254,10 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       onError?.(msg);
       setStatus('error');
       onLiveChange?.(false);
+      void publishServerLiveFlag(false);
       await publisherRef.current?.stop();
       publisherRef.current = null;
-      void startPreview(cameraId);
+      void startPreview(cameraId, facing);
     }
   }
 
@@ -307,6 +266,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     publisherRef.current = null;
     setStatus('preview');
     onLiveChange?.(false);
+    void publishServerLiveFlag(false);
     window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: false } }));
   }
 
@@ -327,43 +287,36 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       </div>
 
       <div className="studioControls">
-        {status !== 'live' && !hasCanvas ? (
-          <section className="studioPermissionStep" aria-live="polite">
-            <strong>Access camera</strong>
-            <p>Allow camera + mic when the phone asks. Then pick a look and hit Go Live.</p>
-            <p className="cMuted" role="status">
-              {permissionSummary}
-            </p>
+        <section className="studioPermissionStep" aria-live="polite">
+          <strong>1. Access camera</strong>
+          <p>Tap the button, then Allow camera (mic is optional). Flip to the rear camera if you want.</p>
+          <div className="cBtnRow">
             <button
               type="button"
               className="cBtn primary"
               disabled={!canRequestMedia || checkingAccess}
-              onClick={() => void startPreview(cameraId)}
+              onClick={() => void startPreview(cameraId, facing)}
             >
               {!canRequestMedia
-                ? 'Open https://3000studios.vip/admin'
+                ? 'Use https://3000studios.vip/admin'
                 : checkingAccess
                   ? 'Opening camera…'
-                  : 'Access camera'}
+                  : hasCanvas
+                    ? 'Refresh camera'
+                    : 'Access camera'}
             </button>
-          </section>
-        ) : null}
-        {permHint ? (
-          <div className="studioPermBanner">
-            <strong>Camera blocked</strong>
-            <p>Tap the lock in the browser address bar → allow Camera and Microphone → try again.</p>
-            <button type="button" className="cBtn primary" disabled={checkingAccess} onClick={() => void startPreview(cameraId)}>
-              {checkingAccess ? 'Opening camera…' : 'Access camera'}
+            <button type="button" className="cBtn ghost" disabled={checkingAccess} onClick={() => void flipFacing()}>
+              {facing === 'user' ? 'Use rear camera' : 'Use front camera'}
             </button>
           </div>
-        ) : null}
+        </section>
 
         <label className="easyField">
           <span>Camera</span>
           <select value={cameraId} onChange={(e) => void switchCamera(e.target.value)} className="studioSelect">
             {cameras.length === 0 ? <option value="">Default camera</option> : null}
             {cameras.map((c, i) => (
-              <option key={c.deviceId} value={c.deviceId}>
+              <option key={c.deviceId || i} value={c.deviceId}>
                 {c.label || `Camera ${i + 1}`}
               </option>
             ))}
@@ -440,9 +393,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         ) : null}
 
         <div className="cBtnRow">
-          <button type="button" className="cBtn ghost" onClick={() => void startPreview(cameraId)}>
-            {hasCanvas ? 'Refresh camera' : 'Access camera'}
-          </button>
           {status === 'live' ? (
             <button type="button" className="cBtn danger" onClick={() => void endLive()}>
               End live
@@ -456,7 +406,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
         {error ? <p className="adminError">{error}</p> : null}
         <p className="cMuted studioHelp">
-          Access camera → pick filter / overlay → Go Live. Viewers see it on /live.
+          Access camera → pick filter / overlay → Go Live. Viewers see it on /live. Backend keys stay hidden.
         </p>
       </div>
     </div>
