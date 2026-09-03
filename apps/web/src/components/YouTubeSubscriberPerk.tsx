@@ -98,7 +98,7 @@ export function YouTubeSubscriberPerk() {
   }, []);
 
   useEffect(() => {
-    if (!open || status === 'unlocked' || status === 'playing') return;
+    if (!open || status === 'unlocked' || status === 'playing' || status === 'blocked') return;
     void loadScript('https://apis.google.com/js/platform.js', 'data-yt-platform')
       .then(() => window.gapi?.ytsubscribe?.go())
       .catch(() => undefined);
@@ -114,24 +114,23 @@ export function YouTubeSubscriberPerk() {
 
   const playDrop = async () => {
     const audio = audioRef.current;
-    if (!audio) return false;
+    if (!audio) {
+      setStatus('blocked');
+      setError('Player is ready below. Press the play triangle.');
+      return false;
+    }
     try {
-      if (!audio.getAttribute('src')) audio.src = FREE_TRACK.src;
+      audio.src = FREE_TRACK.src;
       audio.muted = false;
-      audio.volume = 0.85;
-      audio.currentTime = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+      audio.volume = 0.9;
       await audio.play();
       setPlaying(true);
       setStatus('playing');
-      window.dispatchEvent(
-        new CustomEvent('3000-play-track', {
-          detail: { src: FREE_TRACK.src, title: FREE_TRACK.title },
-        }),
-      );
+      setError('');
       return true;
     } catch {
       setStatus('blocked');
-      setError('Tap Play drop to start audio. Your browser blocked autoplay.');
+      setError('Press the player triangle if Play drop is blocked.');
       return false;
     }
   };
@@ -192,16 +191,6 @@ export function YouTubeSubscriberPerk() {
 
   return (
     <>
-      <audio
-        ref={audioRef}
-        src={FREE_TRACK.src}
-        preload="auto"
-        playsInline
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onEnded={() => setPlaying(false)}
-      />
-
       {banner && showGift ? (
         <div className="ytSubBanner" role="status">
           <img src={FREE_TRACK.cover} alt="" />
@@ -209,16 +198,16 @@ export function YouTubeSubscriberPerk() {
             <strong>Subscriber VIP</strong>
             <span>{playing ? `Playing ${FREE_TRACK.title}` : `Unlocked: ${FREE_TRACK.title}`}</span>
           </div>
-          <button type="button" className="ytSubBannerPlay" onClick={() => void playDrop()}>
+          <button type="button" className="ytSubBannerPlay ytPerkSafe" onClick={() => void playDrop()}>
             {playing ? 'Playing' : 'Play'}
           </button>
-          <button type="button" className="ytSubBannerClose" onClick={() => setBanner(false)} aria-label="Dismiss banner">
+          <button type="button" className="ytSubBannerClose ytPerkSafe" onClick={() => setBanner(false)} aria-label="Dismiss banner">
             ×
           </button>
         </div>
       ) : null}
 
-      <button type="button" className="ytSubFab" onClick={() => setOpen(true)}>
+      <button type="button" className="ytSubFab ytPerkSafe" onClick={() => setOpen(true)}>
         {showGift ? 'Subscriber drop' : 'Free subscriber drop'}
       </button>
 
@@ -229,7 +218,7 @@ export function YouTubeSubscriberPerk() {
               <>
                 <p className="vipKicker">Welcome, subscriber</p>
                 <h2 id="yt-sub-title">Your drop is ready.</h2>
-                <p>Thanks for subscribing to @3000Studio. Hit play if the track is not already going.</p>
+                <p>Thanks for subscribing to @3000Studio. Use Play drop or the player controls.</p>
                 <div className="ytSubGift">
                   <img src={FREE_TRACK.cover} alt="" />
                   <div>
@@ -237,7 +226,17 @@ export function YouTubeSubscriberPerk() {
                     <span>Official DistroKid release · free subscriber play</span>
                   </div>
                 </div>
-                <audio className="ytSubPlayer" src={FREE_TRACK.src} controls playsInline preload="auto" />
+                <audio
+                  ref={audioRef}
+                  className="ytSubPlayer"
+                  src={FREE_TRACK.src}
+                  controls
+                  playsInline
+                  preload="auto"
+                  onPlay={() => setPlaying(true)}
+                  onPause={() => setPlaying(false)}
+                  onEnded={() => setPlaying(false)}
+                />
                 {error ? <p className="ytSubWarn">{error}</p> : null}
                 <div className="heroActions">
                   <button type="button" className="studioButton ytCta ytPerkSafe" onClick={() => void playDrop()}>
@@ -268,6 +267,7 @@ export function YouTubeSubscriberPerk() {
                     data-theme="dark"
                   />
                 </div>
+                <audio ref={audioRef} src={FREE_TRACK.src} preload="auto" playsInline hidden />
                 {status === 'need-sub' ? (
                   <p className="ytSubWarn">Google says this account is not subscribed yet. Hit subscribe, then verify again.</p>
                 ) : null}
