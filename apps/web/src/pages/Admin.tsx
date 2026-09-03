@@ -12,6 +12,8 @@ import {
 } from '../lib/streamConfig';
 import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
+import { AdminObservability } from '../components/AdminObservability';
+import '../styles/discover.css';
 
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
@@ -148,12 +150,8 @@ export function Admin() {
             />
           </label>
           {error ? <div className="adminError">{error}</div> : null}
-          <button type="submit" className="cBtn primary" style={{ width: '100%' }}>
-            Unlock
-          </button>
-          <Link to="/" className="adminBackLink">
-            ← Back to public site
-          </Link>
+          <button type="submit" className="cBtn primary" style={{ width: '100%' }}>Unlock</button>
+          <Link to="/" className="adminBackLink">← Back to public site</Link>
         </form>
       </div>
     );
@@ -172,38 +170,24 @@ export function Admin() {
               <span className="cDot" />
               {broadcasting || isLive ? 'LIVE' : 'OFFLINE'}
             </span>
-            <Link to="/live" className="cBtn sm ghost" target="_blank" rel="noreferrer">
-              Public /live
-            </Link>
-            <button className="cBtn sm" type="button" onClick={handleLock}>
-              Lock
-            </button>
+            <Link to="/live" className="cBtn sm ghost" target="_blank" rel="noreferrer">Public /live</Link>
+            <button className="cBtn sm" type="button" onClick={handleLock}>Lock</button>
           </div>
         </header>
-
         <main className="cScroll">
           <div className="cStack">
             <section className="easyStatusStrip">
               <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>{deviceBadge}</div>
-              <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>
-                {whipReady ? 'Stream ready' : 'Stream path missing'}
-              </div>
+              <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>{whipReady ? 'Stream ready' : 'Stream path missing'}</div>
               <div className="easyChip info">Viewers: /live</div>
             </section>
-
             <section className="cPanel">
               <div className="cPanelHead">
                 <h2>Studio</h2>
                 <span className="cSub">Access camera → set the look → Go Live</span>
               </div>
               <div className="cPanelBody">
-                <StreamStudioPanel
-                  whipUrl={whipUrl}
-                  whipReady={whipReady}
-                  liveInputId={liveInputId}
-                  onLiveChange={onStudioLive}
-                  onError={setStudioError}
-                />
+                <StreamStudioPanel whipUrl={whipUrl} whipReady={whipReady} liveInputId={liveInputId} onLiveChange={onStudioLive} onError={setStudioError} />
                 {studioError ? <p className="adminError">{studioError}</p> : null}
                 <p className="adminStandbyNote" style={{ marginTop: 10 }}>
                   {broadcasting ? 'You are live on /live.' : 'Viewers stay on standby until you hit Go Live.'}{' '}
@@ -211,7 +195,7 @@ export function Admin() {
                 </p>
               </div>
             </section>
-
+            <AdminObservability />
             <section className="cPanel">
               <div className="cPanelHead">
                 <h2>Advanced</h2>
@@ -226,32 +210,12 @@ export function Admin() {
                     <p className="cMuted">Built-in WHIP path is already wired. Only change this if Cloudflare rotated keys.</p>
                     <label className="easyField">
                       <span>WHIP publish URL</span>
-                      <input
-                        type="url"
-                        value={whipUrl}
-                        onChange={(e) => {
-                          setWhipUrl(e.target.value);
-                          localStorage.setItem(WHIP_URL_STORAGE_KEY, e.target.value.trim());
-                        }}
-                        spellCheck={false}
-                        autoComplete="off"
-                      />
+                      <input type="url" value={whipUrl} onChange={(e) => { setWhipUrl(e.target.value); localStorage.setItem(WHIP_URL_STORAGE_KEY, e.target.value.trim()); }} spellCheck={false} autoComplete="off" />
                     </label>
                     {STREAM_WHIP_PUBLISH_URL ? (
-                      <button
-                        type="button"
-                        className="cBtn sm ghost"
-                        onClick={() => {
-                          setWhipUrl(STREAM_WHIP_PUBLISH_URL);
-                          localStorage.setItem(WHIP_URL_STORAGE_KEY, STREAM_WHIP_PUBLISH_URL);
-                        }}
-                      >
-                        Reset built-in stream URL
-                      </button>
+                      <button type="button" className="cBtn sm ghost" onClick={() => { setWhipUrl(STREAM_WHIP_PUBLISH_URL); localStorage.setItem(WHIP_URL_STORAGE_KEY, STREAM_WHIP_PUBLISH_URL); }}>Reset built-in stream URL</button>
                     ) : null}
-                    <p className="cMuted" style={{ marginTop: 12 }}>
-                      Customer: {customerCode}
-                    </p>
+                    <p className="cMuted" style={{ marginTop: 12 }}>Customer: {customerCode}</p>
                   </div>
                 ) : null}
               </div>
