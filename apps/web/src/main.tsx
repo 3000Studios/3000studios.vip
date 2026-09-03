@@ -21,6 +21,7 @@ import {
 } from './pages/Home';
 import { DiscoverHome } from './components/DiscoverHome';
 import { BottomDock } from './components/BottomDock';
+import { SampleGate } from './components/SampleGate';
 import { LiveStreamPage } from './pages/LiveStreamPage';
 import { PhoneGoLive } from './pages/PhoneGoLive';
 import { MusicDeck } from './pages/MusicDeck';
@@ -68,6 +69,7 @@ function RootLayout() {
     <>
       <SparkClickFX />
       <YouTubeSubscriberPerk />
+      <SampleGate />
       <Outlet />
       <BottomDock />
       <AdminFab />
