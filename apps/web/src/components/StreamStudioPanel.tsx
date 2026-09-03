@@ -128,7 +128,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const startPreview = useCallback(
     async (deviceId?: string) => {
       if (!canRequestMedia) {
-        const msg = 'Camera access requires HTTPS in Chrome. Open the secure 3000studios.vip page and try again.';
+        const msg = 'Camera needs HTTPS. Stay on https://3000studios.vip/admin.';
         setError(msg);
         onError?.(msg);
         setStatus('error');
@@ -150,8 +150,11 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         const preview = studio.getOutputStream(30, true);
         const cameraTrack = preview.getVideoTracks()[0];
         const microphoneTrack = preview.getAudioTracks()[0];
-        if (!cameraTrack || cameraTrack.readyState !== 'live' || !microphoneTrack || microphoneTrack.readyState !== 'live') {
-          throw new Error('Camera or microphone did not register. Check Chrome site permissions, then retry.');
+        if (!cameraTrack || cameraTrack.readyState !== 'live') {
+          throw new Error('Camera did not start. Tap Allow on the browser prompt.');
+        }
+        if (!microphoneTrack || microphoneTrack.readyState !== 'live') {
+          throw new Error('Microphone did not start. Allow mic, then tap Access camera again.');
         }
         studio.start();
         mountCanvas();
@@ -188,8 +191,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   );
 
   useEffect(() => {
-    // Defer the read until after the effect commits so React does not treat the
-    // permission state update as a synchronous effect cascade.
     const timer = window.setTimeout(() => {
       void refreshPermissions();
     }, 0);
@@ -218,10 +219,10 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
   const permissionSummary =
     permissions.camera === 'granted' && permissions.microphone === 'granted'
-      ? 'Camera and microphone registered'
+      ? 'Camera and mic ready'
       : permissions.camera === 'denied' || permissions.microphone === 'denied'
-        ? 'Chrome is blocking camera or microphone'
-        : 'Camera and microphone access not confirmed yet';
+        ? 'Browser is blocking camera or mic — tap the lock icon and Allow'
+        : 'Tap Access camera, then Allow';
 
   function toggleOverlay(id: OverlayId) {
     setOverlays((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -254,13 +255,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       setStatus('error');
       return;
     }
-    if (!whipReady) {
-      const msg = 'Paste a valid WHIP publish URL (…/<SECRET>/webRTC/publish) in the Phone path section first.';
-      setError(msg);
-      onError?.(msg);
-      setStatus('error');
-      return;
-    }
 
     setStatus('starting');
     setError(null);
@@ -284,7 +278,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
       const out = studio.getOutputStream(30, true);
       if (!out.getVideoTracks().length) {
-        throw new Error('Canvas has no video track. Allow camera, then try Go Live again.');
+        throw new Error('No camera picture yet. Tap Access camera first.');
       }
 
       const publisher = new WhipPublisher(check.endpoint);
@@ -293,6 +287,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
       setStatus('live');
       onLiveChange?.(true);
+      window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: true } }));
       await refreshCameraList();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not go live';
@@ -311,16 +306,17 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     publisherRef.current = null;
     setStatus('preview');
     onLiveChange?.(false);
+    window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: false } }));
   }
 
   return (
     <div className="studioPanel">
       <div className="adminCameraFrame studioPreviewFrame">
         <div ref={mountRef} className="studioCanvasMount" />
-        {status === 'live' ? <div className="streamLiveBadge">● LIVE · WHIP</div> : null}
-        {status === 'starting' ? <div className="adminCameraOverlay">Connecting WHIP (POST SDP)…</div> : null}
+        {status === 'live' ? <div className="streamLiveBadge">● LIVE</div> : null}
+        {status === 'starting' ? <div className="adminCameraOverlay">Going live…</div> : null}
         {status === 'idle' || (status === 'error' && !hasCanvas) ? (
-          <div className="adminCameraOverlay">{error || 'Starting camera preview…'}</div>
+          <div className="adminCameraOverlay">{error || 'Tap Access camera'}</div>
         ) : null}
         <div className="studioFramingBadge" aria-hidden="true">
           {rotation}° · {zoom.toFixed(1)}x
@@ -332,12 +328,8 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       <div className="studioControls">
         {status !== 'live' && !hasCanvas ? (
           <section className="studioPermissionStep" aria-live="polite">
-            <span>Step 1 of 3</span>
-            <strong>Allow camera and microphone</strong>
-            <p>
-              This opens Chrome’s permission prompt for <em>3000studios.vip</em>. Choose <strong>Allow</strong>, then
-              your preview starts automatically.
-            </p>
+            <strong>Access camera</strong>
+            <p>Allow camera + mic when the phone asks. Then pick a look and hit Go Live.</p>
             <p className="cMuted" role="status">
               {permissionSummary}
             </p>
@@ -348,38 +340,26 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
               onClick={() => void startPreview(cameraId)}
             >
               {!canRequestMedia
-                ? 'Open this page in HTTPS Chrome'
+                ? 'Open https://3000studios.vip/admin'
                 : checkingAccess
-                  ? 'Checking camera and mic…'
-                  : 'Check access & start preview'}
+                  ? 'Opening camera…'
+                  : 'Access camera'}
             </button>
           </section>
         ) : null}
         {permHint ? (
           <div className="studioPermBanner">
-            <strong>Camera access needed</strong>
-            <p>
-              In Chrome, tap the lock icon → Permissions → allow <em>Camera</em> and <em>Microphone</em> for this
-              site. Then try again.
-            </p>
-            <button
-              type="button"
-              className="cBtn primary"
-              disabled={checkingAccess}
-              onClick={() => void startPreview(cameraId)}
-            >
-              {checkingAccess ? 'Checking camera and mic…' : 'Check access again'}
+            <strong>Camera blocked</strong>
+            <p>Tap the lock in the browser address bar → allow Camera and Microphone → try again.</p>
+            <button type="button" className="cBtn primary" disabled={checkingAccess} onClick={() => void startPreview(cameraId)}>
+              {checkingAccess ? 'Opening camera…' : 'Access camera'}
             </button>
           </div>
         ) : null}
 
         <label className="easyField">
           <span>Camera</span>
-          <select
-            value={cameraId}
-            onChange={(e) => void switchCamera(e.target.value)}
-            className="studioSelect"
-          >
+          <select value={cameraId} onChange={(e) => void switchCamera(e.target.value)} className="studioSelect">
             {cameras.length === 0 ? <option value="">Default camera</option> : null}
             {cameras.map((c, i) => (
               <option key={c.deviceId} value={c.deviceId}>
@@ -393,27 +373,14 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           <span className="studioBlockLabel">Rotate &amp; crop</span>
           <div className="studioChipRow">
             {ROTATIONS.map((r) => (
-              <button
-                key={r.value}
-                type="button"
-                className={`studioChip ${rotation === r.value ? 'active' : ''}`}
-                onClick={() => setRotation(r.value)}
-              >
+              <button key={r.value} type="button" className={`studioChip ${rotation === r.value ? 'active' : ''}`} onClick={() => setRotation(r.value)}>
                 {r.label}
               </button>
             ))}
-            <button
-              type="button"
-              className={`studioChip ${flipH ? 'active' : ''}`}
-              onClick={() => setFlipH((v) => !v)}
-            >
+            <button type="button" className={`studioChip ${flipH ? 'active' : ''}`} onClick={() => setFlipH((v) => !v)}>
               Flip H
             </button>
-            <button
-              type="button"
-              className={`studioChip ${flipV ? 'active' : ''}`}
-              onClick={() => setFlipV((v) => !v)}
-            >
+            <button type="button" className={`studioChip ${flipV ? 'active' : ''}`} onClick={() => setFlipV((v) => !v)}>
               Flip V
             </button>
             <button type="button" className="studioChip" onClick={resetFraming}>
@@ -422,56 +389,25 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           </div>
           <div className="studioSliders">
             <label className="studioSlider">
-              <span>Zoom / crop {zoom.toFixed(2)}×</span>
-              <input
-                type="range"
-                min={1}
-                max={3}
-                step={0.05}
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-              />
+              <span>Zoom {zoom.toFixed(2)}×</span>
+              <input type="range" min={1} max={3} step={0.05} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} />
             </label>
             <label className="studioSlider">
-              <span>Pan X {panX.toFixed(2)}</span>
-              <input
-                type="range"
-                min={-1}
-                max={1}
-                step={0.02}
-                value={panX}
-                disabled={zoom <= 1.01}
-                onChange={(e) => setPanX(Number(e.target.value))}
-              />
+              <span>Pan X</span>
+              <input type="range" min={-1} max={1} step={0.02} value={panX} disabled={zoom <= 1.01} onChange={(e) => setPanX(Number(e.target.value))} />
             </label>
             <label className="studioSlider">
-              <span>Pan Y {panY.toFixed(2)}</span>
-              <input
-                type="range"
-                min={-1}
-                max={1}
-                step={0.02}
-                value={panY}
-                disabled={zoom <= 1.01}
-                onChange={(e) => setPanY(Number(e.target.value))}
-              />
+              <span>Pan Y</span>
+              <input type="range" min={-1} max={1} step={0.02} value={panY} disabled={zoom <= 1.01} onChange={(e) => setPanY(Number(e.target.value))} />
             </label>
           </div>
-          <p className="cMuted" style={{ fontSize: 11, margin: '6px 0 0' }}>
-            Zoom in to crop, then pan. Rotation and flips are burned into the WHIP feed viewers receive.
-          </p>
         </div>
 
         <div className="studioBlock">
-          <span className="studioBlockLabel">Lens filters</span>
+          <span className="studioBlockLabel">Filters</span>
           <div className="studioChipRow">
             {LENS_FILTERS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                className={`studioChip ${filter === f.id ? 'active' : ''}`}
-                onClick={() => setFilter(f.id)}
-              >
+              <button key={f.id} type="button" className={`studioChip ${filter === f.id ? 'active' : ''}`} onClick={() => setFilter(f.id)}>
                 {f.label}
               </button>
             ))}
@@ -479,16 +415,10 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         </div>
 
         <div className="studioBlock">
-          <span className="studioBlockLabel">Premade overlays</span>
+          <span className="studioBlockLabel">Overlays</span>
           <div className="studioChipRow">
             {PREMADE_OVERLAYS.map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                className={`studioChip ${overlays.includes(o.id) ? 'active' : ''}`}
-                onClick={() => toggleOverlay(o.id)}
-                title={o.hint}
-              >
+              <button key={o.id} type="button" className={`studioChip ${overlays.includes(o.id) ? 'active' : ''}`} onClick={() => toggleOverlay(o.id)} title={o.hint}>
                 {o.label}
               </button>
             ))}
@@ -510,28 +440,22 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
         <div className="cBtnRow">
           <button type="button" className="cBtn ghost" onClick={() => void startPreview(cameraId)}>
-            {hasCanvas ? 'Refresh preview' : 'Retry access'}
+            {hasCanvas ? 'Refresh camera' : 'Access camera'}
           </button>
           {status === 'live' ? (
             <button type="button" className="cBtn danger" onClick={() => void endLive()}>
-              End Stream
+              End live
             </button>
           ) : (
-            <button
-              type="button"
-              className="cBtn primary"
-              disabled={status === 'starting'}
-              onClick={() => void goLive()}
-            >
-              {status === 'starting' ? 'WHIP connecting…' : 'Go Live with looks'}
+            <button type="button" className="cBtn primary" disabled={status === 'starting'} onClick={() => void goLive()}>
+              {status === 'starting' ? 'Going live…' : 'Go Live'}
             </button>
           )}
         </div>
 
         {error ? <p className="adminError">{error}</p> : null}
         <p className="cMuted studioHelp">
-          Left = your composited camera (what you publish). Right = public /live monitor with sound so you can hear
-          what viewers get. Framing + looks are burned into the WHIP stream.
+          Access camera → pick filter / overlay → Go Live. Viewers see it on /live.
         </p>
       </div>
     </div>
