@@ -87,13 +87,14 @@ export function YouTubeSubscriberPerk() {
         setBanner(true);
         return;
       }
+      const path = window.location.pathname || '';
+      if (path.startsWith('/live') || path.startsWith('/admin')) return;
       if (!localStorage.getItem(SEEN_KEY)) {
         const timer = window.setTimeout(() => setOpen(true), 1800);
         return () => window.clearTimeout(timer);
       }
     } catch {
-      const timer = window.setTimeout(() => setOpen(true), 1800);
-      return () => window.clearTimeout(timer);
+      /* ignore */
     }
   }, []);
 
