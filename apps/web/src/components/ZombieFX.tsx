@@ -10,6 +10,10 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+function isPhoneUi() {
+  return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 900;
+}
+
 function playZombieGrowl() {
   const AudioCtx =
     window.AudioContext ||
@@ -116,12 +120,12 @@ export function ZombieFX() {
   const busy = useRef(new WeakSet<Element>());
 
   useEffect(() => {
-    if (prefersReducedMotion()) return;
+    if (prefersReducedMotion() || isPhoneUi()) return;
 
     const skip = (el: HTMLElement | null) =>
       Boolean(
         el?.closest(
-          '.ytSubModal, .ytSubModalScrim, .ytSubFab, .ytSubBanner, .ytPerkSafe, .adminUnlockBtn, .adminFab, form, .gpCollapseBtn',
+          '.ytSubModal, .ytSubModalScrim, .ytSubFab, .ytSubBanner, .ytPerkSafe, .adminUnlockBtn, .adminFab, form, .gpCollapseBtn, .liveOnlyFeed, .liveStreamIframe',
         ),
       );
 
