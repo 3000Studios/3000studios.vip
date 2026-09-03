@@ -1,25 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   OFFICIAL_YOUTUBE_CHANNEL_ID,
   OFFICIAL_YOUTUBE_CHANNEL_URL,
 } from '../data/officialReleases';
 
 const STORAGE_KEY = '3000-yt-subscriber-perk';
-const PROMPT_KEY = '3000-yt-perk-prompted';
-const CLICKED_SUB_KEY = '3000-yt-clicked-subscribe';
-
+const SEEN_KEY = '3000-yt-subscriber-seen';
 const FREE_TRACK = {
   title: 'Not Giving Up Tonight',
   src: '/media/not-giving-up-tonight.mp3',
   watch: 'https://www.youtube.com/watch?v=tIY1WU9N_RU',
+  cover: '/media/covers/not-giving-up-tonight.jpg',
 };
-
-const SUBSCRIBE_URL = `${OFFICIAL_YOUTUBE_CHANNEL_URL}?sub_confirmation=1`;
+const SUBSCRIBE_URL = `https://www.youtube.com/channel/${OFFICIAL_YOUTUBE_CHANNEL_ID}?sub_confirmation=1`;
 
 type Status = 'idle' | 'checking' | 'unlocked' | 'need-sub';
 
 declare global {
   interface Window {
+    gapi?: { ytsubscribe?: { go: () => void } };
     google?: {
       accounts: {
         oauth2: {
@@ -34,21 +33,29 @@ declare global {
   }
 }
 
-function loadGis(): Promise<void> {
-  if (window.google?.accounts?.oauth2) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector('script[data-gis="1"]') as HTMLScriptElement | null;
+function loadScript(src: string, marker: string) {
+  return new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector(`script[${marker}]`) as HTMLScriptElement | null;
     if (existing) {
+      if (existing.dataset.ready === '1') {
+        resolve();
+        return;
+      }
       existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', () => reject(new Error('GIS failed')));
+      existing.addEventListener('error', () => reject(new Error('script failed')));
       return;
     }
     const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
+    script.src = src;
     script.async = true;
-    script.dataset.gis = '1';
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('GIS failed'));
+    script.setAttribute(marker.split('=')[0].replace(/[^a-z-]/g, '') === marker ? marker : marker, '1');
+    const [attr] = marker.split('=');
+    script.setAttribute(attr, '1');
+    script.onload = () => {
+      script.dataset.ready = '1';
+      resolve();
+    };
+    script.onerror = () => reject(new Error('script failed'));
     document.head.appendChild(script);
   });
 }
@@ -60,18 +67,17 @@ async function checkSubscription(accessToken: string) {
   url.searchParams.set('forChannelId', OFFICIAL_YOUTUBE_CHANNEL_ID);
   url.searchParams.set('maxResults', '1');
   const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-  if (!res.ok) throw new Error(`YouTube API ${res.status}`);
+  if (!res.ok) throw new Error('YouTube API error');
   const data = (await res.json()) as { items?: unknown[] };
   return Boolean(data.items?.length);
 }
 
 export function YouTubeSubscriberPerk() {
-  const clientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
-  const canVerify = Boolean(clientId);
+  const clientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined)?.trim();
+  const widgetRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<Status>('idle');
   const [open, setOpen] = useState(false);
   const [banner, setBanner] = useState(false);
-  const [clickedSub, setClickedSub] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -79,75 +85,54 @@ export function YouTubeSubscriberPerk() {
       if (localStorage.getItem(STORAGE_KEY) === '1') {
         setStatus('unlocked');
         setBanner(true);
+        return;
       }
-      if (sessionStorage.getItem(CLICKED_SUB_KEY) === '1') setClickedSub(true);
+      if (!localStorage.getItem(SEEN_KEY)) {
+        const timer = window.setTimeout(() => setOpen(true), 1800);
+        return () => window.clearTimeout(timer);
+      }
     } catch {
-      /* ignore */
+      const timer = window.setTimeout(() => setOpen(true), 1800);
+      return () => window.clearTimeout(timer);
     }
   }, []);
 
   useEffect(() => {
-    if (status === 'unlocked') return;
-    try {
-      if (sessionStorage.getItem(PROMPT_KEY) === '1') return;
-    } catch {
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      try {
-        sessionStorage.setItem(PROMPT_KEY, '1');
-      } catch {
-        /* ignore */
-      }
-      setOpen(true);
-    }, 4500);
-    return () => window.clearTimeout(timer);
-  }, [status]);
+    if (!open || status === 'unlocked') return;
+    void loadScript('https://apis.google.com/js/platform.js', 'data-yt-platform')
+      .then(() => window.gapi?.ytsubscribe?.go())
+      .catch(() => undefined);
+  }, [open, status]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
-
-  const markSubscribeClick = () => {
-    setClickedSub(true);
+  const markSeen = () => {
     try {
-      sessionStorage.setItem(CLICKED_SUB_KEY, '1');
+      localStorage.setItem(SEEN_KEY, '1');
     } catch {
       /* ignore */
     }
   };
 
-  const playDrop = () => {
-    window.dispatchEvent(
-      new CustomEvent('3000-play-track', {
-        detail: { src: FREE_TRACK.src, title: FREE_TRACK.title },
-      }),
-    );
-  };
-
-  const unlock = (playNow: boolean) => {
+  const unlock = () => {
     try {
       localStorage.setItem(STORAGE_KEY, '1');
+      localStorage.setItem(SEEN_KEY, '1');
     } catch {
       /* ignore */
     }
     setStatus('unlocked');
     setBanner(true);
     setOpen(true);
-    if (playNow) playDrop();
+    window.dispatchEvent(
+      new CustomEvent('3000-play-track', { detail: { src: FREE_TRACK.src, title: FREE_TRACK.title } }),
+    );
   };
 
   const verifyWithGoogle = async () => {
-    if (!canVerify) return;
+    if (!clientId) return;
     setStatus('checking');
     setError('');
     try {
-      await loadGis();
+      await loadScript('https://accounts.google.com/gsi/client', 'data-gis');
       await new Promise<void>((resolve, reject) => {
         const client = window.google?.accounts.oauth2.initTokenClient({
           client_id: clientId,
@@ -159,109 +144,110 @@ export function YouTubeSubscriberPerk() {
             }
             try {
               const subscribed = await checkSubscription(response.access_token);
-              if (subscribed) unlock(true);
-              else {
-                setStatus('need-sub');
-                setError('');
-              }
+              if (subscribed) unlock();
+              else setStatus('need-sub');
               resolve();
             } catch (err) {
               reject(err);
             }
           },
         });
-        if (!client) {
-          reject(new Error('Google Identity not ready'));
-          return;
-        }
-        client.requestAccessToken();
+        client?.requestAccessToken();
       });
     } catch {
       setStatus('idle');
-      setError('Google could not finish the check. Subscribe first, then try Verify again.');
+      setError('Google could not confirm this account. Subscribe on YouTube, then claim the drop.');
     }
   };
 
-  const honorUnlock = () => {
-    if (!clickedSub) {
-      setError('Tap Subscribe on YouTube first. Then come back and unlock.');
-      return;
-    }
-    unlock(true);
+  const close = () => {
+    markSeen();
+    setOpen(false);
   };
 
   return (
     <>
       {banner && status === 'unlocked' ? (
         <div className="ytSubBanner" role="status">
-          <strong>Subscriber VIP</strong>
-          <span>Welcome in. Your free drop is unlocked.</span>
-          <button type="button" className="ytSubBannerPlay" onClick={playDrop}>
-            Play it
-          </button>
+          <img src={FREE_TRACK.cover} alt="" />
+          <div>
+            <strong>Subscriber VIP</strong>
+            <span>Welcome in. Your free drop is playing: {FREE_TRACK.title}.</span>
+          </div>
           <button type="button" className="ytSubBannerClose" onClick={() => setBanner(false)} aria-label="Dismiss banner">
             ×
           </button>
         </div>
       ) : null}
 
-      <button type="button" className={status === 'unlocked' ? 'ytSubFab is-on' : 'ytSubFab'} onClick={() => setOpen(true)}>
-        {status === 'unlocked' ? 'Subscriber VIP' : 'Free song'}
+      <button type="button" className="ytSubFab" onClick={() => setOpen(true)}>
+        {status === 'unlocked' ? 'Subscriber drop' : 'Free subscriber drop'}
       </button>
 
       {open ? (
-        <div className="ytSubModalScrim" role="dialog" aria-modal="true" aria-labelledby="yt-sub-title" onClick={() => setOpen(false)}>
-          <div className="ytSubModal" onClick={(event) => event.stopPropagation()}>
+        <div className="ytSubModalScrim" role="dialog" aria-modal="true" aria-labelledby="yt-sub-title">
+          <div className="ytSubModal">
             {status === 'unlocked' ? (
               <>
-                <p className="vipKicker">Subscriber welcome</p>
-                <h2 id="yt-sub-title">You made the cut.</h2>
-                <p>Thanks for riding with @3000Studio. Hit play on your subscriber drop.</p>
+                <p className="vipKicker">Welcome, subscriber</p>
+                <h2 id="yt-sub-title">You are in the VIP.</h2>
+                <p>Thanks for subscribing to @3000Studio. Your DistroKid drop is unlocked and queued on the site player.</p>
+                <div className="ytSubGift">
+                  <img src={FREE_TRACK.cover} alt="" />
+                  <div>
+                    <strong>{FREE_TRACK.title}</strong>
+                    <span>Official DistroKid release · free subscriber play</span>
+                  </div>
+                </div>
                 <div className="heroActions">
-                  <button type="button" className="studioButton" onClick={playDrop}>
-                    Play {FREE_TRACK.title}
-                  </button>
-                  <a className="studioButton secondary" href={FREE_TRACK.watch} target="_blank" rel="noreferrer">
+                  <a className="studioButton ytCta" href={FREE_TRACK.watch} target="_blank" rel="noreferrer">
                     Watch the video
                   </a>
-                  <button type="button" className="studioButton ghost" onClick={() => setOpen(false)}>
+                  <a className="studioButton secondary" href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">
+                    Open channel
+                  </a>
+                  <button type="button" className="studioButton ghost" onClick={close}>
                     Close
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <p className="vipKicker">Official subscriber perk</p>
+                <p className="vipKicker">@3000Studio perk</p>
                 <h2 id="yt-sub-title">Subscribe. Unlock a free drop.</h2>
-                <ol className="ytSubSteps">
-                  <li>Subscribe to the official 3000 Studios channel.</li>
-                  <li>{canVerify ? 'Come back and verify with the same Google account.' : 'Come back and unlock the perk on this device.'}</li>
-                  <li>Play the free song and keep the VIP banner.</li>
-                </ol>
+                <p>
+                  YouTube will not tell this site you are subscribed unless you sign in with Google.
+                  Use the official subscribe button, then claim the DistroKid track.
+                </p>
+                <div className="ytSubWidgetWrap" ref={widgetRef}>
+                  <div
+                    className="g-ytsubscribe"
+                    data-channelid={OFFICIAL_YOUTUBE_CHANNEL_ID}
+                    data-layout="full"
+                    data-count="default"
+                    data-theme="dark"
+                  />
+                </div>
                 {status === 'need-sub' ? (
-                  <p className="ytSubWarn">That Google account is not subscribed to UCTQnEFZUIutrFuDlxGj9cDA yet.</p>
+                  <p className="ytSubWarn">Google says this account is not subscribed yet. Hit subscribe, then verify again.</p>
                 ) : null}
                 {error ? <p className="ytSubWarn">{error}</p> : null}
                 <div className="heroActions">
-                  <a className="studioButton ytCta" href={SUBSCRIBE_URL} target="_blank" rel="noreferrer" onClick={markSubscribeClick}>
-                    1. Subscribe on YouTube
+                  <a className="studioButton ytCta" href={SUBSCRIBE_URL} target="_blank" rel="noreferrer">
+                    Subscribe on YouTube
                   </a>
-                  {canVerify ? (
+                  {clientId ? (
                     <button type="button" className="studioButton secondary" onClick={() => void verifyWithGoogle()} disabled={status === 'checking'}>
-                      {status === 'checking' ? 'Checking YouTube…' : '2. Verify with Google'}
+                      {status === 'checking' ? 'Checking Google…' : 'Verify with Google'}
                     </button>
-                  ) : (
-                    <button type="button" className="studioButton secondary" onClick={honorUnlock} disabled={!clickedSub}>
-                      2. I subscribed — unlock
-                    </button>
-                  )}
-                  <button type="button" className="studioButton ghost" onClick={() => setOpen(false)}>
+                  ) : null}
+                  <button type="button" className="studioButton secondary" onClick={unlock}>
+                    I subscribed — play my drop
+                  </button>
+                  <button type="button" className="studioButton ghost" onClick={close}>
                     Not now
                   </button>
                 </div>
-                {!canVerify ? (
-                  <p className="ytSubNote">Live check needs VITE_GOOGLE_CLIENT_ID in Cloudflare Pages. Until that is set, unlock requires the Subscribe click first.</p>
-                ) : null}
               </>
             )}
           </div>
