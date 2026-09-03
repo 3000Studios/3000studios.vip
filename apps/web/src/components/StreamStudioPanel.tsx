@@ -174,6 +174,15 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     applyFraming(studio);
   }, [filter, overlays, lowerTitle, lowerSub, applyFraming]);
 
+  useEffect(() => {
+    if (status !== 'live') return;
+    void publishServerLiveFlag(true);
+    const id = window.setInterval(() => {
+      void publishServerLiveFlag(true);
+    }, 15000);
+    return () => window.clearInterval(id);
+  }, [status]);
+
   function toggleOverlay(id: OverlayId) {
     setOverlays((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
