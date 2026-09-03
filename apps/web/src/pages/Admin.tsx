@@ -2,26 +2,19 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { Link } from 'react-router-dom';
 import {
   WHIP_URL_STORAGE_KEY,
-  buildWhepUrl,
   validateWhipUrl,
 } from '../lib/webrtcStream';
-import { StreamFrame } from '../components/StreamViewWindow';
 import { StreamStudioPanel } from '../components/StreamStudioPanel';
-import { LiveSiteMonitor } from '../components/LiveSiteMonitor';
-import { StreamSceneEditor } from '../components/StreamSceneEditor';
 import {
   STREAM_CUSTOMER_CODE,
   STREAM_LIVE_INPUT_ID,
-  STREAM_PLAYER_URL,
   STREAM_WHIP_PUBLISH_URL,
-  STREAM_WHEP_URL,
 } from '../lib/streamConfig';
 import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
+import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
-const OBS_SERVER = 'rtmps://live.cloudflare.com:443/live/';
-const CF_LIVE_INPUTS_URL = 'https://dash.cloudflare.com/?to=/:account/stream/inputs';
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 
 const customerCode = STREAM_CUSTOMER_CODE;
@@ -63,8 +56,6 @@ export function Admin() {
   const [whipUrl, setWhipUrl] = useState(() => loadInitialWhipUrl());
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const isConfigured = Boolean(customerCode && liveInputId);
-  const whepUrl = STREAM_WHEP_URL || (isConfigured ? buildWhepUrl(customerCode, liveInputId) : null);
   const whipCheck = validateWhipUrl(whipUrl, liveInputId);
   const whipReady = whipCheck.ok;
 
@@ -107,18 +98,24 @@ export function Admin() {
     setAuthed(false);
     setBroadcasting(false);
     setHostLiveFlag(false);
+    void publishServerLiveFlag(false);
   }
 
   function onStudioLive(live: boolean) {
     setBroadcasting(live);
     setIsLive(live);
     setHostLiveFlag(live);
+    void publishServerLiveFlag(live);
   }
 
   useEffect(() => {
     if (!broadcasting) return undefined;
     setHostLiveFlag(true);
-    const id = window.setInterval(() => setHostLiveFlag(true), 10_000);
+    void publishServerLiveFlag(true);
+    const id = window.setInterval(() => {
+      setHostLiveFlag(true);
+      void publishServerLiveFlag(true);
+    }, 10_000);
     return () => window.clearInterval(id);
   }, [broadcasting]);
 
@@ -173,7 +170,7 @@ export function Admin() {
           <div className="cTopbarRight">
             <span className={`cPill ${broadcasting || isLive ? 'live' : 'warn'}`}>
               <span className="cDot" />
-              {broadcasting ? 'LIVE' : isLive ? 'LIVE' : 'OFFLINE'}
+              {broadcasting || isLive ? 'LIVE' : 'OFFLINE'}
             </span>
             <Link to="/live" className="cBtn sm ghost" target="_blank" rel="noreferrer">
               Public /live
@@ -189,7 +186,7 @@ export function Admin() {
             <section className="easyStatusStrip">
               <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>{deviceBadge}</div>
               <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>
-                {whipReady ? 'Stream ready' : 'Stream URL missing'}
+                {whipReady ? 'Stream ready' : 'Stream path missing'}
               </div>
               <div className="easyChip info">Viewers: /live</div>
             </section>
@@ -208,18 +205,6 @@ export function Admin() {
                   onError={setStudioError}
                 />
                 {studioError ? <p className="adminError">{studioError}</p> : null}
-              </div>
-            </section>
-
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>What viewers see</h2>
-                <span className="cSub">Public /live</span>
-              </div>
-              <div className="cPanelBody">
-                <StreamFrame isLive={broadcasting} className="adminPublicPreview">
-                  <LiveSiteMonitor broadcasting={broadcasting} />
-                </StreamFrame>
                 <p className="adminStandbyNote" style={{ marginTop: 10 }}>
                   {broadcasting ? 'You are live on /live.' : 'Viewers stay on standby until you hit Go Live.'}{' '}
                   <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">Open /live</a>
@@ -229,26 +214,16 @@ export function Admin() {
 
             <section className="cPanel">
               <div className="cPanelHead">
-                <h2>Standby / overlay text</h2>
-                <span className="cSub">Optional public page copy</span>
-              </div>
-              <div className="cPanelBody">
-                <StreamSceneEditor />
-              </div>
-            </section>
-
-            <section className="cPanel">
-              <div className="cPanelHead">
                 <h2>Advanced</h2>
-                <span className="cSub">OBS / keys — leave closed on phone</span>
+                <span className="cSub">OBS / keys stay hidden. Phone Go Live does not need this.</span>
               </div>
               <div className="cPanelBody">
                 <button type="button" className="cBtn ghost" onClick={() => setShowAdvanced((v) => !v)}>
-                  {showAdvanced ? 'Hide OBS / keys' : 'Show OBS / keys'}
+                  {showAdvanced ? 'Hide backend keys' : 'Show backend keys'}
                 </button>
                 {showAdvanced ? (
                   <div className="easyGuide" style={{ marginTop: 16 }}>
-                    <p className="cMuted">Laptop OBS only. Phone Go Live already uses the saved stream path.</p>
+                    <p className="cMuted">Built-in WHIP path is already wired. Only change this if Cloudflare rotated keys.</p>
                     <label className="easyField">
                       <span>WHIP publish URL</span>
                       <input
@@ -275,16 +250,7 @@ export function Admin() {
                       </button>
                     ) : null}
                     <p className="cMuted" style={{ marginTop: 12 }}>
-                      OBS server: {OBS_SERVER}
-                      <br />
-                      <a href={CF_LIVE_INPUTS_URL} target="_blank" rel="noreferrer">Cloudflare Live Inputs</a>
-                      <br />
-                      Player: {STREAM_PLAYER_URL}
-                      {whepUrl ? (
-                        <>
-                          <br />WHEP: {whepUrl}
-                        </>
-                      ) : null}
+                      Customer: {customerCode}
                     </p>
                   </div>
                 ) : null}
