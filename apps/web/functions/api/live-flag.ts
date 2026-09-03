@@ -1,5 +1,5 @@
 const CACHE_URL = 'https://3000studios.vip/__internal/live-flag';
-const MAX_AGE_MS = 45_000;
+const MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
 type Flag = { live: boolean; ts: number };
 
@@ -21,7 +21,7 @@ async function writeFlag(live: boolean) {
   const res = new Response(body, {
     headers: {
       'content-type': 'application/json',
-      'cache-control': 'public, max-age=45',
+      'cache-control': 'no-store',
     },
   });
   await caches.default.put(CACHE_URL, res);

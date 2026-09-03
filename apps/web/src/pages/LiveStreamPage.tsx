@@ -1,7 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { PublicLayout } from './Home';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
-import { StandbySoon } from '../components/StandbySoon';
 import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
 import { STREAM_LIVE_INPUT_ID, STREAM_PLAYER_EMBED_SRC, STREAM_WHEP_URL } from '../lib/streamConfig';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
@@ -11,8 +10,8 @@ const INQUIRY_EMAIL = 'Team@3000studios.vip';
 const TITLE = '3000 Studios.vip LIVE STREAM';
 
 /**
- * Public /live — nav + gold title + stream window + inquiry.
- * WHIP publish requires WHEP playback; OBS RTMPS plays through the hosted Stream player.
+ * Public /live always mounts the Cloudflare Stream iframe so the window is
+ * never empty. WHEP is an optional low-latency overlay when the host is live.
  */
 export function LiveStreamPage() {
   const [scene, setScene] = useState<StreamScene>(() => loadStreamScene());
@@ -32,20 +31,16 @@ export function LiveStreamPage() {
         setLive(state.live);
         if (state.live) {
           setWhepStatus((s) => (s === 'idle' || s === 'error' ? 'connecting' : s));
-        } else {
+        } else if (whepStatus !== 'live') {
           setWhepStatus('idle');
         }
       }
     };
     void poll();
-    // Fast poll so Go Live appears quickly for viewers
-    const id = window.setInterval(poll, 2000);
+    const id = window.setInterval(poll, 2500);
     const unsub = subscribeHostLive((flag) => {
       setLive(flag);
-      if (flag) {
-        // Force WHEP remount to renegotiate after publish starts
-        setWhepKey((k) => k + 1);
-      }
+      if (flag) setWhepKey((k) => k + 1);
     });
     const onHost = (e: Event) => {
       const detail = (e as CustomEvent).detail as { live?: boolean };
@@ -61,19 +56,17 @@ export function LiveStreamPage() {
       unsub();
       window.removeEventListener('3000-host-live', onHost);
     };
-  }, []);
+  }, [whepStatus]);
 
-  // Retry WHEP while marked live but not connected yet; hard-fail to iframe after ~8s
   useEffect(() => {
     if (!live) return;
-    if (whepStatus === 'live') return;
-    if (whepStatus === 'error') return;
+    if (whepStatus === 'live' || whepStatus === 'error') return;
     const retry = window.setInterval(() => {
       setWhepKey((k) => k + 1);
-    }, 4000);
+    }, 5000);
     const failSafe = window.setTimeout(() => {
       setWhepStatus('error');
-    }, 8000);
+    }, 10000);
     return () => {
       window.clearInterval(retry);
       window.clearTimeout(failSafe);
@@ -81,6 +74,7 @@ export function LiveStreamPage() {
   }, [live, whepStatus]);
 
   const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}&body=${encodeURIComponent('Hi 3000 Studios team,\n\n')}`;
+  const useWhep = live && whepStatus !== 'error';
 
   return (
     <PublicLayout variant="blackhole">
@@ -102,40 +96,43 @@ export function LiveStreamPage() {
 
         <main className="livePublicMain">
           <div className="liveOnlyStage livePublicStage mobileSafe">
-            {live ? (
-              <>
-                <div className="liveOnlyFeed">
-                  {whepStatus === 'error' ? (
-                    <iframe
-                      title="3000 Studios Live"
-                      src={STREAM_PLAYER_EMBED_SRC}
-                      className="liveStreamIframe"
-                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <WhepStreamPlayer
-                      key={whepKey}
-                      uid={STREAM_LIVE_INPUT_ID}
-                      whepUrl={STREAM_WHEP_URL}
-                      title="3000 Studios Live"
-                      muted={false}
-                      autoplay
-                      onStatus={(s) => setWhepStatus(s)}
-                    />
-                  )}
-                  {whepStatus === 'connecting' ? (
-                    <div className="liveConnectingOverlay" aria-live="polite">
-                      <strong>Connecting to live feed…</strong>
-                      <span>Trying phone WebRTC first. OBS streams switch to the Cloudflare player automatically.</span>
-                    </div>
-                  ) : null}
+            <div className="liveOnlyFeed">
+              {useWhep ? (
+                <WhepStreamPlayer
+                  key={whepKey}
+                  uid={STREAM_LIVE_INPUT_ID}
+                  whepUrl={STREAM_WHEP_URL}
+                  title="3000 Studios Live"
+                  muted={false}
+                  autoplay
+                  onStatus={(s) => setWhepStatus(s)}
+                />
+              ) : (
+                <iframe
+                  title="3000 Studios Live"
+                  src={`${STREAM_PLAYER_EMBED_SRC}${STREAM_PLAYER_EMBED_SRC.includes('?') ? '&' : '?'}preload=auto`}
+                  className="liveStreamIframe"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                />
+              )}
+              {live && whepStatus === 'connecting' ? (
+                <div className="liveConnectingOverlay" aria-live="polite">
+                  <strong>Connecting to live feed…</strong>
+                  <span>Low-latency WebRTC first. Cloudflare player stays underneath.</span>
                 </div>
-                <StreamOverlayLayers layers={scene.layers} />
-              </>
-            ) : (
-              <StandbySoon scene={scene} hideControls forceMusic={false} shuffle />
-            )}
+              ) : null}
+              {!live ? (
+                <div className="liveStandbyBadge" aria-live="polite">
+                  Waiting for host · player stays ready
+                </div>
+              ) : (
+                <div className="liveOnAirBadge" aria-live="polite">
+                  ON AIR
+                </div>
+              )}
+            </div>
+            {live ? <StreamOverlayLayers layers={scene.layers} /> : null}
           </div>
         </main>
 
