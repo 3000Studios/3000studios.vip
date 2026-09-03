@@ -5,9 +5,12 @@ import {
 } from '../data/officialReleases';
 
 const STORAGE_KEY = '3000-yt-subscriber-perk';
+const PROMPT_KEY = '3000-yt-perk-prompted';
+const CLICKED_SUB_KEY = '3000-yt-clicked-subscribe';
+
 const FREE_TRACK = {
   title: 'Not Giving Up Tonight',
-  src: '/media/always-feel-like.mp3',
+  src: '/media/not-giving-up-tonight.mp3',
   watch: 'https://www.youtube.com/watch?v=tIY1WU9N_RU',
 };
 
@@ -57,16 +60,18 @@ async function checkSubscription(accessToken: string) {
   url.searchParams.set('forChannelId', OFFICIAL_YOUTUBE_CHANNEL_ID);
   url.searchParams.set('maxResults', '1');
   const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-  if (!res.ok) throw new Error('YouTube API error');
+  if (!res.ok) throw new Error(`YouTube API ${res.status}`);
   const data = (await res.json()) as { items?: unknown[] };
   return Boolean(data.items?.length);
 }
 
 export function YouTubeSubscriberPerk() {
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+  const clientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
+  const canVerify = Boolean(clientId);
   const [status, setStatus] = useState<Status>('idle');
   const [open, setOpen] = useState(false);
   const [banner, setBanner] = useState(false);
+  const [clickedSub, setClickedSub] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -75,12 +80,57 @@ export function YouTubeSubscriberPerk() {
         setStatus('unlocked');
         setBanner(true);
       }
+      if (sessionStorage.getItem(CLICKED_SUB_KEY) === '1') setClickedSub(true);
     } catch {
       /* ignore */
     }
   }, []);
 
-  const unlock = () => {
+  useEffect(() => {
+    if (status === 'unlocked') return;
+    try {
+      if (sessionStorage.getItem(PROMPT_KEY) === '1') return;
+    } catch {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      try {
+        sessionStorage.setItem(PROMPT_KEY, '1');
+      } catch {
+        /* ignore */
+      }
+      setOpen(true);
+    }, 4500);
+    return () => window.clearTimeout(timer);
+  }, [status]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const markSubscribeClick = () => {
+    setClickedSub(true);
+    try {
+      sessionStorage.setItem(CLICKED_SUB_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const playDrop = () => {
+    window.dispatchEvent(
+      new CustomEvent('3000-play-track', {
+        detail: { src: FREE_TRACK.src, title: FREE_TRACK.title },
+      }),
+    );
+  };
+
+  const unlock = (playNow: boolean) => {
     try {
       localStorage.setItem(STORAGE_KEY, '1');
     } catch {
@@ -89,16 +139,11 @@ export function YouTubeSubscriberPerk() {
     setStatus('unlocked');
     setBanner(true);
     setOpen(true);
-    window.dispatchEvent(
-      new CustomEvent('3000-play-track', { detail: { src: FREE_TRACK.src, title: FREE_TRACK.title } }),
-    );
+    if (playNow) playDrop();
   };
 
   const verifyWithGoogle = async () => {
-    if (!clientId) {
-      setError('Google client ID is not set yet. Subscribe on YouTube, then confirm below.');
-      return;
-    }
+    if (!canVerify) return;
     setStatus('checking');
     setError('');
     try {
@@ -114,20 +159,35 @@ export function YouTubeSubscriberPerk() {
             }
             try {
               const subscribed = await checkSubscription(response.access_token);
-              if (subscribed) unlock();
-              else setStatus('need-sub');
+              if (subscribed) unlock(true);
+              else {
+                setStatus('need-sub');
+                setError('');
+              }
               resolve();
             } catch (err) {
               reject(err);
             }
           },
         });
-        client?.requestAccessToken();
+        if (!client) {
+          reject(new Error('Google Identity not ready'));
+          return;
+        }
+        client.requestAccessToken();
       });
     } catch {
       setStatus('idle');
-      setError('Could not verify with Google. Subscribe on YouTube, then confirm below.');
+      setError('Google could not finish the check. Subscribe first, then try Verify again.');
     }
+  };
+
+  const honorUnlock = () => {
+    if (!clickedSub) {
+      setError('Tap Subscribe on YouTube first. Then come back and unlock.');
+      return;
+    }
+    unlock(true);
   };
 
   return (
@@ -135,27 +195,32 @@ export function YouTubeSubscriberPerk() {
       {banner && status === 'unlocked' ? (
         <div className="ytSubBanner" role="status">
           <strong>Subscriber VIP</strong>
-          <span>Welcome back. Your free drop is unlocked.</span>
+          <span>Welcome in. Your free drop is unlocked.</span>
+          <button type="button" className="ytSubBannerPlay" onClick={playDrop}>
+            Play it
+          </button>
           <button type="button" className="ytSubBannerClose" onClick={() => setBanner(false)} aria-label="Dismiss banner">
             ×
           </button>
         </div>
       ) : null}
 
-      <button type="button" className="ytSubFab" onClick={() => setOpen(true)}>
-        {status === 'unlocked' ? 'Subscriber perk' : 'YouTube perk'}
+      <button type="button" className={status === 'unlocked' ? 'ytSubFab is-on' : 'ytSubFab'} onClick={() => setOpen(true)}>
+        {status === 'unlocked' ? 'Subscriber VIP' : 'Free song'}
       </button>
 
       {open ? (
-        <div className="ytSubModalScrim" role="dialog" aria-modal="true" aria-labelledby="yt-sub-title">
-          <div className="ytSubModal">
+        <div className="ytSubModalScrim" role="dialog" aria-modal="true" aria-labelledby="yt-sub-title" onClick={() => setOpen(false)}>
+          <div className="ytSubModal" onClick={(event) => event.stopPropagation()}>
             {status === 'unlocked' ? (
               <>
                 <p className="vipKicker">Subscriber welcome</p>
                 <h2 id="yt-sub-title">You made the cut.</h2>
-                <p>Thanks for riding with @3000Studio. Your subscriber drop is unlocked — hit play on the free track.</p>
-                <audio className="ytSubAudio" src={FREE_TRACK.src} controls preload="none" />
+                <p>Thanks for riding with @3000Studio. Hit play on your subscriber drop.</p>
                 <div className="heroActions">
+                  <button type="button" className="studioButton" onClick={playDrop}>
+                    Play {FREE_TRACK.title}
+                  </button>
                   <a className="studioButton secondary" href={FREE_TRACK.watch} target="_blank" rel="noreferrer">
                     Watch the video
                   </a>
@@ -166,33 +231,37 @@ export function YouTubeSubscriberPerk() {
               </>
             ) : (
               <>
-                <p className="vipKicker">Subscriber perk</p>
-                <h2 id="yt-sub-title">Subscribe. Get a free drop.</h2>
-                <p>
-                  YouTube will not tell this site you are subscribed unless you sign in with Google and allow a one-time check.
-                  Subscribe first, then verify.
-                </p>
+                <p className="vipKicker">Official subscriber perk</p>
+                <h2 id="yt-sub-title">Subscribe. Unlock a free drop.</h2>
+                <ol className="ytSubSteps">
+                  <li>Subscribe to the official 3000 Studios channel.</li>
+                  <li>{canVerify ? 'Come back and verify with the same Google account.' : 'Come back and unlock the perk on this device.'}</li>
+                  <li>Play the free song and keep the VIP banner.</li>
+                </ol>
                 {status === 'need-sub' ? (
-                  <p className="ytSubWarn">Google says this account is not subscribed to the official channel yet.</p>
+                  <p className="ytSubWarn">That Google account is not subscribed to UCTQnEFZUIutrFuDlxGj9cDA yet.</p>
                 ) : null}
                 {error ? <p className="ytSubWarn">{error}</p> : null}
                 <div className="heroActions">
-                  <a className="studioButton ytCta" href={SUBSCRIBE_URL} target="_blank" rel="noreferrer">
-                    Subscribe on YouTube
+                  <a className="studioButton ytCta" href={SUBSCRIBE_URL} target="_blank" rel="noreferrer" onClick={markSubscribeClick}>
+                    1. Subscribe on YouTube
                   </a>
-                  {clientId ? (
+                  {canVerify ? (
                     <button type="button" className="studioButton secondary" onClick={() => void verifyWithGoogle()} disabled={status === 'checking'}>
-                      {status === 'checking' ? 'Checking…' : 'Verify with Google'}
+                      {status === 'checking' ? 'Checking YouTube…' : '2. Verify with Google'}
                     </button>
                   ) : (
-                    <button type="button" className="studioButton secondary" onClick={unlock}>
-                      I subscribed — unlock perk
+                    <button type="button" className="studioButton secondary" onClick={honorUnlock} disabled={!clickedSub}>
+                      2. I subscribed — unlock
                     </button>
                   )}
                   <button type="button" className="studioButton ghost" onClick={() => setOpen(false)}>
                     Not now
                   </button>
                 </div>
+                {!canVerify ? (
+                  <p className="ytSubNote">Live check needs VITE_GOOGLE_CLIENT_ID in Cloudflare Pages. Until that is set, unlock requires the Subscribe click first.</p>
+                ) : null}
               </>
             )}
           </div>
