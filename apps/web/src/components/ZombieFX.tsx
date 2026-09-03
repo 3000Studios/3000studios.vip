@@ -10,7 +10,6 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-/** Procedural zombie growl — no external audio asset required. */
 function playZombieGrowl() {
   const AudioCtx =
     window.AudioContext ||
@@ -112,11 +111,6 @@ function detachHands(el: HTMLElement) {
   el.classList.remove('zombie-hand-host');
 }
 
-/**
- * Zombie wallpaper interactivity for 3000 Studios VIP:
- * - Hover buttons → decayed hands claw the perimeter
- * - Click nav / buttons → sucked into live wallpaper + dust warp + growl, restore after 2s
- */
 export function ZombieFX() {
   const navigate = useNavigate();
   const busy = useRef(new WeakSet<Element>());
@@ -124,15 +118,22 @@ export function ZombieFX() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
 
+    const skip = (el: HTMLElement | null) =>
+      Boolean(
+        el?.closest(
+          '.ytSubModal, .ytSubModalScrim, .ytSubFab, .ytSubBanner, .ytPerkSafe, .adminUnlockBtn, .adminFab, form, .gpCollapseBtn',
+        ),
+      );
+
     const onEnter = (e: Event) => {
       const t = (e.target as Element | null)?.closest?.(HOVER_SEL) as HTMLElement | null;
-      if (!t || busy.current.has(t)) return;
+      if (!t || busy.current.has(t) || skip(t)) return;
       attachHands(t);
     };
     const onLeave = (e: Event) => {
       const me = e as MouseEvent;
       const t = (e.target as Element | null)?.closest?.(HOVER_SEL) as HTMLElement | null;
-      if (!t) return;
+      if (!t || skip(t)) return;
       const related = me.relatedTarget as Node | null;
       if (related && t.contains(related)) return;
       detachHands(t);
@@ -140,8 +141,7 @@ export function ZombieFX() {
 
     const onClick = (e: MouseEvent) => {
       const t = (e.target as Element | null)?.closest?.(TARGET_SEL) as HTMLElement | null;
-      if (!t || busy.current.has(t)) return;
-      if (t.closest('.adminUnlockBtn, .adminFab, form, .gpCollapseBtn')) return;
+      if (!t || busy.current.has(t) || skip(t)) return;
 
       busy.current.add(t);
       const rect = t.getBoundingClientRect();
