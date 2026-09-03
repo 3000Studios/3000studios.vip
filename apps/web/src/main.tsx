@@ -14,12 +14,13 @@ import {
   BlogPage,
   CommunityPage,
   ContactPage,
-  Home,
   LegalPage,
   RequestsPage,
   SponsorsPage,
   VideoPage,
 } from './pages/Home';
+import { DiscoverHome } from './components/DiscoverHome';
+import { BottomDock } from './components/BottomDock';
 import { LiveStreamPage } from './pages/LiveStreamPage';
 import { PhoneGoLive } from './pages/PhoneGoLive';
 import { MusicDeck } from './pages/MusicDeck';
@@ -68,6 +69,7 @@ function RootLayout() {
       <SparkClickFX />
       <YouTubeSubscriberPerk />
       <Outlet />
+      <BottomDock />
       <AdminFab />
     </>
   );
@@ -77,7 +79,7 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: '/', element: <Home /> },
+      { path: '/', element: <DiscoverHome /> },
       { path: '/music', element: <MusicDeck /> },
       { path: '/video', element: <VideoPage /> },
       { path: '/live', element: <LiveStreamPage /> },
