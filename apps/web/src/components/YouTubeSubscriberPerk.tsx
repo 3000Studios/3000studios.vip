@@ -14,7 +14,7 @@ const FREE_TRACK = {
 };
 const SUBSCRIBE_URL = `https://www.youtube.com/channel/${OFFICIAL_YOUTUBE_CHANNEL_ID}?sub_confirmation=1`;
 
-type Status = 'idle' | 'checking' | 'unlocked' | 'need-sub';
+type Status = 'idle' | 'checking' | 'unlocked' | 'need-sub' | 'playing' | 'blocked';
 
 declare global {
   interface Window {
@@ -48,7 +48,6 @@ function loadScript(src: string, marker: string) {
     const script = document.createElement('script');
     script.src = src;
     script.async = true;
-    script.setAttribute(marker.split('=')[0].replace(/[^a-z-]/g, '') === marker ? marker : marker, '1');
     const [attr] = marker.split('=');
     script.setAttribute(attr, '1');
     script.onload = () => {
@@ -74,11 +73,12 @@ async function checkSubscription(accessToken: string) {
 
 export function YouTubeSubscriberPerk() {
   const clientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined)?.trim();
-  const widgetRef = useRef<HTMLDivElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [status, setStatus] = useState<Status>('idle');
   const [open, setOpen] = useState(false);
   const [banner, setBanner] = useState(false);
   const [error, setError] = useState('');
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     try {
@@ -98,7 +98,7 @@ export function YouTubeSubscriberPerk() {
   }, []);
 
   useEffect(() => {
-    if (!open || status === 'unlocked') return;
+    if (!open || status === 'unlocked' || status === 'playing') return;
     void loadScript('https://apis.google.com/js/platform.js', 'data-yt-platform')
       .then(() => window.gapi?.ytsubscribe?.go())
       .catch(() => undefined);
@@ -112,19 +112,42 @@ export function YouTubeSubscriberPerk() {
     }
   };
 
-  const unlock = () => {
+  const playDrop = async () => {
+    const audio = audioRef.current;
+    if (!audio) return false;
+    try {
+      if (!audio.getAttribute('src')) audio.src = FREE_TRACK.src;
+      audio.muted = false;
+      audio.volume = 0.85;
+      audio.currentTime = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+      await audio.play();
+      setPlaying(true);
+      setStatus('playing');
+      window.dispatchEvent(
+        new CustomEvent('3000-play-track', {
+          detail: { src: FREE_TRACK.src, title: FREE_TRACK.title },
+        }),
+      );
+      return true;
+    } catch {
+      setStatus('blocked');
+      setError('Tap Play drop to start audio. Your browser blocked autoplay.');
+      return false;
+    }
+  };
+
+  const unlock = async () => {
     try {
       localStorage.setItem(STORAGE_KEY, '1');
       localStorage.setItem(SEEN_KEY, '1');
     } catch {
       /* ignore */
     }
-    setStatus('unlocked');
+    setError('');
     setBanner(true);
     setOpen(true);
-    window.dispatchEvent(
-      new CustomEvent('3000-play-track', { detail: { src: FREE_TRACK.src, title: FREE_TRACK.title } }),
-    );
+    setStatus('unlocked');
+    await playDrop();
   };
 
   const verifyWithGoogle = async () => {
@@ -144,7 +167,7 @@ export function YouTubeSubscriberPerk() {
             }
             try {
               const subscribed = await checkSubscription(response.access_token);
-              if (subscribed) unlock();
+              if (subscribed) await unlock();
               else setStatus('need-sub');
               resolve();
             } catch (err) {
@@ -165,15 +188,30 @@ export function YouTubeSubscriberPerk() {
     setOpen(false);
   };
 
+  const showGift = status === 'unlocked' || status === 'playing' || status === 'blocked';
+
   return (
     <>
-      {banner && status === 'unlocked' ? (
+      <audio
+        ref={audioRef}
+        src={FREE_TRACK.src}
+        preload="auto"
+        playsInline
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+      />
+
+      {banner && showGift ? (
         <div className="ytSubBanner" role="status">
           <img src={FREE_TRACK.cover} alt="" />
           <div>
             <strong>Subscriber VIP</strong>
-            <span>Welcome in. Your free drop is playing: {FREE_TRACK.title}.</span>
+            <span>{playing ? `Playing ${FREE_TRACK.title}` : `Unlocked: ${FREE_TRACK.title}`}</span>
           </div>
+          <button type="button" className="ytSubBannerPlay" onClick={() => void playDrop()}>
+            {playing ? 'Playing' : 'Play'}
+          </button>
           <button type="button" className="ytSubBannerClose" onClick={() => setBanner(false)} aria-label="Dismiss banner">
             ×
           </button>
@@ -181,17 +219,17 @@ export function YouTubeSubscriberPerk() {
       ) : null}
 
       <button type="button" className="ytSubFab" onClick={() => setOpen(true)}>
-        {status === 'unlocked' ? 'Subscriber drop' : 'Free subscriber drop'}
+        {showGift ? 'Subscriber drop' : 'Free subscriber drop'}
       </button>
 
       {open ? (
         <div className="ytSubModalScrim" role="dialog" aria-modal="true" aria-labelledby="yt-sub-title">
           <div className="ytSubModal">
-            {status === 'unlocked' ? (
+            {showGift ? (
               <>
                 <p className="vipKicker">Welcome, subscriber</p>
-                <h2 id="yt-sub-title">You are in the VIP.</h2>
-                <p>Thanks for subscribing to @3000Studio. Your DistroKid drop is unlocked and queued on the site player.</p>
+                <h2 id="yt-sub-title">Your drop is ready.</h2>
+                <p>Thanks for subscribing to @3000Studio. Hit play if the track is not already going.</p>
                 <div className="ytSubGift">
                   <img src={FREE_TRACK.cover} alt="" />
                   <div>
@@ -199,14 +237,19 @@ export function YouTubeSubscriberPerk() {
                     <span>Official DistroKid release · free subscriber play</span>
                   </div>
                 </div>
+                <audio className="ytSubPlayer" src={FREE_TRACK.src} controls playsInline preload="auto" />
+                {error ? <p className="ytSubWarn">{error}</p> : null}
                 <div className="heroActions">
-                  <a className="studioButton ytCta" href={FREE_TRACK.watch} target="_blank" rel="noreferrer">
+                  <button type="button" className="studioButton ytCta ytPerkSafe" onClick={() => void playDrop()}>
+                    {playing ? 'Playing now' : 'Play drop'}
+                  </button>
+                  <a className="studioButton secondary ytPerkSafe" href={FREE_TRACK.watch} target="_blank" rel="noreferrer">
                     Watch the video
                   </a>
-                  <a className="studioButton secondary" href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">
+                  <a className="studioButton ghost ytPerkSafe" href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">
                     Open channel
                   </a>
-                  <button type="button" className="studioButton ghost" onClick={close}>
+                  <button type="button" className="studioButton ghost ytPerkSafe" onClick={close}>
                     Close
                   </button>
                 </div>
@@ -215,11 +258,8 @@ export function YouTubeSubscriberPerk() {
               <>
                 <p className="vipKicker">@3000Studio perk</p>
                 <h2 id="yt-sub-title">Subscribe. Unlock a free drop.</h2>
-                <p>
-                  YouTube will not tell this site you are subscribed unless you sign in with Google.
-                  Use the official subscribe button, then claim the DistroKid track.
-                </p>
-                <div className="ytSubWidgetWrap" ref={widgetRef}>
+                <p>Use the official subscribe button, then claim the DistroKid track. Playback starts on this page.</p>
+                <div className="ytSubWidgetWrap">
                   <div
                     className="g-ytsubscribe"
                     data-channelid={OFFICIAL_YOUTUBE_CHANNEL_ID}
@@ -233,18 +273,18 @@ export function YouTubeSubscriberPerk() {
                 ) : null}
                 {error ? <p className="ytSubWarn">{error}</p> : null}
                 <div className="heroActions">
-                  <a className="studioButton ytCta" href={SUBSCRIBE_URL} target="_blank" rel="noreferrer">
+                  <a className="studioButton ytCta ytPerkSafe" href={SUBSCRIBE_URL} target="_blank" rel="noreferrer">
                     Subscribe on YouTube
                   </a>
                   {clientId ? (
-                    <button type="button" className="studioButton secondary" onClick={() => void verifyWithGoogle()} disabled={status === 'checking'}>
+                    <button type="button" className="studioButton secondary ytPerkSafe" onClick={() => void verifyWithGoogle()} disabled={status === 'checking'}>
                       {status === 'checking' ? 'Checking Google…' : 'Verify with Google'}
                     </button>
                   ) : null}
-                  <button type="button" className="studioButton secondary" onClick={unlock}>
+                  <button type="button" className="studioButton secondary ytPerkSafe" onClick={() => void unlock()}>
                     I subscribed — play my drop
                   </button>
-                  <button type="button" className="studioButton ghost" onClick={close}>
+                  <button type="button" className="studioButton ghost ytPerkSafe" onClick={close}>
                     Not now
                   </button>
                 </div>
