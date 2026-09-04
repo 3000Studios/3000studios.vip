@@ -19,6 +19,10 @@ import '../styles/discover.css';
 const ADMIN_PASSCODE = '3000';
 const AUTH_KEY = '3000-admin-auth-v1';
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
+const NOTES_KEY = '3000-admin-rundown';
+const SESS_KEY = '3000-admin-sessions';
+
+type SessionMark = { ts: number; live: boolean };
 
 const customerCode = STREAM_CUSTOMER_CODE;
 const liveInputId = STREAM_LIVE_INPUT_ID;
@@ -58,6 +62,22 @@ export function Admin() {
   const [studioError, setStudioError] = useState<string | null>(null);
   const [whipUrl, setWhipUrl] = useState(() => loadInitialWhipUrl());
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [notes, setNotes] = useState(() => {
+    try {
+      return localStorage.getItem(NOTES_KEY) || '';
+    } catch {
+      return '';
+    }
+  });
+  const [copied, setCopied] = useState('');
+  const [sessions, setSessions] = useState<SessionMark[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(SESS_KEY) || '[]') as SessionMark[];
+    } catch {
+      return [];
+    }
+  });
+  const [liveFlag, setLiveFlag] = useState<{ live?: boolean; ts?: number } | null>(null);
 
   const whipCheck = validateWhipUrl(whipUrl, liveInputId);
   const whipReady = whipCheck.ok;
@@ -109,7 +129,33 @@ export function Admin() {
     setIsLive(live);
     setHostLiveFlag(live);
     void publishServerLiveFlag(live);
+    const next = [{ ts: Date.now(), live }, ...sessions].slice(0, 12);
+    setSessions(next);
+    localStorage.setItem(SESS_KEY, JSON.stringify(next));
   }
+
+  async function copyText(label: string, value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(label);
+      window.setTimeout(() => setCopied(''), 1600);
+    } catch {
+      setCopied('');
+    }
+  }
+
+  function refreshLiveFlag() {
+    void fetch('/api/live-flag')
+      .then((r) => r.json())
+      .then(setLiveFlag)
+      .catch(() => setLiveFlag(null));
+  }
+
+  useEffect(() => {
+    refreshLiveFlag();
+    const id = window.setInterval(refreshLiveFlag, 12000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (!broadcasting) return undefined;
@@ -180,7 +226,60 @@ export function Admin() {
             <section className="easyStatusStrip">
               <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>{deviceBadge}</div>
               <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>{whipReady ? 'Stream ready' : 'Stream path missing'}</div>
-              <div className="easyChip info">Viewers: /live</div>
+              <div className={`easyChip ${liveFlag?.live || broadcasting ? 'ok' : 'info'}`}>
+                Flag: {liveFlag?.live || broadcasting ? 'ON AIR' : 'offline'}
+              </div>
+              <button type="button" className="easyChip info" onClick={refreshLiveFlag}>Refresh flag</button>
+            </section>
+            <section className="cPanel">
+              <div className="cPanelHead">
+                <h2>Quick actions</h2>
+                <span className="cSub">Copy, preview, phone go-live</span>
+              </div>
+              <div className="cPanelBody adminQuickGrid">
+                <button type="button" className="cBtn sm" onClick={() => copyText('live', PUBLIC_LIVE_URL)}>
+                  {copied === 'live' ? 'Copied /live' : 'Copy /live URL'}
+                </button>
+                <button type="button" className="cBtn sm ghost" onClick={() => copyText('inquiry', 'Team@3000studios.vip')}>
+                  {copied === 'inquiry' ? 'Copied email' : 'Copy inquiry email'}
+                </button>
+                <Link className="cBtn sm ghost" to="/go-live">Phone Go Live</Link>
+                <Link className="cBtn sm ghost" to="/music">Music deck</Link>
+                <Link className="cBtn sm ghost" to="/video">Videos</Link>
+                <a className="cBtn sm ghost" href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">Open public player</a>
+              </div>
+            </section>
+            <section className="cPanel">
+              <div className="cPanelHead">
+                <h2>Run of show</h2>
+                <span className="cSub">Local notes for this browser</span>
+              </div>
+              <div className="cPanelBody">
+                <textarea
+                  className="adminNoteBox"
+                  value={notes}
+                  onChange={(e) => {
+                    setNotes(e.target.value);
+                    localStorage.setItem(NOTES_KEY, e.target.value);
+                  }}
+                  placeholder="Set list, overlays, sponsor reads, camera notes…"
+                />
+                <p className="cMuted" style={{ marginTop: 10 }}>
+                  Last session marks:{' '}
+                  {sessions.length === 0
+                    ? 'none yet'
+                    : sessions.slice(0, 4).map((s) => `${s.live ? 'LIVE' : 'OFF'} ${new Date(s.ts).toLocaleTimeString()}`).join(' · ')}
+                </p>
+              </div>
+            </section>
+            <section className="cPanel">
+              <div className="cPanelHead">
+                <h2>Public preview</h2>
+                <span className="cSub">What viewers see on /live</span>
+              </div>
+              <div className="cPanelBody">
+                <iframe className="adminPreviewFrame" title="Public live preview" src="/live" />
+              </div>
             </section>
             <section className="cPanel">
               <div className="cPanelHead">

@@ -1,0 +1,199 @@
+@layer reset, tokens, layout, components;
+
+@layer tokens {
+  :root {
+    --ink: oklch(96% 0.02 95);
+    --subtle: oklch(90% 0.03 95 / 0.72);
+    --gold: oklch(82% 0.14 85);
+    --gold-soft: oklch(82% 0.14 85 / 0.22);
+    --ember: oklch(68% 0.2 35);
+    --cyan: oklch(86% 0.12 200);
+    --bg: oklch(12% 0.02 260);
+    --glass: oklch(16% 0.02 260 / 0.68);
+    --line: oklch(96% 0.02 95 / 0.16);
+    --font-step-sm: clamp(0.8rem, 0.74rem + 0.28vw, 0.95rem);
+    --font-step-base: clamp(1rem, 0.92rem + 0.4vw, 1.2rem);
+    --font-step-xl: clamp(1.6rem, 1.15rem + 2.2vw, 3.1rem);
+    --space-page: clamp(1rem, 0.7rem + 1.4vw, 2rem);
+    --radius-card: clamp(14px, 1.2vw, 22px);
+    --hero-vh: 100dvh;
+    interpolate-size: allow-keywords;
+  }
+
+  html {
+    hanging-punctuation: first last;
+  }
+
+  h1, h2, h3, .beatGoldTitle, .livePublicTitle {
+    text-wrap: balance;
+  }
+
+  p, .vipCard p, .sampleRow small {
+    text-wrap: pretty;
+  }
+}
+
+@layer layout {
+  .bentoHome {
+    display: grid;
+    gap: clamp(0.75rem, 1.4vw, 1.25rem);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    container-type: inline-size;
+    container-name: home;
+  }
+
+  .bentoHome > * {
+    min-width: 0;
+  }
+
+  .bentoFeature {
+    grid-column: 1 / -1;
+    min-height: min(68dvh, 560px);
+  }
+
+  .bentoLive { grid-column: span 12; }
+  .bentoMusic { grid-column: span 12; }
+  .bentoShop { grid-column: span 12; }
+
+  @container home (min-width: 720px) {
+    .bentoFeature { grid-column: 1 / span 8; grid-row: span 2; }
+    .bentoLive { grid-column: 9 / span 4; }
+    .bentoMusic { grid-column: 9 / span 4; }
+    .bentoShop { grid-column: 1 / -1; }
+  }
+
+  @container home (min-width: 1080px) {
+    .bentoShop { grid-column: 9 / span 4; }
+    .bentoFeature { grid-row: span 3; }
+  }
+
+  .grid-card-deck,
+  .vwGrid,
+  .featureRail,
+  .networkGrid,
+  .sponsorGrid,
+  .blogGrid,
+  .platformTiles,
+  .adminObsGrid {
+    display: grid;
+    gap: clamp(0.75rem, 1.2vw, 1.25rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    container-type: inline-size;
+  }
+
+  .subgrid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 1rem;
+    grid-auto-rows: auto 1fr auto;
+  }
+}
+
+@layer components {
+  .bentoTile {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    border: 1px solid color-mix(in oklch, var(--gold) 35%, transparent);
+    background:
+      linear-gradient(180deg, oklch(20% 0.03 85 / 0.35), oklch(10% 0.02 260 / 0.82));
+    color: var(--ink);
+    text-decoration: none;
+    min-height: 140px;
+    padding: 1.1rem 1.15rem;
+    display: grid;
+    align-content: end;
+    gap: 0.35rem;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+    view-transition-name: bento-tile;
+
+    &:hover {
+      transform: translateY(-4px);
+      border-color: color-mix(in oklch, var(--gold) 70%, white 10%);
+    }
+
+    small {
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      color: var(--gold);
+    }
+
+    strong { font-size: clamp(1.05rem, 0.9rem + 0.8vw, 1.45rem); }
+  }
+
+  .livePulse {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+  }
+
+  .livePulse::before {
+    content: '';
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: oklch(68% 0.22 25);
+    box-shadow: 0 0 0 0 oklch(68% 0.22 25 / 0.7);
+    animation: livePing 1.6s ease-out infinite;
+  }
+
+  @keyframes livePing {
+    70% { box-shadow: 0 0 0 10px oklch(68% 0.22 25 / 0); }
+    100% { box-shadow: 0 0 0 0 oklch(68% 0.22 25 / 0); }
+  }
+
+  .liveStageFrame {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: #000;
+    container-type: inline-size;
+  }
+
+  .liveStageFrame iframe,
+  .liveStreamIframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .adminQuickGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    gap: 0.65rem;
+  }
+
+  .adminNoteBox {
+    width: 100%;
+    min-height: 7rem;
+    resize: vertical;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: oklch(12% 0.02 260 / 0.7);
+    color: var(--ink);
+    padding: 0.75rem;
+  }
+
+  .adminPreviewFrame {
+    width: 100%;
+    min-height: 220px;
+    border: 0;
+    border-radius: 14px;
+    background: #000;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .livePulse::before,
+  .bentoTile {
+    animation: none;
+    transition: none;
+  }
+}

@@ -4,7 +4,6 @@ import { motion, type Variants } from 'framer-motion';
 import { rolloutSongs, type SongPalette } from '../data/music';
 import { GlobalMusicToggle, useGlobalMusic } from '../components/GlobalMusic';
 import {
-  OFFICIAL_YOUTUBE_CHANNEL_URL,
   officialReleaseVideos,
   youtubeArtworkUrl,
   youtubeEmbedUrl,

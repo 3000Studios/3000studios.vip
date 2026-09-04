@@ -63,8 +63,14 @@
   color: #d4af37;
 }
 .vwCopy strong { font-size: 1.35rem; line-height: 1.15; }
-.vwGrid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-@media (min-width: 720px) { .vwGrid { grid-template-columns: 1fr 1fr 1fr; } }
+.vwGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+}
+@media (min-width: 720px) {
+  .vwGrid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+}
 .discoverHead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
 .discoverHead h2 { margin: 0; color: #f3e6c4; }
 .discoverHead a { color: #d4af37; }

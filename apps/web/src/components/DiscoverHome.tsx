@@ -48,13 +48,30 @@ export function DiscoverHome() {
             ),
           )}
         </section>
-        <VideoWallpaperCard className="discoverHero" videoId={featured.videoId} kicker="Featured official video" title="Watch the videos. Own the drop." href={youtubeWatchUrl(featured.videoId)}>
-          <p>{featured.title} · sample {SAMPLE_SECONDS}s free · full track {formatMoney(TRACK_PRICE_CENTS)}</p>
-          <div className="discoverHeroActions">
-            <Link className="pill" to="/video">Watch</Link>
-            <Link className="pill gold" to="/shop">Shop</Link>
-          </div>
-        </VideoWallpaperCard>
+        <section className="bentoHome" aria-label="Home bento">
+          <VideoWallpaperCard className="discoverHero bentoFeature" videoId={featured.videoId} kicker="Featured official video" title="Watch the videos. Own the drop." href={youtubeWatchUrl(featured.videoId)}>
+            <p>{featured.title} · sample {SAMPLE_SECONDS}s free · full track {formatMoney(TRACK_PRICE_CENTS)}</p>
+            <div className="discoverHeroActions">
+              <Link className="pill" to="/video">Watch</Link>
+              <Link className="pill gold" to="/shop">Shop</Link>
+            </div>
+          </VideoWallpaperCard>
+          <Link className="bentoTile bentoLive" to="/live">
+            <small>Broadcast</small>
+            <strong>3000 Studios Live</strong>
+            <span>Standby until the host goes on air. Player stays ready.</span>
+          </Link>
+          <Link className="bentoTile bentoMusic" to="/music">
+            <small>Coverflow</small>
+            <strong>Music deck</strong>
+            <span>Official cards, seek, and catalog — music stays off until you hit play.</span>
+          </Link>
+          <Link className="bentoTile bentoShop" to="/shop">
+            <small>Unlock</small>
+            <strong>Own the vault</strong>
+            <span>{formatMoney(TRACK_PRICE_CENTS)} a track · {formatMoney(MONTHLY_PRICE_CENTS)} / month</span>
+          </Link>
+        </section>
         <section className="discoverUnlock">
           <h2>Samples only until you unlock</h2>
           <p>Every song plays a {SAMPLE_SECONDS}-second preview. Buy one track for {formatMoney(TRACK_PRICE_CENTS)}, or unlock the whole vault.</p>
