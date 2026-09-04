@@ -11,11 +11,14 @@ import {
 import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSong } from '../data/music';
 
 
+const MUSIC_ON_KEY = '3000-music-on';
+
 type MusicApi = {
   isPlaying: boolean;
   muted: boolean;
   volume: number;
   currentTime: number;
+  progress: number;
   duration: number;
   activeIndex: number;
   activeSong: CatalogSong;
@@ -25,11 +28,12 @@ type MusicApi = {
   toggle: () => void;
   next: () => void;
   prev: () => void;
+  seek: (t: number) => void;
   setVolume: (v: number) => void;
   setMuted: (m: boolean) => void;
   seekTo: (seconds: number) => void;
   playTrack: (src: string, title: string) => void;
-  playIndex: (i: number) => void;
+  playIndex: (i: number, opts?: { autoplay?: boolean }) => void;
 };
 
 const MusicContext = createContext<MusicApi | null>(null);
@@ -129,8 +133,11 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       audio.muted = muted;
       connectAnalyzer();
       void ctxRef.current?.resume();
-      if (opts?.autoplay !== false) {
+      if (opts?.autoplay === true) {
         void audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+      } else {
+        audio.pause();
+        setIsPlaying(false);
       }
     },
     [volume, muted, connectAnalyzer],
@@ -141,7 +148,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       const song = getSongBySrc(src) || getSongByTitle(title);
       if (song) {
         const idx = rolloutSongs.findIndex((s) => s.slug === song.slug || s.src === song.src);
-        playIndex(idx >= 0 ? idx : 0);
+        playIndex(idx >= 0 ? idx : 0, { autoplay: true });
         return;
       }
       const audio = audioRef.current;
@@ -167,17 +174,22 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggle = useCallback(() => {
-    if (isPlaying) pause();
-    else play();
+    if (isPlaying) {
+      pause();
+      localStorage.setItem(MUSIC_ON_KEY, '0');
+    } else {
+      play();
+      localStorage.setItem(MUSIC_ON_KEY, '1');
+    }
   }, [isPlaying, play, pause]);
 
   const next = useCallback(() => {
-    playIndex(activeIndex + 1);
-  }, [activeIndex, playIndex]);
+    playIndex(activeIndex + 1, { autoplay: isPlaying });
+  }, [activeIndex, isPlaying, playIndex]);
 
   const prev = useCallback(() => {
-    playIndex(activeIndex - 1);
-  }, [activeIndex, playIndex]);
+    playIndex(activeIndex - 1, { autoplay: isPlaying });
+  }, [activeIndex, isPlaying, playIndex]);
 
   const setVolume = useCallback((v: number) => {
     const clamped = Math.min(1, Math.max(0, v));
@@ -198,12 +210,14 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     setCurrentTime(audio.currentTime);
   }, []);
 
+  const seek = seekTo;
+
   // Load metadata only. Playback must always come from an explicit music control.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
-    playIndex(startIndex);
+    playIndex(startIndex, { autoplay: false });
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
@@ -211,7 +225,22 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const onEnded = () => playIndex(activeIndex + 1);
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onTime = () => {
+      setCurrentTime(audio.currentTime || 0);
+      setDuration(audio.duration || 0);
+    };
+    audio.addEventListener('timeupdate', onTime);
+    audio.addEventListener('loadedmetadata', onTime);
+    return () => {
+      audio.removeEventListener('timeupdate', onTime);
+      audio.removeEventListener('loadedmetadata', onTime);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onEnded = () => playIndex(activeIndex + 1, { autoplay: true });
     const audio = audioRef.current;
     audio?.addEventListener('ended', onEnded);
     return () => audio?.removeEventListener('ended', onEnded);
@@ -260,6 +289,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       muted,
       volume,
       currentTime,
+      progress: currentTime,
       duration,
       activeIndex,
       activeSong,
@@ -269,6 +299,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       toggle,
       next,
       prev,
+      seek,
       setVolume,
       setMuted,
       seekTo,
@@ -289,6 +320,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       toggle,
       next,
       prev,
+      seek,
       setVolume,
       setMuted,
       seekTo,
@@ -305,7 +337,24 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/** Now-playing bar removed — playback lives on /music. */
+/** Site-wide music on/off control. */
+export function GlobalMusicToggle({ className = '' }: { className?: string }) {
+  const { isPlaying, toggle, activeTitle } = useGlobalMusic();
+  return (
+    <button
+      type="button"
+      className={`globalMusicToggle ${isPlaying ? 'is-on' : 'is-off'} ${className}`.trim()}
+      onClick={toggle}
+      aria-pressed={isPlaying}
+      aria-label={isPlaying ? 'Turn music off' : 'Turn music on'}
+      title={isPlaying ? `Music on · ${activeTitle}` : 'Music off'}
+    >
+      <span className="globalMusicToggleIcon" aria-hidden="true">{isPlaying ? '♪' : '⊘'}</span>
+      <span className="globalMusicToggleLabel">{isPlaying ? 'Music on' : 'Music off'}</span>
+    </button>
+  );
+}
+
 export function GlobalMusicBar() {
-  return null;
+  return <GlobalMusicToggle />;
 }

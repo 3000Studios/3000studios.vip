@@ -1,18 +1,13 @@
-import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
+import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Pause,
-  Play,
-  SkipBack,
-  SkipForward,
-  SpeakerHigh,
-  SpeakerSlash,
-} from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
-import { distrokidSongs, rolloutSongs } from '../data/music';
+import { rolloutSongs } from '../data/music';
 import {
   OFFICIAL_YOUTUBE_CHANNEL_URL,
   officialReleaseVideos,
+  youtubeArtworkUrl,
+  youtubeEmbedUrl,
+  youtubeWatchUrl,
 } from '../data/officialReleases';
 import { PublicLayout } from './Home';
 import '../styles/music-deck.css';
@@ -30,132 +25,118 @@ function formatTime(value: number) {
 
 export function MusicDeck() {
   const music = useGlobalMusic();
-  const platterRef = useRef<HTMLButtonElement | null>(null);
-  const scratchRef = useRef({ angle: 0, time: 0, wasPlaying: false });
-  const [scratchAngle, setScratchAngle] = useState(0);
-  const [scratching, setScratching] = useState(false);
-  const video = useMemo(
-    () => officialReleaseVideos.find((item) => normalized(item.title) === normalized(music.activeSong.title)),
-    [music.activeSong.title],
+  const catalog = officialReleaseVideos;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [drag, setDrag] = useState<{ startX: number } | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const active = catalog[activeIndex] ?? catalog[0];
+  const matchedSong = useMemo(
+    () => rolloutSongs.find((song) => normalized(song.title) === normalized(active.title)),
+    [active.title],
   );
-  const fallbackVideo = officialReleaseVideos[music.activeIndex % officialReleaseVideos.length];
-  const wallpaperId = video?.videoId || fallbackVideo.videoId;
 
-  const angleAt = (event: PointerEvent<HTMLButtonElement>) => {
-    const rect = platterRef.current?.getBoundingClientRect();
-    if (!rect) return 0;
-    return Math.atan2(event.clientY - rect.top - rect.height / 2, event.clientX - rect.left - rect.width / 2);
+  const pick = (index: number) => {
+    const next = ((index % catalog.length) + catalog.length) % catalog.length;
+    setActiveIndex(next);
+    const video = catalog[next];
+    const songIdx = rolloutSongs.findIndex((song) => normalized(song.title) === normalized(video.title));
+    if (songIdx >= 0) music.playIndex(songIdx, { autoplay: music.isPlaying });
   };
-  const startScratch = (event: PointerEvent<HTMLButtonElement>) => {
+
+  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    setDrag({ startX: event.clientX });
     event.currentTarget.setPointerCapture(event.pointerId);
-    scratchRef.current = { angle: angleAt(event), time: music.currentTime, wasPlaying: music.isPlaying };
-    music.pause();
-    setScratching(true);
-  };
-  const moveScratch = (event: PointerEvent<HTMLButtonElement>) => {
-    if (!scratching) return;
-    const delta = angleAt(event) - scratchRef.current.angle;
-    const seconds = scratchRef.current.time + delta * 2.6;
-    music.seekTo(seconds);
-    setScratchAngle((value) => value + (delta * 180) / Math.PI);
-    scratchRef.current = { ...scratchRef.current, angle: angleAt(event), time: seconds };
-  };
-  const endScratch = () => {
-    setScratching(false);
-    if (scratchRef.current.wasPlaying) music.play();
   };
 
-  const keyboardSeek = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
-      event.preventDefault();
-      music.seekTo(music.currentTime - 5);
-    }
-    if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      music.seekTo(music.currentTime + 5);
-    }
+  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (!drag) return;
+    const delta = event.clientX - drag.startX;
+    if (delta < -48) pick(activeIndex + 1);
+    else if (delta > 48) pick(activeIndex - 1);
+    setDrag(null);
   };
+
+  const yt = active.videoId;
+  const art = youtubeArtworkUrl(yt);
 
   return (
     <PublicLayout variant="electric">
-      <div className="musicVideoWall" aria-hidden="true">
-        <iframe
-          title=""
-          src={`https://www.youtube-nocookie.com/embed/${wallpaperId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${wallpaperId}&rel=0&modestbranding=1`}
-          allow="autoplay; encrypted-media"
-        />
-      </div>
-      <main className="musicDeckPage">
-        <section className="deckArtworkStage">
-          <img src={music.activeSong.cover} alt={`${music.activeSong.title} cover art`} />
-        </section>
-        <section className={`turntableDeck${scratching ? ' is-scratching' : ''}`} aria-label="Interactive turntable">
-          <button
-            ref={platterRef}
-            className={`vinylPlatter${music.isPlaying && !scratching ? ' is-spinning' : ''}`}
-            style={{ '--scratch-angle': `${scratchAngle}deg` } as CSSProperties}
-            type="button"
-            onPointerDown={startScratch}
-            onPointerMove={moveScratch}
-            onPointerUp={endScratch}
-            onPointerCancel={endScratch}
-            onKeyDown={keyboardSeek}
-            aria-label="Scratch record to seek"
+      <main className="vipMain dkMusicPage musicDeckPage">
+        <div className="dkArtFill" style={{ backgroundImage: `url(${art})` }} aria-hidden="true" />
+        <div className="dkVideoStage" aria-hidden="true">
+          <iframe
+            key={`${yt}-${music.isPlaying ? 'play' : 'stop'}`}
+            title={`${active.title} video`}
+            src={`${youtubeEmbedUrl(yt)}&autoplay=${music.isPlaying ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1`}
+            allow="encrypted-media; picture-in-picture"
+          />
+        </div>
+        <div className="dkArtDim" aria-hidden="true" />
+        <section className="dkStage" aria-label="Official release coverflow">
+          <p className="vipKicker dkKicker">3000 Studios · Coverflow</p>
+          <div
+            className="dkCoverflow"
+            ref={stageRef}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerCancel={() => setDrag(null)}
           >
-            <span className="vinylLabel"><img src="/media/official-3000-studios-profile.png" alt="" /></span>
-          </button>
-        </section>
-        <section className="deckControls" aria-label="Music controls">
-          <div className="deckTitle">
-            <div>
-              <h1>{music.activeSong.title}</h1>
-              <p>3000 Studios</p>
-            </div>
-          </div>
-          <label className="deckSeek">
-            <span className="srOnly">Song position</span>
-            <input type="range" min="0" max={music.duration || 1} value={Math.min(music.currentTime, music.duration || 1)} onChange={(event) => music.seekTo(Number(event.target.value))} />
-            <small>{formatTime(music.currentTime)}</small>
-            <small>-{formatTime(Math.max(0, music.duration - music.currentTime))}</small>
-          </label>
-          <div className="transportControls">
-            <button type="button" onClick={music.prev} aria-label="Previous song"><SkipBack weight="fill" /></button>
-            <button className="mainTransport" type="button" onClick={music.toggle} aria-label={music.isPlaying ? 'Pause' : 'Play'}>
-              {music.isPlaying ? <Pause weight="fill" /> : <Play weight="fill" />}
-            </button>
-            <button type="button" onClick={music.next} aria-label="Next song"><SkipForward weight="fill" /></button>
-          </div>
-          <label className="volumeControl">
-            <button type="button" onClick={() => music.setMuted(!music.muted)} aria-label={music.muted ? 'Unmute' : 'Mute'}>
-              {music.muted ? <SpeakerSlash /> : <SpeakerHigh />}
-            </button>
-            <input type="range" min="0" max="1" step="0.01" value={music.muted ? 0 : music.volume} onChange={(event) => music.setVolume(Number(event.target.value))} />
-          </label>
-        </section>
-        <section className="deckQueue" aria-labelledby="up-next-title">
-          <div className="queueHeading"><h2 id="up-next-title">Official release deck</h2></div>
-          <div className="releaseRail">
-            {distrokidSongs.map((song) => {
-              const index = rolloutSongs.findIndex((item) => item.slug === song.slug);
+            {catalog.map((song, index) => {
+              const offset = index - activeIndex;
+              const abs = Math.abs(offset);
+              if (abs > 4) return null;
               return (
-                <button className={song.slug === music.activeSong.slug ? 'releaseTile is-active' : 'releaseTile'} type="button" key={song.slug} onClick={() => music.playIndex(index)}>
-                  <img src={song.cover} alt="" loading="lazy" />
-                  <span><strong>{song.title}</strong></span>
-                  <Play weight="fill" />
+                <button
+                  type="button"
+                  key={song.videoId}
+                  className={offset === 0 ? 'dkSlide is-active' : 'dkSlide'}
+                  style={{ '--offset': offset, zIndex: 40 - abs } as CSSProperties}
+                  onClick={() => pick(index)}
+                  aria-current={offset === 0 ? 'true' : undefined}
+                  aria-label={song.title}
+                >
+                  <img src={youtubeArtworkUrl(song.videoId)} alt="" draggable={false} />
                 </button>
               );
             })}
           </div>
+
+          <div className="dkPlayer">
+            <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex - 1)} aria-label="Previous song">‹</button>
+            <button type="button" className="dkPlayMain" onClick={music.toggle} aria-label={music.isPlaying ? 'Pause' : 'Play'}>
+              {music.isPlaying ? '❚❚' : '▶'}
+            </button>
+            <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex + 1)} aria-label="Next song">›</button>
+            <div className="dkPlayerMeta">
+              <strong>{active.title}</strong>
+              <span>3000 Studios · {active.release}{matchedSong ? '' : ' · video'}</span>
+            </div>
+            <label className="dkSeek">
+              <span>{formatTime(music.currentTime)}</span>
+              <input
+                type="range"
+                min={0}
+                max={Math.max(1, music.duration)}
+                step={0.1}
+                value={Math.min(music.currentTime, music.duration || 0)}
+                onChange={(event) => music.seekTo(Number(event.target.value))}
+                aria-label="Seek"
+              />
+              <span>{formatTime(music.duration)}</span>
+            </label>
+            <a className="studioButton secondary dkWatch" href={youtubeWatchUrl(yt)} target="_blank" rel="noreferrer">Open video</a>
+          </div>
+
+          <nav className="platformLinks" aria-label="Official music platforms">
+            <a href={SPOTIFY_ARTIST} target="_blank" rel="noreferrer">Spotify</a>
+            <a href={APPLE_ARTIST} target="_blank" rel="noreferrer">Apple Music</a>
+            <a href={YT_MUSIC} target="_blank" rel="noreferrer">YouTube Music</a>
+            <a href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">YouTube</a>
+            <Link to="/video">Videos</Link>
+            <Link to="/live">Live</Link>
+            <Link to="/shop">Shop</Link>
+          </nav>
         </section>
-        <nav className="platformLinks" aria-label="Official music platforms">
-          <a href={SPOTIFY_ARTIST} target="_blank" rel="noreferrer">Spotify</a>
-          <a href={APPLE_ARTIST} target="_blank" rel="noreferrer">Apple Music</a>
-          <a href={YT_MUSIC} target="_blank" rel="noreferrer">YouTube Music</a>
-          <a href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">YouTube</a>
-          <Link to="/video">Videos</Link>
-          <Link to="/live">Live</Link>
-          <Link to="/shop">Shop</Link>
-        </nav>
       </main>
     </PublicLayout>
   );

@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { type SongPalette } from '../data/music';
+import { rolloutSongs, type SongPalette } from '../data/music';
+import { GlobalMusicToggle, useGlobalMusic } from '../components/GlobalMusic';
 import {
   OFFICIAL_YOUTUBE_CHANNEL_URL,
   officialReleaseVideos,
@@ -282,6 +283,8 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
           </div>
         </nav>
 
+        <GlobalMusicToggle className="vipHeaderMusic" />
+
         <button className={open ? 'vipMenu is-open' : 'vipMenu'} type="button" aria-expanded={open} aria-controls="vip-primary-nav" onClick={() => setOpen((value) => !value)}>
           <span className="vipMenuBars" aria-hidden="true"><i /><i /><i /></span>
           <span className="vipMenuText">{open ? 'Close' : 'Menu'}</span>
@@ -379,43 +382,123 @@ export function Home() {
   );
 }
 
+function formatClock(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 export function MusicShowcase() {
+  const catalog = officialReleaseVideos;
+  const music = useGlobalMusic();
   const [activeIndex, setActiveIndex] = useState(0);
-  const playerRef = useRef<HTMLDivElement | null>(null);
-  const activeSong = officialReleaseVideos[activeIndex] ?? officialReleaseVideos[0];
-  const pick = (index: number) => setActiveIndex(((index % officialReleaseVideos.length) + officialReleaseVideos.length) % officialReleaseVideos.length);
-  const preview = (index: number) => {
-    pick(index);
-    window.setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
+  const [drag, setDrag] = useState<{ startX: number } | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const active = catalog[activeIndex] ?? catalog[0];
+  const norm = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  const pick = (index: number) => {
+    const next = ((index % catalog.length) + catalog.length) % catalog.length;
+    setActiveIndex(next);
+    const video = catalog[next];
+    const songIdx = rolloutSongs.findIndex((song) => norm(song.title) === norm(video.title));
+    if (songIdx >= 0) music.playIndex(songIdx, { autoplay: music.isPlaying });
   };
+
+  const onPointerDown = (event: ReactPointerEvent) => {
+    setDrag({ startX: event.clientX });
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  const onPointerUp = (event: ReactPointerEvent) => {
+    if (!drag) return;
+    const delta = event.clientX - drag.startX;
+    if (delta < -48) pick(activeIndex + 1);
+    else if (delta > 48) pick(activeIndex - 1);
+    setDrag(null);
+  };
+
+  const yt = active.videoId;
+  const art = youtubeArtworkUrl(yt);
 
   return (
     <PublicLayout variant="vortex">
       <main className="vipMain dkMusicPage">
-        <div className="dkArtFill" style={{ backgroundImage: `url(${youtubeArtworkUrl(activeSong.videoId)})` }} aria-hidden="true" />
+        <div className="dkArtFill" style={{ backgroundImage: `url(${art})` }} aria-hidden="true" />
+        <div className="dkVideoStage" aria-hidden="true">
+          <iframe
+            key={`${yt}-${music.isPlaying ? 'play' : 'stop'}`}
+            title={`${active.title} video`}
+            src={`${youtubeEmbedUrl(yt)}&autoplay=${music.isPlaying ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1`}
+            allow="encrypted-media; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
         <div className="dkArtDim" aria-hidden="true" />
-        <section className="dkStage" aria-label="DistroKid releases">
-          <p className="vipKicker dkKicker">DistroKid · Official YouTube catalog</p>
-          <div className="dkDock" ref={playerRef}>
-            <button type="button" className="dkArrow" onClick={() => pick(activeIndex - 1)} aria-label="Previous release">
+        <section className="dkStage" aria-label="Music catalog">
+          <p className="vipKicker dkKicker">3000 Studios · Coverflow</p>
+          <div
+            className="dkCoverflow"
+            ref={stageRef}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerCancel={() => setDrag(null)}
+          >
+            {catalog.map((song, index) => {
+              const offset = index - activeIndex;
+              const abs = Math.abs(offset);
+              if (abs > 4) return null;
+              return (
+                <button
+                  type="button"
+                  key={song.videoId}
+                  className={offset === 0 ? 'dkSlide is-active' : 'dkSlide'}
+                  style={{
+                    '--offset': offset,
+                    zIndex: 40 - abs,
+                  } as CSSProperties}
+                  onClick={() => pick(index)}
+                  aria-current={offset === 0 ? 'true' : undefined}
+                  aria-label={song.title}
+                >
+                  <img src={youtubeArtworkUrl(song.videoId)} alt="" draggable={false} />
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="dkPlayer">
+            <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex - 1)} aria-label="Previous song">
               ‹
             </button>
-            <div className="dkHero">
-              <iframe className="dkOfficialEmbed" src={youtubeEmbedUrl(activeSong.videoId)} title={`${activeSong.title} official video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
-              <div className="dkMeta">
-                <h1>{activeSong.title}</h1>
-                <p>3000 Studios · {activeSong.release} · {activeSong.duration}</p>
-                <div className="dkActions">
-                  <a className="studioButton ytCta" href={youtubeWatchUrl(activeSong.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a>
-                  <a className="studioButton secondary" href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">Official channel</a>
-                </div>
-              </div>
-            </div>
-            <button type="button" className="dkArrow" onClick={() => pick(activeIndex + 1)} aria-label="Next release">
+            <button type="button" className="dkPlayMain" onClick={music.toggle} aria-label={music.isPlaying ? 'Pause' : 'Play'}>
+              {music.isPlaying ? '❚❚' : '▶'}
+            </button>
+            <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex + 1)} aria-label="Next song">
               ›
             </button>
+            <div className="dkPlayerMeta">
+              <strong>{active.title}</strong>
+              <span>3000 Studios · {active.release}</span>
+            </div>
+            <label className="dkSeek">
+              <span>{formatClock(music.progress)}</span>
+              <input
+                type="range"
+                min={0}
+                max={Math.max(1, music.duration)}
+                step={0.1}
+                value={Math.min(music.progress, music.duration || 0)}
+                onChange={(e) => music.seek(Number(e.target.value))}
+                aria-label="Seek"
+              />
+              <span>{formatClock(music.duration)}</span>
+            </label>
+            <a className="studioButton secondary dkWatch" href={youtubeWatchUrl(yt)} target="_blank" rel="noreferrer">
+              Open video
+            </a>
           </div>
-          <ReleaseCarousel key="music-carousel" activeIndex={activeIndex} onSelect={preview} />
         </section>
       </main>
     </PublicLayout>

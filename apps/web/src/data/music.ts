@@ -17,6 +17,11 @@ export type CatalogSong = {
   cover: string;
   palette: SongPalette;
   wallpaper: string;
+  youtubeId?: string;
+};
+
+const YOUTUBE_BY_SLUG: Record<string, string> = {
+  'not-giving-up-tonight': 'tIY1WU9N_RU',
 };
 
 function enrich(
@@ -41,6 +46,7 @@ function enrich(
     cover: meta.cover,
     palette: meta.palette,
     wallpaper: meta.wallpaper,
+    youtubeId: YOUTUBE_BY_SLUG[slug],
   };
 }
 
