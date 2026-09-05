@@ -29,7 +29,15 @@ export type OverlayId =
   | 'lowerThird'
   | 'goldFrame'
   | 'vipCorner'
-  | 'ticker';
+  | 'ticker'
+  | 'neonFrame'
+  | 'cinemaBars'
+  | 'scanlines'
+  | 'cornerBrackets'
+  | 'holographic'
+  | 'broadcastSafe'
+  | 'pulseRing'
+  | 'dualGold';
 
 export const LENS_FILTERS: { id: LensFilterId; label: string; css: string; group?: string }[] = [
   { id: 'none', label: 'Clean', css: 'none', group: 'base' },
@@ -55,13 +63,21 @@ export const LENS_FILTERS: { id: LensFilterId; label: string; css: string; group
   { id: 'greenScreen', label: 'Chroma key', css: 'none', group: 'fx' },
 ];
 
-export const PREMADE_OVERLAYS: { id: OverlayId; label: string; hint: string }[] = [
-  { id: 'liveBadge', label: 'LIVE badge', hint: 'Red pill top-left' },
-  { id: 'watermark', label: '3000 watermark', hint: 'Bottom-right logo text' },
-  { id: 'lowerThird', label: 'Lower third', hint: 'Name plate across bottom' },
-  { id: 'goldFrame', label: 'Gold frame', hint: 'Premium border' },
-  { id: 'vipCorner', label: 'VIP corner', hint: 'Top-right tag' },
-  { id: 'ticker', label: 'Ticker bar', hint: 'Scrolling bottom strip' },
+export const PREMADE_OVERLAYS: { id: OverlayId; label: string; hint: string; group: string }[] = [
+  { id: 'liveBadge', label: 'LIVE badge', hint: 'Red pill top-left', group: 'info' },
+  { id: 'watermark', label: '3000 watermark', hint: 'Bottom-right logo text', group: 'info' },
+  { id: 'lowerThird', label: 'Lower third', hint: 'Name plate across bottom', group: 'info' },
+  { id: 'vipCorner', label: 'VIP corner', hint: 'Top-right tag', group: 'info' },
+  { id: 'ticker', label: 'Ticker bar', hint: 'Scrolling bottom strip', group: 'info' },
+  { id: 'goldFrame', label: 'Gold frame', hint: 'Classic premium border', group: 'frame' },
+  { id: 'dualGold', label: 'Double gold', hint: 'Inner + outer gold rails', group: 'frame' },
+  { id: 'neonFrame', label: 'Neon frame', hint: 'Cyan/magenta broadcast edge', group: 'frame' },
+  { id: 'cornerBrackets', label: 'HUD brackets', hint: 'Tactical corner marks', group: 'frame' },
+  { id: 'cinemaBars', label: 'Cinema bars', hint: 'Letterbox 2.35 look', group: 'frame' },
+  { id: 'holographic', label: 'Holographic', hint: 'Iridescent edge wash', group: 'frame' },
+  { id: 'pulseRing', label: 'Pulse ring', hint: 'Animated live halo', group: 'frame' },
+  { id: 'scanlines', label: 'Scanlines', hint: 'CRT overlay', group: 'fx' },
+  { id: 'broadcastSafe', label: 'Safe title', hint: 'Action-safe guides', group: 'fx' },
 ];
 
 export type CameraRotation = 0 | 90 | 180 | 270;
@@ -323,6 +339,89 @@ export class StreamStudio {
       ctx.lineWidth = 6;
       ctx.strokeRect(14, 14, w - 28, h - 28);
     }
+
+    if (this.overlays.has('dualGold')) {
+      ctx.strokeStyle = 'rgba(255, 215, 0, 0.9)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+      ctx.strokeStyle = 'rgba(255, 236, 160, 0.55)';
+      ctx.lineWidth = 10;
+      ctx.strokeRect(28, 28, w - 56, h - 56);
+    }
+
+    if (this.overlays.has('neonFrame')) {
+      ctx.strokeStyle = 'rgba(111, 244, 255, 0.85)';
+      ctx.lineWidth = 4;
+      ctx.shadowColor = 'rgba(111, 244, 255, 0.7)';
+      ctx.shadowBlur = 18;
+      ctx.strokeRect(12, 12, w - 24, h - 24);
+      ctx.strokeStyle = 'rgba(255, 77, 196, 0.55)';
+      ctx.shadowColor = 'rgba(255, 77, 196, 0.5)';
+      ctx.strokeRect(22, 22, w - 44, h - 44);
+      ctx.shadowBlur = 0;
+    }
+
+    if (this.overlays.has('cornerBrackets')) {
+      const arm = Math.min(w, h) * 0.08;
+      ctx.strokeStyle = 'rgba(255, 215, 0, 0.9)';
+      ctx.lineWidth = 4;
+      const corners: [number, number][] = [
+        [24, 24],
+        [w - 24, 24],
+        [24, h - 24],
+        [w - 24, h - 24],
+      ];
+      corners.forEach(([cx, cy], i) => {
+        const sx = i % 2 === 0 ? 1 : -1;
+        const sy = i < 2 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + sy * arm);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx + sx * arm, cy);
+        ctx.stroke();
+      });
+    }
+
+    if (this.overlays.has('cinemaBars')) {
+      const bar = Math.round(h * 0.12);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, bar);
+      ctx.fillRect(0, h - bar, w, bar);
+    }
+
+    if (this.overlays.has('holographic')) {
+      const hg = ctx.createLinearGradient(0, 0, w, h);
+      hg.addColorStop(0, 'rgba(111, 244, 255, 0.12)');
+      hg.addColorStop(0.5, 'rgba(255, 215, 0, 0.08)');
+      hg.addColorStop(1, 'rgba(255, 77, 196, 0.12)');
+      ctx.fillStyle = hg;
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(18, 18, w - 36, h - 36);
+    }
+
+    if (this.overlays.has('pulseRing')) {
+      const pulse = 0.5 + Math.sin(this.tick / 18) * 0.5;
+      ctx.strokeStyle = `rgba(255, 60, 60, ${0.35 + pulse * 0.45})`;
+      ctx.lineWidth = 8 + pulse * 6;
+      ctx.strokeRect(8, 8, w - 16, h - 16);
+    }
+
+    if (this.overlays.has('scanlines')) {
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 1);
+    }
+
+    if (this.overlays.has('broadcastSafe')) {
+      ctx.strokeStyle = 'rgba(30, 240, 120, 0.45)';
+      ctx.setLineDash([8, 8]);
+      ctx.strokeRect(w * 0.05, h * 0.05, w * 0.9, h * 0.9);
+      ctx.strokeStyle = 'rgba(255, 215, 0, 0.35)';
+      ctx.strokeRect(w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+      ctx.setLineDash([]);
+    }
+
     if (this.overlays.has('liveBadge')) {
       const label = '● LIVE';
       ctx.font = 'bold 28px Inter, Arial, sans-serif';

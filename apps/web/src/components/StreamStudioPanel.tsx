@@ -10,6 +10,7 @@ import {
 } from '../lib/streamStudio';
 import { WhipPublisher, describeCameraError, validateWhipUrl } from '../lib/webrtcStream';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
+import { StreamSceneEditor } from './StreamSceneEditor';
 
 type Props = {
   whipUrl: string;
@@ -279,27 +280,61 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: false } }));
   }
 
+  const [openSection, setOpenSection] = useState<string>('camera');
+  const toggleSection = (id: string) => setOpenSection((cur) => (cur === id ? '' : id));
+
+  const frameOverlays = PREMADE_OVERLAYS.filter((o) => o.group === 'frame' || o.group === 'fx');
+  const infoOverlays = PREMADE_OVERLAYS.filter((o) => o.group === 'info');
+
   return (
-    <div className="studioPanel">
-      <div className="adminCameraFrame studioPreviewFrame">
-        <div ref={mountRef} className="studioCanvasMount" />
-        {status === 'live' ? <div className="streamLiveBadge">● LIVE</div> : null}
-        {status === 'starting' ? <div className="adminCameraOverlay">Going live…</div> : null}
-        {status === 'idle' || (status === 'error' && !hasCanvas) ? (
-          <div className="adminCameraOverlay">{error || 'Tap Access camera'}</div>
-        ) : null}
-        <div className="studioFramingBadge" aria-hidden="true">
-          {rotation}° · {zoom.toFixed(1)}x
-          {flipH ? ' · ↔' : ''}
-          {flipV ? ' · ↕' : ''}
+    <div className="studioPanel prodStudio">
+      <div className="prodStudioPreview">
+        <div className="adminCameraFrame studioPreviewFrame">
+          <div ref={mountRef} className="studioCanvasMount" />
+          {status === 'live' ? <div className="streamLiveBadge">● LIVE · WHIP</div> : null}
+          {status === 'starting' ? <div className="adminCameraOverlay">Connecting WHIP (POST SDP)…</div> : null}
+          {status === 'idle' || (status === 'error' && !hasCanvas) ? (
+            <div className="adminCameraOverlay">{error || 'Starting camera preview…'}</div>
+          ) : null}
+          <div className="studioFramingBadge" aria-hidden="true">
+            {rotation}° · {zoom.toFixed(1)}x
+            {flipH ? ' · ↔' : ''}
+            {flipV ? ' · ↕' : ''}
+          </div>
+        </div>
+        <div className="prodStudioLiveBar">
+          {status === 'live' ? (
+            <button type="button" className="cBtn danger" onClick={() => void endLive()}>
+              End Stream
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="cBtn primary"
+              disabled={status === 'starting'}
+              onClick={() => void goLive()}
+            >
+              {status === 'starting' ? 'WHIP connecting…' : 'Go Live with looks'}
+            </button>
+          )}
+          <button type="button" className="cBtn ghost" onClick={() => void startPreview(cameraId)}>
+            {hasCanvas ? 'Refresh preview' : 'Retry access'}
+          </button>
         </div>
       </div>
 
-      <div className="studioControls">
-        <section className="studioPermissionStep" aria-live="polite">
-          <strong>1. Access camera</strong>
-          <p>Tap the button, then Allow camera (mic is optional). Flip to the rear camera if you want.</p>
-          <div className="cBtnRow">
+      <div className="studioControls prodStudioDock">
+        {status !== 'live' && !hasCanvas ? (
+          <section className="studioPermissionStep" aria-live="polite">
+            <span>Step 1 of 3</span>
+            <strong>Allow camera and microphone</strong>
+            <p>
+              This opens Chrome’s permission prompt for <em>3000studios.vip</em>. Choose <strong>Allow</strong>, then
+              your preview starts automatically.
+            </p>
+            <p className="cMuted" role="status">
+              {canRequestMedia ? 'Camera access is available in this browser.' : 'Use HTTPS Chrome or Safari to access the camera.'}
+            </p>
             <button
               type="button"
               className="cBtn primary"
@@ -317,23 +352,30 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
             <button type="button" className="cBtn ghost" disabled={checkingAccess} onClick={() => void flipFacing()}>
               {facing === 'user' ? 'Use rear camera' : 'Use front camera'}
             </button>
-          </div>
-        </section>
+          </section>
+        ) : null}
 
-        <label className="easyField">
-          <span>Camera</span>
-          <select value={cameraId} onChange={(e) => void switchCamera(e.target.value)} className="studioSelect">
-            {cameras.length === 0 ? <option value="">Default camera</option> : null}
-            {cameras.map((c, i) => (
-              <option key={c.deviceId || i} value={c.deviceId}>
-                {c.label || `Camera ${i + 1}`}
-              </option>
-            ))}
-          </select>
-        </label>
+        <details className="studioAccord" open={openSection === 'camera'} onToggle={() => toggleSection('camera')}>
+          <summary>Camera &amp; layout</summary>
+          <label className="easyField">
+            <span>Camera</span>
+            <select
+              value={cameraId}
+              onChange={(e) => void switchCamera(e.target.value)}
+              className="studioSelect"
+            >
+              {cameras.length === 0 ? <option value="">Default camera</option> : null}
+              {cameras.map((c, i) => (
+                <option key={c.deviceId} value={c.deviceId}>
+                  {c.label || `Camera ${i + 1}`}
+                </option>
+              ))}
+            </select>
+          </label>
+        </details>
 
-        <div className="studioBlock">
-          <span className="studioBlockLabel">Rotate & crop</span>
+        <details className="studioAccord" open={openSection === 'framing'} onToggle={() => toggleSection('framing')}>
+          <summary>Crop, rotate &amp; size</summary>
           <div className="studioChipRow">
             {ROTATIONS.map((r) => (
               <button key={r.value} type="button" className={`studioChip ${rotation === r.value ? 'active' : ''}`} onClick={() => setRotation(r.value)}>
@@ -364,10 +406,13 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
               <input type="range" min={-1} max={1} step={0.02} value={panY} disabled={zoom <= 1.01} onChange={(e) => setPanY(Number(e.target.value))} />
             </label>
           </div>
-        </div>
+          <p className="cMuted" style={{ fontSize: 11, margin: '6px 0 0' }}>
+            Zoom in to crop, then pan. Rotation and flips are burned into the WHIP feed viewers receive.
+          </p>
+        </details>
 
-        <div className="studioBlock">
-          <span className="studioBlockLabel">Filters</span>
+        <details className="studioAccord" open={openSection === 'filters'} onToggle={() => toggleSection('filters')}>
+          <summary>Filters &amp; looks</summary>
           <div className="studioChipRow">
             {LENS_FILTERS.map((f) => (
               <button key={f.id} type="button" className={`studioChip ${filter === f.id ? 'active' : ''}`} onClick={() => setFilter(f.id)}>
@@ -375,47 +420,60 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
               </button>
             ))}
           </div>
-        </div>
+        </details>
 
-        <div className="studioBlock">
-          <span className="studioBlockLabel">Overlays</span>
+        <details className="studioAccord" open={openSection === 'frames'} onToggle={() => toggleSection('frames')}>
+          <summary>Animated frames &amp; overlays</summary>
+          <span className="studioBlockLabel">Graphics</span>
           <div className="studioChipRow">
-            {PREMADE_OVERLAYS.map((o) => (
-              <button key={o.id} type="button" className={`studioChip ${overlays.includes(o.id) ? 'active' : ''}`} onClick={() => toggleOverlay(o.id)} title={o.hint}>
+            {infoOverlays.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                className={`studioChip ${overlays.includes(o.id) ? 'active' : ''}`}
+                onClick={() => toggleOverlay(o.id)}
+                title={o.hint}
+              >
                 {o.label}
               </button>
             ))}
           </div>
-        </div>
-
-        {overlays.includes('lowerThird') ? (
-          <div className="studioLowerFields">
-            <label className="easyField">
-              <span>Lower third title</span>
-              <input value={lowerTitle} onChange={(e) => setLowerTitle(e.target.value)} />
-            </label>
-            <label className="easyField">
-              <span>Lower third subtitle</span>
-              <input value={lowerSub} onChange={(e) => setLowerSub(e.target.value)} />
-            </label>
+          <span className="studioBlockLabel">Frames</span>
+          <div className="studioChipRow">
+            {frameOverlays.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                className={`studioChip ${overlays.includes(o.id) ? 'active' : ''}`}
+                onClick={() => toggleOverlay(o.id)}
+                title={o.hint}
+              >
+                {o.label}
+              </button>
+            ))}
           </div>
-        ) : null}
+          {overlays.includes('lowerThird') ? (
+            <div className="studioLowerFields">
+              <label className="easyField">
+                <span>Lower third title</span>
+                <input value={lowerTitle} onChange={(e) => setLowerTitle(e.target.value)} />
+              </label>
+              <label className="easyField">
+                <span>Lower third subtitle</span>
+                <input value={lowerSub} onChange={(e) => setLowerSub(e.target.value)} />
+              </label>
+            </div>
+          ) : null}
+        </details>
 
-        <div className="cBtnRow">
-          {status === 'live' ? (
-            <button type="button" className="cBtn danger" onClick={() => void endLive()}>
-              End live
-            </button>
-          ) : (
-            <button type="button" className="cBtn primary" disabled={status === 'starting' || !whipReady} onClick={() => void goLive()}>
-              {status === 'starting' ? 'Going live…' : 'Go Live'}
-            </button>
-          )}
-        </div>
+        <details className="studioAccord" open={openSection === 'scene'} onToggle={() => toggleSection('scene')}>
+          <summary>Standby, branding &amp; custom layers</summary>
+          <StreamSceneEditor />
+        </details>
 
         {error ? <p className="adminError">{error}</p> : null}
         <p className="cMuted studioHelp">
-          Access camera → pick filter / overlay → Go Live. Viewers see it on /live. Backend keys stay hidden.
+          Preview stays on screen while you change looks. Framing + overlays are burned into the WHIP stream.
         </p>
       </div>
     </div>

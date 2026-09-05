@@ -323,7 +323,7 @@
 .cCols {
   display: grid;
   gap: 22px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 /* ---------- Table ---------- */
@@ -775,6 +775,23 @@
     min-height: auto;
   }
   .cHeroActions { justify-content: flex-start; }
+  .cTable thead { display: none; }
+  .cTable, .cTable tbody, .cTable tr, .cTable td { display: block; width: 100%; }
+  .cTable tr {
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--c-line);
+    border-radius: 12px;
+    background: var(--c-elevated);
+  }
+  .cTable td {
+    padding: 6px 0;
+    border: 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+  .cScroll { overflow-x: hidden; }
+  .cCols { grid-template-columns: 1fr; }
 }
 
 /* ============================================================

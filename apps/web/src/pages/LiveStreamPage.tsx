@@ -5,14 +5,18 @@ import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { STREAM_PLAYER_EMBED_SRC } from '../lib/streamConfig';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
+import { LiveChatPanel, TipJar, ViewerCount, useLiveRoom } from '../components/LiveInteraction';
 import '../styles/discover.css';
 
 const INQUIRY_EMAIL = 'Team@3000studios.vip';
+const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}`;
 
 export function LiveStreamPage() {
   const [scene, setScene] = useState<StreamScene>(() => loadStreamScene());
   const [live, setLive] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const liveRoom = useLiveRoom();
 
   useEffect(() => subscribeStreamScene(setScene), []);
 
@@ -39,13 +43,14 @@ export function LiveStreamPage() {
   }, []);
 
   return (
-    <PublicLayout variant="blackhole">
-      <div className="livePublicClean liveWithNav discoverLive" data-live={live ? '1' : '0'}>
+    <PublicLayout variant="blackhole" compact>
+      <div className={`livePublicClean liveWithNav liveWatchLayout discoverLive ${chatOpen ? 'is-chat-open' : ''}`} data-live={live ? '1' : '0'}>
         <header className="livePublicHeader">
           <p className={live ? 'livePulse' : 'vipKicker'}>{live ? 'On air' : 'Standby'}</p>
           <h1 className="livePublicTitle">3000 Studios Live</h1>
+          <ViewerCount count={liveRoom.viewers} />
         </header>
-        <main className="livePublicMain">
+        <main className="livePublicMain liveWatchMain">
           <div className="liveOnlyStage livePublicStage mobileSafe liveStageFrame">
             <div className="liveOnlyFeed">
               <iframe
@@ -61,26 +66,40 @@ export function LiveStreamPage() {
               </div>
             </div>
           </div>
+          <aside className="liveWatchRail" aria-label="Viewer interaction">
+            <TipJar />
+            <LiveChatPanel messages={liveRoom.messages} onSent={liveRoom.setMessages} />
+            <button
+              type="button"
+              className="liveInquiryBtn"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(window.location.href);
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 1600);
+                } catch {
+                  setCopied(false);
+                }
+              }}
+            >
+              {copied ? 'Link copied' : 'Copy live link'}
+            </button>
+            <a className="liveInquiryBtn" href={inquiryHref}>
+              Stream Inquiry
+            </a>
+            <Link className="liveInquiryBtn" to="/music">
+              Music
+            </Link>
+          </aside>
         </main>
-        <footer className="livePublicFooter">
-          <button
-            type="button"
-            className="liveInquiryBtn"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(window.location.href);
-                setCopied(true);
-                window.setTimeout(() => setCopied(false), 1600);
-              } catch {
-                setCopied(false);
-              }
-            }}
-          >
-            {copied ? 'Link copied' : 'Copy live link'}
+        <div className="liveMobileDock">
+          <button type="button" className="liveDockBtn" onClick={() => setChatOpen((v) => !v)}>
+            {chatOpen ? 'Close chat' : 'Chat & tips'}
           </button>
-          <a className="liveInquiryBtn" href={`mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}`}>Stream Inquiry</a>
-          <Link className="liveInquiryBtn" to="/music">Music</Link>
-        </footer>
+          <a className="liveInquiryBtn" href={inquiryHref}>
+            Inquiry
+          </a>
+        </div>
       </div>
     </PublicLayout>
   );

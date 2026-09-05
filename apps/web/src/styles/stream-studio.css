@@ -1,3 +1,63 @@
+.prodStudio {
+  display: grid;
+  gap: 12px;
+}
+.prodStudioPreview {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: #05070c;
+}
+.prodStudioPreview .studioPreviewFrame {
+  margin-bottom: 8px;
+  min-height: min(42dvh, 360px);
+  aspect-ratio: 16 / 9;
+}
+.prodStudioLiveBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+.prodStudioLiveBar .cBtn {
+  min-height: var(--touch);
+  flex: 1;
+}
+.prodStudioDock {
+  min-width: 0;
+}
+.studioAccord {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  background: rgba(8, 12, 22, 0.72);
+  padding: 0 10px 10px;
+}
+.studioAccord summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: var(--touch);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffd700;
+}
+.studioAccord summary::-webkit-details-marker { display: none; }
+.studioAccord summary::after {
+  content: '▾';
+  color: rgba(255, 215, 0, 0.7);
+}
+.studioAccord:not([open]) summary::after { content: '▸'; }
+@media (min-width: 1100px) {
+  .prodStudio {
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    align-items: start;
+  }
+  .prodStudioPreview { top: 8px; }
+}
 .studioCanvasMount {
   position: absolute;
   inset: 0;

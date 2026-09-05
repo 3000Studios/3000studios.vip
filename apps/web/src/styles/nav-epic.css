@@ -551,6 +551,10 @@ body {
 @media (max-width: 1080px) {
   .vipHeader.vipHeader--epic {
     grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+    max-width: 100vw;
+    padding-left: max(0.7rem, var(--safe-left, 0px));
+    padding-right: max(0.7rem, var(--safe-right, 0px));
   }
 
   .vipMenu {

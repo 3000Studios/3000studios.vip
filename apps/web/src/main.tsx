@@ -23,7 +23,6 @@ import { CinematicHome } from './components/CinematicHome';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
-import { LiveStreamPage } from './pages/LiveStreamPage';
 import { PhoneGoLive } from './pages/PhoneGoLive';
 import { MusicDeck } from './pages/MusicDeck';
 import { ShopPage } from './pages/Shop';
@@ -56,6 +55,9 @@ const SongPage = lazy(() =>
   import('./pages/SongPage').then((module) => ({ default: module.SongPage })),
 );
 const Admin = lazy(() => import('./pages/Admin').then((module) => ({ default: module.Admin })));
+const LiveStreamPageLazy = lazy(() =>
+  import('./pages/LiveStreamPage').then((module) => ({ default: module.LiveStreamPage })),
+);
 const AgentCommandCenter = lazy(() =>
   import('./pages/AgentCommandCenter').then((module) => ({ default: module.AgentCommandCenter })),
 );
@@ -87,7 +89,14 @@ const router = createBrowserRouter([
       { path: '/', element: <CinematicHome /> },
       { path: '/music', element: <MusicDeck /> },
       { path: '/video', element: <VideoPage /> },
-      { path: '/live', element: <LiveStreamPage /> },
+      {
+        path: '/live',
+        element: (
+          <RouteLoader>
+            <LiveStreamPageLazy />
+          </RouteLoader>
+        ),
+      },
       { path: '/shop', element: <ShopPage /> },
       { path: '/go-live', element: <PhoneGoLive /> },
       { path: '/concepts', element: <ConceptBoard /> },

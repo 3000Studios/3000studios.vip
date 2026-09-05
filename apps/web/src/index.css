@@ -10,6 +10,7 @@
 @import './styles/mobile-touch.css';
 @import './styles/admin-easy.css';
 @import './styles/stream-studio.css';
+@import './styles/live-experience.css';
 @import './styles/music-video-generator.css';
 @import './styles/blackscreen-fix.css';
 @import './styles/velvet-machine.css';
@@ -60,6 +61,19 @@
   .commandBar {
     grid-template-columns: 1fr;
   }
+}
+
+html, body, #root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img, video, canvas, iframe, svg {
+  max-width: 100%;
+}
+
+button, a, input, select, textarea, summary {
+  touch-action: manipulation;
 }
 
 @media (max-width: 760px) {

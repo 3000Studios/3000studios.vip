@@ -210,7 +210,7 @@ function useStoredList<T>(key: string, fallback: T[]) {
   return [items, setItems] as const;
 }
 
-export function PublicLayout({ children, variant = 'spiral' }: { children: ReactNode; variant?: string }) {
+export function PublicLayout({ children, variant = 'spiral', compact = false }: { children: ReactNode; variant?: string; compact?: boolean }) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<{ wallpaper: string; cover?: string; palette?: SongPalette }>({ wallpaper: variant });
@@ -242,7 +242,7 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
   const wallpaperVariant = theme.wallpaper || variant;
 
   return (
-    <div className={`vipSite vipSite-${variant} vipSite-live${open ? ' is-nav-open' : ''}`} data-page-wallpaper={variant} data-song-wallpaper={wallpaperVariant}>
+    <div className={`vipSite vipSite-${variant} vipSite-live${open ? ' is-nav-open' : ''}${compact ? ' is-compact' : ''}`} data-page-wallpaper={variant} data-song-wallpaper={wallpaperVariant}>
       <div className="filmLetterbox top" aria-hidden="true" />
       <div className="filmLetterbox bottom" aria-hidden="true" />
       <div className="filmGrain" aria-hidden="true" />
@@ -296,7 +296,8 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
         <button type="button" className={open ? 'vipNavBackdrop is-open' : 'vipNavBackdrop'} aria-label="Close navigation" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
       </header>
       {children}
-      <div className="vipEnergyDivider" aria-hidden="true" />
+      {compact ? null : <div className="vipEnergyDivider" aria-hidden="true" />}
+      {compact ? null : (
       <footer className="vipFooter">
         <div className="footerBrand">
           <strong className="shimmerText">3000 Studios</strong>
@@ -311,7 +312,8 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
           <Link to="/contact">Contact</Link>
         </div>
       </footer>
-      <div className="vipEnergyDivider bottom" aria-hidden="true" />
+      )}
+      {compact ? null : <div className="vipEnergyDivider bottom" aria-hidden="true" />}
     </div>
   );
 }
