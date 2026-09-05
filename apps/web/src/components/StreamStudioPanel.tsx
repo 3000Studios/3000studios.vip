@@ -280,9 +280,6 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: false } }));
   }
 
-  const [openSection, setOpenSection] = useState<string>('camera');
-  const toggleSection = (id: string) => setOpenSection((cur) => (cur === id ? '' : id));
-
   const frameOverlays = PREMADE_OVERLAYS.filter((o) => o.group === 'frame' || o.group === 'fx');
   const infoOverlays = PREMADE_OVERLAYS.filter((o) => o.group === 'info');
 
@@ -355,13 +352,15 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           </section>
         ) : null}
 
-        <details className="studioAccord" open={openSection === 'camera'} onToggle={() => toggleSection('camera')}>
+        <details className="studioAccord" defaultOpen>
           <summary>Camera &amp; layout</summary>
           <label className="easyField">
             <span>Camera</span>
             <select
               value={cameraId}
               onChange={(e) => void switchCamera(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
               className="studioSelect"
             >
               {cameras.length === 0 ? <option value="">Default camera</option> : null}
@@ -374,7 +373,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           </label>
         </details>
 
-        <details className="studioAccord" open={openSection === 'framing'} onToggle={() => toggleSection('framing')}>
+        <details className="studioAccord">
           <summary>Crop, rotate &amp; size</summary>
           <div className="studioChipRow">
             {ROTATIONS.map((r) => (
@@ -411,7 +410,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           </p>
         </details>
 
-        <details className="studioAccord" open={openSection === 'filters'} onToggle={() => toggleSection('filters')}>
+        <details className="studioAccord">
           <summary>Filters &amp; looks</summary>
           <div className="studioChipRow">
             {LENS_FILTERS.map((f) => (
@@ -422,7 +421,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           </div>
         </details>
 
-        <details className="studioAccord" open={openSection === 'frames'} onToggle={() => toggleSection('frames')}>
+        <details className="studioAccord">
           <summary>Animated frames &amp; overlays</summary>
           <span className="studioBlockLabel">Graphics</span>
           <div className="studioChipRow">
@@ -466,7 +465,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           ) : null}
         </details>
 
-        <details className="studioAccord" open={openSection === 'scene'} onToggle={() => toggleSection('scene')}>
+        <details className="studioAccord">
           <summary>Standby, branding &amp; custom layers</summary>
           <StreamSceneEditor />
         </details>

@@ -114,6 +114,8 @@ export function StreamSceneEditor() {
             <select
               className="studioSelect"
               value={scene.standby.fontFamily}
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
               onChange={(e) => patchStandby({ fontFamily: e.target.value })}
             >
               {FONTS.map((f) => (
@@ -149,6 +151,8 @@ export function StreamSceneEditor() {
             <select
               className="studioSelect"
               value={scene.standby.textTransform}
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
               onChange={(e) =>
                 patchStandby({ textTransform: e.target.value as StreamScene['standby']['textTransform'] })
               }
