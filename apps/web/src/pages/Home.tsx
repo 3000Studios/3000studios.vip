@@ -17,6 +17,7 @@ import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { ReleaseCarousel } from '../components/ReleaseCarousel';
 import { PlatformLogos } from '../components/PlatformLogos';
+import { ChromeWallpaper } from '../components/ChromeWallpaper';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -254,6 +255,7 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
       <ScrollFX />
       <div className="scrollProgress" aria-hidden="true" />
       <header className="vipHeader vipHeader--epic">
+        <ChromeWallpaper zone="header" />
         <Link className="vipLogo" to="/" onClick={() => setOpen(false)} aria-label="3000 Studios VIP home">
           <img className="officialProfileLogo" src="/media/official-3000-studios-profile.png" alt="" />
           <span className="logoStack">
@@ -299,6 +301,7 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
       {children}
       {compact ? null : <div className="vipEnergyDivider" aria-hidden="true" />}
       <footer className={compact ? 'vipFooter vipFooter--slim' : 'vipFooter'}>
+        <ChromeWallpaper zone="footer" />
         <PlatformLogos />
         {compact ? null : (
           <>

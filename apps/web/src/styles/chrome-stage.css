@@ -1,0 +1,93 @@
+.vipHeader,
+.vipFooter {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.chromeWall {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 900px;
+}
+
+.chromeWallCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.chromeWallDepth {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 120% at 18% 50%, rgba(255, 215, 0, 0.08), transparent 46%),
+    radial-gradient(ellipse 70% 110% at 86% 40%, rgba(111, 244, 255, 0.07), transparent 50%);
+  transform: translateZ(-40px);
+  animation: chromeDrift 14s ease-in-out infinite alternate;
+}
+
+.vipHeader.vipHeader--epic,
+.vipHeader {
+  background: rgba(4, 3, 6, 0.28) !important;
+}
+
+.vipHeader > :not(.chromeWall):not(.vipNavBackdrop),
+.vipFooter > :not(.chromeWall) {
+  position: relative;
+  z-index: 2;
+}
+
+.vipFooter {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 1.15rem;
+  padding: 2.2rem 1.15rem calc(2.4rem + var(--safe-bottom, 0px));
+  background: rgba(2, 4, 8, 0.32);
+}
+
+.vipFooter .footerBrand {
+  max-width: 36rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.vipFooter .footerBrand p {
+  margin: 0.35rem 0 0;
+}
+
+.vipFooter .footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.1rem;
+  width: 100%;
+}
+
+.vipFooter .footerLinks a,
+.vipFooter .platLogo,
+.vipHeader a,
+.vipHeader button,
+.vipHeader .vipNavLink {
+  position: relative;
+  z-index: 3;
+}
+
+.vipFooter--slim {
+  padding: 0.9rem 1rem calc(0.95rem + var(--safe-bottom, 0px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chromeWallDepth { animation: none; }
+}
+
+@keyframes chromeDrift {
+  from { transform: translate3d(-2%, 0, -40px) scale(1); }
+  to { transform: translate3d(2%, 1%, -24px) scale(1.06); }
+}
