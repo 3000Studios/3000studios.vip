@@ -1,20 +1,16 @@
-import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { rolloutSongs } from '../data/music';
 import {
-  OFFICIAL_YOUTUBE_CHANNEL_URL,
   officialReleaseVideos,
   youtubeArtworkUrl,
   youtubeEmbedUrl,
   youtubeWatchUrl,
 } from '../data/officialReleases';
 import { PublicLayout } from './Home';
+import { ReleaseCarousel } from '../components/ReleaseCarousel';
 import '../styles/music-deck.css';
 
-const SPOTIFY_ARTIST = 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik';
-const APPLE_ARTIST = 'https://music.apple.com/us/artist/3000-studios/6802721597';
-const YT_MUSIC = 'https://music.youtube.com/channel/UCTQnEFZUIutrFuDlxGj9cDA';
 const normalized = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 function formatTime(value: number) {
@@ -27,8 +23,6 @@ export function MusicDeck() {
   const music = useGlobalMusic();
   const catalog = officialReleaseVideos;
   const [activeIndex, setActiveIndex] = useState(0);
-  const [drag, setDrag] = useState<{ startX: number } | null>(null);
-  const stageRef = useRef<HTMLDivElement | null>(null);
   const active = catalog[activeIndex] ?? catalog[0];
   const matchedSong = useMemo(
     () => rolloutSongs.find((song) => normalized(song.title) === normalized(active.title)),
@@ -41,19 +35,6 @@ export function MusicDeck() {
     const video = catalog[next];
     const songIdx = rolloutSongs.findIndex((song) => normalized(song.title) === normalized(video.title));
     if (songIdx >= 0) music.playIndex(songIdx, { autoplay: music.isPlaying });
-  };
-
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    setDrag({ startX: event.clientX });
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    if (!drag) return;
-    const delta = event.clientX - drag.startX;
-    if (delta < -48) pick(activeIndex + 1);
-    else if (delta > 48) pick(activeIndex - 1);
-    setDrag(null);
   };
 
   const yt = active.videoId;
@@ -73,33 +54,8 @@ export function MusicDeck() {
         </div>
         <div className="dkArtDim" aria-hidden="true" />
         <section className="dkStage" aria-label="Official release coverflow">
-          <p className="vipKicker dkKicker">3000 Studios · Coverflow</p>
-          <div
-            className="dkCoverflow"
-            ref={stageRef}
-            onPointerDown={onPointerDown}
-            onPointerUp={onPointerUp}
-            onPointerCancel={() => setDrag(null)}
-          >
-            {catalog.map((song, index) => {
-              const offset = index - activeIndex;
-              const abs = Math.abs(offset);
-              if (abs > 4) return null;
-              return (
-                <button
-                  type="button"
-                  key={song.videoId}
-                  className={offset === 0 ? 'dkSlide is-active' : 'dkSlide'}
-                  style={{ '--offset': offset, zIndex: 40 - abs } as CSSProperties}
-                  onClick={() => pick(index)}
-                  aria-current={offset === 0 ? 'true' : undefined}
-                  aria-label={song.title}
-                >
-                  <img src={youtubeArtworkUrl(song.videoId)} alt="" draggable={false} />
-                </button>
-              );
-            })}
-          </div>
+          <p className="vipKicker dkKicker">3000 Studios · 3D selector</p>
+          <ReleaseCarousel activeIndex={activeIndex} onSelect={pick} />
 
           <div className="dkPlayer">
             <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex - 1)} aria-label="Previous song">‹</button>
@@ -127,15 +83,7 @@ export function MusicDeck() {
             <a className="studioButton secondary dkWatch" href={youtubeWatchUrl(yt)} target="_blank" rel="noreferrer">Open video</a>
           </div>
 
-          <nav className="platformLinks" aria-label="Official music platforms">
-            <a href={SPOTIFY_ARTIST} target="_blank" rel="noreferrer">Spotify</a>
-            <a href={APPLE_ARTIST} target="_blank" rel="noreferrer">Apple Music</a>
-            <a href={YT_MUSIC} target="_blank" rel="noreferrer">YouTube Music</a>
-            <a href={OFFICIAL_YOUTUBE_CHANNEL_URL} target="_blank" rel="noreferrer">YouTube</a>
-            <Link to="/video">Videos</Link>
-            <Link to="/live">Live</Link>
-            <Link to="/shop">Shop</Link>
-          </nav>
+
         </section>
       </main>
     </PublicLayout>

@@ -55,12 +55,8 @@ export function writeEntitlement(next: Entitlement) {
   window.dispatchEvent(new CustomEvent('3000-entitlement', { detail: next }));
 }
 
-export function hasFullAccess(slug?: string) {
-  const ent = readEntitlement();
-  if (ent.plan === 'admin') return true;
-  if ((ent.plan === 'monthly' || ent.plan === 'yearly') && ent.expiresAt > Date.now()) return true;
-  if (slug && ent.tracks.includes(slug)) return true;
-  return false;
+export function hasFullAccess(_slug?: string) {
+  return true;
 }
 
 export function grantTrack(slug: string) {

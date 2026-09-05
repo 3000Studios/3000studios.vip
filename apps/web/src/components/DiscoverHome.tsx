@@ -3,17 +3,7 @@ import { officialReleaseVideos, youtubeWatchUrl } from '../data/officialReleases
 import { rolloutSongs } from '../data/music';
 import { PublicLayout } from '../pages/Home';
 import { VideoWallpaperCard } from './VideoWallpaperCard';
-import {
-  PLATFORMS,
-  SAMPLE_SECONDS,
-  TRACK_PRICE_CENTS,
-  MONTHLY_PRICE_CENTS,
-  YEARLY_PRICE_CENTS,
-  formatMoney,
-  grantPlan,
-  grantTrack,
-  hasFullAccess,
-} from '../lib/commerce';
+import { PLATFORMS } from '../lib/commerce';
 import '../styles/discover.css';
 
 const featured = officialReleaseVideos[0];
@@ -50,7 +40,7 @@ export function DiscoverHome() {
         </section>
         <section className="bentoHome" aria-label="Home bento">
           <VideoWallpaperCard className="discoverHero bentoFeature" videoId={featured.videoId} kicker="Featured official video" title="Watch the videos. Own the drop." href={youtubeWatchUrl(featured.videoId)}>
-            <p>{featured.title} · sample {SAMPLE_SECONDS}s free · full track {formatMoney(TRACK_PRICE_CENTS)}</p>
+            <p>{featured.title} · full stream free</p>
             <div className="discoverHeroActions">
               <Link className="pill" to="/video">Watch</Link>
               <Link className="pill gold" to="/shop">Shop</Link>
@@ -67,19 +57,12 @@ export function DiscoverHome() {
             <span>Official cards, seek, and catalog — music stays off until you hit play.</span>
           </Link>
           <Link className="bentoTile bentoShop" to="/shop">
-            <small>Unlock</small>
-            <strong>Own the vault</strong>
-            <span>{formatMoney(TRACK_PRICE_CENTS)} a track · {formatMoney(MONTHLY_PRICE_CENTS)} / month</span>
+            <small>Merch</small>
+            <strong>Shop</strong>
+            <span>Hoodies, tees, and studio marks.</span>
           </Link>
         </section>
-        <section className="discoverUnlock">
-          <h2>Samples only until you unlock</h2>
-          <p>Every song plays a {SAMPLE_SECONDS}-second preview. Buy one track for {formatMoney(TRACK_PRICE_CENTS)}, or unlock the whole vault.</p>
-          <div className="unlockRow">
-            <Link className="studioButton" to="/shop" onClick={() => grantPlan('monthly')}>{formatMoney(MONTHLY_PRICE_CENTS)} / month</Link>
-            <Link className="studioButton secondary" to="/shop" onClick={() => grantPlan('yearly')}>{formatMoney(YEARLY_PRICE_CENTS)} / year</Link>
-          </div>
-        </section>
+
         <section className="discoverGrid" aria-label="Official videos">
           <div className="discoverHead"><h2>Official videos</h2><Link to="/video">All videos</Link></div>
           <div className="vwGrid">
@@ -91,26 +74,18 @@ export function DiscoverHome() {
           </div>
         </section>
         <section className="discoverGrid" aria-label="Music samples">
-          <div className="discoverHead"><h2>Music samples</h2><Link to="/music">Open deck</Link></div>
+          <div className="discoverHead"><h2>Play free</h2><Link to="/music">Open deck</Link></div>
           <div className="sampleList">
-            {rolloutSongs.slice(0, 18).map((song) => {
-              const unlocked = hasFullAccess(song.slug);
-              return (
-                <article className="sampleRow" key={song.slug}>
-                  <img src={song.cover} alt="" />
-                  <div>
-                    <strong>{song.title}</strong>
-                    <small>{unlocked ? 'Full track unlocked' : `${SAMPLE_SECONDS}s sample`}</small>
-                  </div>
-                  <button type="button" onClick={() => startSample(song.slug, song.src, song.title)}>Play</button>
-                  {!unlocked ? (
-                    <Link className="buyBtn" to="/shop" onClick={() => grantTrack(song.slug)}>{formatMoney(TRACK_PRICE_CENTS)}</Link>
-                  ) : (
-                    <span className="owned">Owned</span>
-                  )}
-                </article>
-              );
-            })}
+            {rolloutSongs.slice(0, 18).map((song) => (
+              <article className="sampleRow" key={song.slug}>
+                <img src={song.cover} alt="" />
+                <div>
+                  <strong>{song.title}</strong>
+                  <small>Full stream · free</small>
+                </div>
+                <button type="button" onClick={() => startSample(song.slug, song.src, song.title)}>Play</button>
+              </article>
+            ))}
           </div>
         </section>
         <section className="discoverGrid" aria-label="Platforms">

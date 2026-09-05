@@ -16,6 +16,7 @@ import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { ReleaseCarousel } from '../components/ReleaseCarousel';
+import { PlatformLogos } from '../components/PlatformLogos';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -297,30 +298,31 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
       </header>
       {children}
       {compact ? null : <div className="vipEnergyDivider" aria-hidden="true" />}
-      {compact ? null : (
-      <footer className="vipFooter">
-        <div className="footerBrand">
-          <strong className="shimmerText">3000 Studios</strong>
-          <p>Music, cinematic video content, live streams, sponsorships, song requests, and private creator operations.</p>
-        </div>
-        <div className="footerLinks">
-          <Link to="/privacy">Privacy</Link>
-          <Link to="/terms">Terms</Link>
-          <Link to="/copyright">Copyright</Link>
-          <Link to="/cookies">Cookies</Link>
-          <Link to="/disclaimer">Disclaimer</Link>
-          <Link to="/contact">Contact</Link>
-        </div>
+      <footer className={compact ? 'vipFooter vipFooter--slim' : 'vipFooter'}>
+        <PlatformLogos />
+        {compact ? null : (
+          <>
+            <div className="footerBrand">
+              <strong className="shimmerText">3000 Studios</strong>
+              <p>Free official music, videos, and live streams. Listen anywhere.</p>
+            </div>
+            <div className="footerLinks">
+              <Link to="/privacy">Privacy</Link>
+              <Link to="/terms">Terms</Link>
+              <Link to="/copyright">Copyright</Link>
+              <Link to="/cookies">Cookies</Link>
+              <Link to="/disclaimer">Disclaimer</Link>
+              <Link to="/contact">Contact</Link>
+            </div>
+          </>
+        )}
       </footer>
-      )}
       {compact ? null : <div className="vipEnergyDivider bottom" aria-hidden="true" />}
     </div>
   );
 }
 
 export function Home() {
-  const checkoutHref = import.meta.env.VITE_STRIPE_PAYMENT_LINK || import.meta.env.VITE_STRIPE_BASIC_LINK || `mailto:${OWNER_EMAIL}?subject=3000%20Studios%20music%20purchase`;
-
   return (
     <PublicLayout variant="spiral">
       <main className="vipMain">
@@ -330,7 +332,7 @@ export function Home() {
           <motion.div className="heroCopy heroCopy--yt" initial="hidden" animate="show" variants={stagger}>
             <motion.span className="vipKicker" variants={fadeUp}>YouTube · DistroKid · Official artist</motion.span>
             <BeatDancingTitle text="3000 Studios" />
-            <motion.p variants={fadeUp}>Official music videos and DistroKid releases. Subscribe so YouTube actually puts the next drop in your feed.</motion.p>
+            <motion.p variants={fadeUp}>Official music videos and DistroKid releases. Everything streams free. Subscribe so YouTube puts the next drop in your feed.</motion.p>
             <motion.div className="heroFeature" variants={fadeUp}>
               <a className="heroFeatureCard" href="https://www.youtube.com/watch?v=tIY1WU9N_RU" target="_blank" rel="noreferrer">
                 <img src="/media/covers/not-giving-up-tonight.jpg" alt="Not Giving Up Tonight official video" />
@@ -344,7 +346,6 @@ export function Home() {
               <a className="studioButton ytCta" href="https://www.youtube.com/@3000Studio?sub_confirmation=1" target="_blank" rel="noreferrer">Subscribe on YouTube</a>
               <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">Watch the video</StudioButton>
               <StudioButton to="/music" variant="ghost">Full catalog</StudioButton>
-              <StudioButton href={checkoutHref} variant="ghost">Buy Or Book</StudioButton>
             </motion.div>
           </motion.div>
         </section>
@@ -364,7 +365,7 @@ export function Home() {
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
 
         <motion.section className="vipSection featureRail" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
-          {[['Music Showcase', 'Original tracks, playable previews, direct purchase and licensing paths.'], ['Live Stream', 'Cloudflare Stream-ready playback plus a protected owner stream console.'], ['Community Chat', 'Visitor chat and song ideas that can upgrade to Firebase or D1 persistence.'], ['Sponsor Inventory', 'Clear placements for launch partners, video sponsors, and creator tools.']].map(([title, copy]) => (
+          {[['Music Showcase', 'Original tracks, full streams, and official videos — all free.'], ['Live Stream', 'Cloudflare Stream-ready playback plus a protected owner stream console.'], ['Community Chat', 'Visitor chat and song ideas that can upgrade to Firebase or D1 persistence.'], ['Sponsor Inventory', 'Clear placements for launch partners, video sponsors, and creator tools.']].map(([title, copy]) => (
             <motion.article className="vipCard" key={title} variants={fadeUp}><h2>{title}</h2><p>{copy}</p></motion.article>
           ))}
         </motion.section>

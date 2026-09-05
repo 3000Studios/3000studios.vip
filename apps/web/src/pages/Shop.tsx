@@ -18,11 +18,11 @@ export function ShopPage() {
       <main className="discoverPage shopPage">
         <section className="discoverUnlock">
           <h1>Shop</h1>
-          <p>Card checkout on Stripe. After pay you return here unlocked on this device.</p>
-          {paid ? <p className="owned">Payment returned. Unlock is stored on this device.</p> : null}
+          <p>Music streams free. This page is merch only.</p>
+          {paid ? <p className="owned">Thanks — your merch order is in.</p> : null}
         </section>
         <div className="shopGrid">
-          {MERCH_ITEMS.map((item) => (
+          {MERCH_ITEMS.filter((item) => item.kind === 'merch').map((item) => (
             <article className="shopCard" key={item.id}>
               <div className="shopArt" style={{ backgroundImage: `url(${item.image})` }} />
               <span className="shopKind">{item.kind}</span>

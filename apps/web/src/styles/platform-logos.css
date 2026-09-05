@@ -1,0 +1,72 @@
+.platLogoRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem 1.15rem;
+  width: 100%;
+}
+.platLogo {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  min-width: 4.5rem;
+  color: #f4efe7;
+  text-decoration: none;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.platLogoMark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  animation: platFloat 3.6s ease-in-out infinite;
+}
+.platLogo:nth-child(2) .platLogoMark { animation-delay: 0.2s; }
+.platLogo:nth-child(3) .platLogoMark { animation-delay: 0.4s; }
+.platLogo:nth-child(4) .platLogoMark { animation-delay: 0.6s; }
+.platLogo:nth-child(5) .platLogoMark { animation-delay: 0.8s; }
+.platLogo:nth-child(6) .platLogoMark { animation-delay: 1s; }
+.platLogo:nth-child(7) .platLogoMark { animation-delay: 1.2s; }
+.platLogoMark svg { display: block; overflow: visible; }
+.platLogo:hover .platLogoMark,
+.platLogo:focus-visible .platLogoMark {
+  transform: translateY(-3px) scale(1.08);
+  animation-play-state: paused;
+}
+.platLivePulse {
+  transform-origin: 12px 12px;
+  animation: platPulse 1.6s ease-out infinite;
+}
+@keyframes platFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes platPulse {
+  0% { opacity: 0.9; transform: scale(0.7); }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .platLogoMark, .platLivePulse { animation: none; }
+}
+.vipFooter {
+  display: grid;
+  gap: 1.25rem;
+  justify-items: stretch;
+}
+.vipFooter--slim {
+  padding: 0.85rem 1rem calc(0.85rem + var(--safe-bottom, 0px));
+  border-top: 1px solid rgba(255, 215, 0, 0.12);
+}
+.vipFooter .footerBrand,
+.vipFooter .footerLinks {
+  text-align: center;
+}
+.vipFooter .footerLinks {
+  justify-content: center;
+}

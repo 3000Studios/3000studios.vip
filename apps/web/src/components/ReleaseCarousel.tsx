@@ -25,7 +25,7 @@ export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number
   };
   const pauseSpin = () => {
     holdPause();
-    resumeTimer.current = window.setTimeout(() => setPaused(false), 3000);
+    resumeTimer.current = window.setTimeout(() => setPaused(false), 2000);
   };
 
   useEffect(() => {
