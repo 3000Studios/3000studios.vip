@@ -23,6 +23,8 @@
 @import './styles/carousel-3d.css';
 @import './styles/discover.css';
 @import './styles/fit.css';
+@import './styles/lock.css';
+@import './styles/film-world.css';
 
 .routeLoader {
   min-height: 100vh;

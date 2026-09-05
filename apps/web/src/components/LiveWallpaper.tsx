@@ -40,19 +40,38 @@ export function LiveWallpaper({ variant = 'spiral', palette = DEFAULT_PALETTE }:
     };
     resize();
     window.addEventListener('resize', resize);
+    const motes = Array.from({ length: 48 }, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      z: 0.3 + Math.random() * 0.7,
+      s: 0.4 + Math.random() * 1.4,
+    }));
     const draw = (t: number) => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      const g = ctx.createRadialGradient(w * 0.5, h * 0.35, 20, w * 0.5, h * 0.5, Math.max(w, h) * 0.8);
-      g.addColorStop(0, `${palette.gold}22`);
-      g.addColorStop(0.45, `${palette.b}18`);
+      const mx = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mx') || '0.5') || 0.5;
+      const my = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--my') || '0.35') || 0.35;
+      ctx.fillStyle = 'rgba(4, 3, 8, 0.22)';
+      ctx.fillRect(0, 0, w, h);
+      const g = ctx.createRadialGradient(w * mx, h * my, 12, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
+      g.addColorStop(0, `${palette.gold}33`);
+      g.addColorStop(0.35, `${palette.b}1c`);
       g.addColorStop(1, '#050506');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = `${palette.gold}33`;
+      ctx.strokeStyle = `${palette.gold}40`;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.arc(w * 0.5, h * 0.42, 80 + Math.sin(t * 0.0006) * 10, 0, Math.PI * 2);
+      ctx.arc(w * 0.5, h * 0.42, 90 + Math.sin(t * 0.0007) * 16, 0, Math.PI * 2);
       ctx.stroke();
+      for (const mote of motes) {
+        const x = ((mote.x + t * 0.00002 * mote.s) % 1) * w;
+        const y = ((mote.y + Math.sin(t * 0.0004 + mote.z) * 0.02) % 1) * h;
+        ctx.fillStyle = `${palette.gold}${Math.floor(40 + mote.z * 80).toString(16).padStart(2, '0')}`;
+        ctx.beginPath();
+        ctx.arc(x, y, mote.s, 0, Math.PI * 2);
+        ctx.fill();
+      }
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);

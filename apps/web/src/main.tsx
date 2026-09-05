@@ -19,7 +19,7 @@ import {
   SponsorsPage,
   VideoPage,
 } from './pages/Home';
-import { DiscoverHome } from './components/DiscoverHome';
+import { CinematicHome } from './components/CinematicHome';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: '/', element: <DiscoverHome /> },
+      { path: '/', element: <CinematicHome /> },
       { path: '/music', element: <MusicDeck /> },
       { path: '/video', element: <VideoPage /> },
       { path: '/live', element: <LiveStreamPage /> },

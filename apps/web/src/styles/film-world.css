@@ -1,0 +1,292 @@
+@property --spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@layer components {
+  .vipSite {
+    --film-gold: oklch(82% 0.16 92);
+    background: #040308;
+  }
+
+  .filmLetterbox {
+    pointer-events: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: clamp(10px, 2.2vh, 28px);
+    z-index: 70;
+    background: linear-gradient(180deg, #000, rgba(0, 0, 0, 0.85));
+  }
+  .filmLetterbox.top { top: 0; }
+  .filmLetterbox.bottom { bottom: 0; background: linear-gradient(0deg, #000, rgba(0, 0, 0, 0.85)); }
+
+  .filmGrain {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+    background-image: repeating-radial-gradient(circle at 20% 40%, #fff 0 0.4px, transparent 0.6px 3px);
+    animation: filmFlicker 0.18s steps(2) infinite;
+  }
+
+  @keyframes filmFlicker {
+    0% { opacity: 0.08; transform: translate3d(0, 0, 0); }
+    100% { opacity: 0.16; transform: translate3d(-1%, 1%, 0); }
+  }
+
+  .filmScan {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    background: repeating-linear-gradient(
+      180deg,
+      transparent 0 2px,
+      rgba(255, 255, 255, 0.015) 2px 3px
+    );
+    animation: scanDrift 9s linear infinite;
+  }
+
+  @keyframes scanDrift {
+    to { background-position: 0 120px; }
+  }
+
+  .cinePage {
+    position: relative;
+    z-index: 4;
+    padding: 5.5rem var(--space-page) 8rem;
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.75rem);
+  }
+
+  .cineHero {
+    position: relative;
+    min-height: min(88dvh, 920px);
+    border-radius: 28px;
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid oklch(82% 0.16 92 / 0.28);
+    box-shadow: 0 30px 80px oklch(0% 0 0 / 0.55);
+  }
+
+  .cineHeroVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.08);
+    animation: ken 28s ease-in-out infinite alternate;
+  }
+
+  @keyframes ken {
+    to { transform: scale(1.18) translate3d(-2%, -1%, 0); }
+  }
+
+  .cineHeroShade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, oklch(8% 0.03 40 / 0.92) 0%, oklch(8% 0.03 40 / 0.35) 55%, transparent 100%),
+      linear-gradient(180deg, transparent 40%, oklch(6% 0.02 40 / 0.92));
+  }
+
+  .cineHeroCopy {
+    position: relative;
+    z-index: 2;
+    max-width: 38rem;
+    padding: clamp(1.5rem, 5vw, 4rem);
+    display: grid;
+    gap: 0.85rem;
+    color: oklch(96% 0.02 95);
+  }
+
+  .cineKicker {
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: var(--film-gold);
+    animation: pulseGold 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulseGold {
+    50% { opacity: 0.55; }
+  }
+
+  .cineTitle {
+    margin: 0;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(2.4rem, 1.2rem + 5vw, 5.4rem);
+    line-height: 0.92;
+    background: linear-gradient(110deg, #8a6914, #fff6c8 35%, #ffd700 50%, #c9a227 80%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: liquidGold 8s ease-in-out infinite;
+  }
+
+  .cineMarquee {
+    overflow: hidden;
+    border-block: 1px solid oklch(82% 0.16 92 / 0.25);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .cineMarqueeTrack {
+    display: flex;
+    gap: 2.5rem;
+    width: max-content;
+    animation: marquee 28s linear infinite;
+    padding: 0.7rem 0;
+    color: oklch(90% 0.04 95 / 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+  }
+
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
+
+  .cinePortals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 1rem;
+  }
+
+  .cinePortal {
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+    padding: 1.2rem;
+    border-radius: 20px;
+    border: 1px solid oklch(96% 0.02 95 / 0.14);
+    color: inherit;
+    text-decoration: none;
+    background: oklch(16% 0.03 40 / 0.72);
+    backdrop-filter: blur(16px);
+    display: grid;
+    align-content: end;
+    gap: 0.35rem;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s;
+  }
+
+  .cinePortal::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: conic-gradient(from var(--spin, 0deg), transparent, oklch(82% 0.16 92 / 0.35), transparent 40%);
+    animation: spin 8s linear infinite;
+    opacity: 0.55;
+  }
+
+  .cinePortal > * { position: relative; z-index: 1; }
+
+  .cinePortal:hover {
+    transform: translateY(-6px) rotate(-0.4deg);
+    border-color: oklch(82% 0.16 92 / 0.55);
+  }
+
+  @keyframes spin { to { --spin: 360deg; transform: rotate(1turn); } }
+
+  .cineReel {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 28vw);
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.6rem;
+    scroll-snap-type: x mandatory;
+  }
+
+  .cineReel a {
+    scroll-snap-align: start;
+    position: relative;
+    min-height: 280px;
+    border-radius: 18px;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .cineReel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: ken 16s ease-in-out infinite alternate;
+  }
+
+  .cineReel figcaption {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 1rem;
+    background: linear-gradient(transparent, #000);
+  }
+
+  .adminScrim {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: oklch(8% 0.02 40 / 0.78);
+    backdrop-filter: blur(18px);
+  }
+
+  .adminCodeModal {
+    position: relative;
+    z-index: 201;
+    display: grid;
+    gap: 14px;
+    width: min(440px, calc(100vw - 24px));
+    border: 1px solid oklch(82% 0.16 92 / 0.45);
+    border-radius: 18px;
+    background: linear-gradient(160deg, oklch(18% 0.03 50), oklch(10% 0.02 40));
+    padding: 28px;
+    color: oklch(96% 0.02 95);
+    box-shadow: 0 24px 80px oklch(0% 0 0 / 0.55), 0 0 40px oklch(82% 0.16 92 / 0.2);
+  }
+
+  .adminCodeModal input {
+    min-height: 56px;
+    font-size: 1.25rem;
+    letter-spacing: 0.2em;
+    background: #111;
+    color: #fff;
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+    padding: 0 12px;
+  }
+
+  .adminUnlockBtn {
+    min-height: 48px;
+    border: 0;
+    border-radius: 999px;
+    background: #d4af37;
+    color: #16120a;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .modalClose {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filmGrain, .filmScan, .cineHeroVideo, .cineMarqueeTrack, .cinePortal::before, .cineReel img {
+      animation: none !important;
+    }
+  }
+}

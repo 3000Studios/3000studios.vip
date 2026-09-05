@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const AUTH_KEY = '3000-admin-auth-v1';
@@ -10,6 +11,15 @@ export function AdminFab() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/vault')) {
     return null;
@@ -45,9 +55,10 @@ export function AdminFab() {
         <span className="adminFabLabel">Admin</span>
       </button>
 
-      {open ? (
-        <div className="adminScrim" role="dialog" aria-modal="true" aria-label="Admin passcode">
-          <form className="adminCodeModal" onSubmit={submit}>
+      {open
+        ? createPortal(
+        <div className="adminScrim" role="dialog" aria-modal="true" aria-label="Admin passcode" onClick={() => setOpen(false)}>
+          <form className="adminCodeModal" onSubmit={submit} onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               className="modalClose"
@@ -80,8 +91,10 @@ export function AdminFab() {
               Unlock Admin
             </button>
           </form>
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+        : null}
     </>
   );
 }

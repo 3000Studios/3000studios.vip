@@ -243,6 +243,10 @@ export function PublicLayout({ children, variant = 'spiral' }: { children: React
 
   return (
     <div className={`vipSite vipSite-${variant} vipSite-live${open ? ' is-nav-open' : ''}`} data-page-wallpaper={variant} data-song-wallpaper={wallpaperVariant}>
+      <div className="filmLetterbox top" aria-hidden="true" />
+      <div className="filmLetterbox bottom" aria-hidden="true" />
+      <div className="filmGrain" aria-hidden="true" />
+      <div className="filmScan" aria-hidden="true" />
       <AudioReactiveWallpaper variant={wallpaperVariant} palette={theme.palette} coverUrl={theme.cover} />
       <MouseFX />
       <ZombieFX />
