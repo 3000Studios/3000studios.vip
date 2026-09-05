@@ -176,7 +176,7 @@ export function Admin() {
 
   if (!authed) {
     return (
-      <PublicLayout variant="blackhole" compact>
+      <PublicLayout variant="blackhole">
       <div className="adminScrim adminEasyShell adminWithNav">
         <form className="adminCodeModal" onSubmit={handleUnlock}>
           <span>3000 Studios · Owner Access</span>
@@ -208,7 +208,7 @@ export function Admin() {
   }
 
   return (
-    <PublicLayout variant="blackhole" compact>
+    <PublicLayout variant="blackhole">
     <div className="console adminEasyShell adminWithNav" style={{ gridTemplateColumns: '1fr' }}>
       <div className="cMain">
         <header className="cTopbar">

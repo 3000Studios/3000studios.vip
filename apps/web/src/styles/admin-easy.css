@@ -1,21 +1,44 @@
-/* Keep the public navbar visible above admin */
+/* Admin sits in the page: public header + footer stay visible and the console scrolls */
 .console.adminWithNav {
-  position: fixed;
-  top: var(--nav-h, 64px);
-  right: 0;
-  bottom: 0;
-  left: 0;
-  inset: unset;
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
   z-index: 1;
-  grid-template-columns: 1fr;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  overflow: visible !important;
+  grid-template-columns: 1fr !important;
+}
+.console.adminWithNav .cMain {
+  overflow: visible;
+  min-height: 0;
+}
+.console.adminWithNav .cScroll {
+  overflow: visible;
+  flex: none;
+  height: auto;
+  padding-bottom: 2.5rem;
+}
+.console.adminWithNav .cTopbar {
+  position: sticky;
+  top: var(--nav-h, 64px);
+  z-index: 3;
+}
+.vipSite:has(.adminWithNav) {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .vipSite .adminScrim.adminWithNav {
   position: relative !important;
   inset: auto !important;
   z-index: 1 !important;
-  min-height: calc(100dvh - var(--nav-h, 64px));
-  padding-top: 1rem;
-  padding-bottom: calc(1rem + var(--safe-bottom, 0px));
+  min-height: min(70dvh, 640px);
+  padding-top: 1.25rem;
+  padding-bottom: 2rem;
 }
 .vipHeader {
   z-index: var(--z-header, 40);
