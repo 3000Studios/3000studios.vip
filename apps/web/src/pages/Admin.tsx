@@ -14,6 +14,7 @@ import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { AdminObservability } from '../components/AdminObservability';
 import { MarketingAdvisor } from '../components/MarketingAdvisor';
+import { PublicLayout } from './Home';
 import '../styles/discover.css';
 
 const ADMIN_PASSCODE = '3000';
@@ -175,7 +176,8 @@ export function Admin() {
 
   if (!authed) {
     return (
-      <div className="adminScrim adminEasyShell">
+      <PublicLayout variant="blackhole" compact>
+      <div className="adminScrim adminEasyShell adminWithNav">
         <form className="adminCodeModal" onSubmit={handleUnlock}>
           <span>3000 Studios · Owner Access</span>
           <h2>Go Live Console</h2>
@@ -201,11 +203,13 @@ export function Admin() {
           <Link to="/" className="adminBackLink">← Back to public site</Link>
         </form>
       </div>
+      </PublicLayout>
     );
   }
 
   return (
-    <div className="console adminEasyShell" style={{ gridTemplateColumns: '1fr' }}>
+    <PublicLayout variant="blackhole" compact>
+    <div className="console adminEasyShell adminWithNav" style={{ gridTemplateColumns: '1fr' }}>
       <div className="cMain">
         <header className="cTopbar">
           <div className="cTitle">
@@ -325,5 +329,6 @@ export function Admin() {
         </main>
       </div>
     </div>
+    </PublicLayout>
   );
 }

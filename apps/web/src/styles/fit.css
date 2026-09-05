@@ -48,7 +48,7 @@ img, video, iframe { max-width: 100%; }
   opacity: .35;
 }
 .musicDeckPage { position: relative; z-index: 1; }
-.adminScrim { z-index: 80 !important; }
+.adminScrim { z-index: 1 !important; }
 .adminCodeModal {
   z-index: 81;
   width: min(440px, calc(100vw - 24px)) !important;

@@ -230,7 +230,7 @@
   .adminScrim {
     position: fixed;
     inset: 0;
-    z-index: 200;
+    z-index: 1;
     display: grid;
     place-items: center;
     padding: 18px;

@@ -352,7 +352,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           </section>
         ) : null}
 
-        <details className="studioAccord" defaultOpen>
+        <details className="studioAccord">
           <summary>Camera &amp; layout</summary>
           <label className="easyField">
             <span>Camera</span>
