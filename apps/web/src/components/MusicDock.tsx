@@ -18,7 +18,7 @@ export function MusicDock() {
       <img src={music.activeSong.cover} alt="" />
       <div className="musicDockMeta">
         <strong>{music.activeSong.title}</strong>
-        <span>{fmt(music.currentTime)} · 30s sample unless unlocked</span>
+        <span>{fmt(music.currentTime)} / {fmt(music.duration)} · Full stream</span>
       </div>
       <button type="button" className="musicDockPlay" onClick={music.toggle} aria-label={music.isPlaying ? 'Pause' : 'Play'}>
         {music.isPlaying ? '❚❚' : '▶'}

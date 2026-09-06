@@ -7,13 +7,32 @@ import {
 export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number; onSelect: (index: number) => void }) {
   const [frontIndex, setFrontIndex] = useState(activeIndex);
   const [paused, setPaused] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(
+    typeof window !== 'undefined' ? Math.min(window.innerWidth - 24, 760) : 760
+  );
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const dragStart = useRef<number | null>(null);
   const suppressClick = useRef(false);
   const resumeTimer = useRef<number | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
-  const rotationRef = useRef(activeIndex * (360 / Math.max(officialReleaseVideos.length, 1)));
   const count = officialReleaseVideos.length;
   const step = 360 / count;
+
+  useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth);
+      } else {
+        setContainerWidth(Math.min(window.innerWidth - 24, 760));
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  const rotationRef = useRef(activeIndex * step);
 
   const paintRing = (degrees: number) => {
     if (ringRef.current) ringRef.current.style.transform = `rotateY(${-degrees}deg)`;
@@ -25,7 +44,7 @@ export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number
   };
   const pauseSpin = () => {
     holdPause();
-    resumeTimer.current = window.setTimeout(() => setPaused(false), 2000);
+    resumeTimer.current = window.setTimeout(() => setPaused(false), 2500);
   };
 
   useEffect(() => {
@@ -44,7 +63,7 @@ export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number
       if (!frame) frame = now;
       const delta = Math.min(32, now - frame);
       frame = now;
-      rotationRef.current = (rotationRef.current + delta * 0.012) % 360;
+      rotationRef.current = (rotationRef.current + delta * 0.01) % 360;
       paintRing(rotationRef.current);
       raf = requestAnimationFrame(tick);
     };
@@ -81,17 +100,26 @@ export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number
     }
   };
 
-  const cardWidth = 260;
-  const gap = 10;
-  const radius = Math.max(340, Math.round((count * (cardWidth + gap)) / (2 * Math.PI)));
+  const isMobile = containerWidth < 540;
+  const cardWidth = isMobile ? 140 : 210;
+  const cardHeight = isMobile ? 140 : 210;
+
+  // Maximum radius so 3D diameter (2 * radius + cardWidth) NEVER exceeds (containerWidth - 20px)
+  const maxRadius = Math.max(70, Math.floor((containerWidth - cardWidth - 20) / 2));
+  const radius = Math.min(maxRadius, isMobile ? 110 : 230);
 
   return (
     <div
+      ref={containerRef}
       className="releaseCarousel"
       role="region"
       aria-label="Official release preview carousel"
       tabIndex={0}
-      style={{ '--carousel-radius': `${radius}px` } as React.CSSProperties}
+      style={{
+        '--card-width': `${cardWidth}px`,
+        '--card-height': `${cardHeight}px`,
+        '--carousel-radius': `${radius}px`,
+      } as React.CSSProperties}
       onMouseEnter={holdPause}
       onMouseLeave={pauseSpin}
       onTouchStart={pauseSpin}
@@ -108,7 +136,7 @@ export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number
       }}
     >
       <p className="releaseCarouselHint">Swipe or use arrows · Tap a thumbnail to play</p>
-      <div className="releaseCarouselViewport">
+      <div className="releaseCarouselViewport" style={{ height: isMobile ? '230px' : '320px' }}>
         <div className="releaseCarouselRing" ref={ringRef} style={{ transform: `rotateY(${-frontIndex * step}deg)` }}>
           {officialReleaseVideos.map((release, index) => (
             <button
