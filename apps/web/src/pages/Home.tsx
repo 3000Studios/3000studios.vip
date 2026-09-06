@@ -15,7 +15,6 @@ import { MouseFX } from '../components/MouseFX';
 import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
-import { ReleaseCarousel } from '../components/ReleaseCarousel';
 import { PlatformLogos } from '../components/PlatformLogos';
 import { ChromeWallpaper } from '../components/ChromeWallpaper';
 
@@ -536,7 +535,6 @@ export function VideoPage() {
             <iframe src={youtubeEmbedUrl(featured.videoId)} title={`${featured.title} official music video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
             <div><span className="vipKicker">Now screening</span><h2>{featured.title}</h2><p>{featured.release} · {featured.duration}</p><a className="studioButton secondary" href={youtubeWatchUrl(featured.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a></div>
           </div>
-          <ReleaseCarousel key="video-carousel" activeIndex={activeIndex} onSelect={preview} />
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
       </main>

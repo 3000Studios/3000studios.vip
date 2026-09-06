@@ -8,7 +8,6 @@ import {
   youtubeWatchUrl,
 } from '../data/officialReleases';
 import { PublicLayout } from './Home';
-import { ReleaseCarousel } from '../components/ReleaseCarousel';
 import '../styles/music-deck.css';
 
 const normalized = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -53,9 +52,7 @@ export function MusicDeck() {
           />
         </div>
         <div className="dkArtDim" aria-hidden="true" />
-        <section className="dkStage" aria-label="Official release coverflow">
-          <p className="vipKicker dkKicker">3000 Studios · 3D selector</p>
-          <ReleaseCarousel activeIndex={activeIndex} onSelect={pick} />
+        <section className="dkStage" aria-label="Official release player">
 
           <div className="dkPlayer">
             <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex - 1)} aria-label="Previous song">‹</button>

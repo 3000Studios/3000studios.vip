@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { officialReleaseVideos, youtubeArtworkUrl, youtubeWatchUrl } from '../data/officialReleases';
 import { rolloutSongs } from '../data/music';
 import { PublicLayout } from '../pages/Home';
-import { ReleaseCarousel } from './ReleaseCarousel';
 import { PLATFORMS } from '../lib/commerce';
 
 const featured = officialReleaseVideos[0];
@@ -88,22 +87,6 @@ export function CinematicHome() {
               </a>
             ))}
           </div>
-        </section>
-
-        <section aria-label="Music selector">
-          <div className="discoverHead">
-            <h2>Spin the catalog</h2>
-            <Link to="/music">Open deck</Link>
-          </div>
-          <ReleaseCarousel
-            activeIndex={0}
-            onSelect={(index) => {
-              const song = rolloutSongs.find((item) => item.title.toLowerCase() === officialReleaseVideos[index]?.title.toLowerCase());
-              const video = officialReleaseVideos[index];
-              if (song) startSample(song.slug, song.src, song.title);
-              else if (video) window.open(youtubeWatchUrl(video.videoId), '_blank', 'noreferrer');
-            }}
-          />
         </section>
 
         <section aria-label="Play the catalog">
