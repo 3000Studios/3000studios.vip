@@ -514,14 +514,9 @@ export function MusicShowcase() {
 }
 
 export function VideoPage() {
-  const [featuredVideoId, setFeaturedVideoId] = useState(officialReleaseVideos[0].videoId);
+  const [featuredVideoId] = useState(officialReleaseVideos[0].videoId);
   const playerRef = useRef<HTMLDivElement | null>(null);
   const featured = officialReleaseVideos.find((video) => video.videoId === featuredVideoId) ?? officialReleaseVideos[0];
-  const activeIndex = officialReleaseVideos.findIndex((video) => video.videoId === featured.videoId);
-  const preview = (index: number) => {
-    setFeaturedVideoId(officialReleaseVideos[index].videoId);
-    window.setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
-  };
   return (
     <PublicLayout variant="electric">
       <main className="vipMain videoPage">
