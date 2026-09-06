@@ -81,12 +81,17 @@ export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number
     }
   };
 
+  const cardWidth = 260;
+  const gap = 10;
+  const radius = Math.max(340, Math.round((count * (cardWidth + gap)) / (2 * Math.PI)));
+
   return (
     <div
       className="releaseCarousel"
       role="region"
       aria-label="Official release preview carousel"
       tabIndex={0}
+      style={{ '--carousel-radius': `${radius}px` } as React.CSSProperties}
       onMouseEnter={holdPause}
       onMouseLeave={pauseSpin}
       onTouchStart={pauseSpin}
@@ -110,7 +115,7 @@ export function ReleaseCarousel({ activeIndex, onSelect }: { activeIndex: number
               type="button"
               key={release.videoId}
               className={index === activeIndex ? 'releaseCarouselCard is-playing' : 'releaseCarouselCard'}
-              style={{ transform: `rotateY(${index * step}deg) translateZ(var(--carousel-radius))` }}
+              style={{ transform: `rotateY(${index * step}deg) translateZ(${radius}px)` }}
               onClick={() => select(index)}
               aria-label={`Play ${release.title} in the main player`}
               aria-pressed={index === activeIndex}

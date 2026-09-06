@@ -12,6 +12,26 @@ type Props = {
 
 const DEFAULT_PALETTE: SongPalette = { a: '#1ef078', b: '#236dff', c: '#ff4d6d', gold: '#ffd700' };
 
+function toAlphaColor(color: string, alphaHexOrDec: string | number): string {
+  const alphaNum = typeof alphaHexOrDec === 'number'
+    ? alphaHexOrDec
+    : parseInt(alphaHexOrDec, 16) / 255;
+  if (!color) return `rgba(255, 215, 0, ${alphaNum.toFixed(2)})`;
+  if (color.startsWith('hsl(')) {
+    return color.replace(/^hsl\((.*)\)$/, `hsla($1, ${alphaNum.toFixed(2)})`);
+  }
+  if (color.startsWith('#')) {
+    const hexAlpha = typeof alphaHexOrDec === 'number'
+      ? Math.floor(alphaHexOrDec * 255).toString(16).padStart(2, '0')
+      : alphaHexOrDec;
+    const cleanHex = color.length === 4
+      ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+      : color;
+    return `${cleanHex.slice(0, 7)}${hexAlpha}`;
+  }
+  return color;
+}
+
 export function LiveWallpaper({ variant = 'spiral', palette = DEFAULT_PALETTE }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -54,12 +74,12 @@ export function LiveWallpaper({ variant = 'spiral', palette = DEFAULT_PALETTE }:
       ctx.fillStyle = 'rgba(4, 3, 8, 0.22)';
       ctx.fillRect(0, 0, w, h);
       const g = ctx.createRadialGradient(w * mx, h * my, 12, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
-      g.addColorStop(0, `${palette.gold}33`);
-      g.addColorStop(0.35, `${palette.b}1c`);
+      g.addColorStop(0, toAlphaColor(palette.gold || '#ffd700', '33'));
+      g.addColorStop(0.35, toAlphaColor(palette.b || '#236dff', '1c'));
       g.addColorStop(1, '#050506');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = `${palette.gold}40`;
+      ctx.strokeStyle = toAlphaColor(palette.gold || '#ffd700', '40');
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.arc(w * 0.5, h * 0.42, 90 + Math.sin(t * 0.0007) * 16, 0, Math.PI * 2);
@@ -67,7 +87,7 @@ export function LiveWallpaper({ variant = 'spiral', palette = DEFAULT_PALETTE }:
       for (const mote of motes) {
         const x = ((mote.x + t * 0.00002 * mote.s) % 1) * w;
         const y = ((mote.y + Math.sin(t * 0.0004 + mote.z) * 0.02) % 1) * h;
-        ctx.fillStyle = `${palette.gold}${Math.floor(40 + mote.z * 80).toString(16).padStart(2, '0')}`;
+        ctx.fillStyle = toAlphaColor(palette.gold || '#ffd700', Math.floor(40 + mote.z * 80).toString(16).padStart(2, '0'));
         ctx.beginPath();
         ctx.arc(x, y, mote.s, 0, Math.PI * 2);
         ctx.fill();

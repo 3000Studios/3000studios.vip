@@ -82,27 +82,6 @@ export function MusicDeck() {
             </label>
             <a className="studioButton secondary dkWatch" href={youtubeWatchUrl(yt)} target="_blank" rel="noreferrer">Open video</a>
           </div>
-
-          <div className="compactTrackSection">
-            <h3 className="compactTrackHead">Official Catalog ({catalog.length})</h3>
-            <div className="compactTrackGrid">
-              {catalog.map((track, idx) => (
-                <button
-                  key={track.videoId}
-                  type="button"
-                  className={`compactTrackRow ${idx === activeIndex ? 'is-active' : ''}`}
-                  onClick={() => pick(idx)}
-                >
-                  <img src={youtubeArtworkUrl(track.videoId)} alt="" className="compactTrackThumb" />
-                  <div className="compactTrackInfo">
-                    <strong>{track.title}</strong>
-                    <span>{track.release}</span>
-                  </div>
-                  <span className="compactTrackBadge">{idx === activeIndex && music.isPlaying ? '▶ ON AIR' : 'PLAY'}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </section>
       </main>
     </PublicLayout>

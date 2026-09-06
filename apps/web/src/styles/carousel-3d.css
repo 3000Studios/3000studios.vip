@@ -1,51 +1,98 @@
-/* Full-bleed 3D release ring — cards wrap around the page with real spacing. */
+/* Full-bleed 3D release ring — cards wrap around the page with real 10px spacing. */
 .releaseCarousel {
-  --carousel-radius: clamp(520px, 54vw, 820px);
   position: relative;
   width: 100%;
   max-width: 100%;
-  margin-inline: 0;
-  min-height: 520px;
+  margin: 0 auto;
+  min-height: 560px;
   overflow: visible;
+  perspective: 1400px;
 }
 .releaseCarouselViewport {
-  height: 460px;
-  perspective: 1600px;
-  perspective-origin: 50% 42%;
+  height: 500px;
+  perspective: 1400px;
+  perspective-origin: 50% 45%;
+  transform-style: preserve-3d;
   overflow: visible;
 }
 .releaseCarouselRing {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
   transition: none;
 }
 .releaseCarouselCard {
-  top: 88px;
-  width: 132px;
-  min-height: 132px;
-  margin-left: -66px;
-  backface-visibility: hidden;
+  position: absolute;
+  left: 50%;
+  top: 60px;
+  width: 260px;
+  min-height: 260px;
+  margin-left: -130px;
+  backface-visibility: visible !important;
+  transform-style: preserve-3d;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 215, 0, 0.35);
+  background: rgba(8, 10, 18, 0.92);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  overflow: hidden;
+  cursor: pointer;
 }
+.releaseCarouselCard:hover,
+.releaseCarouselCard.is-playing {
+  border-color: #ffd700 !important;
+  box-shadow:
+    0 0 30px rgba(255, 215, 0, 0.95),
+    0 0 60px rgba(255, 215, 0, 0.5),
+    inset 0 0 15px rgba(255, 215, 0, 0.6) !important;
+  z-index: 10;
+}
+.releasePreviewArt {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.releasePreviewArt img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.releasePreviewTitle {
+  display: block;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+  color: #ffd700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .dkMusicPage .dkStage,
-.officialCinema {
-  overflow: visible;
-}
+.officialCinema,
 .dkMusicPage,
 .videoPage {
   overflow: visible;
 }
+
 @media (max-width: 700px) {
   .releaseCarousel {
-    --carousel-radius: clamp(280px, 46vw, 360px);
-    min-height: 380px;
+    min-height: 440px;
   }
   .releaseCarouselViewport {
-    height: 320px;
-    perspective: 1000px;
+    height: 380px;
+    perspective: 900px;
   }
   .releaseCarouselCard {
-    top: 70px;
-    width: 108px;
-    min-height: 108px;
-    margin-left: -54px;
+    top: 40px;
+    width: 190px;
+    min-height: 190px;
+    margin-left: -95px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
