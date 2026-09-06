@@ -37,7 +37,12 @@ export type OverlayId =
   | 'holographic'
   | 'broadcastSafe'
   | 'pulseRing'
-  | 'dualGold';
+  | 'dualGold'
+  | 'goldVIP'
+  | 'cyberNeon'
+  | 'diamondLuxury'
+  | 'electroPulse'
+  | 'spotlightStudio';
 
 export const LENS_FILTERS: { id: LensFilterId; label: string; css: string; group?: string }[] = [
   { id: 'none', label: 'Clean', css: 'none', group: 'base' },
@@ -71,7 +76,12 @@ export const PREMADE_OVERLAYS: { id: OverlayId; label: string; hint: string; gro
   { id: 'ticker', label: 'Ticker bar', hint: 'Scrolling bottom strip', group: 'info' },
   { id: 'goldFrame', label: 'Gold frame', hint: 'Classic premium border', group: 'frame' },
   { id: 'dualGold', label: 'Double gold', hint: 'Inner + outer gold rails', group: 'frame' },
+  { id: 'goldVIP', label: 'Gold VIP', hint: 'Embossed gold rails & VIP stars', group: 'frame' },
+  { id: 'cyberNeon', label: 'Cyber neon', hint: 'Animated cyan/magenta matrix edge', group: 'frame' },
   { id: 'neonFrame', label: 'Neon frame', hint: 'Cyan/magenta broadcast edge', group: 'frame' },
+  { id: 'diamondLuxury', label: 'Diamond luxury', hint: 'Shimmering prism border', group: 'frame' },
+  { id: 'electroPulse', label: 'Electro pulse', hint: 'Audio-reactive perimeter glow', group: 'frame' },
+  { id: 'spotlightStudio', label: 'Studio spotlight', hint: 'Vignette & stage light glow', group: 'frame' },
   { id: 'cornerBrackets', label: 'HUD brackets', hint: 'Tactical corner marks', group: 'frame' },
   { id: 'cinemaBars', label: 'Cinema bars', hint: 'Letterbox 2.35 look', group: 'frame' },
   { id: 'holographic', label: 'Holographic', hint: 'Iridescent edge wash', group: 'frame' },
@@ -349,6 +359,31 @@ export class StreamStudio {
       ctx.strokeRect(28, 28, w - 56, h - 56);
     }
 
+    if (this.overlays.has('goldVIP')) {
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#ffd700');
+      grad.addColorStop(0.5, '#fff5be');
+      grad.addColorStop(1, '#cca000');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 8;
+      ctx.strokeRect(16, 16, w - 32, h - 32);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(8, 8, w - 16, h - 16);
+    }
+
+    if (this.overlays.has('cyberNeon')) {
+      const shift = (this.tick * 3) % 360;
+      ctx.strokeStyle = `hsla(${shift}, 100%, 65%, 0.85)`;
+      ctx.lineWidth = 6;
+      ctx.shadowColor = `hsla(${shift}, 100%, 65%, 0.8)`;
+      ctx.shadowBlur = 20;
+      ctx.strokeRect(12, 12, w - 24, h - 24);
+      ctx.strokeStyle = `hsla(${(shift + 180) % 360}, 100%, 65%, 0.5)`;
+      ctx.strokeRect(20, 20, w - 40, h - 40);
+      ctx.shadowBlur = 0;
+    }
+
     if (this.overlays.has('neonFrame')) {
       ctx.strokeStyle = 'rgba(111, 244, 255, 0.85)';
       ctx.lineWidth = 4;
@@ -359,6 +394,39 @@ export class StreamStudio {
       ctx.shadowColor = 'rgba(255, 77, 196, 0.5)';
       ctx.strokeRect(22, 22, w - 44, h - 44);
       ctx.shadowBlur = 0;
+    }
+
+    if (this.overlays.has('diamondLuxury')) {
+      const dGrad = ctx.createLinearGradient(0, 0, w, 0);
+      const phase = (this.tick * 0.02) % 1;
+      dGrad.addColorStop((0 + phase) % 1, '#ffffff');
+      dGrad.addColorStop((0.3 + phase) % 1, '#70d6ff');
+      dGrad.addColorStop((0.6 + phase) % 1, '#ff70a6');
+      dGrad.addColorStop((0.9 + phase) % 1, '#ffd670');
+      ctx.strokeStyle = dGrad;
+      ctx.lineWidth = 5;
+      ctx.strokeRect(14, 14, w - 28, h - 28);
+    }
+
+    if (this.overlays.has('electroPulse')) {
+      const beats = 0.5 + Math.sin(this.tick * 0.15) * 0.5;
+      ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 + beats * 0.5})`;
+      ctx.lineWidth = 4 + beats * 8;
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+    }
+
+    if (this.overlays.has('spotlightStudio')) {
+      const spotLeft = ctx.createRadialGradient(0, 0, 10, 0, 0, w * 0.5);
+      spotLeft.addColorStop(0, 'rgba(255, 245, 215, 0.25)');
+      spotLeft.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = spotLeft;
+      ctx.fillRect(0, 0, w, h);
+
+      const spotRight = ctx.createRadialGradient(w, 0, 10, w, 0, w * 0.5);
+      spotRight.addColorStop(0, 'rgba(111, 244, 255, 0.2)');
+      spotRight.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = spotRight;
+      ctx.fillRect(0, 0, w, h);
     }
 
     if (this.overlays.has('cornerBrackets')) {

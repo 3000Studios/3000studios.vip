@@ -12,3 +12,75 @@
 .srOnly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes vinylSpin{to{transform:rotate(calc(var(--scratch-angle) + 360deg))}}
 @media(min-width:760px){.musicDeckPage{padding-top:120px}.turntableDeck{min-height:auto}.vinylPlatter{width:280px}.platformLinks a{font-size:.95rem}}
 @media(prefers-reduced-motion:reduce){.vinylPlatter.is-spinning{animation:none}.deckWaveform i,.deckLights i{box-shadow:none}}
+
+/* Compact Mobile Music List */
+.compactTrackSection {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 14px;
+  background: rgba(8, 12, 22, 0.75);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+}
+.compactTrackHead {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffd700;
+}
+.compactTrackGrid {
+  display: grid;
+  gap: 0.5rem;
+}
+.compactTrackRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: rgba(15, 23, 42, 0.6);
+  color: #f1f5f9;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.compactTrackRow:hover,
+.compactTrackRow.is-active {
+  border-color: rgba(255, 215, 0, 0.5);
+  background: rgba(255, 215, 0, 0.12);
+}
+.compactTrackThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.compactTrackInfo {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.compactTrackInfo strong {
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.compactTrackInfo span {
+  font-size: 0.72rem;
+  color: rgba(226, 232, 240, 0.65);
+}
+.compactTrackBadge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+}
+
