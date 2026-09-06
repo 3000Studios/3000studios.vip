@@ -50,6 +50,7 @@ function pruneViewers(room: RoomState, now: number) {
 }
 
 function sanitize(value: string, max: number) {
+  // eslint-disable-next-line no-control-regex
   return value.replace(/[\u0000-\u001f]/g, '').trim().slice(0, max);
 }
 

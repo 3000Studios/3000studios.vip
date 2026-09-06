@@ -4,6 +4,7 @@ import {
   PREMADE_OVERLAYS,
   StreamStudio,
   listCameras,
+  listMicrophones,
   type CameraRotation,
   type LensFilterId,
   type OverlayId,
@@ -34,6 +35,11 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [cameraId, setCameraId] = useState('');
+  const [mics, setMics] = useState<MediaDeviceInfo[]>([]);
+  const [micId, setMicId] = useState(() => localStorage.getItem('3000-stream-mic-id-v1') || '');
+  const [micMuted, setMicMuted] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [hasAudioTrack, setHasAudioTrack] = useState(false);
   const [facing, setFacing] = useState<'user' | 'environment'>('user');
   const [filter, setFilter] = useState<LensFilterId>('warmGold');
   const [overlays, setOverlays] = useState<OverlayId[]>(['liveBadge', 'watermark', 'lowerThird']);
@@ -71,6 +77,12 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         panX,
         panY,
       });
+      studioRef.current.setOnAudioTrackChange((track) => {
+        setHasAudioTrack(true);
+        if (publisherRef.current) {
+          void publisherRef.current.replaceAudioTrack(track);
+        }
+      });
     }
     return studioRef.current;
   }, [filter, overlays, lowerTitle, lowerSub, rotation, flipH, flipV, zoom, panX, panY]);
@@ -89,17 +101,37 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     }
   }, [ensureStudio]);
 
-  const refreshCameraList = useCallback(async () => {
-    const cams = await listCameras();
-    setCameras(cams);
-    setCameraId((prev) => {
-      if (prev && cams.some((c) => c.deviceId === prev)) return prev;
-      return cams[0]?.deviceId || '';
-    });
+  const refreshDeviceLists = useCallback(async () => {
+    try {
+      const [cams, audioInputs] = await Promise.all([listCameras(), listMicrophones()]);
+      setCameras(cams);
+      setCameraId((prev) => {
+        if (prev && cams.some((c) => c.deviceId === prev)) return prev;
+        return cams[0]?.deviceId || '';
+      });
+      setMics(audioInputs);
+      setMicId((prev) => {
+        if (prev && audioInputs.some((m) => m.deviceId === prev)) return prev;
+        const saved = localStorage.getItem('3000-stream-mic-id-v1');
+        if (saved && audioInputs.some((m) => m.deviceId === saved)) return saved;
+        return audioInputs[0]?.deviceId || '';
+      });
+    } catch {
+      /* ignore */
+    }
   }, []);
 
+  useEffect(() => {
+    const studio = studioRef.current;
+    if (!studio) return;
+    const unsub = studio.subscribeAudioLevel((lvl) => {
+      setAudioLevel(lvl);
+    });
+    return () => unsub();
+  }, [hasCanvas]);
+
   const startPreview = useCallback(
-    async (deviceId?: string, facingMode?: 'user' | 'environment') => {
+    async (deviceId?: string, facingMode?: 'user' | 'environment', audioDeviceId?: string) => {
       if (!canRequestMedia) {
         const msg = 'Open this page in Safari or Chrome on https://3000studios.vip/admin and tap Access camera.';
         setError(msg);
@@ -118,15 +150,20 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         studio.lowerThirdTitle = lowerTitle;
         studio.lowerThirdSub = lowerSub;
         applyFraming(studio);
-        await studio.openCamera(deviceId || cameraId || undefined, facingMode || facing);
+        await studio.openCamera(
+          deviceId || cameraId || undefined,
+          facingMode || facing,
+          audioDeviceId || micId || undefined,
+        );
         const preview = studio.getOutputStream(30, true);
         const cameraTrack = preview.getVideoTracks()[0];
         if (!cameraTrack || cameraTrack.readyState === 'ended') {
           throw new Error('Camera did not start. Tap Allow when the phone asks.');
         }
+        setHasAudioTrack(studio.hasAudioTrack());
         studio.start();
         mountCanvas();
-        await refreshCameraList();
+        await refreshDeviceLists();
         setStatus((s) => (s === 'live' ? 'live' : 'preview'));
         return true;
       } catch (err) {
@@ -141,6 +178,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     },
     [
       cameraId,
+      micId,
       facing,
       ensureStudio,
       filter,
@@ -151,7 +189,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       mountCanvas,
       onError,
       canRequestMedia,
-      refreshCameraList,
+      refreshDeviceLists,
     ],
   );
 
@@ -199,19 +237,44 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
   async function switchCamera(id: string) {
     setCameraId(id);
-    await startPreview(id, facing);
+    await startPreview(id, facing, micId);
     if (status === 'live' && publisherRef.current && studioRef.current) {
-      const out = studioRef.current.getOutputStream(30, true);
+      const out = studioRef.current.getOutputStream(30);
       const v = out.getVideoTracks()[0];
       if (v) await publisherRef.current.replaceVideoTrack(v);
     }
+  }
+
+  async function switchMicrophone(id: string) {
+    setMicId(id);
+    localStorage.setItem('3000-stream-mic-id-v1', id);
+    if (!studioRef.current) return;
+    try {
+      const track = await studioRef.current.openMicrophone(id || undefined);
+      if (track) {
+        setHasAudioTrack(true);
+        if (status === 'live' && publisherRef.current) {
+          await publisherRef.current.replaceAudioTrack(track);
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Microphone switch failed';
+      setError(msg);
+      onError?.(msg);
+    }
+  }
+
+  function toggleMic() {
+    const next = !micMuted;
+    setMicMuted(next);
+    studioRef.current?.setMicrophoneEnabled(!next);
   }
 
   async function flipFacing() {
     const next = facing === 'user' ? 'environment' : 'user';
     setFacing(next);
     setCameraId('');
-    await startPreview(undefined, next);
+    await startPreview(undefined, next, micId);
   }
 
   async function goLive() {
@@ -233,7 +296,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       publisherRef.current = null;
 
       const studio = ensureStudio();
-      await studio.openCamera(cameraId || undefined, facing);
+      await studio.openCamera(cameraId || undefined, facing, micId || undefined);
       studio.start();
       mountCanvas();
       studio.setFilter(filter);
@@ -244,9 +307,25 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-      const out = studio.getOutputStream(30, true);
+      const out = studio.getOutputStream(30, false);
       if (!out.getVideoTracks().length) {
         throw new Error('No camera picture yet. Tap Access camera first.');
+      }
+
+      // Verify and guarantee microphone track is present
+      if (!out.getAudioTracks().length) {
+        try {
+          const track = await studio.openMicrophone(micId || undefined);
+          if (track) out.addTrack(track);
+        } catch (mErr) {
+          console.warn('Microphone ensure error:', mErr);
+        }
+      }
+
+      if (!out.getAudioTracks().length) {
+        throw new Error(
+          'Microphone audio track missing. Please allow microphone access or choose a microphone above so your stream has sound.',
+        );
       }
 
       const publisher = new WhipPublisher(check.endpoint);
@@ -254,10 +333,11 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       await publisher.startWithStream(out);
 
       setStatus('live');
+      setHasAudioTrack(true);
       onLiveChange?.(true);
       void publishServerLiveFlag(true);
       window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: true } }));
-      await refreshCameraList();
+      await refreshDeviceLists();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not go live';
       setError(msg);
@@ -267,7 +347,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       void publishServerLiveFlag(false);
       await publisherRef.current?.stop();
       publisherRef.current = null;
-      void startPreview(cameraId, facing);
+      void startPreview(cameraId, facing, micId);
     }
   }
 
@@ -289,6 +369,14 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         <div className="adminCameraFrame studioPreviewFrame">
           <div ref={mountRef} className="studioCanvasMount" />
           {status === 'live' ? <div className="streamLiveBadge">● LIVE · WHIP</div> : null}
+          {hasCanvas ? (
+            <div
+              className={`studioMicIndicator ${micMuted ? 'is-muted' : audioLevel > 5 ? 'is-active' : 'is-listening'}`}
+              title={micMuted ? 'Microphone muted' : audioLevel > 5 ? 'Sound detected' : 'Microphone ready'}
+            >
+              {micMuted ? '🔇 MIC MUTED' : audioLevel > 5 ? '🎙️ SOUND ON' : '🎙️ MIC READY'}
+            </div>
+          ) : null}
           {status === 'starting' ? <div className="adminCameraOverlay">Connecting WHIP (POST SDP)…</div> : null}
           {status === 'idle' || (status === 'error' && !hasCanvas) ? (
             <div className="adminCameraOverlay">{error || 'Starting camera preview…'}</div>
@@ -314,7 +402,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
               {status === 'starting' ? 'WHIP connecting…' : 'Go Live with looks'}
             </button>
           )}
-          <button type="button" className="cBtn ghost" onClick={() => void startPreview(cameraId)}>
+          <button type="button" className="cBtn ghost" onClick={() => void startPreview(cameraId, facing, micId)}>
             {hasCanvas ? 'Refresh preview' : 'Retry access'}
           </button>
         </div>
@@ -327,30 +415,107 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
             <strong>Allow camera and microphone</strong>
             <p>
               This opens Chrome’s permission prompt for <em>3000studios.vip</em>. Choose <strong>Allow</strong>, then
-              your preview starts automatically.
+              your preview starts automatically with camera and microphone active.
             </p>
             <p className="cMuted" role="status">
-              {canRequestMedia ? 'Camera access is available in this browser.' : 'Use HTTPS Chrome or Safari to access the camera.'}
+              {canRequestMedia ? 'Camera & microphone access is available in this browser.' : 'Use HTTPS Chrome or Safari to access the camera.'}
             </p>
             <button
               type="button"
               className="cBtn primary"
               disabled={!canRequestMedia || checkingAccess}
-              onClick={() => void startPreview(cameraId, facing)}
+              onClick={() => void startPreview(cameraId, facing, micId)}
             >
               {!canRequestMedia
                 ? 'Use https://3000studios.vip/admin'
                 : checkingAccess
-                  ? 'Opening camera…'
+                  ? 'Opening camera & mic…'
                   : hasCanvas
-                    ? 'Refresh camera'
-                    : 'Access camera'}
+                    ? 'Refresh camera & mic'
+                    : 'Access camera & microphone'}
             </button>
             <button type="button" className="cBtn ghost" disabled={checkingAccess} onClick={() => void flipFacing()}>
               {facing === 'user' ? 'Use rear camera' : 'Use front camera'}
             </button>
           </section>
         ) : null}
+
+        <details className="studioAccord" open>
+          <summary>Microphone &amp; Sound</summary>
+          <div className="studioAudioControls">
+            <label className="easyField">
+              <span>Microphone device</span>
+              <select
+                value={micId}
+                onChange={(e) => void switchMicrophone(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="studioSelect"
+              >
+                {mics.length === 0 ? <option value="">Default microphone</option> : null}
+                {mics.map((m, i) => (
+                  <option key={m.deviceId} value={m.deviceId}>
+                    {m.label || `Microphone ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="studioAudioMeterBox">
+              <div className="studioAudioMeterHead">
+                <span className="studioAudioMeterLabel">Live volume</span>
+                <span
+                  className={`studioAudioMeterStatus ${
+                    micMuted ? 'muted' : audioLevel > 5 ? 'active' : hasAudioTrack ? 'idle' : 'error'
+                  }`}
+                >
+                  {micMuted
+                    ? '🔇 Muted'
+                    : audioLevel > 5
+                      ? '🟢 Sound detected'
+                      : hasAudioTrack
+                        ? '⚪ Mic ready (speak to test)'
+                        : '🔴 No mic track'}
+                </span>
+              </div>
+              <div
+                className="studioAudioMeterTrack"
+                aria-label="Microphone volume meter"
+                role="progressbar"
+                aria-valuenow={audioLevel}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div
+                  className={`studioAudioMeterFill ${micMuted ? 'is-muted' : ''}`}
+                  style={{ width: `${micMuted ? 0 : Math.max(2, audioLevel)}%` }}
+                />
+              </div>
+              <div className="studioAudioActions">
+                <button
+                  type="button"
+                  className={`cBtn sm ${micMuted ? 'danger' : 'ghost'}`}
+                  onClick={toggleMic}
+                >
+                  {micMuted ? '🔇 Unmute mic' : '🎙️ Mute mic'}
+                </button>
+                <button
+                  type="button"
+                  className="cBtn sm ghost"
+                  onClick={() => void refreshDeviceLists()}
+                >
+                  Refresh devices
+                </button>
+              </div>
+            </div>
+
+            {!hasAudioTrack && hasCanvas && (
+              <p className="adminError" style={{ marginTop: 8 }}>
+                No active microphone sound track! Click the lock icon in the address bar → allow Microphone for 3000studios.vip, then select your mic above.
+              </p>
+            )}
+          </div>
+        </details>
 
         <details className="studioAccord">
           <summary>Camera &amp; layout</summary>

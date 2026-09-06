@@ -56,6 +56,7 @@ export function writeEntitlement(next: Entitlement) {
 }
 
 export function hasFullAccess(_slug?: string) {
+  void _slug;
   return true;
 }
 

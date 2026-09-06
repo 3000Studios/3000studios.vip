@@ -214,8 +214,14 @@ export class WhipPublisher {
     });
 
     this.localStream = stream;
-    for (const track of stream.getTracks()) {
-      this.pc.addTransceiver(track, { direction: 'sendonly' });
+    if (audioTracks[0]) {
+      this.pc.addTransceiver(audioTracks[0], { direction: 'sendonly' });
+    }
+    if (videoTracks[0]) {
+      const vt = this.pc.addTransceiver(videoTracks[0], { direction: 'sendonly' });
+      if (vt.sender.track) {
+        void vt.sender.track.applyConstraints({ width: 1280, height: 720 }).catch(() => undefined);
+      }
     }
 
     if (previewEl && 'srcObject' in previewEl) {
@@ -226,9 +232,6 @@ export class WhipPublisher {
     }
 
     this.resourceUrl = await negotiateOffer(this.pc, check.endpoint, this.authHeader);
-
-    // Keep a soft reference so we can report track liveness
-    void audioTracks;
   }
 
   async start(videoEl: HTMLVideoElement, facingMode: 'user' | 'environment' = 'user'): Promise<void> {
@@ -259,17 +262,33 @@ export class WhipPublisher {
           height: { ideal: 720 },
         },
       });
-    } catch (err) {
-      throw new Error(describeCameraError(err));
+    } catch {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+        });
+      } catch (err) {
+        throw new Error(describeCameraError(err));
+      }
     }
     this.localStream = stream;
 
-    stream.getTracks().forEach((track) => {
-      const transceiver = this.pc!.addTransceiver(track, { direction: 'sendonly' });
-      if (track.kind === 'video' && transceiver.sender.track) {
+    const audio = stream.getAudioTracks()[0];
+    const video = stream.getVideoTracks()[0];
+    if (audio) {
+      this.pc.addTransceiver(audio, { direction: 'sendonly' });
+    }
+    if (video) {
+      const transceiver = this.pc.addTransceiver(video, { direction: 'sendonly' });
+      if (transceiver.sender.track) {
         void transceiver.sender.track.applyConstraints({ width: 1280, height: 720 }).catch(() => undefined);
       }
-    });
+    }
 
     videoEl.srcObject = stream;
     videoEl.muted = true;
@@ -282,6 +301,15 @@ export class WhipPublisher {
   async replaceVideoTrack(track: MediaStreamTrack): Promise<void> {
     const sender = this.pc?.getSenders().find((s) => s.track?.kind === 'video');
     if (sender) await sender.replaceTrack(track);
+  }
+
+  async replaceAudioTrack(track: MediaStreamTrack): Promise<void> {
+    const sender = this.pc?.getSenders().find((s) => s.track?.kind === 'audio');
+    if (sender) {
+      await sender.replaceTrack(track);
+    } else if (this.pc) {
+      this.pc.addTransceiver(track, { direction: 'sendonly' });
+    }
   }
 
   async stop(): Promise<void> {

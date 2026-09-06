@@ -586,3 +586,133 @@ button.liveInquiryBtn {
     grid-template-columns: 1fr;
   }
 }
+
+/* Audio & Microphone Controls */
+.studioAudioControls {
+  display: grid;
+  gap: 12px;
+}
+
+.studioAudioMeterBox {
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(3, 7, 18, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  display: grid;
+  gap: 8px;
+}
+
+.studioAudioMeterHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.studioAudioMeterLabel {
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.studioAudioMeterStatus {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+.studioAudioMeterStatus.active {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+}
+
+.studioAudioMeterStatus.idle {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.studioAudioMeterStatus.muted {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.studioAudioMeterStatus.error {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.studioAudioMeterTrack {
+  height: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  position: relative;
+}
+
+.studioAudioMeterFill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #22c55e 60%, #eab308 85%, #ef4444 100%);
+  border-radius: 999px;
+  transition: width 0.06s cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.studioAudioMeterFill.is-muted {
+  background: #64748b;
+  box-shadow: none;
+}
+
+.studioAudioActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.studioAudioActions .cBtn {
+  flex: 1;
+}
+
+.studioMicIndicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.studioMicIndicator.is-active {
+  background: rgba(6, 78, 59, 0.85);
+  border: 1px solid #10b981;
+  color: #6ee7b7;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.studioMicIndicator.is-listening {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #e2e8f0;
+}
+
+.studioMicIndicator.is-muted {
+  background: rgba(127, 29, 29, 0.85);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+

@@ -69,6 +69,17 @@ export function PhoneGoLive() {
     }
   }
 
+  const [micMuted, setMicMuted] = useState(false);
+
+  function toggleMic() {
+    const next = !micMuted;
+    setMicMuted(next);
+    const media = pubRef.current?.getMediaStream();
+    media?.getAudioTracks().forEach((t) => {
+      t.enabled = !next;
+    });
+  }
+
   async function endLive() {
     await pubRef.current?.stop();
     pubRef.current = null;
@@ -121,7 +132,11 @@ export function PhoneGoLive() {
       </header>
       <video ref={videoRef} className="phoneGoLiveVideo" playsInline muted autoPlay />
       <div className="phoneGoLiveDock">
-        <p className={status === 'live' ? 'is-live' : ''}>{status === 'live' ? 'YOU ARE LIVE' : 'Preview · one tap to broadcast'}</p>
+        <p className={status === 'live' ? 'is-live' : ''}>
+          {status === 'live'
+            ? `YOU ARE LIVE ${micMuted ? '· 🔇 MIC MUTED' : '· 🎙️ SOUND ON'}`
+            : 'Preview · one tap to broadcast'}
+        </p>
         {error ? <p className="phoneGoLiveErr">{error}</p> : null}
         <div className="phoneGoLiveActions">
           {status === 'live' ? (
@@ -139,6 +154,14 @@ export function PhoneGoLive() {
             onClick={() => setFacing((f) => (f === 'user' ? 'environment' : 'user'))}
           >
             Flip camera
+          </button>
+          <button
+            type="button"
+            className="phoneGoLiveFlip"
+            style={{ background: micMuted ? 'rgba(239, 68, 68, 0.4)' : undefined }}
+            onClick={toggleMic}
+          >
+            {micMuted ? '🔇 Unmute' : '🎙️ Mic on'}
           </button>
         </div>
       </div>

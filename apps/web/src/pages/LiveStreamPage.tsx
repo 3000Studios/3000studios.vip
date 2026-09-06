@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PublicLayout } from './Home';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
-import { STREAM_PLAYER_EMBED_SRC } from '../lib/streamConfig';
+import { streamPlayerIframeSrc } from '../lib/streamConfig';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
 import { LiveChatPanel, TipJar, ViewerCount, useLiveRoom } from '../components/LiveInteraction';
@@ -16,7 +16,14 @@ export function LiveStreamPage() {
   const [live, setLive] = useState(false);
   const [copied, setCopied] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const liveRoom = useLiveRoom();
+
+  const iframeSrc = `${streamPlayerIframeSrc({
+    autoplay: true,
+    muted: isMuted,
+    primaryColor: 'ffd700',
+  })}${streamPlayerIframeSrc({}).includes('?') ? '&' : '?'}preload=auto`;
 
   useEffect(() => subscribeStreamScene(setScene), []);
 
@@ -54,12 +61,36 @@ export function LiveStreamPage() {
           <div className="liveOnlyStage livePublicStage mobileSafe liveStageFrame">
             <div className="liveOnlyFeed">
               <iframe
+                key={isMuted ? 'muted-player' : 'unmuted-player'}
                 title="3000 Studios Live"
-                src={`${STREAM_PLAYER_EMBED_SRC}${STREAM_PLAYER_EMBED_SRC.includes('?') ? '&' : '?'}preload=auto`}
+                src={iframeSrc}
                 className="liveStreamIframe"
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
                 allowFullScreen
               />
+              {isMuted ? (
+                <button
+                  type="button"
+                  className="liveSoundToggleBanner"
+                  onClick={() => setIsMuted(false)}
+                  title="Click to turn on live stream audio"
+                >
+                  <span className="soundIcon" aria-hidden="true">🔊</span>
+                  <div className="soundTextBox">
+                    <strong>TAP FOR SOUND</strong>
+                    <span>Stream starts muted for browser autoplay. Tap to listen with full audio.</span>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="liveSoundIndicatorBtn"
+                  onClick={() => setIsMuted(true)}
+                  title="Mute stream audio"
+                >
+                  🔊 Audio playing (tap to mute)
+                </button>
+              )}
               {live ? <StreamOverlayLayers layers={scene.layers} /> : null}
               <div className={live ? 'liveOnAirBadge' : 'liveStandbyBadge'} aria-live="polite">
                 {live ? 'ON AIR' : 'Waiting for host · player stays ready'}

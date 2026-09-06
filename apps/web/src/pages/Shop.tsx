@@ -11,7 +11,7 @@ export function ShopPage() {
     if (item.id === 'monthly') grantPlan('monthly');
     if (item.id === 'yearly') grantPlan('yearly');
     if (item.id === 'track') grantTrack('not-giving-up-tonight');
-    window.location.href = item.stripe;
+    window.location.assign(item.stripe);
   };
   return (
     <PublicLayout variant="goldwave">

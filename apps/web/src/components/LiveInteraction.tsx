@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   CASH_APP_CASHTAG,

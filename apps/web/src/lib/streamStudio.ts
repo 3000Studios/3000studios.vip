@@ -113,7 +113,16 @@ export class StreamStudio {
   private canvas = document.createElement('canvas');
   private ctx: CanvasRenderingContext2D;
   private camStream: MediaStream | null = null;
+  private micStream: MediaStream | null = null;
   private outStream: MediaStream | null = null;
+  private micDeviceId?: string;
+  private micMuted = false;
+  private audioCtx: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
+  private audioSourceNode: MediaStreamAudioSourceNode | null = null;
+  private audioLevelSubs = new Set<(level: number) => void>();
+  private audioLevelTimer = 0;
+  private onAudioTrackChange?: (track: MediaStreamTrack) => void;
   private raf = 0;
   private tick = 0;
   private running = false;
@@ -162,54 +171,220 @@ export class StreamStudio {
     return this.canvas;
   }
 
-  getOutputStream(fps = 30, forceNew = false): MediaStream {
-    if (forceNew && this.outStream) {
-      this.outStream.getTracks().forEach((t) => {
-        if (t.kind === 'audio') t.stop();
+  private setupAudioMeter(stream: MediaStream) {
+    try {
+      if (!this.audioCtx) {
+        const AudioContextClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (AudioContextClass) {
+          this.audioCtx = new AudioContextClass();
+        }
+      }
+      if (!this.audioCtx) return;
+      if (this.audioCtx.state === 'suspended') {
+        void this.audioCtx.resume();
+      }
+      if (this.audioSourceNode) {
+        try {
+          this.audioSourceNode.disconnect();
+        } catch {
+          /* ignore */
+        }
+      }
+      this.audioSourceNode = this.audioCtx.createMediaStreamSource(stream);
+      this.analyser = this.audioCtx.createAnalyser();
+      this.analyser.fftSize = 256;
+      this.analyser.smoothingTimeConstant = 0.4;
+      this.audioSourceNode.connect(this.analyser);
+
+      if (!this.audioLevelTimer) {
+        const data = new Uint8Array(this.analyser.frequencyBinCount);
+        const update = () => {
+          if (!this.analyser || this.audioLevelSubs.size === 0) {
+            this.audioLevelTimer = 0;
+            return;
+          }
+          this.analyser.getByteFrequencyData(data);
+          let sum = 0;
+          for (let i = 0; i < data.length; i++) {
+            sum += data[i];
+          }
+          const avg = sum / data.length;
+          // Scale from 0-128 average to 0-100%
+          const level = this.micMuted ? 0 : Math.min(100, Math.round((avg / 128) * 100));
+          this.audioLevelSubs.forEach((cb) => cb(level));
+          this.audioLevelTimer = requestAnimationFrame(update);
+        };
+        this.audioLevelTimer = requestAnimationFrame(update);
+      }
+    } catch (e) {
+      console.warn('Audio meter setup failed:', e);
+    }
+  }
+
+  subscribeAudioLevel(cb: (level: number) => void): () => void {
+    this.audioLevelSubs.add(cb);
+    if (this.audioCtx?.state === 'suspended') {
+      void this.audioCtx.resume();
+    }
+    if (!this.audioLevelTimer && this.analyser) {
+      const data = new Uint8Array(this.analyser.frequencyBinCount);
+      const update = () => {
+        if (!this.analyser || this.audioLevelSubs.size === 0) {
+          this.audioLevelTimer = 0;
+          return;
+        }
+        this.analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+          sum += data[i];
+        }
+        const avg = sum / data.length;
+        const level = this.micMuted ? 0 : Math.min(100, Math.round((avg / 128) * 100));
+        this.audioLevelSubs.forEach((fn) => fn(level));
+        this.audioLevelTimer = requestAnimationFrame(update);
+      };
+      this.audioLevelTimer = requestAnimationFrame(update);
+    }
+    return () => {
+      this.audioLevelSubs.delete(cb);
+    };
+  }
+
+  async openMicrophone(deviceId?: string): Promise<MediaStreamTrack | null> {
+    if (this.micStream) {
+      this.micStream.getTracks().forEach((t) => t.stop());
+      this.micStream = null;
+    }
+    this.micDeviceId = deviceId;
+
+    const attempts: MediaTrackConstraints[] = [];
+    if (deviceId) {
+      attempts.push({
+        deviceId: { exact: deviceId },
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
       });
+      attempts.push({ deviceId: { ideal: deviceId } });
+    }
+    attempts.push({
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+    });
+    attempts.push({});
+
+    let lastError: unknown = null;
+    for (const audioConstraint of attempts) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: Object.keys(audioConstraint).length ? audioConstraint : true,
+        });
+        if (stream.getAudioTracks().length > 0) {
+          this.micStream = stream;
+          break;
+        }
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    if (!this.micStream) {
+      const msg = lastError instanceof Error ? lastError.message : 'Microphone access failed';
+      throw new Error(`Microphone error: ${msg}. Please allow microphone in your browser.`);
+    }
+
+    const track = this.micStream.getAudioTracks()[0];
+    if (track) {
+      track.enabled = !this.micMuted;
+      this.setupAudioMeter(this.micStream);
+      this.syncAudioTrackToOutput(track);
+    }
+    return track || null;
+  }
+
+  private syncAudioTrackToOutput(track: MediaStreamTrack) {
+    if (!this.outStream) return;
+    const existing = this.outStream.getAudioTracks();
+    existing.forEach((t) => {
+      this.outStream!.removeTrack(t);
+      if (t !== track) t.stop();
+    });
+    this.outStream.addTrack(track);
+    this.onAudioTrackChange?.(track);
+  }
+
+  setMicrophoneEnabled(enabled: boolean) {
+    this.micMuted = !enabled;
+    const tracks = this.micStream?.getAudioTracks() ?? [];
+    tracks.forEach((t) => {
+      t.enabled = enabled;
+    });
+    if (!enabled) {
+      this.audioLevelSubs.forEach((cb) => cb(0));
+    }
+  }
+
+  isMicrophoneEnabled(): boolean {
+    return !this.micMuted;
+  }
+
+  hasAudioTrack(): boolean {
+    const tracks = this.micStream?.getAudioTracks() ?? [];
+    return tracks.some((t) => t.readyState === 'live');
+  }
+
+  getActiveMicrophoneTrack(): MediaStreamTrack | null {
+    return this.micStream?.getAudioTracks()[0] ?? null;
+  }
+
+  setOnAudioTrackChange(cb?: (track: MediaStreamTrack) => void) {
+    this.onAudioTrackChange = cb;
+  }
+
+  getOutputStream(fps = 30, forceNew = false): MediaStream {
+    const activeAudioTrack = this.micStream?.getAudioTracks()[0] || this.camStream?.getAudioTracks()[0];
+
+    if (forceNew && this.outStream) {
+      // Don't stop the microphone track, just reset the video container
       this.outStream = null;
     }
+
     if (!this.outStream) {
       const drawn = this.canvas.captureStream(fps);
-      const audio = this.camStream?.getAudioTracks() ?? [];
       this.outStream = new MediaStream([
         ...drawn.getVideoTracks(),
-        ...audio.map((t) => t.clone()),
+        ...(activeAudioTrack ? [activeAudioTrack] : []),
       ]);
     } else {
       const existingAudio = this.outStream.getAudioTracks();
-      const liveAudio = this.camStream?.getAudioTracks() ?? [];
-      if (liveAudio.length && (!existingAudio.length || existingAudio[0].id !== liveAudio[0].id)) {
+      if (activeAudioTrack && (!existingAudio.length || existingAudio[0] !== activeAudioTrack)) {
         existingAudio.forEach((t) => {
           this.outStream!.removeTrack(t);
-          t.stop();
+          if (t !== activeAudioTrack) t.stop();
         });
-        liveAudio.forEach((t) => this.outStream!.addTrack(t.clone()));
+        this.outStream.addTrack(activeAudioTrack);
       }
     }
     return this.outStream;
   }
 
-  async openCamera(deviceId?: string, facingMode: 'user' | 'environment' = 'user') {
+  async openCamera(deviceId?: string, facingMode: 'user' | 'environment' = 'user', audioDeviceId?: string) {
     this.camStream?.getTracks().forEach((t) => t.stop());
     this.camStream = null;
 
     const attempts: MediaStreamConstraints[] = [];
     if (deviceId) {
-      attempts.push({
-        audio: { echoCancellation: true, noiseSuppression: true },
-        video: { deviceId: { exact: deviceId } },
-      });
-      attempts.push({ audio: true, video: { deviceId: { ideal: deviceId } } });
-      attempts.push({ audio: false, video: { deviceId: { ideal: deviceId } } });
+      attempts.push({ video: { deviceId: { exact: deviceId } } });
+      attempts.push({ video: { deviceId: { ideal: deviceId } } });
     }
     attempts.push({
-      audio: { echoCancellation: true, noiseSuppression: true },
       video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } },
     });
-    attempts.push({ audio: true, video: { facingMode } });
-    attempts.push({ audio: false, video: { facingMode } });
-    attempts.push({ audio: false, video: true });
+    attempts.push({ video: { facingMode } });
+    attempts.push({ video: true });
 
     let lastError: unknown = null;
     for (const constraints of attempts) {
@@ -225,8 +400,16 @@ export class StreamStudio {
     this.video.srcObject = this.camStream;
     await this.video.play().catch(() => undefined);
 
+    // Acquire microphone independently so camera constraints never break sound
+    if (!this.micStream || this.micStream.getAudioTracks().length === 0 || audioDeviceId !== undefined) {
+      try {
+        await this.openMicrophone(audioDeviceId || this.micDeviceId);
+      } catch (err) {
+        console.warn('Microphone initialization warning:', err);
+      }
+    }
+
     if (this.outStream) {
-      this.outStream.getTracks().forEach((t) => t.stop());
       this.outStream = null;
     }
   }
@@ -248,9 +431,27 @@ export class StreamStudio {
     cancelAnimationFrame(this.raf);
     this.camStream?.getTracks().forEach((t) => t.stop());
     this.camStream = null;
+    this.micStream?.getTracks().forEach((t) => t.stop());
+    this.micStream = null;
     this.outStream?.getTracks().forEach((t) => t.stop());
     this.outStream = null;
     this.video.srcObject = null;
+    if (this.audioSourceNode) {
+      try {
+        this.audioSourceNode.disconnect();
+      } catch {
+        /* ignore */
+      }
+      this.audioSourceNode = null;
+    }
+    if (this.audioCtx) {
+      try {
+        void this.audioCtx.close();
+      } catch {
+        /* ignore */
+      }
+      this.audioCtx = null;
+    }
   }
 
   setFilter(id: LensFilterId) {
@@ -558,6 +759,21 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 
 export async function listCameras(): Promise<MediaDeviceInfo[]> {
   if (!navigator.mediaDevices?.enumerateDevices) return [];
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  return devices.filter((d) => d.kind === 'videoinput');
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter((d) => d.kind === 'videoinput');
+  } catch {
+    return [];
+  }
 }
+
+export async function listMicrophones(): Promise<MediaDeviceInfo[]> {
+  if (!navigator.mediaDevices?.enumerateDevices) return [];
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter((d) => d.kind === 'audioinput');
+  } catch {
+    return [];
+  }
+}
+

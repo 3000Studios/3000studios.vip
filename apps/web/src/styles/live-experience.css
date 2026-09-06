@@ -232,3 +232,90 @@
 @media (prefers-reduced-motion: reduce) {
   .liveViewerDot { box-shadow: none; }
 }
+
+/* Sound & unmute banner for live viewers */
+.liveSoundToggleBanner {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background: rgba(10, 8, 4, 0.92);
+  border: 1px solid rgba(255, 215, 0, 0.65);
+  border-radius: 999px;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(255, 215, 0, 0.35);
+  color: #fef08a;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  animation: liveSoundPulse 2.5s infinite;
+  max-width: calc(100% - 24px);
+  text-align: left;
+}
+
+@keyframes liveSoundPulse {
+  0%, 100% {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 215, 0, 0.3);
+    border-color: rgba(255, 215, 0, 0.55);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 28px rgba(255, 215, 0, 0.7);
+    border-color: rgba(255, 215, 0, 0.95);
+  }
+}
+
+.liveSoundToggleBanner:hover {
+  background: rgba(24, 18, 5, 0.96);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.liveSoundToggleBanner .soundIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.liveSoundToggleBanner .soundTextBox {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.liveSoundToggleBanner .soundTextBox strong {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #ffd700;
+  text-transform: uppercase;
+}
+
+.liveSoundToggleBanner .soundTextBox span {
+  font-size: 11px;
+  color: rgba(244, 239, 231, 0.85);
+}
+
+.liveSoundIndicatorBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 9;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #6ee7b7;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s ease;
+}
+
+.liveSoundIndicatorBtn:hover {
+  background: rgba(16, 185, 129, 0.35);
+}
+
