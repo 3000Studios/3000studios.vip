@@ -102,6 +102,16 @@ export function Privacy() {
         </p>
       </section>
       <section className="legalSection">
+        <h2>Third-Party Advertising &amp; Cookies</h2>
+        <p>
+          We use third-party advertising companies, including Google AdSense, to serve ads when you visit our website.
+          Google uses cookies (such as the DoubleClick DART cookie) to serve ads based on your prior visits to this website or other websites across the Internet.
+        </p>
+        <p>
+          You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">Google Ads Settings</a> or by visiting <a href="http://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>.
+        </p>
+      </section>
+      <section className="legalSection">
         <h2>Storage and disclosure</h2>
         <p>
           Data is retained only as long as operationally necessary and is not publicly disclosed
