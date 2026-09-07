@@ -1,0 +1,192 @@
+/* Last-loaded layout lock. Beats layered film/nav hacks. */
+html, body, #root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.vipSite {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: 100%;
+}
+
+.vipHeader,
+.vipHeader.vipHeader--epic {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 100vw;
+  min-height: 72px;
+  padding: 10px clamp(12px, 2.4vw, 28px);
+  margin: 0 !important;
+  transform: none !important;
+  scale: 1 !important;
+  background: rgba(6, 5, 8, 0.92) !important;
+  backdrop-filter: blur(18px);
+}
+
+.vipLogo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.officialProfileLogo {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.logoWordmark { font-size: 1rem; white-space: nowrap; }
+.logoSub { display: block; font-size: 10px; letter-spacing: 0.08em; }
+
+.vipNav,
+.vipNav--rail {
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+  transform: none !important;
+  scale: 1 !important;
+}
+.vipNavLink {
+  flex: 0 0 auto;
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+}
+.vipNavHint { display: none !important; }
+
+.vipMenu { justify-self: end; }
+
+.cinePage,
+.discoverPage,
+.vipMain,
+.musicDeckPage,
+.shopPage {
+  width: min(1180px, calc(100% - 24px));
+  margin-inline: auto;
+  padding-top: 18px;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: clamp(18px, 3vw, 32px);
+}
+
+.cineHero {
+  min-height: min(72dvh, 680px) !important;
+  max-height: none;
+  width: 100%;
+  border-radius: 22px !important;
+}
+.cineHeroCopy {
+  width: 100% !important;
+  max-width: 720px !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  padding: clamp(72px, 10vh, 120px) 20px 36px !important;
+  place-items: center;
+  text-align: center;
+  overflow: visible !important;
+}
+.cineTitle {
+  font-size: clamp(2.4rem, 8vw, 5.6rem) !important;
+  line-height: 0.95 !important;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.cineHeroCopy p {
+  max-width: 38rem;
+  margin-inline: auto;
+}
+.cineHeroCopy .heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.cineHeroCopy .heroActions a,
+.cineHeroCopy .heroActions .studioButton {
+  width: auto;
+}
+
+.cinePortals,
+.platformTiles,
+.vwGrid,
+.shopGrid,
+.bentoHome {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 14px;
+}
+
+.cineReel {
+  display: grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(200px, 240px);
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.vipFooter {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid !important;
+  justify-items: center;
+  gap: 14px;
+  padding: 28px 16px calc(28px + env(safe-area-inset-bottom));
+  text-align: center;
+}
+.vipFooter .footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 16px;
+}
+
+.musicDock {
+  left: 12px !important;
+  right: 12px !important;
+  width: auto !important;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.ytSubFab { bottom: calc(148px + env(safe-area-inset-bottom)) !important; }
+.adminFab { bottom: calc(148px + env(safe-area-inset-bottom)) !important; }
+
+@media (max-width: 980px) {
+  .vipHeader,
+  .vipHeader.vipHeader--epic {
+    grid-template-columns: auto 1fr auto;
+  }
+  .vipNav--rail:not(.open) {
+    display: none !important;
+  }
+  .vipNav--rail.open {
+    position: fixed;
+    inset: 72px 10px auto;
+    display: grid !important;
+    background: rgba(8, 8, 10, 0.96);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 16px;
+    padding: 12px;
+    z-index: 60;
+  }
+  .vipMenu { display: inline-flex !important; }
+  .cineHero { min-height: 70dvh !important; }
+}
+
+@media (min-width: 981px) {
+  .vipMenu { display: none !important; }
+  .bottomDock { display: none !important; }
+}
