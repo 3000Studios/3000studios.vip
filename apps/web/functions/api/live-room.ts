@@ -64,8 +64,12 @@ export async function onRequestOptions() {
   });
 }
 
+function getDefaultCache(): Cache {
+  return (caches as unknown as { default: Cache }).default;
+}
+
 export async function onRequestGet() {
-  const cache = caches.default;
+  const cache = getDefaultCache();
   const room = await readRoom(cache);
   pruneViewers(room, Date.now());
   return new Response(
@@ -79,7 +83,7 @@ export async function onRequestGet() {
 }
 
 export async function onRequestPost({ request }: { request: Request }) {
-  const cache = caches.default;
+  const cache = getDefaultCache();
   let body: { type?: string; id?: string; name?: string; text?: string } = {};
   try {
     body = await request.json();

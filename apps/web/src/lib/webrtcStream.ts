@@ -12,8 +12,8 @@
  */
 
 export type WhipValidation =
-  | { ok: true; endpoint: string; hint?: string }
-  | { ok: false; reason: string; code: 'empty' | 'format' | 'play_url' | 'rtmp' | 'input_id' | 'missing_secret' };
+  | { ok: true; endpoint: string; hint?: string; reason?: undefined }
+  | { ok: false; reason: string; code: 'empty' | 'format' | 'play_url' | 'rtmp' | 'input_id' | 'missing_secret'; endpoint?: undefined };
 
 const LIVE_INPUT_ID_HINT = '654382980fc1896d6e16b1e66a299bd6';
 
@@ -194,7 +194,7 @@ export class WhipPublisher {
   /** Publish a pre-built stream (e.g. StreamStudio canvas + mic). */
   async startWithStream(stream: MediaStream, previewEl?: HTMLVideoElement | HTMLCanvasElement): Promise<void> {
     const check = validateWhipUrl(this.endpoint);
-    if (!check.ok) throw new Error(check.reason);
+    if (!check.ok) throw new Error(check.reason || 'Invalid WHIP publish URL');
 
     await this.stop();
     this.ownsTracks = false;
@@ -236,7 +236,7 @@ export class WhipPublisher {
 
   async start(videoEl: HTMLVideoElement, facingMode: 'user' | 'environment' = 'user'): Promise<void> {
     const check = validateWhipUrl(this.endpoint);
-    if (!check.ok) throw new Error(check.reason);
+    if (!check.ok) throw new Error(check.reason || 'Invalid WHIP publish URL');
 
     await this.stop();
     this.ownsTracks = true;
