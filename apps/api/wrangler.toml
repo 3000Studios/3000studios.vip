@@ -15,6 +15,3 @@ binding = "AI"
 binding = "DB"
 database_name = "apex_citadel"
 database_id = "6ae6bd18-e43a-4c57-beba-0c3ed1b5a56b"
-
-[triggers]
-crons = ["*/5 * * * *"]
