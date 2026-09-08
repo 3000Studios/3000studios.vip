@@ -99,6 +99,9 @@
 .phoneGoLiveStop { background: #222; color: #fff; border: 1px solid #666; }
 .phoneGoLiveFlip { background: transparent; color: #ffd700; border: 1px solid rgba(212,175,55,.45); }
 .phoneGoLiveErr { color: #ff8a8a; }
+.phoneGoLiveWhip { display: grid; gap: 7px; max-width: 720px; margin: 12px auto 0; text-align: left; }
+.phoneGoLiveWhip span { color: #f3e6c4; font-size: 0.8rem; font-weight: 700; }
+.phoneGoLiveWhip input { width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid rgba(212,175,55,.45); border-radius: 12px; color: #fff7d6; background: #120e09; }
 
 @media (max-width: 720px) {
   .heroPlayer { flex-direction: column; text-align: center; }

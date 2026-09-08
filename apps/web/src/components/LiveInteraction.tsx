@@ -7,6 +7,7 @@ import {
   heartbeatLiveRoom,
   liveChatName,
   liveViewerId,
+  isLiveRoomConnected,
   sendLiveChat,
   setLiveChatName,
   type LiveChatMessage,
@@ -166,11 +167,11 @@ export function LiveChatPanel({
     <section className="liveChat" aria-label="Live chat">
       <header className="liveChatHead">
         <strong>Live chat</strong>
-        <span>Real-time with other viewers</span>
+        <span>{isLiveRoomConnected ? 'Real-time with other viewers' : 'Connect a chat service to share messages publicly'}</span>
       </header>
       <div className="liveChatList" ref={listRef}>
         {messages.length === 0 ? (
-          <p className="liveChatEmpty">Say hello. Chat updates for everyone watching.</p>
+          <p className="liveChatEmpty">{isLiveRoomConnected ? 'Say hello. Chat updates for everyone watching.' : 'Chat is ready on this device. Add VITE_LIVE_ROOM_API to enable public shared chat.'}</p>
         ) : (
           messages.map((msg) => (
             <article key={msg.id} className="liveChatMsg">

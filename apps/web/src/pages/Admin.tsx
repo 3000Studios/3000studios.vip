@@ -8,7 +8,6 @@ import { StreamStudioPanel } from '../components/StreamStudioPanel';
 import {
   STREAM_CUSTOMER_CODE,
   STREAM_LIVE_INPUT_ID,
-  STREAM_WHIP_PUBLISH_URL,
 } from '../lib/streamConfig';
 import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
@@ -38,7 +37,7 @@ function loadInitialWhipUrl(): string {
   } catch {
     /* ignore */
   }
-  return STREAM_WHIP_PUBLISH_URL;
+  return '';
 }
 
 type DeviceKind = 'phone' | 'laptop';
@@ -78,7 +77,6 @@ export function Admin() {
       return [];
     }
   });
-  const [liveFlag, setLiveFlag] = useState<{ live?: boolean; ts?: number } | null>(null);
 
   const whipCheck = validateWhipUrl(whipUrl, liveInputId);
   const whipReady = whipCheck.ok;
@@ -144,19 +142,6 @@ export function Admin() {
       setCopied('');
     }
   }
-
-  function refreshLiveFlag() {
-    void fetch('/api/live-flag')
-      .then((r) => r.json())
-      .then(setLiveFlag)
-      .catch(() => setLiveFlag(null));
-  }
-
-  useEffect(() => {
-    refreshLiveFlag();
-    const id = window.setInterval(refreshLiveFlag, 12000);
-    return () => window.clearInterval(id);
-  }, []);
 
   useEffect(() => {
     if (!broadcasting) return undefined;
@@ -230,10 +215,9 @@ export function Admin() {
             <section className="easyStatusStrip">
               <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>{deviceBadge}</div>
               <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>{whipReady ? 'Stream ready' : 'Stream path missing'}</div>
-              <div className={`easyChip ${liveFlag?.live || broadcasting ? 'ok' : 'info'}`}>
-                Flag: {liveFlag?.live || broadcasting ? 'ON AIR' : 'offline'}
+              <div className={`easyChip ${isLive || broadcasting ? 'ok' : 'info'}`}>
+                Broadcast: {isLive || broadcasting ? 'ON AIR' : 'offline'}
               </div>
-              <button type="button" className="easyChip info" onClick={refreshLiveFlag}>Refresh flag</button>
             </section>
             <section className="cPanel">
               <div className="cPanelHead">
@@ -312,14 +296,11 @@ export function Admin() {
                 </button>
                 {showAdvanced ? (
                   <div className="easyGuide" style={{ marginTop: 16 }}>
-                    <p className="cMuted">Built-in WHIP path is already wired. Only change this if Cloudflare rotated keys.</p>
+                    <p className="cMuted">Paste the WebRTC publish URL from Cloudflare Live Inputs once on this owner device. It remains in this browser only and is never bundled into the public site.</p>
                     <label className="easyField">
                       <span>WHIP publish URL</span>
                       <input type="url" value={whipUrl} onChange={(e) => { setWhipUrl(e.target.value); localStorage.setItem(WHIP_URL_STORAGE_KEY, e.target.value.trim()); }} spellCheck={false} autoComplete="off" />
                     </label>
-                    {STREAM_WHIP_PUBLISH_URL ? (
-                      <button type="button" className="cBtn sm ghost" onClick={() => { setWhipUrl(STREAM_WHIP_PUBLISH_URL); localStorage.setItem(WHIP_URL_STORAGE_KEY, STREAM_WHIP_PUBLISH_URL); }}>Reset built-in stream URL</button>
-                    ) : null}
                     <p className="cMuted" style={{ marginTop: 12 }}>Customer: {customerCode}</p>
                   </div>
                 ) : null}

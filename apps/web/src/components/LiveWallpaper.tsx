@@ -18,7 +18,10 @@ function toAlphaColor(color: string, alphaHexOrDec: string | number): string {
     : parseInt(alphaHexOrDec, 16) / 255;
   if (!color) return `rgba(255, 215, 0, ${alphaNum.toFixed(2)})`;
   if (color.startsWith('hsl(')) {
-    return color.replace(/^hsl\((.*)\)$/, `hsla($1, ${alphaNum.toFixed(2)})`);
+    const body = color.slice(4, -1).trim();
+    return body.includes(',')
+      ? `hsla(${body}, ${alphaNum.toFixed(2)})`
+      : `hsl(${body} / ${alphaNum.toFixed(2)})`;
   }
   if (color.startsWith('#')) {
     const hexAlpha = typeof alphaHexOrDec === 'number'

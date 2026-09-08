@@ -8,7 +8,8 @@
  *  - SRT / RTMPS (pro apps: OBS, ffplay, vMix — not browsers)
  *
  * Publish (browser ultra-low latency):
- *  - WebRTC WHIP publish URL (secret path — for admin /phone studio only)
+ *  - WebRTC WHIP publish URL is entered by the owner on the device that
+ *    broadcasts. It must never be bundled into public JavaScript.
  *
  * Live input id is used for WHIP publish and WHEP browser playback.
  */
@@ -32,19 +33,10 @@ export const STREAM_LIVE_INPUT_ID =
   '3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
 
 /**
- * Browser ultra-low latency **publish** (WHIP).
- * Secret is embedded in the path (not the public asset UID alone).
- * Dashboard → Stream → WebRTC (WHIP) URL.
- * Override with VITE_STREAM_WHIP_URL if keys rotate.
+ * Browser ultra-low latency **publish** (WHIP) is intentionally not exported
+ * here. A WHIP URL contains a publish secret. Store it only in the owner
+ * browser's local storage after copying it from Cloudflare Live Inputs.
  */
-export const STREAM_WHIP_PUBLISH_URL =
-  import.meta.env.VITE_STREAM_WHIP_URL?.toString().trim() ||
-  'https://customer-wx8j23tjjjpkb37k.cloudflarestream.com/aec35a431bd94081d29586ba38b83e25k3e4ea5b57e0ce5cc54fd519ba2b7ae7d/webRTC/publish';
-
-/** OBS / encoder stream key for the same live input. */
-export const STREAM_RTMPS_PUBLISH_KEY =
-  import.meta.env.VITE_STREAM_RTMPS_PUBLISH_KEY?.toString().trim() ||
-  '75c893f2c0aedfe17eb91d2761a54d45k3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
 
 // ─── URL builders ─────────────────────────────
 
@@ -125,7 +117,6 @@ export const STREAM_DASH_URL = buildStreamManifestDash();
 export const STREAM_WHEP_URL = buildStreamWhepUrl(STREAM_LIVE_INPUT_ID);
 export const STREAM_SRT_PLAYBACK_URL = buildStreamSrtPlaybackUrl();
 export const STREAM_RTMPS_PLAYBACK_KEY = buildStreamRtmpsPlaybackKey();
-export const STREAM_WHIP_URL = STREAM_WHIP_PUBLISH_URL;
 
 export const STREAM_PLAYER_EMBED_SRC = streamPlayerIframeSrc({
   autoplay: true,

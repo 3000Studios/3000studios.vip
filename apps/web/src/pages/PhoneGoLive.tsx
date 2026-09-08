@@ -1,41 +1,16 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { STREAM_WHIP_PUBLISH_URL } from '../lib/streamConfig';
-import { WhipPublisher, validateWhipUrl } from '../lib/webrtcStream';
+import { WHIP_URL_STORAGE_KEY, WhipPublisher, validateWhipUrl } from '../lib/webrtcStream';
 import { setHostLiveFlag } from '../lib/streamScene';
-
-const PASS = '3000';
 
 export function PhoneGoLive() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const pubRef = useRef<WhipPublisher | null>(null);
-  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('3000-admin-auth-v1') === '1');
-  const [code, setCode] = useState('');
+  const [unlocked] = useState(() => sessionStorage.getItem('3000-admin-auth-v1') === '1');
   const [facing, setFacing] = useState<'user' | 'environment'>('user');
   const [status, setStatus] = useState<'idle' | 'live' | 'busy'>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [whip, setWhip] = useState(STREAM_WHIP_PUBLISH_URL);
-
-  useEffect(() => {
-    if (!unlocked) return;
-    let cancelled = false;
-    void (async () => {
-      try {
-        const res = await fetch('/api/stream-config', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ passcode: PASS }),
-        });
-        const data = (await res.json()) as { ok?: boolean; whipUrl?: string };
-        if (!cancelled && data.whipUrl) setWhip(data.whipUrl);
-      } catch {
-        /* baked WHIP still works */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [unlocked]);
+  const [whip, setWhip] = useState(() => localStorage.getItem(WHIP_URL_STORAGE_KEY) || '');
 
   useEffect(() => {
     return () => {
@@ -88,35 +63,16 @@ export function PhoneGoLive() {
     window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: false } }));
   }
 
-  function unlock(e: FormEvent) {
-    e.preventDefault();
-    if (code.trim() !== PASS) {
-      setError('Wrong passcode');
-      return;
-    }
-    sessionStorage.setItem('3000-admin-auth-v1', '1');
-    setUnlocked(true);
-    setError(null);
-  }
-
   if (!unlocked) {
     return (
       <div className="phoneGoLive phoneGoLiveLock">
-        <form className="phoneGoLiveCard" onSubmit={unlock}>
+        <div className="phoneGoLiveCard">
           <p>3000 Studios</p>
-          <h1>Go live from your phone</h1>
-          <input
-            type="password"
-            inputMode="numeric"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Passcode"
-            autoFocus
-          />
-          {error ? <p className="phoneGoLiveErr">{error}</p> : null}
-          <button type="submit">Unlock</button>
+          <h1>Owner access required</h1>
+          <p>Open the owner Go Live Console first, then return here to use your phone camera.</p>
+          <Link to="/admin">Open Go Live Console</Link>
           <Link to="/">Back home</Link>
-        </form>
+        </div>
       </div>
     );
   }
@@ -138,6 +94,23 @@ export function PhoneGoLive() {
             : 'Preview · one tap to broadcast'}
         </p>
         {error ? <p className="phoneGoLiveErr">{error}</p> : null}
+        {!validateWhipUrl(whip).ok ? (
+          <label className="phoneGoLiveWhip">
+            <span>Cloudflare WebRTC publish URL</span>
+            <input
+              type="url"
+              value={whip}
+              onChange={(event) => {
+                const value = event.target.value;
+                setWhip(value);
+                localStorage.setItem(WHIP_URL_STORAGE_KEY, value.trim());
+              }}
+              placeholder="Paste once from Cloudflare Live Inputs"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </label>
+        ) : null}
         <div className="phoneGoLiveActions">
           {status === 'live' ? (
             <button type="button" className="phoneGoLiveStop" onClick={() => void endLive()}>

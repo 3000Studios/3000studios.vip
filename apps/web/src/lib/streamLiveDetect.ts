@@ -8,26 +8,11 @@ export type LiveDetectState = {
 };
 
 export async function fetchServerLiveFlag(): Promise<boolean | null> {
-  try {
-    const res = await fetch('/api/live-flag', { cache: 'no-store' });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { live?: boolean };
-    return typeof data.live === 'boolean' ? data.live : null;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export async function publishServerLiveFlag(live: boolean): Promise<void> {
-  try {
-    await fetch('/api/live-flag', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ live, passcode: '3000' }),
-    });
-  } catch {
-    /* ignore */
-  }
+  void live;
 }
 
 export async function fetchStreamLifecycle(

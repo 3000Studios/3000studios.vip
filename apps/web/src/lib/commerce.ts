@@ -10,6 +10,7 @@ export const PLATFORMS = [
   { id: 'ytmusic', label: 'YouTube Music', url: 'https://music.youtube.com/channel/UCTQnEFZUIutrFuDlxGj9cDA' },
   { id: 'spotify', label: 'Spotify', url: 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik' },
   { id: 'apple', label: 'Apple Music', url: 'https://music.apple.com/us/artist/3000-studios/6802721597' },
+  { id: 'facebook', label: 'Facebook', url: 'https://www.facebook.com/3000Studios.comm/' },
   { id: 'live', label: 'Live', url: 'https://3000studios.vip/live' },
   { id: 'site', label: '3000 Studios', url: 'https://3000studios.vip' },
   { id: 'games', label: 'Games · Nexa', url: 'https://getnexa.space' },

@@ -60,8 +60,11 @@
     z-index: 4;
     padding: 5.5rem var(--space-page) 8rem;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: clamp(1.5rem, 3vw, 2.75rem);
   }
+
+  .cinePage > * { min-width: 0; }
 
   .cineHero {
     position: relative;

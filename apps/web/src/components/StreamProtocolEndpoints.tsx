@@ -1,10 +1,5 @@
 import { useState } from 'react';
-import {
-  STREAM_PLAYER_UID,
-  STREAM_WHIP_PUBLISH_URL,
-  getStreamPlaybackEndpoints,
-  type StreamProtocolEndpoint,
-} from '../lib/streamConfig';
+import { STREAM_PLAYER_UID, getStreamPlaybackEndpoints, type StreamProtocolEndpoint } from '../lib/streamConfig';
 
 async function copyText(value: string) {
   try {
@@ -28,41 +23,13 @@ export function StreamProtocolEndpoints({ uid = STREAM_PLAYER_UID }: { uid?: str
     }
   }
 
-  async function onCopyWhip() {
-    if (!STREAM_WHIP_PUBLISH_URL) return;
-    const ok = await copyText(STREAM_WHIP_PUBLISH_URL);
-    if (ok) {
-      setCopied('whip');
-      window.setTimeout(() => setCopied(null), 1600);
-    }
-  }
-
   const browser = endpoints.filter((e) => e.browser);
   const pro = endpoints.filter((e) => !e.browser && e.value.trim());
 
   return (
     <div className="streamProtocolBlock">
       <h2>Protocol-specific endpoints</h2>
-      <p className="cMuted">
-        Playback for viewers · WHIP for browser ultra-low latency publish (owner only). SRT/RTMPS are for pro tools,
-        not Chrome/Safari.
-      </p>
-
-      <h3 className="streamProtocolSub">Publish · browser (WHIP)</h3>
-      <ul className="streamMetaList">
-        <EndpointRow
-          ep={{
-            id: 'whip',
-            label: 'WebRTC (WHIP) URL',
-            value: STREAM_WHIP_PUBLISH_URL || 'Not configured: paste the Cloudflare WebRTC publish URL in /admin',
-            kind: 'url',
-            clients: 'Best for browser-based ultra low latency publishing · admin Go Live',
-            browser: true,
-          }}
-          copied={copied === 'whip'}
-          onCopy={() => void onCopyWhip()}
-        />
-      </ul>
+      <p className="cMuted">Playback endpoints for viewers. The owner-only WHIP publish URL is stored locally in the Go Live Console and is never displayed here.</p>
 
       <h3 className="streamProtocolSub">Playback · web / in-app</h3>
       <ul className="streamMetaList">

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { officialReleaseVideos } from '../data/officialReleases';
 import { rolloutSongs } from '../data/music';
 import { PLATFORMS, readEntitlement, readOpsEvents, grantPlan } from '../lib/commerce';
+import { readHostLiveFlag } from '../lib/streamScene';
 
 type AdSenseReport = {
   ok: boolean;
@@ -12,16 +13,16 @@ type AdSenseReport = {
 };
 
 export function AdminObservability() {
-  const [ads, setAds] = useState<AdSenseReport | null>(null);
-  const [live, setLive] = useState<{ live?: boolean; ts?: number } | null>(null);
+  const [ads] = useState<AdSenseReport | null>(null);
+  const [live, setLive] = useState(() => readHostLiveFlag());
   const [adsTxt, setAdsTxt] = useState('');
   const ent = readEntitlement();
   const events = readOpsEvents();
 
   useEffect(() => {
-    void fetch('/api/adsense-status').then((r) => r.json()).then(setAds).catch(() => setAds(null));
-    void fetch('/api/live-flag').then((r) => r.json()).then(setLive).catch(() => setLive(null));
     void fetch('/ads.txt').then((r) => r.text()).then(setAdsTxt).catch(() => setAdsTxt('missing'));
+    const timer = window.setInterval(() => setLive(readHostLiveFlag()), 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const slotOk = Boolean(ads?.checklist.displaySlot);
@@ -35,9 +36,9 @@ export function AdminObservability() {
       </div>
       <div className="cPanelBody adminObs">
         <div className="adminObsGrid">
-          <div className={`adminObsCard ${live?.live ? 'ok' : 'warn'}`}>
-            <strong>Live flag</strong>
-            <p>{live?.live ? 'ON AIR' : 'offline'} · /api/live-flag</p>
+          <div className={`adminObsCard ${live ? 'ok' : 'warn'}`}>
+            <strong>Browser broadcast</strong>
+            <p>{live ? 'ON AIR' : 'offline'} · Cloudflare lifecycle checks viewers</p>
           </div>
           <div className="adminObsCard ok">
             <strong>Catalog</strong>
