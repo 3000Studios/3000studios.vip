@@ -5,6 +5,10 @@
 /favicon.ico  /favicon.ico  200
 /listen.html  /listen.html  200
 /listen  /listen.html  200
+/tiktok  /tiktok/index.html  200
+/tiktok/  /tiktok/index.html  200
+/tiktok/callback  /tiktok/callback.html  200
+/tiktok/callback/  /tiktok/callback.html  200
 
 # Pages Functions under /api must not fall through to the SPA
 /api/*  /api/:splat  200

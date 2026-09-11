@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>TikTok callback — 3000 Studios</title>
+  <style>
+    body { margin:0; font-family: ui-sans-serif, system-ui, sans-serif; background:#07070a; color:#f4f4f5; }
+    main { max-width: 720px; margin: 0 auto; padding: 48px 20px; }
+    a { color:#fe2c55; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>TikTok Login Kit callback</h1>
+    <p>Authorization returned to <code>https://3000studios.vip/tiktok/callback</code>.</p>
+    <p id="status">Completing login…</p>
+    <p><a href="/tiktok/index.html?connected=1">Continue to promo upload</a></p>
+  </main>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const code = params.get("code");
+    document.getElementById("status").textContent = code
+      ? "Login Kit authorized (user.info.basic). Code received."
+      : "No code yet — open Connect TikTok from /tiktok first.";
+    if (code) {
+      setTimeout(() => { location.href = "/tiktok/index.html?connected=1"; }, 1200);
+    }
+  </script>
+</body>
+</html>

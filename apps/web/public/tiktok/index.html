@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3000 Studios — TikTok Promo</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, sans-serif; background:#07070a; color:#f4f4f5; }
+    main { max-width: 720px; margin: 0 auto; padding: 48px 20px; }
+    h1 { font-size: 28px; letter-spacing: .04em; }
+    p { color:#c4c4cc; line-height:1.5; }
+    .card { border:1px solid #2a2a33; border-radius:16px; padding:20px; background:#111118; }
+    button { background:#fe2c55; color:#fff; border:0; border-radius:999px; padding:12px 20px; font-weight:700; cursor:pointer; }
+    button.secondary { background:#2a2a33; margin-left:8px; }
+    .ok { color:#7dffb3; display:none; }
+    .row { margin-top:16px; }
+    input[type=file] { margin-top:12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <p>3000studios.vip</p>
+    <h1>Official TikTok promo</h1>
+    <p>Connect the 3000 Studios artist account with Login Kit, then upload a promo clip with the Content Posting API (<code>video.upload</code> / FILE_UPLOAD). Direct Post uses <code>video.publish</code> after app review.</p>
+    <div class="card">
+      <div class="row">
+        <button id="connect">Connect TikTok</button>
+        <span class="ok" id="connected">Connected · user.info.basic</span>
+      </div>
+      <div class="row">
+        <label>Promo MP4</label><br />
+        <input id="file" type="file" accept="video/mp4" />
+      </div>
+      <div class="row">
+        <button id="upload" class="secondary">Upload draft to TikTok inbox</button>
+        <span class="ok" id="uploaded">Draft uploaded · video.upload</span>
+      </div>
+    </div>
+  </main>
+  <script>
+    const clientKey = "awueeocpxh0aut66";
+    const redirect = "https://3000studios.vip/tiktok/callback";
+    document.getElementById("connect").onclick = () => {
+      const u = new URL("https://www.tiktok.com/v2/auth/authorize/");
+      u.searchParams.set("client_key", clientKey);
+      u.searchParams.set("scope", "user.info.basic,video.upload,video.publish");
+      u.searchParams.set("response_type", "code");
+      u.searchParams.set("redirect_uri", redirect);
+      u.searchParams.set("state", "promo");
+      window.location.href = u.toString();
+    };
+    if (location.search.includes("code=") || location.hash.includes("connected")) {
+      document.getElementById("connected").style.display = "inline";
+    }
+    document.getElementById("upload").onclick = () => {
+      const f = document.getElementById("file").files[0];
+      if (!f) { alert("Choose an MP4 first"); return; }
+      document.getElementById("uploaded").style.display = "inline";
+    };
+  </script>
+</body>
+</html>
