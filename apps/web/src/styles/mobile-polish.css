@@ -1,0 +1,202 @@
+/* Final public-shell polish: one responsive rhythm for every route. */
+:root {
+  --page-gutter: clamp(0.85rem, 2.5vw, 2rem);
+  --page-width: 1180px;
+  --surface-panel: color-mix(in srgb, var(--color-surface-2, #0a0b10) 82%, transparent);
+  --line-soft: color-mix(in srgb, var(--color-accent-primary, #ffd36a) 18%, transparent);
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-width: 320px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.vipSite {
+  isolation: isolate;
+  animation: siteArrive 0.55s var(--ease-premium) both;
+}
+
+@keyframes siteArrive {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.vipMain,
+.cinePage,
+.discoverPage,
+.musicDeckPage,
+.shopPage {
+  width: min(var(--page-width), calc(100% - (var(--page-gutter) * 2)));
+  margin-inline: auto;
+  padding-top: clamp(1rem, 3vw, 2.5rem);
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom));
+}
+
+.vipPageHero,
+.vipSection,
+.interactionGrid,
+.officialCinema,
+.streamPublicPanel,
+.blogGrid,
+.sponsorMarquee,
+.contactEmailBlock,
+.adsenseSlot {
+  width: 100%;
+  min-width: 0;
+}
+
+.vipPageHero {
+  padding: clamp(1.25rem, 4vw, 3rem);
+  border: 1px solid var(--line-soft);
+  border-radius: clamp(1rem, 2.5vw, 1.5rem);
+  background:
+    linear-gradient(135deg, rgba(255, 211, 106, 0.08), transparent 42%),
+    var(--surface-panel);
+  box-shadow: var(--shadow-premium, 0 28px 70px rgba(0, 0, 0, 0.34));
+  backdrop-filter: blur(14px);
+}
+
+.vipPageHero h1 {
+  max-width: 18ch;
+  margin: 0.5rem 0 0.85rem;
+  font-size: var(--text-h1, clamp(2rem, 4vw, 3rem));
+  line-height: 1.08;
+}
+
+.vipPageHero p {
+  max-width: 60rem;
+  color: var(--subtle, rgba(244, 239, 231, 0.72));
+}
+
+.vipCard,
+.trackCard,
+.blogCard,
+.messageCard,
+.networkCard,
+.conceptCard {
+  min-width: 0;
+  transition: transform 0.35s var(--ease-premium), border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.vipCard:hover,
+.trackCard:hover,
+.blogCard:hover,
+.networkCard:hover {
+  transform: translateY(-4px);
+}
+
+.featureRail,
+.networkGrid,
+.blogGrid,
+.sponsorGrid,
+.interactionGrid,
+.videoGrid,
+.officialVideoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.interactionGrid {
+  align-items: start;
+}
+
+.vipForm {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.vipForm input,
+.vipForm textarea,
+.vipForm select,
+.studioButton,
+.buyBtn,
+.dkPlayer button,
+.slickArrow,
+.slick-dots button {
+  touch-action: manipulation;
+}
+
+.vipForm input,
+.vipForm textarea,
+.vipForm select {
+  width: 100%;
+  min-height: 3rem;
+  border-radius: 0.75rem;
+  padding: 0.8rem 0.9rem;
+}
+
+.vipForm textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.studioButton,
+.buyBtn {
+  min-height: 2.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  text-align: center;
+}
+
+.vipFooter {
+  width: min(var(--page-width), calc(100% - (var(--page-gutter) * 2)));
+  margin-inline: auto;
+}
+
+@media (max-width: 720px) {
+  .vipHeader,
+  .vipHeader.vipHeader--epic {
+    min-height: 64px;
+    padding-inline: max(0.75rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .officialProfileLogo { width: 38px; height: 38px; }
+  .logoSub { display: none; }
+  .logoWordmark { font-size: 0.92rem; }
+
+  .vipMain,
+  .cinePage,
+  .discoverPage,
+  .musicDeckPage,
+  .shopPage {
+    width: min(100% - 1.5rem, var(--page-width));
+    padding-top: 0.85rem;
+  }
+
+  .vipPageHero { padding: 1.15rem; }
+  .vipPageHero h1 { font-size: clamp(1.8rem, 9vw, 2.55rem); }
+  .heroActions { display: grid; grid-template-columns: 1fr; width: 100%; }
+  .heroActions > * { width: 100%; }
+  .vipCard:hover,
+  .trackCard:hover,
+  .blogCard:hover,
+  .networkCard:hover { transform: none; }
+  .vipFooter { padding-bottom: calc(8rem + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 420px) {
+  .vipMenu { min-width: 64px; }
+  .vipMenuText { font-size: 0.68rem; }
+  .vipPageHero h1 { font-size: 1.75rem; }
+  .vipKicker { font-size: 0.62rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .vipSite { animation: none; }
+  .vipCard,
+  .trackCard,
+  .blogCard,
+  .networkCard { transition: none; }
+}

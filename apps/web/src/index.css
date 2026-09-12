@@ -30,6 +30,7 @@
 @import './styles/lock.css';
 @import './styles/film-world.css';
 @import './styles/premium-shell.css';
+@import './styles/mobile-polish.css';
 
 .routeLoader {
   min-height: 100vh;
