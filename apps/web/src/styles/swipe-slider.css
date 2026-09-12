@@ -64,7 +64,7 @@
   padding: 14px 18px;
   border: 3px solid #fff;
   color: #fff;
-  font-size: clamp(16px, 3.2vw, 32px);
+  font-size: clamp(22px, 5.2vw, 52px);
   font-weight: 700;
   letter-spacing: 0.02em;
   opacity: 0;
@@ -84,6 +84,9 @@
   transform: translate(-50%, 0);
   transition: all 0.7s cubic-bezier(0.32, 0.34, 0, 1.62) 0.35s;
 }
+.slickHome .slick-active .caption.cap-1 { transform: translate(-50%, 0) scale(1.04); }
+.slickHome .slick-active .caption.cap-2 { letter-spacing: 0.08em; }
+.slickHome .slick-active .caption.cap-3 { transform: translate(-50%, 0) rotate(-1.2deg); }
 
 .slickHome .buyBtn {
   position: absolute;
@@ -118,10 +121,11 @@
 }
 .slickHome .viz i {
   flex: 1;
-  height: calc(18% + var(--beat, 0.2) * 82%);
-  background: #fff;
-  opacity: 0.85;
-  animation: vizPulse 0.45s ease-in-out infinite alternate;
+  height: calc(12% + var(--beat, 0.2) * 88%);
+  background: linear-gradient(to top, #d4af37, #fff);
+  opacity: 0.92;
+  transform-origin: bottom center;
+  animation: vizPulse 0.38s ease-in-out infinite alternate;
 }
 @keyframes vizPulse {
   from { transform: scaleY(0.45); }

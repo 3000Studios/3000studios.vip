@@ -93,7 +93,7 @@ export function SwipeHome() {
                 <div key={s.slug} className={`slick-slide item image${active ? ' slick-active' : ''}`}>
                   <figure>
                     <div className={`slide-image slide-media show`} style={{ backgroundImage: `url('${cover}')` }} />
-                    <figcaption className="caption">{s.title}</figcaption>
+                    <figcaption className={`caption cap-${i % 4}`}>{s.title}</figcaption>
                     {active ? <SlideViz /> : null}
                     {active ? (
                       <a
