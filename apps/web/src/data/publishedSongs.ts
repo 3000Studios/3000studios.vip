@@ -9,6 +9,8 @@ export type PublishedSong = {
   preview: string;
   cover: string;
   youtubeId?: string;
+  buy?: string;
+  apple?: string;
 };
 
 function norm(s: string) {

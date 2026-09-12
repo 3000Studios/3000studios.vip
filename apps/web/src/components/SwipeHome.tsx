@@ -5,6 +5,16 @@ import { publishedSongs, publishedToCatalog } from '../data/publishedSongs';
 import { youtubeArtworkUrl } from '../data/officialReleases';
 import { PublicLayout } from '../pages/Home';
 
+function SlideViz() {
+  return (
+    <div className="viz" aria-hidden="true">
+      {Array.from({ length: 24 }, (_, i) => (
+        <i key={i} style={{ animationDelay: `${i * 40}ms` }} />
+      ))}
+    </div>
+  );
+}
+
 export function SwipeHome() {
   const music = useGlobalMusic();
   const [index, setIndex] = useState(0);
@@ -84,6 +94,18 @@ export function SwipeHome() {
                   <figure>
                     <div className={`slide-image slide-media show`} style={{ backgroundImage: `url('${cover}')` }} />
                     <figcaption className="caption">{s.title}</figcaption>
+                    {active ? <SlideViz /> : null}
+                    {active ? (
+                      <a
+                        className="buyBtn"
+                        href={s.buy || s.apple || 'https://distrokid.com/hyperfollow/3000studios'}
+                        target="_blank"
+                        rel="noreferrer"
+                        onPointerDown={(ev) => ev.stopPropagation()}
+                      >
+                        Buy / stream
+                      </a>
+                    ) : null}
                   </figure>
                 </div>
               );

@@ -22,6 +22,8 @@ for (const row of data.results || []) {
     preview: row.previewUrl || '',
     cover: art,
     youtubeId: '',
+    buy: row.trackViewUrl || 'https://distrokid.com/hyperfollow/3000studios',
+    apple: row.trackViewUrl || '',
   });
 }
 writeFileSync(
