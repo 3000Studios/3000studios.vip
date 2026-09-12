@@ -9,6 +9,10 @@
 /tiktok/  /tiktok/index.html  200
 /tiktok/callback  /tiktok/callback.html  200
 /tiktok/callback/  /tiktok/callback.html  200
+/privacy  /privacy.html  200
+/privacy/  /privacy.html  200
+/terms  /terms.html  200
+/terms/  /terms.html  200
 
 # Pages Functions under /api must not fall through to the SPA
 /api/*  /api/:splat  200

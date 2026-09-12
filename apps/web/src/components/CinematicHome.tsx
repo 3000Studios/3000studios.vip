@@ -4,15 +4,12 @@ import { rolloutSongs } from '../data/music';
 import { PublicLayout } from '../pages/Home';
 import { PLATFORMS } from '../lib/commerce';
 
-const featured = officialReleaseVideos[0];
 const INTRO = '/media/spotify-signing.mp4';
 
 export function CinematicHome() {
   const startSample = (slug: string, src: string, title: string) => {
     window.dispatchEvent(new CustomEvent('3000-play-track', { detail: { src, title, slug } }));
   };
-
-  const marquee = [...officialReleaseVideos, ...officialReleaseVideos].map((v) => v.title).join('  ·  ');
 
   return (
     <PublicLayout variant="spiral">
@@ -21,53 +18,46 @@ export function CinematicHome() {
           <video className="cineHeroVideo" src={INTRO} autoPlay muted loop playsInline preload="metadata" />
           <div className="cineHeroShade" />
           <div className="cineHeroCopy">
-            <p className="cineKicker">Official artist · DistroKid · Free to stream</p>
+            <p className="cineKicker">Official artist · DistroKid · one HyperFollow</p>
             <h1 className="cineTitle">3000 Studios</h1>
-            <p>Cinematic music, official videos, and a live stage. Every track plays in full — no paywall, no sample cut.</p>
+            <p>Original music, official videos, and promo Shorts. Stream free here. Stores pay through DistroKid.</p>
             <div className="heroActions">
               <a className="studioButton ytCta" href="https://www.youtube.com/@3000Studio?sub_confirmation=1" target="_blank" rel="noreferrer">
-                Subscribe
+                YouTube
               </a>
-              <a className="studioButton secondary" href={youtubeWatchUrl(featured.videoId)} target="_blank" rel="noreferrer">
-                Watch {featured.title}
+              <a className="studioButton secondary" href="https://distrokid.com/hyperfollow/3000studios" target="_blank" rel="noreferrer">
+                Listen everywhere
               </a>
-              <Link className="studioButton ghost" to="/live">
-                Live stage
-              </Link>
               <Link className="studioButton ghost" to="/music">
-                Music deck
+                Catalog
               </Link>
+              <a className="studioButton ghost" href="/tiktok">
+                TikTok promo
+              </a>
             </div>
           </div>
         </section>
 
-        <div className="cineMarquee" aria-hidden="true">
-          <div className="cineMarqueeTrack">
-            <span>{marquee}</span>
-            <span>{marquee}</span>
-          </div>
-        </div>
-
         <section className="cinePortals" aria-label="Enter">
-          <Link className="cinePortal" to="/live">
-            <small>Broadcast</small>
-            <strong>Live stream</strong>
-            <span>Standby until the host is on air.</span>
-          </Link>
           <Link className="cinePortal" to="/music">
-            <small>Vault</small>
-            <strong>Coverflow deck</strong>
-            <span>Official cards. You start the music.</span>
-          </Link>
-          <Link className="cinePortal" to="/shop">
-            <small>Merch</small>
-            <strong>Shop</strong>
-            <span>Hoodies, tees, and studio marks.</span>
+            <small>Listen</small>
+            <strong>Catalog</strong>
+            <span>Full tracks on this site, free.</span>
           </Link>
           <Link className="cinePortal" to="/video">
-            <small>Picture</small>
+            <small>Watch</small>
             <strong>Official videos</strong>
-            <span>DistroKid-clean YouTube shelf.</span>
+            <span>YouTube MVs and Shorts.</span>
+          </Link>
+          <a className="cinePortal" href="https://distrokid.com/hyperfollow/3000studios" target="_blank" rel="noreferrer">
+            <small>Stores</small>
+            <strong>HyperFollow</strong>
+            <span>Spotify, Apple, and the rest.</span>
+          </a>
+          <Link className="cinePortal" to="/live">
+            <small>Broadcast</small>
+            <strong>Live</strong>
+            <span>On air when the host is live.</span>
           </Link>
         </section>
 
@@ -95,7 +85,7 @@ export function CinematicHome() {
             <Link to="/music">Open deck</Link>
           </div>
           <div className="sampleList">
-            {rolloutSongs.slice(0, 16).map((song) => (
+            {rolloutSongs.slice(0, 8).map((song) => (
               <article className="sampleRow" key={song.slug}>
                 <img src={song.cover} alt="" />
                 <div>

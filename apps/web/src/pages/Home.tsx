@@ -306,7 +306,7 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
           <>
             <div className="footerBrand">
               <strong className="shimmerText">3000 Studios</strong>
-              <p>Free official music, videos, and live streams. Listen anywhere.</p>
+              <p>Official music, videos, TikTok/IG promo, and DistroKid HyperFollow.</p>
             </div>
             <div className="footerLinks">
               <Link to="/privacy">Privacy</Link>

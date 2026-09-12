@@ -22,7 +22,7 @@
   <main>
     <p>3000studios.vip</p>
     <h1>Official TikTok promo</h1>
-    <p>Connect the 3000 Studios artist account with Login Kit, then upload a promo clip with the Content Posting API (<code>video.upload</code> / FILE_UPLOAD). Direct Post uses <code>video.publish</code> after app review.</p>
+    <p>Connect the 3000 Studios artist account with Login Kit, then upload a promo clip with the Content Posting API (<code>video.upload</code> / FILE_UPLOAD). Direct Post uses <code>video.publish</code> after app review. Legal: <a href="/privacy" style="color:#fe2c55">Privacy</a> · <a href="/terms" style="color:#fe2c55">Terms</a>.</p>
     <div class="card">
       <div class="row">
         <button id="connect">Connect TikTok</button>
@@ -44,7 +44,7 @@
     document.getElementById("connect").onclick = () => {
       const u = new URL("https://www.tiktok.com/v2/auth/authorize/");
       u.searchParams.set("client_key", clientKey);
-      u.searchParams.set("scope", "user.info.basic,video.upload,video.publish");
+      u.searchParams.set("scope", "user.info.basic,video.upload");
       u.searchParams.set("response_type", "code");
       u.searchParams.set("redirect_uri", redirect);
       u.searchParams.set("state", "promo");

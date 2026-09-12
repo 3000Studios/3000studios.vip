@@ -91,8 +91,8 @@ export function Privacy() {
   return (
     <LegalFrame
       eyebrow="Privacy"
-      title="Privacy practices for the 3000 Studios web portfolio."
-      intro="This site respects visitor privacy and limits collection to what is needed for operations, analytics, lead handling, and site performance."
+      title="Privacy Policy"
+      intro="How 3000studios.vip uses data for the site, ads, and official TikTok / YouTube / Instagram promo."
     >
       <section className="legalSection">
         <h2>Information use</h2>
@@ -126,8 +126,8 @@ export function Terms() {
   return (
     <LegalFrame
       eyebrow="Terms"
-      title="Terms for access to 3000 Studios properties and tools."
-      intro="Use of the site network and associated tools means acceptance of the operational, legal, and platform-specific terms that govern access."
+      title="Terms of Service"
+      intro="Use of 3000studios.vip, DistroKid HyperFollow, and official social promo tools."
     >
       <section className="legalSection">
         <h2>Use conditions</h2>

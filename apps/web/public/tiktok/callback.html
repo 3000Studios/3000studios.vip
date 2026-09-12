@@ -20,11 +20,8 @@
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
     document.getElementById("status").textContent = code
-      ? "Login Kit authorized (user.info.basic). Code received."
-      : "No code yet — open Connect TikTok from /tiktok first.";
-    if (code) {
-      setTimeout(() => { location.href = "/tiktok/index.html?connected=1"; }, 1200);
-    }
+      ? ("Login Kit code received. Keep this tab. Paste the code into tiktok_oauth.py:\n" + code)
+      : "No code yet — TikTok Production Login Kit fails on a draft app (client_key). Use Sandbox.";
   </script>
 </body>
 </html>
