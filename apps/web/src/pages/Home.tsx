@@ -17,6 +17,8 @@ import { ScrollFX } from '../components/ScrollFX';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { PlatformLogos } from '../components/PlatformLogos';
 import { ChromeWallpaper } from '../components/ChromeWallpaper';
+import { MagneticButton } from '../components/MagneticButton';
+import { ParticleField } from '../components/ParticleField';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
@@ -331,6 +333,7 @@ export function Home() {
         <section className="redCarpetHero">
           <video src={INTRO_VIDEO} autoPlay muted loop playsInline preload="auto" />
           <div className="carpetDepth" aria-hidden="true" />
+          <ParticleField />
           <motion.div className="heroCopy heroCopy--yt" initial="hidden" animate="show" variants={stagger}>
             <motion.span className="vipKicker" variants={fadeUp}>YouTube · DistroKid · Official artist</motion.span>
             <BeatDancingTitle text="3000 Studios" />
@@ -345,7 +348,7 @@ export function Home() {
               </a>
             </motion.div>
             <motion.div className="heroActions" variants={fadeUp}>
-              <a className="studioButton ytCta" href="https://www.youtube.com/@3000Studio?sub_confirmation=1" target="_blank" rel="noreferrer">Subscribe on YouTube</a>
+              <MagneticButton className="studioButton ytCta" href="https://www.youtube.com/@3000Studio?sub_confirmation=1">Subscribe on YouTube</MagneticButton>
               <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">Watch the video</StudioButton>
               <StudioButton to="/music" variant="ghost">Full catalog</StudioButton>
             </motion.div>

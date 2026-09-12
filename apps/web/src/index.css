@@ -1,4 +1,5 @@
 @import './styles/variables.css';
+@import './styles/theme.css';
 @import './styles/next-gen.css';
 @import './styles/global.css';
 @import './styles/components.css';
@@ -37,11 +38,17 @@
     linear-gradient(145deg, #050505, #10100f 48%, #16030a);
 }
 
-html, body, #root {
+html,
+body,
+#root {
   max-width: 100%;
   overflow-x: hidden;
 }
 
-img, video, canvas, iframe, svg {
+img,
+video,
+canvas,
+iframe,
+svg {
   max-width: 100%;
 }
