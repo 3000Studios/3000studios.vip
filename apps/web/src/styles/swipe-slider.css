@@ -1,0 +1,152 @@
+.slickHome {
+  background: #2d3042;
+  color: #efefef;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.slickHome .main-slider {
+  position: relative;
+  width: 100%;
+  height: min(72vh, 820px);
+  min-height: 280px;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.slickHome .slickTrack {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+
+.slickHome .slick-slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.slickHome .slick-slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0.32;
+  z-index: 1;
+}
+
+.slickHome .slick-slide figure {
+  position: relative;
+  height: 100%;
+  margin: 0;
+}
+
+.slickHome .slide-image {
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.slickHome .slick-slide.slick-active .slide-media {
+  animation: slickSlideIn 2.4s cubic-bezier(0.4, 0.29, 0.01, 1);
+}
+
+.slickHome .caption {
+  position: absolute;
+  top: 44%;
+  left: 5%;
+  z-index: 2;
+  margin: 0;
+  padding: 20px;
+  border: 3px solid #fff;
+  color: #fff;
+  font-size: clamp(22px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translateY(80px);
+  pointer-events: none;
+  max-width: 86%;
+  text-align: center;
+}
+
+.slickHome .slick-active .caption {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.7s cubic-bezier(0.32, 0.34, 0, 1.62) 0.35s;
+}
+
+.slickHome .slick-dots {
+  text-align: center;
+  padding: 16px 8px 8px;
+  max-height: 72px;
+  overflow: hidden;
+}
+
+.slickHome .slick-dots li {
+  display: inline-block;
+  margin: 0 5px 6px;
+}
+
+.slickHome .slick-dots li button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #fff;
+  opacity: 0.35;
+  cursor: pointer;
+}
+
+.slickHome .slick-dots li.slick-active button {
+  opacity: 1;
+  box-shadow: 0 0 0 2px #fff;
+  border-color: #2d3042;
+}
+
+.slickHome .slickArrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 72px;
+  border: 0;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  font-size: 42px;
+  cursor: pointer;
+}
+
+.slickHome .slickArrow.prev { left: 0; }
+.slickHome .slickArrow.next { right: 0; }
+
+.slickHome .container.slickCopy {
+  background: #f2f2f2;
+  color: #444;
+  line-height: 1.6;
+  padding: 36px 0 80px;
+}
+
+.slickHome .slickCopy .content {
+  width: 90%;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.slickHome .slickCopy a {
+  color: #2d3042;
+}
+
+@keyframes slickSlideIn {
+  from { filter: blur(15px); }
+  to { filter: blur(0); }
+}
+
+.vipSite .vipHeaderMusic {
+  z-index: 20;
+}
