@@ -74,6 +74,14 @@ const concepts = [
     focus: 'Phone streaming, platform checkboxes, stream health, quick recovery',
     platforms: ['On Site', 'Twitch', 'YouTube', 'Facebook', 'Podcast'],
   },
+  {
+    name: '3000 Promo',
+    tagline: 'Suno to DistroKid to official TikTok draft or Direct Post. Caption from lyrics JSON. No fake views.',
+    palette: 'Deep black, gold #D4AF37, purple neon',
+    motion: 'Queue pulse, caption preview, post-now confirm lock',
+    focus: '9:16 shorts from the music pipeline, inbox draft until audited, post only after confirm',
+    platforms: ['TikTok', 'Suno', 'DistroKid', 'YouTube', 'Pipeline'],
+  },
 ];
 
 export function ConceptBoard() {
@@ -85,30 +93,31 @@ export function ConceptBoard() {
             <span className="vipKicker">Flagship redesign concepts</span>
             <h1>Choose the visual system before replacing the site.</h1>
             <p>
-              Nine directions for a mobile-first 3000 Studios flagship: stronger animation, unified
-              styling, featured music, live streaming, multistream controls, sponsor paths, and
-              AdSense-ready content structure.
+              Ten directions for a mobile-first 3000 Studios flagship: stronger animation, unified
+              styling, featured music, live streaming, multistream controls, sponsor paths,
+              AdSense-ready content, and the Suno / DistroKid / TikTok promo publisher.
             </p>
           </div>
           <div className="conceptHeroPanel" aria-label="Live dashboard concept preview">
             <span>Owner dashboard target</span>
             <strong>One tap Go Live</strong>
             <div className="destinationChecks" aria-label="Platform destination examples">
-              {['3000studios.vip', 'Twitch', 'YouTube', 'Facebook', 'Spotify'].map((item, index) => (
+              {['3000studios.vip', 'Twitch', 'YouTube', 'TikTok', 'Spotify'].map((item, index) => (
                 <label key={item}>
-                  <input type="checkbox" defaultChecked={index < 2} />
+                  <input type="checkbox" defaultChecked={index < 3} />
                   <span>{item}</span>
                 </label>
               ))}
             </div>
             <small>
               Final build can store OAuth/API connection states, but each platform still needs its
-              real app credentials and streaming permissions.
+              real app credentials and streaming permissions. TikTok uses the official Content
+              Posting API only.
             </small>
           </div>
         </section>
 
-        <section className="conceptGrid" aria-label="Nine 3000 Studios redesign concepts">
+        <section className="conceptGrid" aria-label="3000 Studios redesign concepts">
           {concepts.map((concept, index) => (
             <article className={`conceptCard conceptCard-${index + 1}`} key={concept.name}>
               <div className="conceptArt" aria-hidden="true">
@@ -168,11 +177,20 @@ export function ConceptBoard() {
             </div>
             <div>
               <strong>Owner live deck</strong>
-              <p>Add a dashboard destination checklist for 3000studios.vip, Twitch, YouTube, Facebook, and podcast workflows, backed by real connection status.</p>
+              <p>Add a dashboard destination checklist for 3000studios.vip, Twitch, YouTube, Facebook, TikTok, and podcast workflows, backed by real connection status.</p>
             </div>
             <div>
               <strong>AdSense readiness</strong>
               <p>Keep privacy, terms, cookies, contact, useful editorial content, and responsive ad slots ready without fake approval claims.</p>
+            </div>
+            <div>
+              <strong>3000 Promo</strong>
+              <p>
+                Official TikTok Content Posting API publisher hooked to the Suno / DistroKid pipeline.
+                Watches 08-Social-Shorts and lyrics JSON, queues a caption, inbox-draft by default,
+                publishes only after an explicit post now. No fake likes or follow bots.
+                App code: tools/3000-promo. Developer portal: developers.tiktok.com.
+              </p>
             </div>
           </div>
           <Link className="studioButton primary" to="/">
