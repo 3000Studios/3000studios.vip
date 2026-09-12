@@ -19,6 +19,7 @@ export function SwipeHome() {
   const music = useGlobalMusic();
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const startX = useRef(0);
   const dragging = useRef(false);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -52,6 +53,7 @@ export function SwipeHome() {
 
   const onPointerDown = (e: ReactPointerEvent) => {
     dragging.current = true;
+    setIsDragging(true);
     startX.current = e.clientX;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
@@ -62,6 +64,7 @@ export function SwipeHome() {
   const onPointerUp = () => {
     if (!dragging.current) return;
     dragging.current = false;
+    setIsDragging(false);
     const w = trackRef.current?.parentElement?.clientWidth || 1;
     if (drag < -w * 0.12) go(index + 1);
     else if (drag > w * 0.12) go(index - 1);
@@ -83,7 +86,7 @@ export function SwipeHome() {
             className="slickTrack"
             style={{
               transform: `translateX(calc(${-index * 100}% + ${drag}px))`,
-              transition: dragging.current ? 'none' : 'transform 0.55s cubic-bezier(0.4, 0.29, 0.01, 1)',
+              transition: isDragging ? 'none' : 'transform 0.55s cubic-bezier(0.4, 0.29, 0.01, 1)',
             }}
           >
             {publishedSongs.map((s, i) => {

@@ -66,6 +66,12 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .particleField {
+    display: none;
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;
