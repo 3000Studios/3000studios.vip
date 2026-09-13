@@ -7,8 +7,6 @@
 /listen  /listen.html  200
 /tiktok  /tiktok/index.html  200
 /tiktok/  /tiktok/index.html  200
-/tiktok/callback  /tiktok/callback.html  200
-/tiktok/callback/  /tiktok/callback.html  200
 /privacy  /privacy.html  200
 /privacy/  /privacy.html  200
 /terms  /terms.html  200
