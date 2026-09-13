@@ -88,7 +88,7 @@ app.get('/health', (c) => c.json({ ok: true, at: nowIso() }));
 
 const TikTokExchangeSchema = z.object({
   code: z.string().min(8).max(2000),
-  redirectUri: z.literal('https://3000studios.vip/tiktok/callback'),
+  redirectUri: z.literal('https://3000studios.vip/tiktok'),
 });
 
 app.post('/tiktok/oauth/exchange', async (c) => {
