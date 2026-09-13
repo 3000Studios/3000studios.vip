@@ -41,7 +41,7 @@
   <script>
     const clientKey = "sbawunwbiuohnfsdsc";
     const redirect = "https://3000studios.vip/tiktok";
-    const api = "https://apex-citadel-api.mr-jwswain.workers.dev";
+    const api = "";
     document.getElementById("connect").onclick = () => {
       const u = new URL("https://www.tiktok.com/v2/auth/authorize/");
       u.searchParams.set("client_key", clientKey);
@@ -56,7 +56,7 @@
     if (code) {
       document.getElementById("connect").disabled = true;
       document.getElementById("connect").textContent = "Completing TikTok connection…";
-      fetch(api + "/tiktok/oauth/exchange", {
+      fetch(api + "/api/tiktok-exchange", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ code, redirectUri: redirect }),
@@ -81,7 +81,7 @@
       button.disabled = true;
       button.textContent = "Uploading securely…";
       try {
-        const response = await fetch(api + "/tiktok/upload-draft", {
+        const response = await fetch(api + "/api/tiktok-upload", {
           method: "POST",
           headers: { "content-type": f.type || "video/mp4", "x-tiktok-session": session },
           body: f,
