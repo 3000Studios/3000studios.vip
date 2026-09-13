@@ -12,7 +12,7 @@
 <body>
   <main>
     <h1>TikTok Login Kit callback</h1>
-    <p>Authorization returned to <code>https://3000studios.vip/tiktok/callback</code>.</p>
+    <p>Authorization returned to <code>https://3000studios.vip/tiktok/callback.html</code>.</p>
     <p id="status">Completing login…</p>
     <p><a id="continue" href="/tiktok">Continue to promo upload</a></p>
   </main>
@@ -26,7 +26,7 @@
       fetch("https://apex-citadel-api.mr-jwswain.workers.dev/tiktok/oauth/exchange", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ code, redirectUri: "https://3000studios.vip/tiktok/callback" }),
+        body: JSON.stringify({ code, redirectUri: "https://3000studios.vip/tiktok/callback.html" }),
       }).then(async (response) => {
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || "Authorization failed");
