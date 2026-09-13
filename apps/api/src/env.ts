@@ -11,4 +11,6 @@ export type Env = {
   DUDE_SYNC_TOKEN?: string;
   ALERT_FROM_EMAIL?: string;
   MAILCHANNELS_API_KEY?: string;
+  MUSIC_JOBS?: R2Bucket;
+  MUSIC_DEVICE_TOKEN?: string;
 };

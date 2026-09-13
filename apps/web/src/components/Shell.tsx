@@ -5,17 +5,70 @@ import { useAuth } from '../lib/auth';
 import { DudeAgent } from './DudeAgent';
 
 const NAV = [
-  { to: '/vault', end: true, icon: '◈', label: 'Command Center', title: 'Command Center', sub: 'Fleet health at a glance' },
-  { to: '/vault/sites', end: false, icon: '▦', label: 'Fleet', title: 'Fleet', sub: 'Every site under watch' },
-  { to: '/vault/ops', end: false, icon: '⌘', label: 'Ops Console', title: 'Ops Console', sub: 'Commands, bridges, analytics' },
-  { to: '/vault/stream', end: false, icon: '⦿', label: 'Stream Vault', title: 'Stream Vault', sub: 'Private stream control' },
-  { to: '/vault/music-video', end: false, icon: '▣', label: 'Video Maker', title: 'Music Video Generator', sub: 'Lyrics to AI video prompts' },
-  { to: '/vault/settings', end: false, icon: '♪', label: 'Audio', title: 'Audio Console', sub: 'Ambient mix & SFX' },
+  {
+    to: '/vault',
+    end: true,
+    icon: '◈',
+    label: 'Command Center',
+    title: 'Command Center',
+    sub: 'Fleet health at a glance',
+  },
+  {
+    to: '/vault/sites',
+    end: false,
+    icon: '▦',
+    label: 'Fleet',
+    title: 'Fleet',
+    sub: 'Every site under watch',
+  },
+  {
+    to: '/vault/ops',
+    end: false,
+    icon: '⌘',
+    label: 'Ops Console',
+    title: 'Ops Console',
+    sub: 'Commands, bridges, analytics',
+  },
+  {
+    to: '/vault/stream',
+    end: false,
+    icon: '⦿',
+    label: 'Stream Vault',
+    title: 'Stream Vault',
+    sub: 'Private stream control',
+  },
+  {
+    to: '/vault/song-drop',
+    end: false,
+    icon: '♫',
+    label: 'Song Drop',
+    title: 'Remote Song Drop',
+    sub: 'Release factory & promotion pipeline',
+  },
+  {
+    to: '/vault/music-video',
+    end: false,
+    icon: '▣',
+    label: 'Video Maker',
+    title: 'Music Video Generator',
+    sub: 'Lyrics to AI video prompts',
+  },
+  {
+    to: '/vault/settings',
+    end: false,
+    icon: '♪',
+    label: 'Audio',
+    title: 'Audio Console',
+    sub: 'Ambient mix & SFX',
+  },
 ];
 
 function titleFor(pathname: string): { title: string; sub: string } {
-  if (/^\/vault\/sites\/[^/]+$/.test(pathname)) return { title: 'Site Detail', sub: 'Deep dive & controls' };
-  const match = [...NAV].reverse().find((n) => (n.end ? pathname === n.to : pathname.startsWith(n.to)));
+  if (/^\/vault\/sites\/[^/]+$/.test(pathname))
+    return { title: 'Site Detail', sub: 'Deep dive & controls' };
+  const match = [...NAV]
+    .reverse()
+    .find((n) => (n.end ? pathname === n.to : pathname.startsWith(n.to)));
   return match ? { title: match.title, sub: match.sub } : { title: 'Vault', sub: '' };
 }
 
@@ -44,7 +97,9 @@ export function Shell() {
         >
           <div className="cBrandMark">3K</div>
           <div className="cBrandText">
-            <Link to="/vault" className="cBrandName">3000 Studios</Link>
+            <Link to="/vault" className="cBrandName">
+              3000 Studios
+            </Link>
             <span className="cBrandSub">Fleet Control · Owner</span>
           </div>
         </motion.div>
@@ -106,7 +161,10 @@ export function Shell() {
             {sub ? <span className="cTitleSub">{sub}</span> : null}
           </div>
           <div className="cTopbarRight">
-            <span className="cPill ok"><span className="cDot" />System nominal</span>
+            <span className="cPill ok">
+              <span className="cDot" />
+              System nominal
+            </span>
           </div>
         </header>
 

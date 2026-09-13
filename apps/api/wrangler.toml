@@ -15,3 +15,7 @@ binding = "AI"
 binding = "DB"
 database_name = "apex_citadel"
 database_id = "6ae6bd18-e43a-4c57-beba-0c3ed1b5a56b"
+
+[[r2_buckets]]
+binding = "MUSIC_JOBS"
+bucket_name = "3000studios-music-jobs"

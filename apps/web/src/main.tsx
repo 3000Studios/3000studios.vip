@@ -52,6 +52,9 @@ const StreamVault = lazy(() =>
 const MusicVideoGenerator = lazy(() =>
   import('./pages/MusicVideoGenerator').then((module) => ({ default: module.MusicVideoGenerator })),
 );
+const SongDrop = lazy(() =>
+  import('./pages/SongDrop').then((module) => ({ default: module.SongDrop })),
+);
 const SongPage = lazy(() =>
   import('./pages/SongPage').then((module) => ({ default: module.SongPage })),
 );
@@ -152,6 +155,14 @@ const router = createBrowserRouter([
                 element: (
                   <RouteLoader>
                     <Dashboard />
+                  </RouteLoader>
+                ),
+              },
+              {
+                path: 'song-drop',
+                element: (
+                  <RouteLoader>
+                    <SongDrop />
                   </RouteLoader>
                 ),
               },

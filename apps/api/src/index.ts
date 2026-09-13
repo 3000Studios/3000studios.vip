@@ -52,6 +52,16 @@ app.use(
 app.use('*', async (c, next) => {
   const env = c.env;
   if (env.APP_ENV === 'production' && env.ACCESS_REQUIRED === '1') {
+    const deviceToken = c.req.header('x-music-device-token') ?? '';
+    const musicDeviceAllowed =
+      c.req.path.startsWith('/music/') &&
+      Boolean(env.MUSIC_DEVICE_TOKEN) &&
+      deviceToken.length >= 32 &&
+      deviceToken === env.MUSIC_DEVICE_TOKEN;
+    if (musicDeviceAllowed) {
+      await next();
+      return;
+    }
     if (
       c.req.path === '/dude/learn' &&
       isSyncTokenAllowed(c.req.header('x-dude-sync-token'), env.DUDE_SYNC_TOKEN)
@@ -66,6 +76,105 @@ app.use('*', async (c, next) => {
 });
 
 app.get('/health', (c) => c.json({ ok: true, at: nowIso() }));
+
+const MusicJobMode = z.enum(['dry_run', 'build_only', 'publish']);
+const MAX_MUSIC_UPLOAD_BYTES = 200 * 1024 * 1024;
+
+function musicJobKey(id: string, file: string) {
+  return `music-jobs/${id}/${file}`;
+}
+
+app.post('/music/jobs', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const length = Number(c.req.header('content-length') ?? 0);
+  if (!length || length > MAX_MUSIC_UPLOAD_BYTES) {
+    return c.json({ error: 'audio_size_must_be_1_to_200mb' }, 413);
+  }
+  const mode = MusicJobMode.safeParse(c.req.header('x-pipeline-mode') ?? 'dry_run');
+  if (!mode.success) return c.json({ error: 'invalid_pipeline_mode' }, 400);
+  if (
+    mode.data === 'publish' &&
+    c.req.header('x-publish-confirmation') !== 'PUBLISH 3000 STUDIOS'
+  ) {
+    return c.json({ error: 'publish_confirmation_required' }, 400);
+  }
+  const originalName = (c.req.header('x-file-name') ?? 'song.wav')
+    .replace(/[^a-zA-Z0-9._ -]/g, '_')
+    .slice(0, 180);
+  const id = crypto.randomUUID();
+  const now = nowIso();
+  const status = {
+    id,
+    state: 'queued',
+    mode: mode.data,
+    originalName,
+    progress: 0,
+    stage: 'Queued',
+    createdAt: now,
+    updatedAt: now,
+  };
+  await c.env.MUSIC_JOBS.put(musicJobKey(id, 'input'), c.req.raw.body, {
+    httpMetadata: { contentType: c.req.header('content-type') ?? 'audio/wav' },
+    customMetadata: { originalName, mode: mode.data },
+  });
+  await c.env.MUSIC_JOBS.put(musicJobKey(id, 'status.json'), JSON.stringify(status), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+  return c.json(status, 202);
+});
+
+app.get('/music/jobs', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const listed = await c.env.MUSIC_JOBS.list({ prefix: 'music-jobs/', delimiter: '/' });
+  const ids = listed.delimitedPrefixes
+    .map((prefix) => prefix.split('/')[1])
+    .filter(Boolean)
+    .slice(-50);
+  const jobs = await Promise.all(
+    ids.map(async (id) => {
+      const object = await c.env.MUSIC_JOBS.get(musicJobKey(id, 'status.json'));
+      return object ? object.json() : null;
+    }),
+  );
+  return c.json({ jobs: jobs.filter(Boolean) });
+});
+
+app.get('/music/jobs/:id', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const object = await c.env.MUSIC_JOBS.get(musicJobKey(c.req.param('id'), 'status.json'));
+  if (!object) return c.json({ error: 'job_not_found' }, 404);
+  return new Response(object.body, {
+    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+  });
+});
+
+app.get('/music/jobs/:id/input', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const object = await c.env.MUSIC_JOBS.get(musicJobKey(c.req.param('id'), 'input'));
+  if (!object) return c.json({ error: 'job_input_not_found' }, 404);
+  return new Response(object.body, {
+    headers: { 'content-type': object.httpMetadata?.contentType ?? 'application/octet-stream' },
+  });
+});
+
+app.put('/music/jobs/:id/status', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const id = c.req.param('id');
+  const existing = await c.env.MUSIC_JOBS.get(musicJobKey(id, 'status.json'));
+  if (!existing) return c.json({ error: 'job_not_found' }, 404);
+  const current = (await existing.json()) as Record<string, unknown>;
+  const patch = await c.req.json<Record<string, unknown>>();
+  const allowed = Object.fromEntries(
+    Object.entries(patch).filter(([key]) =>
+      ['state', 'progress', 'stage', 'result', 'error'].includes(key),
+    ),
+  );
+  const next = { ...current, ...allowed, id, updatedAt: nowIso() };
+  await c.env.MUSIC_JOBS.put(musicJobKey(id, 'status.json'), JSON.stringify(next), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+  return c.json(next);
+});
 
 const DudeChatSchema = z.object({
   message: z.string().min(1).max(2000),
@@ -135,7 +244,10 @@ app.post('/dude/chat', async (c) => {
     max_tokens: 700,
   });
   const reply = typeof result === 'string' ? result : result.response;
-  return c.json({ reply: reply ?? 'No response from DUDE cloud brain.', learned: Boolean(learned) });
+  return c.json({
+    reply: reply ?? 'No response from DUDE cloud brain.',
+    learned: Boolean(learned),
+  });
 });
 
 const DudeLearnSchema = z.object({
@@ -810,24 +922,15 @@ function extractTraffic(analytics: any): {
   }
 
   const totals = analytics?.result?.totals ?? analytics?.totals ?? analytics?.result ?? analytics;
-  const requests24h = pickNumber(totals, [
-    ['requests', 'all'],
-    ['requests'],
-  ]);
-  const pageviews24h = pickNumber(totals, [
-    ['pageviews', 'all'],
-    ['pageviews'],
-  ]);
+  const requests24h = pickNumber(totals, [['requests', 'all'], ['requests']]);
+  const pageviews24h = pickNumber(totals, [['pageviews', 'all'], ['pageviews']]);
   const visitors24h = pickNumber(totals, [
     ['uniques', 'all'],
     ['uniques'],
     ['visits', 'all'],
     ['visits'],
   ]);
-  const bandwidth24h = pickNumber(totals, [
-    ['bandwidth', 'all'],
-    ['bandwidth'],
-  ]);
+  const bandwidth24h = pickNumber(totals, [['bandwidth', 'all'], ['bandwidth']]);
 
   return { requests24h, pageviews24h, visitors24h, bandwidth24h };
 }
