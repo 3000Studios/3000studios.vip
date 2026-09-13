@@ -39,8 +39,9 @@
     </div>
   </main>
   <script>
-    const clientKey = "awueeocpxh0aut66";
+    const clientKey = "sbawunwbiuohnfsdsc";
     const redirect = "https://3000studios.vip/tiktok/callback";
+    const api = "https://apex-citadel-api.mr-jwswain.workers.dev";
     document.getElementById("connect").onclick = () => {
       const u = new URL("https://www.tiktok.com/v2/auth/authorize/");
       u.searchParams.set("client_key", clientKey);
@@ -50,13 +51,33 @@
       u.searchParams.set("state", "promo");
       window.location.href = u.toString();
     };
-    if (location.search.includes("code=") || location.hash.includes("connected")) {
+    const session = new URLSearchParams(location.search).get("session") || sessionStorage.getItem("tiktokSession");
+    if (session) {
+      sessionStorage.setItem("tiktokSession", session);
       document.getElementById("connected").style.display = "inline";
     }
-    document.getElementById("upload").onclick = () => {
+    document.getElementById("upload").onclick = async () => {
       const f = document.getElementById("file").files[0];
       if (!f) { alert("Choose an MP4 first"); return; }
-      document.getElementById("uploaded").style.display = "inline";
+      if (!session) { alert("Connect TikTok first"); return; }
+      const button = document.getElementById("upload");
+      button.disabled = true;
+      button.textContent = "Uploading securely…";
+      try {
+        const response = await fetch(api + "/tiktok/upload-draft", {
+          method: "POST",
+          headers: { "content-type": f.type || "video/mp4", "x-tiktok-session": session },
+          body: f,
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Upload failed");
+        document.getElementById("uploaded").style.display = "inline";
+        button.textContent = "Draft sent to TikTok inbox";
+      } catch (error) {
+        alert(error.message);
+        button.disabled = false;
+        button.textContent = "Upload draft to TikTok inbox";
+      }
     };
   </script>
 </body>

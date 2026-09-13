@@ -13,4 +13,6 @@ export type Env = {
   MAILCHANNELS_API_KEY?: string;
   MUSIC_JOBS?: R2Bucket;
   MUSIC_DEVICE_TOKEN?: string;
+  TIKTOK_CLIENT_KEY?: string;
+  TIKTOK_CLIENT_SECRET?: string;
 };

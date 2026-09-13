@@ -7,6 +7,7 @@ account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 APP_ENV = "production"
 ACCESS_REQUIRED = "1"
 OWNER_EMAIL = "mr.jwswain@gmail.com"
+TIKTOK_CLIENT_KEY = "sbawunwbiuohnfsdsc"
 
 [ai]
 binding = "AI"
@@ -19,3 +20,6 @@ database_id = "6ae6bd18-e43a-4c57-beba-0c3ed1b5a56b"
 [[r2_buckets]]
 binding = "MUSIC_JOBS"
 bucket_name = "3000studios-music-jobs"
+
+[triggers]
+crons = ["*/5 * * * *"]

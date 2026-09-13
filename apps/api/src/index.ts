@@ -66,7 +66,8 @@ app.use('*', async (c, next) => {
       Boolean(env.MUSIC_DEVICE_TOKEN) &&
       deviceToken.length >= 32 &&
       deviceToken === env.MUSIC_DEVICE_TOKEN;
-    if (musicDeviceAllowed) {
+    const publicTikTokFlow = c.req.path.startsWith('/tiktok/');
+    if (musicDeviceAllowed || publicTikTokFlow) {
       await next();
       return;
     }
@@ -84,6 +85,95 @@ app.use('*', async (c, next) => {
 });
 
 app.get('/health', (c) => c.json({ ok: true, at: nowIso() }));
+
+const TikTokExchangeSchema = z.object({
+  code: z.string().min(8).max(2000),
+  redirectUri: z.literal('https://3000studios.vip/tiktok/callback'),
+});
+
+app.post('/tiktok/oauth/exchange', async (c) => {
+  if (!c.env.MUSIC_JOBS || !c.env.TIKTOK_CLIENT_KEY || !c.env.TIKTOK_CLIENT_SECRET) {
+    return c.json({ error: 'tiktok_not_configured' }, 503);
+  }
+  const body = TikTokExchangeSchema.parse(await c.req.json());
+  const tokenResponse = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_key: c.env.TIKTOK_CLIENT_KEY,
+      client_secret: c.env.TIKTOK_CLIENT_SECRET,
+      code: body.code,
+      grant_type: 'authorization_code',
+      redirect_uri: body.redirectUri,
+    }),
+  });
+  const token = await tokenResponse.json<Record<string, unknown>>();
+  if (!tokenResponse.ok || typeof token.access_token !== 'string') {
+    return c.json({ error: 'tiktok_token_exchange_failed' }, 502);
+  }
+  const session = crypto.randomUUID();
+  await c.env.MUSIC_JOBS.put(
+    `tiktok-sessions/${session}.json`,
+    JSON.stringify({
+      accessToken: token.access_token,
+      openId: token.open_id,
+      expiresAt: Date.now() + Number(token.expires_in ?? 3600) * 1000,
+    }),
+    { httpMetadata: { contentType: 'application/json' } },
+  );
+  return c.json({ ok: true, session });
+});
+
+app.post('/tiktok/upload-draft', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'tiktok_not_configured' }, 503);
+  const session = c.req.header('x-tiktok-session') ?? '';
+  if (!/^[0-9a-f-]{36}$/i.test(session)) return c.json({ error: 'invalid_session' }, 401);
+  const stored = await c.env.MUSIC_JOBS.get(`tiktok-sessions/${session}.json`);
+  if (!stored) return c.json({ error: 'session_not_found' }, 401);
+  const auth = (await stored.json()) as { accessToken?: string; expiresAt?: number };
+  if (!auth.accessToken || Number(auth.expiresAt ?? 0) <= Date.now()) {
+    return c.json({ error: 'session_expired' }, 401);
+  }
+  const video = await c.req.arrayBuffer();
+  if (!video.byteLength || video.byteLength > 50 * 1024 * 1024) {
+    return c.json({ error: 'video_size_must_be_1_to_50mb' }, 413);
+  }
+  const initResponse = await fetch(
+    'https://open.tiktokapis.com/v2/post/publish/inbox/video/init/',
+    {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${auth.accessToken}`,
+        'content-type': 'application/json; charset=UTF-8',
+      },
+      body: JSON.stringify({
+        source_info: {
+          source: 'FILE_UPLOAD',
+          video_size: video.byteLength,
+          chunk_size: video.byteLength,
+          total_chunk_count: 1,
+        },
+      }),
+    },
+  );
+  const init = await initResponse.json<Record<string, any>>();
+  const uploadUrl = init?.data?.upload_url;
+  const publishId = init?.data?.publish_id;
+  if (!initResponse.ok || typeof uploadUrl !== 'string') {
+    return c.json({ error: 'tiktok_upload_init_failed', details: init?.error?.message }, 502);
+  }
+  const uploadResponse = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: {
+      'content-type': c.req.header('content-type') ?? 'video/mp4',
+      'content-length': String(video.byteLength),
+      'content-range': `bytes 0-${video.byteLength - 1}/${video.byteLength}`,
+    },
+    body: video,
+  });
+  if (!uploadResponse.ok) return c.json({ error: 'tiktok_video_transfer_failed' }, 502);
+  return c.json({ ok: true, publishId, destination: 'TikTok inbox draft' });
+});
 
 const MusicJobMode = z.enum(['dry_run', 'build_only', 'publish']);
 const MAX_MUSIC_UPLOAD_BYTES = 200 * 1024 * 1024;
