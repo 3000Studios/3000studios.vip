@@ -23,6 +23,11 @@ body {
   animation: siteArrive 0.55s var(--ease-premium) both;
 }
 
+.vipHeader,
+.vipHeader.vipHeader--epic {
+  border-bottom: 0 !important;
+}
+
 @keyframes siteArrive {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
