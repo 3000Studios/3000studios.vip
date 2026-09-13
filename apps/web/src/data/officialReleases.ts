@@ -13,7 +13,7 @@ export interface OfficialReleaseVideo {
  * 3000 Studios Official Artist Channel. Keep this list evidence-based: a title
  * must exist in DistroKid and its video must live on the official channel.
  */
-export const officialReleaseVideos: OfficialReleaseVideo[] = [
+const curatedReleaseVideos: OfficialReleaseVideo[] = [
   { title: 'Not Giving Up Tonight', videoId: 'tIY1WU9N_RU', release: 'Single', duration: '3:49' },
   { title: 'Always Feel Like', videoId: 'GRokxtfSu9s', release: 'Single', duration: '3:26' },
   { title: 'After Midnight Blues', videoId: 'Yhp1tp90Idk', release: '3000 Studios Originals', duration: '3:14' },
@@ -31,9 +31,15 @@ export const officialReleaseVideos: OfficialReleaseVideo[] = [
   { title: '3000 Studios Podcast', videoId: 'n0HdKVuzNB4', release: '3000 Studios Originals', duration: '2:45' },
 ];
 
+const curatedByTitle = new Map(curatedReleaseVideos.map((video) => [video.title.toLowerCase(), video]));
+export const officialReleaseVideos: OfficialReleaseVideo[] = (generated as OfficialReleaseVideo[]).map(
+  (video) => curatedByTitle.get(video.title.toLowerCase()) ?? video,
+);
+
 export const youtubeEmbedUrl = (videoId: string) =>
   `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
 
 export const youtubeWatchUrl = (videoId: string) => `https://www.youtube.com/watch?v=${videoId}`;
 
 export const youtubeArtworkUrl = (videoId: string) => `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+import generated from './officialReleases.generated.json';

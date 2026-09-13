@@ -1,4 +1,5 @@
 import coverMap from './coverMap.json';
+import publishedGenerated from './publishedSongs.generated.json';
 
 export type SongPalette = {
   a: string;
@@ -80,7 +81,7 @@ export const distrokidSongs: CatalogSong[] = [
   enrich(1, 'not-giving-up-tonight', 'Not Giving Up Tonight', 'Official DistroKid release · YouTube featured video.', '/media/not-giving-up-tonight.mp3'),
 ];
 
-export const rolloutSongs: CatalogSong[] = [
+const vaultSongs: CatalogSong[] = [
   enrich(0, 'not-giving-up-tonight', 'Not Giving Up Tonight', 'DistroKid live · Official music video on YouTube @3000Studio.', '/media/not-giving-up-tonight.mp3'),
   enrich(1, 'lick-my-balls-jazz', 'Lick My Balls, and Die in a Fire — Jazz Edition', 'Feature song of the week · Jazz edition · 3000 Studios original.', '/media/lick-my-balls-jazz.mp3'),
   enrich(2, 'lick-my-balls-remix', 'Lick My Balls, and Die in a Fire — Remix', 'Feature song remix · Devil DJ cut · 3000 Studios original.', '/media/lick-my-balls-remix.mp3'),
@@ -123,6 +124,38 @@ export const rolloutSongs: CatalogSong[] = [
   enrich(39, 'waynes-world', 'Waynes World', '3000 Studios original from the VIP music vault.', '/media/waynes-world.mp3'),
   enrich(40, 'wi-fi-fridge', 'Wi-Fi Fridge', '3000 Studios original from the VIP music vault.', '/media/wi-fi-fridge.mp3'),
 ];
+
+const normalizedTitle = (value: string) =>
+  value.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+
+/** Public playback is restricted to titles verified live through DistroKid/Apple. */
+export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, index) => {
+  const existing = vaultSongs.find(
+    (song) => song.slug === release.slug || normalizedTitle(song.title) === normalizedTitle(release.title),
+  );
+  if (existing) {
+    return {
+      ...existing,
+      rank: index,
+      description: 'Verified DistroKid release · 3000 Studios',
+      src: release.preview || release.src || existing.src,
+      cover: release.cover || existing.cover,
+      youtubeId: release.youtubeId || existing.youtubeId,
+    };
+  }
+  return {
+    rank: index,
+    id: release.slug,
+    slug: release.slug,
+    title: release.title,
+    description: 'Verified DistroKid release · 3000 Studios',
+    src: release.preview || release.src,
+    cover: release.cover,
+    palette: { a: '#171c2b', b: '#d4af37', c: '#ffffff', gold: '#d4af37' },
+    wallpaper: 'spiral',
+    youtubeId: release.youtubeId,
+  };
+});
 
 export function getSongBySrc(src: string) {
   return rolloutSongs.find((s) => s.src === src);

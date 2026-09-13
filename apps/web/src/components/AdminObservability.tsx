@@ -42,7 +42,7 @@ export function AdminObservability() {
           </div>
           <div className="adminObsCard ok">
             <strong>Catalog</strong>
-            <p>{officialReleaseVideos.length} official videos · {rolloutSongs.length} audio tracks</p>
+            <p>{officialReleaseVideos.length} matched official videos · {rolloutSongs.length} verified DistroKid tracks</p>
           </div>
           <div className={`adminObsCard ${txtOk ? 'ok' : 'bad'}`}>
             <strong>ads.txt</strong>
