@@ -30,7 +30,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okio.BufferedSink
 import org.json.JSONObject
 
-private const val API = "https://api.3000studios.vip"
+private const val API = "https://apex-citadel-api.mr-jwswain.workers.dev"
 private val Gold = Color(0xFFF2C14E); private val Ink = Color(0xFF080A10); private val Card = Color(0xFF151A25)
 
 class MainActivity : ComponentActivity() {

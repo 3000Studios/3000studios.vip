@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import '../styles/song-drop.css';
 
-const API = import.meta.env.VITE_API_BASE?.toString() || 'https://api.3000studios.vip';
+const API = 'https://apex-citadel-api.mr-jwswain.workers.dev';
 type Mode = 'dry_run' | 'build_only' | 'publish';
 type Job = {
   id: string;
