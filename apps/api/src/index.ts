@@ -44,7 +44,15 @@ app.use(
   cors({
     origin: '*',
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['content-type', 'cf-access-jwt-assertion'],
+    allowHeaders: [
+      'content-type',
+      'cf-access-jwt-assertion',
+      'x-owner-email',
+      'x-music-device-token',
+      'x-file-name',
+      'x-pipeline-mode',
+      'x-publish-confirmation',
+    ],
     maxAge: 86400,
   }),
 );
@@ -83,6 +91,115 @@ const MAX_MUSIC_UPLOAD_BYTES = 200 * 1024 * 1024;
 function musicJobKey(id: string, file: string) {
   return `music-jobs/${id}/${file}`;
 }
+
+const MusicCatalogItem = z.object({
+  id: z.string().min(8).max(80),
+  title: z.string().min(1).max(240),
+  relativePath: z.string().min(1).max(500),
+  format: z.string().min(2).max(10),
+  bytes: z.number().int().nonnegative(),
+  modifiedAt: z.string().max(60),
+  duplicateCount: z.number().int().nonnegative().default(0),
+});
+const MusicCatalog = z.object({
+  generatedAt: z.string().max(60),
+  scannedFiles: z.number().int().nonnegative(),
+  totalBytes: z.number().int().nonnegative(),
+  songs: z.array(MusicCatalogItem).max(2000),
+});
+
+app.get('/music/catalog', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const object = await c.env.MUSIC_JOBS.get('music-catalog/catalog.json');
+  if (!object) return c.json({ catalog: null, songs: [] });
+  return new Response(object.body, {
+    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+  });
+});
+
+app.put('/music/catalog', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const parsed = MusicCatalog.safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: 'invalid_music_catalog' }, 400);
+  await c.env.MUSIC_JOBS.put('music-catalog/catalog.json', JSON.stringify(parsed.data), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+  return c.json({ ok: true, songs: parsed.data.songs.length });
+});
+
+app.post('/music/catalog/:id/queue', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const object = await c.env.MUSIC_JOBS.get('music-catalog/catalog.json');
+  if (!object) return c.json({ error: 'catalog_not_found' }, 404);
+  const catalog = MusicCatalog.parse(await object.json());
+  const song = catalog.songs.find((item) => item.id === c.req.param('id'));
+  if (!song) return c.json({ error: 'song_not_found' }, 404);
+  const input = z
+    .object({ mode: MusicJobMode.default('dry_run'), publishConfirmation: z.string().optional() })
+    .parse(await c.req.json().catch(() => ({})));
+  if (input.mode === 'publish' && input.publishConfirmation !== 'PUBLISH 3000 STUDIOS') {
+    return c.json({ error: 'publish_confirmation_required' }, 400);
+  }
+  const id = crypto.randomUUID();
+  const now = nowIso();
+  const status = {
+    id,
+    state: 'queued',
+    mode: input.mode,
+    originalName: song.title,
+    catalogPath: song.relativePath,
+    progress: 0,
+    stage: 'Queued from music library',
+    createdAt: now,
+    updatedAt: now,
+  };
+  await c.env.MUSIC_JOBS.put(musicJobKey(id, 'status.json'), JSON.stringify(status), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+  return c.json(status, 202);
+});
+
+const SiteEditSchema = z.object({
+  request: z.string().min(8).max(3000),
+  source: z.enum(['dashboard', 'dude']).default('dashboard'),
+});
+
+app.get('/music/site-edits', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const listed = await c.env.MUSIC_JOBS.list({ prefix: 'site-edits/' });
+  const edits = await Promise.all(
+    listed.objects.slice(-100).map(async (entry) => {
+      const item = await c.env.MUSIC_JOBS?.get(entry.key);
+      return item ? item.json() : null;
+    }),
+  );
+  return c.json({ edits: edits.filter(Boolean).reverse() });
+});
+
+app.post('/music/site-edits', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const body = SiteEditSchema.parse(await c.req.json());
+  const id = crypto.randomUUID();
+  const edit = { id, ...body, state: 'awaiting_approval', createdAt: nowIso(), updatedAt: nowIso() };
+  await c.env.MUSIC_JOBS.put(`site-edits/${id}.json`, JSON.stringify(edit), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+  return c.json(edit, 202);
+});
+
+app.put('/music/site-edits/:id', async (c) => {
+  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const key = `site-edits/${c.req.param('id')}.json`;
+  const object = await c.env.MUSIC_JOBS.get(key);
+  if (!object) return c.json({ error: 'edit_not_found' }, 404);
+  const current = (await object.json()) as Record<string, unknown>;
+  const body = z.object({ state: z.enum(['approved', 'rejected']) }).parse(await c.req.json());
+  const next = { ...current, state: body.state, updatedAt: nowIso() };
+  await c.env.MUSIC_JOBS.put(key, JSON.stringify(next), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+  return c.json(next);
+});
 
 app.post('/music/jobs', async (c) => {
   if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);

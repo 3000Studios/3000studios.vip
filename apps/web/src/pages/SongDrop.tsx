@@ -14,6 +14,20 @@ type Job = {
   updatedAt: string;
   error?: string;
 };
+type CatalogSong = {
+  id: string;
+  title: string;
+  relativePath: string;
+  format: string;
+  bytes: number;
+  duplicateCount: number;
+};
+type SiteEdit = {
+  id: string;
+  request: string;
+  state: string;
+  createdAt: string;
+};
 const platforms = [
   'DistroKid package',
   'Full music video',
@@ -29,14 +43,32 @@ export function SongDrop() {
     [mode, setMode] = useState<Mode>('dry_run'),
     [phrase, setPhrase] = useState(''),
     [jobs, setJobs] = useState<Job[]>([]),
+    [songs, setSongs] = useState<CatalogSong[]>([]),
+    [catalogStats, setCatalogStats] = useState({ scannedFiles: 0, totalBytes: 0 }),
+    [search, setSearch] = useState(''),
+    [editRequest, setEditRequest] = useState(''),
+    [edits, setEdits] = useState<SiteEdit[]>([]),
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState('');
   const input = useRef<HTMLInputElement>(null);
   const load = useCallback(async () => {
     try {
-      const r = await fetch(`${API}/music/jobs`, { credentials: 'include' });
-      if (!r.ok) throw Error(String(r.status));
-      setJobs(((await r.json()).jobs || []).reverse());
+      const [jobsResponse, catalogResponse, editsResponse] = await Promise.all([
+        fetch(`${API}/music/jobs`, { credentials: 'include' }),
+        fetch(`${API}/music/catalog`, { credentials: 'include' }),
+        fetch(`${API}/music/site-edits`, { credentials: 'include' }),
+      ]);
+      if (!jobsResponse.ok || !catalogResponse.ok || !editsResponse.ok) throw Error('owner_access_required');
+      const jobsData = await jobsResponse.json();
+      const catalogData = await catalogResponse.json();
+      const editsData = await editsResponse.json();
+      setJobs((jobsData.jobs || []).reverse());
+      setSongs(catalogData.songs || []);
+      setCatalogStats({
+        scannedFiles: catalogData.scannedFiles || 0,
+        totalBytes: catalogData.totalBytes || 0,
+      });
+      setEdits(editsData.edits || []);
     } catch {
       setNotice('Remote jobs require owner API access.');
     }
@@ -84,6 +116,60 @@ export function SongDrop() {
       setBusy(false);
     }
   }
+  async function queueCatalogSong(song: CatalogSong) {
+    if (mode === 'publish' && phrase !== 'PUBLISH 3000 STUDIOS') {
+      setNotice('Type the exact publish confirmation first.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch(`${API}/music/catalog/${song.id}/queue`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ mode, publishConfirmation: phrase }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'Queue failed');
+      setNotice(`${song.title} queued as a ${mode.replace('_', ' ')} job.`);
+      await load();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Queue failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function submitEdit() {
+    if (editRequest.trim().length < 8) {
+      setNotice('Describe the site update you want DUDE to prepare.');
+      return;
+    }
+    const response = await fetch(`${API}/music/site-edits`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ request: editRequest.trim(), source: 'dashboard' }),
+    });
+    if (!response.ok) {
+      setNotice('The edit request could not be queued.');
+      return;
+    }
+    setEditRequest('');
+    setNotice('DUDE edit request created. Approve it below when the scope is correct.');
+    await load();
+  }
+  async function decideEdit(id: string, state: 'approved' | 'rejected') {
+    await fetch(`${API}/music/site-edits/${id}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ state }),
+    });
+    await load();
+  }
+  const visibleSongs = songs
+    .filter((song) => song.title.toLowerCase().includes(search.trim().toLowerCase()))
+    .slice(0, 100);
   const active = jobs.find((j) => !['complete', 'failed'].includes(j.state));
   return (
     <div className="sdStack">
@@ -208,6 +294,69 @@ export function SongDrop() {
                 <b>{p}</b>
                 <i className={active && active.progress > (i + 1) * 12 ? 'done' : ''} />
               </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="cPanel">
+        <div className="cPanelHead sdLibraryHead">
+          <div>
+            <h2>Complete music library</h2>
+            <span className="cSub">
+              {songs.length} canonical masters · {catalogStats.scannedFiles} files indexed ·{' '}
+              {(catalogStats.totalBytes / 1073741824).toFixed(1)} GB local
+            </span>
+          </div>
+          <input
+            className="sdSearch"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search songs"
+            aria-label="Search music library"
+          />
+        </div>
+        <div className="cPanelBody sdLibrary">
+          {visibleSongs.map((song) => (
+            <article key={song.id}>
+              <div>
+                <b>{song.title}</b>
+                <small>
+                  {song.format.toUpperCase()} · {(song.bytes / 1048576).toFixed(1)} MB
+                  {song.duplicateCount ? ` · ${song.duplicateCount} duplicate copies skipped` : ''}
+                </small>
+              </div>
+              <button className="cBtn sm" disabled={busy} onClick={() => void queueCatalogSong(song)}>
+                Queue {mode === 'dry_run' ? 'dry run' : mode === 'build_only' ? 'build' : 'publish'}
+              </button>
+            </article>
+          ))}
+          {!songs.length && <div className="sdEmpty"><b>Catalog sync pending</b><small>The workstation will index your Songs folder.</small></div>}
+          {songs.length > 100 && <p className="sdNotice">Showing the first 100 matches. Search to find any song.</p>}
+        </div>
+      </section>
+      <section className="cPanel sdEditDesk">
+        <div className="cPanelHead">
+          <div>
+            <h2>DUDE site edit desk</h2>
+            <span className="cSub">Describe an update, review the ticket, then approve trusted execution</span>
+          </div>
+        </div>
+        <div className="cPanelBody">
+          <textarea
+            value={editRequest}
+            onChange={(event) => setEditRequest(event.target.value)}
+            placeholder="Example: Add a featured release card for The Peepers to the home page."
+          />
+          <button className="cBtn primary" onClick={() => void submitEdit()}>Create edit request</button>
+          <div className="sdEdits">
+            {edits.slice(0, 8).map((edit) => (
+              <article key={edit.id}>
+                <div><b>{edit.request}</b><small>{edit.state.replace('_', ' ')}</small></div>
+                {edit.state === 'awaiting_approval' && <div>
+                  <button className="cBtn sm" onClick={() => void decideEdit(edit.id, 'approved')}>Approve</button>
+                  <button className="cBtn sm ghost" onClick={() => void decideEdit(edit.id, 'rejected')}>Reject</button>
+                </div>}
+              </article>
             ))}
           </div>
         </div>

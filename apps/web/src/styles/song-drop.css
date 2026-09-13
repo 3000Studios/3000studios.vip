@@ -202,6 +202,62 @@
   display: grid;
   gap: 12px;
 }
+.sdLibraryHead {
+  gap: 18px;
+}
+.sdSearch {
+  width: min(300px, 100%);
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: #0b111c;
+  color: #fff;
+}
+.sdLibrary {
+  display: grid;
+  max-height: 620px;
+  gap: 8px;
+  overflow: auto;
+}
+.sdLibrary article,
+.sdEdits article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: #0b111c;
+}
+.sdLibrary small,
+.sdEdits small {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-muted);
+}
+.sdEditDesk textarea {
+  width: 100%;
+  min-height: 110px;
+  margin-bottom: 12px;
+  padding: 14px;
+  resize: vertical;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: #0b111c;
+  color: #fff;
+  font: inherit;
+}
+.sdEdits {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.sdEdits article > div:last-child {
+  display: flex;
+  gap: 8px;
+}
 .sdJob {
   padding: 17px;
   border: 1px solid var(--c-line);
@@ -288,6 +344,12 @@
   }
   .sdModes {
     grid-template-columns: 1fr;
+  }
+  .sdLibraryHead,
+  .sdLibrary article,
+  .sdEdits article {
+    align-items: stretch;
+    flex-direction: column;
   }
   .sdJob footer {
     flex-wrap: wrap;
