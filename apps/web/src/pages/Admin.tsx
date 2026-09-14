@@ -7,6 +7,7 @@ import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { AdminObservability } from '../components/AdminObservability';
 import { MarketingAdvisor } from '../components/MarketingAdvisor';
+import { AdminActivityLog } from '../components/AdminActivityLog';
 import { PublicLayout } from './Home';
 import '../styles/discover.css';
 
@@ -110,6 +111,10 @@ export function Admin() {
   }
 
   function handleLock() {
+    if (broadcasting) {
+      setStudioError('End the live stream before locking the console so the camera and microphone are not stopped accidentally.');
+      return;
+    }
     sessionStorage.removeItem(AUTH_KEY);
     setAuthed(false);
     setBroadcasting(false);
@@ -225,7 +230,8 @@ export function Admin() {
                   Broadcast: {isLive || broadcasting ? 'ON AIR' : 'offline'}
                 </div>
               </section>
-              <section className="cPanel">
+              <AdminActivityLog />
+              <section className="cPanel adminPublicPreviewPanel">
                 <div className="cPanelHead">
                   <h2>Quick actions</h2>
                   <span className="cSub">Copy, preview, phone go-live</span>
@@ -343,7 +349,12 @@ export function Admin() {
                   <span className="cSub">What viewers see on /live</span>
                 </div>
                 <div className="cPanelBody">
-                  <iframe className="adminPreviewFrame" title="Public live preview" src="/live" />
+                  <iframe
+                    className="adminPreviewFrame"
+                    title="Public live preview"
+                    src="/live"
+                    allow="autoplay; fullscreen"
+                  />
                 </div>
               </section>
               <section className="cPanel">

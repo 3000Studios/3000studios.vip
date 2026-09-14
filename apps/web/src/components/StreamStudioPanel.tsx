@@ -28,10 +28,18 @@ const ROTATIONS: { value: CameraRotation; label: string }[] = [
   { value: 270, label: '270°' },
 ];
 
+const OVERLAY_SCENES: { label: string; overlays: OverlayId[] }[] = [
+  { label: 'VIP premiere', overlays: ['liveBadge', 'watermark', 'lowerThird', 'goldVIP', 'spotlightStudio'] },
+  { label: 'Neon energy', overlays: ['liveBadge', 'watermark', 'ticker', 'cyberNeon', 'electroPulse'] },
+  { label: 'Holographic', overlays: ['liveBadge', 'watermark', 'vipCorner', 'holographic', 'pulseRing'] },
+  { label: 'Clean studio', overlays: ['liveBadge', 'watermark', 'lowerThird'] },
+];
+
 export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChange, onError }: Props) {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const studioRef = useRef<StreamStudio | null>(null);
   const publisherRef = useRef<WhipPublisher | null>(null);
+  const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null);
 
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [cameraId, setCameraId] = useState('');
@@ -55,6 +63,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const [error, setError] = useState<string | null>(null);
   const [hasCanvas, setHasCanvas] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(false);
+  const [backgroundGuard, setBackgroundGuard] = useState<'idle' | 'active' | 'limited'>('idle');
 
   const canRequestMedia =
     typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia);
@@ -222,6 +231,58 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     return () => window.clearInterval(id);
   }, [status]);
 
+  useEffect(() => {
+    if (status !== 'live') {
+      void wakeLockRef.current?.release().catch(() => undefined);
+      wakeLockRef.current = null;
+      return undefined;
+    }
+
+    const requestWakeLock = async () => {
+      const wakeLock = (navigator as Navigator & {
+        wakeLock?: { request: (type: 'screen') => Promise<{ release: () => Promise<void> }> };
+      }).wakeLock;
+      if (!wakeLock) {
+        setBackgroundGuard('limited');
+        return;
+      }
+      try {
+        wakeLockRef.current = await wakeLock.request('screen');
+        setBackgroundGuard('active');
+      } catch {
+        setBackgroundGuard('limited');
+      }
+    };
+
+    const protectNavigation = (event: MouseEvent) => {
+      const anchor = (event.target as Element | null)?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!anchor || anchor.target === '_blank' || anchor.origin !== location.origin) return;
+      event.preventDefault();
+      const message = 'End the live stream before leaving this page. Open viewer pages in a new tab.';
+      setError(message);
+      onError?.(message);
+    };
+    const protectClose = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    const restoreWakeLock = () => {
+      if (document.visibilityState === 'visible' && !wakeLockRef.current) void requestWakeLock();
+    };
+
+    void requestWakeLock();
+    document.addEventListener('click', protectNavigation, true);
+    document.addEventListener('visibilitychange', restoreWakeLock);
+    window.addEventListener('beforeunload', protectClose);
+    return () => {
+      document.removeEventListener('click', protectNavigation, true);
+      document.removeEventListener('visibilitychange', restoreWakeLock);
+      window.removeEventListener('beforeunload', protectClose);
+      void wakeLockRef.current?.release().catch(() => undefined);
+      wakeLockRef.current = null;
+    };
+  }, [status, onError]);
+
   function toggleOverlay(id: OverlayId) {
     setOverlays((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
@@ -355,6 +416,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     await publisherRef.current?.stop();
     publisherRef.current = null;
     setStatus('preview');
+    setBackgroundGuard('idle');
     onLiveChange?.(false);
     void publishServerLiveFlag(false);
     window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: false } }));
@@ -406,6 +468,16 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
             {hasCanvas ? 'Refresh preview' : 'Retry access'}
           </button>
         </div>
+        {status === 'live' ? (
+          <div className={`studioBackgroundGuard ${backgroundGuard}`} role="status">
+            <strong>{backgroundGuard === 'active' ? 'Background guard active' : 'Keep this tab visible'}</strong>
+            <span>
+              {backgroundGuard === 'active'
+                ? 'Screen wake lock helps prevent sleep while this tab is active. Chrome and Android still control background camera access.'
+                : 'This browser or device may suspend camera video in the background. Keep Chrome open and power connected.'}
+            </span>
+          </div>
+        ) : null}
       </div>
 
       <div className="studioControls prodStudioDock">
@@ -588,6 +660,14 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
 
         <details className="studioAccord">
           <summary>Animated frames &amp; overlays</summary>
+          <span className="studioBlockLabel">One-tap scenes</span>
+          <div className="studioChipRow">
+            {OVERLAY_SCENES.map((scene) => (
+              <button key={scene.label} type="button" className="studioChip scene" onClick={() => setOverlays(scene.overlays)}>
+                {scene.label}
+              </button>
+            ))}
+          </div>
           <span className="studioBlockLabel">Graphics</span>
           <div className="studioChipRow">
             {infoOverlays.map((o) => (

@@ -13,7 +13,7 @@ type AdSenseReport = {
 };
 
 export function AdminObservability() {
-  const [ads] = useState<AdSenseReport | null>(null);
+  const [ads, setAds] = useState<AdSenseReport | null>(null);
   const [live, setLive] = useState(() => readHostLiveFlag());
   const [adsTxt, setAdsTxt] = useState('');
   const ent = readEntitlement();
@@ -21,6 +21,10 @@ export function AdminObservability() {
 
   useEffect(() => {
     void fetch('/ads.txt').then((r) => r.text()).then(setAdsTxt).catch(() => setAdsTxt('missing'));
+    void fetch('/api/adsense-status')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`Status ${r.status}`))))
+      .then((report: AdSenseReport) => setAds(report))
+      .catch(() => setAds(null));
     const timer = window.setInterval(() => setLive(readHostLiveFlag()), 1000);
     return () => window.clearInterval(timer);
   }, []);

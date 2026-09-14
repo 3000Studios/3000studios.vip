@@ -63,7 +63,11 @@ function needsEmailGate(command: string) {
 
 export function AgentCommandCenter() {
   const [mode, setMode] = useState<AgentMode>('work');
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(() => {
+    const saved = localStorage.getItem('3000-agent-prefill') || '';
+    localStorage.removeItem('3000-agent-prefill');
+    return saved;
+  });
   const [messages, setMessages] = useState<DudeChatMessage[]>(initialMessages);
   const [busy, setBusy] = useState(false);
   const [listening, setListening] = useState(false);
