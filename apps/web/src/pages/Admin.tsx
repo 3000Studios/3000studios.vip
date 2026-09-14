@@ -1,14 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  WHIP_URL_STORAGE_KEY,
-  validateWhipUrl,
-} from '../lib/webrtcStream';
+import { WHIP_URL_STORAGE_KEY, validateWhipUrl } from '../lib/webrtcStream';
 import { StreamStudioPanel } from '../components/StreamStudioPanel';
-import {
-  STREAM_CUSTOMER_CODE,
-  STREAM_LIVE_INPUT_ID,
-} from '../lib/streamConfig';
+import { STREAM_CUSTOMER_CODE, STREAM_LIVE_INPUT_ID } from '../lib/streamConfig';
 import { readHostLiveFlag, setHostLiveFlag } from '../lib/streamScene';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { AdminObservability } from '../components/AdminObservability';
@@ -162,154 +156,268 @@ export function Admin() {
   if (!authed) {
     return (
       <PublicLayout variant="blackhole">
-      <div className="adminScrim adminEasyShell adminWithNav">
-        <form className="adminCodeModal" onSubmit={handleUnlock}>
-          <span>3000 Studios · Owner Access</span>
-          <h2>Go Live Console</h2>
-          <p>Unlock, access camera, pick a look, hit Go Live. Viewers watch /live.</p>
-          <label>
-            <span>Passcode</span>
-            <input
-              type="password"
-              inputMode="numeric"
-              autoComplete="current-password"
-              autoFocus
-              value={passcode}
-              onChange={(e) => {
-                setPasscode(e.target.value);
-                setError(null);
-              }}
-              placeholder="Enter passcode"
-              maxLength={12}
-            />
-          </label>
-          {error ? <div className="adminError">{error}</div> : null}
-          <button type="submit" className="cBtn primary" style={{ width: '100%' }}>Unlock</button>
-          <Link to="/" className="adminBackLink">← Back to public site</Link>
-        </form>
-      </div>
+        <div className="adminScrim adminEasyShell adminWithNav">
+          <form className="adminCodeModal" onSubmit={handleUnlock}>
+            <span>3000 Studios · Owner Access</span>
+            <h2>Go Live Console</h2>
+            <p>Unlock, access camera, pick a look, hit Go Live. Viewers watch /live.</p>
+            <label>
+              <span>Passcode</span>
+              <input
+                type="password"
+                inputMode="numeric"
+                autoComplete="current-password"
+                autoFocus
+                value={passcode}
+                onChange={(e) => {
+                  setPasscode(e.target.value);
+                  setError(null);
+                }}
+                placeholder="Enter passcode"
+                maxLength={12}
+              />
+            </label>
+            {error ? <div className="adminError">{error}</div> : null}
+            <button type="submit" className="cBtn primary" style={{ width: '100%' }}>
+              Unlock
+            </button>
+            <Link to="/" className="adminBackLink">
+              ← Back to public site
+            </Link>
+          </form>
+        </div>
       </PublicLayout>
     );
   }
 
   return (
     <PublicLayout variant="blackhole">
-    <div className="console adminEasyShell adminWithNav" style={{ gridTemplateColumns: '1fr' }}>
-      <div className="cMain">
-        <header className="cTopbar">
-          <div className="cTitle">
-            <h1>Go Live</h1>
-            <span className="cTitleSub">Camera · filter · overlay · Go Live</span>
-          </div>
-          <div className="cTopbarRight">
-            <span className={`cPill ${broadcasting || isLive ? 'live' : 'warn'}`}>
-              <span className="cDot" />
-              {broadcasting || isLive ? 'LIVE' : 'OFFLINE'}
-            </span>
-            <Link to="/live" className="cBtn sm ghost" target="_blank" rel="noreferrer">Public /live</Link>
-            <button className="cBtn sm" type="button" onClick={handleLock}>Lock</button>
-          </div>
-        </header>
-        <main className="cScroll">
-          <div className="cStack">
-            <section className="easyStatusStrip">
-              <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>{deviceBadge}</div>
-              <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>{whipReady ? 'Stream ready' : 'Stream path missing'}</div>
-              <div className={`easyChip ${isLive || broadcasting ? 'ok' : 'info'}`}>
-                Broadcast: {isLive || broadcasting ? 'ON AIR' : 'offline'}
-              </div>
-            </section>
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>Quick actions</h2>
-                <span className="cSub">Copy, preview, phone go-live</span>
-              </div>
-              <div className="cPanelBody adminQuickGrid">
-                <button type="button" className="cBtn sm" onClick={() => copyText('live', PUBLIC_LIVE_URL)}>
-                  {copied === 'live' ? 'Copied /live' : 'Copy /live URL'}
-                </button>
-                <button type="button" className="cBtn sm ghost" onClick={() => copyText('inquiry', 'Team@3000studios.vip')}>
-                  {copied === 'inquiry' ? 'Copied email' : 'Copy inquiry email'}
-                </button>
-                <Link className="cBtn sm ghost" to="/go-live">Phone Go Live</Link>
-                <Link className="cBtn sm ghost" to="/music">Music deck</Link>
-                <Link className="cBtn sm ghost" to="/video">Videos</Link>
-                <a className="cBtn sm ghost" href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">Open public player</a>
-              </div>
-            </section>
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>Run of show</h2>
-                <span className="cSub">Local notes for this browser</span>
-              </div>
-              <div className="cPanelBody">
-                <textarea
-                  className="adminNoteBox"
-                  value={notes}
-                  onChange={(e) => {
-                    setNotes(e.target.value);
-                    localStorage.setItem(NOTES_KEY, e.target.value);
-                  }}
-                  placeholder="Set list, overlays, sponsor reads, camera notes…"
-                />
-                <p className="cMuted" style={{ marginTop: 10 }}>
-                  Last session marks:{' '}
-                  {sessions.length === 0
-                    ? 'none yet'
-                    : sessions.slice(0, 4).map((s) => `${s.live ? 'LIVE' : 'OFF'} ${new Date(s.ts).toLocaleTimeString()}`).join(' · ')}
-                </p>
-              </div>
-            </section>
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>Public preview</h2>
-                <span className="cSub">What viewers see on /live</span>
-              </div>
-              <div className="cPanelBody">
-                <iframe className="adminPreviewFrame" title="Public live preview" src="/live" />
-              </div>
-            </section>
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>Studio</h2>
-                <span className="cSub">Access camera → set the look → Go Live</span>
-              </div>
-              <div className="cPanelBody">
-                <StreamStudioPanel whipUrl={whipUrl} whipReady={whipReady} liveInputId={liveInputId} onLiveChange={onStudioLive} onError={setStudioError} />
-                {studioError ? <p className="adminError">{studioError}</p> : null}
-                <p className="adminStandbyNote" style={{ marginTop: 10 }}>
-                  {broadcasting ? 'You are live on /live.' : 'Viewers stay on standby until you hit Go Live.'}{' '}
-                  <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">Open /live</a>
-                </p>
-              </div>
-            </section>
-            <MarketingAdvisor />
-            <AdminObservability />
-            <section className="cPanel">
-              <div className="cPanelHead">
-                <h2>Advanced</h2>
-                <span className="cSub">OBS / keys stay hidden. Phone Go Live does not need this.</span>
-              </div>
-              <div className="cPanelBody">
-                <button type="button" className="cBtn ghost" onClick={() => setShowAdvanced((v) => !v)}>
-                  {showAdvanced ? 'Hide backend keys' : 'Show backend keys'}
-                </button>
-                {showAdvanced ? (
-                  <div className="easyGuide" style={{ marginTop: 16 }}>
-                    <p className="cMuted">Paste the WebRTC publish URL from Cloudflare Live Inputs once on this owner device. It remains in this browser only and is never bundled into the public site.</p>
-                    <label className="easyField">
-                      <span>WHIP publish URL</span>
-                      <input type="url" value={whipUrl} onChange={(e) => { setWhipUrl(e.target.value); localStorage.setItem(WHIP_URL_STORAGE_KEY, e.target.value.trim()); }} spellCheck={false} autoComplete="off" />
-                    </label>
-                    <p className="cMuted" style={{ marginTop: 12 }}>Customer: {customerCode}</p>
+      <div className="console adminEasyShell adminWithNav" style={{ gridTemplateColumns: '1fr' }}>
+        <div className="cMain">
+          <header className="cTopbar">
+            <div className="cTitle">
+              <h1>Go Live</h1>
+              <span className="cTitleSub">Camera · filter · overlay · Go Live</span>
+            </div>
+            <div className="cTopbarRight">
+              <span className={`cPill ${broadcasting || isLive ? 'live' : 'warn'}`}>
+                <span className="cDot" />
+                {broadcasting || isLive ? 'LIVE' : 'OFFLINE'}
+              </span>
+              <Link to="/live" className="cBtn sm ghost" target="_blank" rel="noreferrer">
+                Public /live
+              </Link>
+              <button className="cBtn sm" type="button" onClick={handleLock}>
+                Lock
+              </button>
+            </div>
+          </header>
+          <main className="cScroll">
+            <div className="cStack">
+              <section className="easyStatusStrip">
+                <div className={`easyChip ${device === 'phone' ? 'ok' : 'info'}`}>
+                  {deviceBadge}
+                </div>
+                <div className={`easyChip ${whipReady ? 'ok' : 'warn'}`}>
+                  {whipReady ? 'Stream ready' : 'Stream path missing'}
+                </div>
+                <div className={`easyChip ${isLive || broadcasting ? 'ok' : 'info'}`}>
+                  Broadcast: {isLive || broadcasting ? 'ON AIR' : 'offline'}
+                </div>
+              </section>
+              <section className="cPanel">
+                <div className="cPanelHead">
+                  <h2>Quick actions</h2>
+                  <span className="cSub">Copy, preview, phone go-live</span>
+                </div>
+                <div className="cPanelBody adminQuickGrid">
+                  <button
+                    type="button"
+                    className="cBtn sm"
+                    onClick={() => copyText('live', PUBLIC_LIVE_URL)}
+                  >
+                    {copied === 'live' ? 'Copied /live' : 'Copy /live URL'}
+                  </button>
+                  <button
+                    type="button"
+                    className="cBtn sm ghost"
+                    onClick={() => copyText('inquiry', 'Team@3000studios.vip')}
+                  >
+                    {copied === 'inquiry' ? 'Copied email' : 'Copy inquiry email'}
+                  </button>
+                  <Link className="cBtn sm ghost" to="/go-live">
+                    Phone Go Live
+                  </Link>
+                  <Link className="cBtn sm ghost" to="/music">
+                    Music deck
+                  </Link>
+                  <Link className="cBtn sm ghost" to="/video">
+                    Videos
+                  </Link>
+                  <a className="cBtn sm tiktokAdminButton" href="/tiktok/">
+                    TikTok App
+                  </a>
+                  <a
+                    className="cBtn sm ghost"
+                    href={PUBLIC_LIVE_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open public player
+                  </a>
+                </div>
+              </section>
+              <section className="cPanel tiktokAdminPanel">
+                <div className="cPanelHead">
+                  <div>
+                    <span className="adminEyebrow">SOCIAL DISTRIBUTION</span>
+                    <h2>TikTok App</h2>
                   </div>
-                ) : null}
-              </div>
-            </section>
-          </div>
-        </main>
+                  <span className="cPill warn">
+                    <span className="cDot" /> App review pending
+                  </span>
+                </div>
+                <div className="cPanelBody tiktokAdminGrid">
+                  <div className="tiktokStatusOrb" aria-hidden="true">
+                    <span>♪</span>
+                  </div>
+                  <div>
+                    <h3>Login Kit + Content Posting API</h3>
+                    <p className="cMuted">
+                      Connect the authorized 3000 Studios account, preview a rights-controlled MP4,
+                      confirm ownership, and deliver it securely to the TikTok inbox as a draft.
+                    </p>
+                    <div className="tiktokFeatureRow">
+                      <span>Login Kit configured</span>
+                      <span>Draft upload tested</span>
+                      <span>Direct Post awaiting approval</span>
+                    </div>
+                    <div className="easyBtnRow">
+                      <a className="cBtn primary" href="/tiktok/">
+                        Open TikTok App
+                      </a>
+                      <a
+                        className="cBtn ghost"
+                        href="https://developers.tiktok.com/app/7684333757280700436/pending"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Review status
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section className="cPanel">
+                <div className="cPanelHead">
+                  <h2>Run of show</h2>
+                  <span className="cSub">Local notes for this browser</span>
+                </div>
+                <div className="cPanelBody">
+                  <textarea
+                    className="adminNoteBox"
+                    value={notes}
+                    onChange={(e) => {
+                      setNotes(e.target.value);
+                      localStorage.setItem(NOTES_KEY, e.target.value);
+                    }}
+                    placeholder="Set list, overlays, sponsor reads, camera notes…"
+                  />
+                  <p className="cMuted" style={{ marginTop: 10 }}>
+                    Last session marks:{' '}
+                    {sessions.length === 0
+                      ? 'none yet'
+                      : sessions
+                          .slice(0, 4)
+                          .map(
+                            (s) =>
+                              `${s.live ? 'LIVE' : 'OFF'} ${new Date(s.ts).toLocaleTimeString()}`,
+                          )
+                          .join(' · ')}
+                  </p>
+                </div>
+              </section>
+              <section className="cPanel">
+                <div className="cPanelHead">
+                  <h2>Public preview</h2>
+                  <span className="cSub">What viewers see on /live</span>
+                </div>
+                <div className="cPanelBody">
+                  <iframe className="adminPreviewFrame" title="Public live preview" src="/live" />
+                </div>
+              </section>
+              <section className="cPanel">
+                <div className="cPanelHead">
+                  <h2>Studio</h2>
+                  <span className="cSub">Access camera → set the look → Go Live</span>
+                </div>
+                <div className="cPanelBody">
+                  <StreamStudioPanel
+                    whipUrl={whipUrl}
+                    whipReady={whipReady}
+                    liveInputId={liveInputId}
+                    onLiveChange={onStudioLive}
+                    onError={setStudioError}
+                  />
+                  {studioError ? <p className="adminError">{studioError}</p> : null}
+                  <p className="adminStandbyNote" style={{ marginTop: 10 }}>
+                    {broadcasting
+                      ? 'You are live on /live.'
+                      : 'Viewers stay on standby until you hit Go Live.'}{' '}
+                    <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
+                      Open /live
+                    </a>
+                  </p>
+                </div>
+              </section>
+              <MarketingAdvisor />
+              <AdminObservability />
+              <section className="cPanel">
+                <div className="cPanelHead">
+                  <h2>Advanced</h2>
+                  <span className="cSub">
+                    OBS / keys stay hidden. Phone Go Live does not need this.
+                  </span>
+                </div>
+                <div className="cPanelBody">
+                  <button
+                    type="button"
+                    className="cBtn ghost"
+                    onClick={() => setShowAdvanced((v) => !v)}
+                  >
+                    {showAdvanced ? 'Hide backend keys' : 'Show backend keys'}
+                  </button>
+                  {showAdvanced ? (
+                    <div className="easyGuide" style={{ marginTop: 16 }}>
+                      <p className="cMuted">
+                        Paste the WebRTC publish URL from Cloudflare Live Inputs once on this owner
+                        device. It remains in this browser only and is never bundled into the public
+                        site.
+                      </p>
+                      <label className="easyField">
+                        <span>WHIP publish URL</span>
+                        <input
+                          type="url"
+                          value={whipUrl}
+                          onChange={(e) => {
+                            setWhipUrl(e.target.value);
+                            localStorage.setItem(WHIP_URL_STORAGE_KEY, e.target.value.trim());
+                          }}
+                          spellCheck={false}
+                          autoComplete="off"
+                        />
+                      </label>
+                      <p className="cMuted" style={{ marginTop: 12 }}>
+                        Customer: {customerCode}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              </section>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
     </PublicLayout>
   );
 }

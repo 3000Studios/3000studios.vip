@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import { Link } from 'react-router-dom';
 import { useGlobalMusic } from './GlobalMusic';
 import { publishedSongs, publishedToCatalog } from '../data/publishedSongs';
@@ -36,7 +42,9 @@ export function SwipeHome() {
       const cat = publishedToCatalog(s);
       const src = s.preview || cat.src;
       if (play && (music.isPlaying || localStorage.getItem('3000-music-on') !== '0')) {
-        window.dispatchEvent(new CustomEvent('3000-play-track', { detail: { src, title: s.title, slug: s.slug } }));
+        window.dispatchEvent(
+          new CustomEvent('3000-play-track', { detail: { src, title: s.title, slug: s.slug } }),
+        );
       }
     },
     [n, music.isPlaying],
@@ -90,12 +98,22 @@ export function SwipeHome() {
             }}
           >
             {publishedSongs.map((s, i) => {
-              const cover = s.cover || (s.youtubeId ? youtubeArtworkUrl(s.youtubeId) : '/media/official-3000-studios-profile.png');
+              const cover =
+                s.cover ||
+                (s.youtubeId
+                  ? youtubeArtworkUrl(s.youtubeId)
+                  : '/media/official-3000-studios-profile.png');
               const active = i === index;
               return (
-                <div key={s.slug} className={`slick-slide item image${active ? ' slick-active' : ''}`}>
+                <div
+                  key={`${s.slug}-${i}`}
+                  className={`slick-slide item image${active ? ' slick-active' : ''}`}
+                >
                   <figure>
-                    <div className={`slide-image slide-media show`} style={{ backgroundImage: `url('${cover}')` }} />
+                    <div
+                      className={`slide-image slide-media show`}
+                      style={{ backgroundImage: `url('${cover}')` }}
+                    />
                     <figcaption className={`caption cap-${i % 4}`}>{s.title}</figcaption>
                     {active ? <SlideViz /> : null}
                     {active ? (
@@ -114,16 +132,26 @@ export function SwipeHome() {
               );
             })}
           </div>
-          <button type="button" className="slickArrow prev" aria-label="Previous song" onClick={() => go(index - 1)}>
+          <button
+            type="button"
+            className="slickArrow prev"
+            aria-label="Previous song"
+            onClick={() => go(index - 1)}
+          >
             ‹
           </button>
-          <button type="button" className="slickArrow next" aria-label="Next song" onClick={() => go(index + 1)}>
+          <button
+            type="button"
+            className="slickArrow next"
+            aria-label="Next song"
+            onClick={() => go(index + 1)}
+          >
             ›
           </button>
         </section>
         <ul className="slick-dots" aria-label="Songs">
           {publishedSongs.map((s, i) => (
-            <li key={s.slug} className={i === index ? 'slick-active' : undefined}>
+            <li key={`${s.slug}-${i}`} className={i === index ? 'slick-active' : undefined}>
               <button type="button" aria-label={s.title} onClick={() => go(i)} />
             </li>
           ))}
@@ -133,7 +161,8 @@ export function SwipeHome() {
             <p>
               {song ? (
                 <>
-                  <strong>{song.title}</strong> — swipe or use the arrows. Audio plays on each slide unless Music is off in the nav.
+                  <strong>{song.title}</strong> — swipe or use the arrows. Audio plays on each slide
+                  unless Music is off in the nav.
                   {n} DistroKid-live tracks.
                 </>
               ) : null}

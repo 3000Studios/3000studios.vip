@@ -67,7 +67,14 @@ app.use('*', async (c, next) => {
       deviceToken.length >= 32 &&
       deviceToken === env.MUSIC_DEVICE_TOKEN;
     const publicTikTokFlow = c.req.path.startsWith('/tiktok/');
-    if (musicDeviceAllowed || publicTikTokFlow) {
+    if (publicTikTokFlow) {
+      if (c.req.header('origin') !== 'https://3000studios.vip') {
+        return c.json({ error: 'origin_not_allowed' }, 403);
+      }
+      await next();
+      return;
+    }
+    if (musicDeviceAllowed) {
       await next();
       return;
     }
@@ -92,6 +99,9 @@ const TikTokExchangeSchema = z.object({
 });
 
 app.post('/tiktok/oauth/exchange', async (c) => {
+  if (c.req.header('origin') !== 'https://3000studios.vip') {
+    return c.json({ error: 'origin_not_allowed' }, 403);
+  }
   if (!c.env.MUSIC_JOBS || !c.env.TIKTOK_CLIENT_KEY || !c.env.TIKTOK_CLIENT_SECRET) {
     return c.json({ error: 'tiktok_not_configured' }, 503);
   }
@@ -118,13 +128,19 @@ app.post('/tiktok/oauth/exchange', async (c) => {
       accessToken: token.access_token,
       openId: token.open_id,
       expiresAt: Date.now() + Number(token.expires_in ?? 3600) * 1000,
+      usedAt: null,
     }),
     { httpMetadata: { contentType: 'application/json' } },
   );
+  c.header('cache-control', 'no-store');
+  c.header('referrer-policy', 'no-referrer');
   return c.json({ ok: true, session });
 });
 
 app.post('/tiktok/upload-draft', async (c) => {
+  if (c.req.header('origin') !== 'https://3000studios.vip') {
+    return c.json({ error: 'origin_not_allowed' }, 403);
+  }
   if (!c.env.MUSIC_JOBS) return c.json({ error: 'tiktok_not_configured' }, 503);
   const session = c.req.header('x-tiktok-session') ?? '';
   if (!/^[0-9a-f-]{36}$/i.test(session)) return c.json({ error: 'invalid_session' }, 401);
@@ -137,6 +153,13 @@ app.post('/tiktok/upload-draft', async (c) => {
   const video = await c.req.arrayBuffer();
   if (!video.byteLength || video.byteLength > 50 * 1024 * 1024) {
     return c.json({ error: 'video_size_must_be_1_to_50mb' }, 413);
+  }
+  if (c.req.header('content-type')?.split(';', 1)[0].trim().toLowerCase() !== 'video/mp4') {
+    return c.json({ error: 'video_must_be_mp4' }, 415);
+  }
+  const signature = new Uint8Array(video.slice(4, 8));
+  if (String.fromCharCode(...signature) !== 'ftyp') {
+    return c.json({ error: 'invalid_mp4_signature' }, 415);
   }
   const initResponse = await fetch(
     'https://open.tiktokapis.com/v2/post/publish/inbox/video/init/',
@@ -172,6 +195,10 @@ app.post('/tiktok/upload-draft', async (c) => {
     body: video,
   });
   if (!uploadResponse.ok) return c.json({ error: 'tiktok_video_transfer_failed' }, 502);
+  // Sessions are intentionally single-use. This limits replay if a browser URL,
+  // extension, or device is compromised after a successful transfer.
+  await c.env.MUSIC_JOBS.delete(`tiktok-sessions/${session}.json`);
+  c.header('cache-control', 'no-store');
   return c.json({ ok: true, publishId, destination: 'TikTok inbox draft' });
 });
 
@@ -270,7 +297,13 @@ app.post('/music/site-edits', async (c) => {
   if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
   const body = SiteEditSchema.parse(await c.req.json());
   const id = crypto.randomUUID();
-  const edit = { id, ...body, state: 'awaiting_approval', createdAt: nowIso(), updatedAt: nowIso() };
+  const edit = {
+    id,
+    ...body,
+    state: 'awaiting_approval',
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  };
   await c.env.MUSIC_JOBS.put(`site-edits/${id}.json`, JSON.stringify(edit), {
     httpMetadata: { contentType: 'application/json' },
   });

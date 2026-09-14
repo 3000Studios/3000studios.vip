@@ -1,0 +1,316 @@
+/* Final cohesive platform layer: responsive chrome, active navigation, song cinema and admin social control. */
+.vipHeader.vipHeader--epic {
+  width: min(100% - 1rem, 1600px);
+  min-height: clamp(4.25rem, 7vw, 5.7rem);
+  padding-inline: clamp(0.75rem, 2vw, 1.5rem);
+  margin-inline: auto;
+}
+
+.vipNavLink.is-active {
+  color: #dff8ff;
+  background: linear-gradient(145deg, rgba(0, 103, 255, 0.2), rgba(0, 229, 255, 0.08));
+  border-color: rgba(51, 211, 255, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(40, 170, 255, 0.18),
+    0 0 24px rgba(0, 153, 255, 0.28),
+    inset 0 0 18px rgba(0, 195, 255, 0.1);
+}
+
+.vipNavLink.is-active .vipNavLabel {
+  color: #e8fbff;
+  animation: activeNavNeon 2.6s ease-in-out infinite;
+}
+
+.vipNavLink.is-active .vipNavIcon {
+  color: #75e8ff;
+}
+
+@keyframes activeNavNeon {
+  0%,
+  100% {
+    text-shadow:
+      0 0 5px #48cfff,
+      0 0 12px rgba(0, 162, 255, 0.55);
+  }
+  50% {
+    text-shadow:
+      0 0 8px #fff,
+      0 0 18px #16c9ff,
+      0 0 34px rgba(0, 119, 255, 0.85);
+  }
+}
+
+.vipFooter {
+  position: relative;
+  width: 100% !important;
+  max-width: none !important;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.footerReactive {
+  position: absolute;
+  inset: auto 0 0;
+  height: 72%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: clamp(2px, 0.42vw, 8px);
+  padding-inline: 2vw;
+  opacity: calc(0.22 + var(--player-beat, 0.04));
+  pointer-events: none;
+  z-index: -1;
+  mask-image: linear-gradient(to top, #000, transparent 92%);
+}
+
+.footerReactive i {
+  width: min(2.1vw, 26px);
+  height: 90%;
+  transform-origin: bottom;
+  transform: scaleY(
+    clamp(0.08, calc(var(--player-beat, 0.04) * 2.4 + var(--footer-energy, 0.1)), 1)
+  );
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(to top, rgba(0, 96, 255, 0.05), #00c8ff 62%, #fff);
+  box-shadow: 0 0 18px rgba(0, 184, 255, 0.48);
+  transition:
+    transform 90ms linear,
+    opacity 220ms ease;
+}
+
+.cinematicSongPage {
+  max-width: 1320px;
+  touch-action: pan-y;
+}
+.songPageTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(230, 245, 255, 0.68);
+  font-size: 0.78rem;
+  margin-bottom: 1rem;
+}
+.songCinema {
+  position: relative;
+  min-height: clamp(430px, 72vh, 850px);
+  overflow: hidden;
+  border-radius: clamp(18px, 3vw, 34px);
+  border: 1px solid rgba(74, 211, 255, 0.28);
+  background: #03060d;
+  box-shadow:
+    0 34px 100px rgba(0, 0, 0, 0.62),
+    0 0 50px rgba(0, 130, 255, 0.12);
+  isolation: isolate;
+}
+.songCinemaGlow {
+  position: absolute;
+  inset: -8%;
+  background: center/cover no-repeat;
+  filter: blur(42px) saturate(1.4);
+  opacity: 0.42;
+  transform: scale(1.12);
+  transition: opacity 1.1s ease;
+}
+.songCinemaCover,
+.songCinemaVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.songCinemaCover {
+  object-fit: contain;
+  padding: clamp(1.25rem, 4vw, 3rem);
+  filter: drop-shadow(0 28px 50px rgba(0, 0, 0, 0.62));
+  opacity: 1;
+  transform: scale(0.88);
+  transition:
+    opacity 1.15s ease,
+    transform 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1.15s ease;
+  z-index: 1;
+}
+.songCinemaVideo {
+  opacity: 0;
+  transform: scale(1.045);
+  transition:
+    opacity 1.2s ease,
+    transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+.songCinema.is-video .songCinemaCover {
+  opacity: 0;
+  transform: scale(1.08);
+  filter: blur(18px);
+}
+.songCinema.is-video .songCinemaVideo {
+  opacity: 1;
+  transform: scale(1);
+}
+.songCinema.is-video .songCinemaGlow {
+  opacity: 0.16;
+}
+.songCinemaShade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(180deg, transparent 42%, rgba(1, 4, 12, 0.92));
+  pointer-events: none;
+}
+.songCinemaMeta {
+  position: absolute;
+  z-index: 4;
+  left: clamp(1.25rem, 4vw, 3rem);
+  right: clamp(1.25rem, 4vw, 3rem);
+  bottom: clamp(1.5rem, 5vw, 3.4rem);
+}
+.songCinemaMeta h1 {
+  max-width: 18ch;
+  margin: 0.55rem 0 0.3rem;
+  font-size: clamp(2rem, 6vw, 5.6rem);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.songCinemaMeta p {
+  margin: 0;
+  color: rgba(235, 246, 255, 0.78);
+}
+.songSwipe {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  translate: 0 -50%;
+  width: 48px;
+  height: 64px;
+  border: 1px solid rgba(110, 221, 255, 0.3);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(3, 10, 24, 0.58);
+  backdrop-filter: blur(12px);
+  font-size: 2rem;
+  cursor: pointer;
+}
+.songSwipe.previous {
+  left: 1rem;
+}
+.songSwipe.next {
+  right: 1rem;
+}
+.songControlGlass {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  backdrop-filter: blur(22px);
+  background: rgba(4, 12, 28, 0.72);
+}
+.songProgressGroup {
+  min-width: 0;
+}
+.songProgressGroup p {
+  margin: 0.45rem 0 0;
+  color: rgba(225, 242, 255, 0.67);
+  font-size: 0.8rem;
+}
+
+.tiktokAdminButton {
+  color: #fff !important;
+  background: linear-gradient(110deg, #25f4ee, #0f7cff 48%, #fe2c55) !important;
+  border: 0 !important;
+}
+.tiktokAdminPanel {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 50%, rgba(37, 244, 238, 0.12), transparent 34%),
+    radial-gradient(circle at 94% 14%, rgba(254, 44, 85, 0.12), transparent 35%),
+    rgba(2, 7, 18, 0.86) !important;
+}
+.tiktokAdminGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.4rem;
+  align-items: center;
+}
+.tiktokStatusOrb {
+  width: clamp(74px, 10vw, 112px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 30%;
+  background: linear-gradient(145deg, rgba(37, 244, 238, 0.18), rgba(254, 44, 85, 0.16));
+  border: 1px solid rgba(128, 234, 255, 0.35);
+  box-shadow: 0 0 36px rgba(0, 198, 255, 0.2);
+  font-size: 2.2rem;
+  animation: tiktokOrb 3s ease-in-out infinite;
+}
+.adminEyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: #5cecff;
+}
+.tiktokFeatureRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.tiktokFeatureRow span {
+  padding: 0.38rem 0.64rem;
+  border-radius: 999px;
+  border: 1px solid rgba(98, 215, 255, 0.23);
+  color: rgba(225, 246, 255, 0.82);
+  font-size: 0.74rem;
+}
+@keyframes tiktokOrb {
+  50% {
+    transform: translateY(-5px) rotate(2deg);
+    box-shadow: 0 0 46px rgba(254, 44, 85, 0.25);
+  }
+}
+
+@media (max-width: 720px) {
+  .songPageTopline span {
+    display: none;
+  }
+  .songCinema {
+    min-height: 68dvh;
+    border-radius: 18px;
+  }
+  .songCinemaCover {
+    padding: 1rem;
+  }
+  .songSwipe {
+    top: auto;
+    bottom: 1rem;
+    width: 44px;
+    height: 48px;
+  }
+  .songControlGlass {
+    grid-template-columns: auto 1fr;
+  }
+  .songControlGlass .bigAction {
+    grid-column: 1/-1;
+    text-align: center;
+  }
+  .tiktokAdminGrid {
+    grid-template-columns: 1fr;
+  }
+  .tiktokStatusOrb {
+    width: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vipNavLink.is-active .vipNavLabel,
+  .tiktokStatusOrb {
+    animation: none;
+  }
+  .songCinemaCover,
+  .songCinemaVideo {
+    transition-duration: 0.01ms;
+  }
+}

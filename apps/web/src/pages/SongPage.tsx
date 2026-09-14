@@ -1,61 +1,70 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useGlobalMusic } from '../components/GlobalMusic';
+import { rolloutSongs } from '../data/music';
+import {
+  getOfficialVideoForTitle,
+  youtubeEmbedUrl,
+  youtubeWatchUrl,
+} from '../data/officialReleases';
 import { getSongBySlug } from '../data/songs';
 import { PublicLayout } from './Home';
+
+const REVEAL_DELAY_MS = 2000;
 
 export function SongPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const music = useGlobalMusic();
   const song = getSongBySlug(slug || '');
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [needsGesture, setNeedsGesture] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [liked, setLiked] = useState(false);
-  const [hearts, setHearts] = useState(124);
+  const [readyVideoId, setReadyVideoId] = useState('');
+  const [revealedVideoId, setRevealedVideoId] = useState('');
+  const touchStart = useRef<number | null>(null);
+  const officialVideo = useMemo(
+    () => (song ? getOfficialVideoForTitle(song.title) : undefined),
+    [song],
+  );
 
   useEffect(() => {
     if (!song) return;
-    window.dispatchEvent(
-      new CustomEvent('3000-play-track', {
-        detail: { src: song.fullAudio, title: song.title },
-      }),
-    );
-  }, [song]);
+    const index = rolloutSongs.findIndex((track) => track.slug === song.slug);
+    if (index >= 0 && music.activeSong.slug !== song.slug) {
+      music.playIndex(index, { autoplay: music.isPlaying });
+    }
+  }, [song, music]);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !song) return;
+    if (!officialVideo) return;
+    const timer = window.setTimeout(() => {
+      setRevealedVideoId(officialVideo.videoId);
+    }, REVEAL_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [officialVideo]);
 
-    const update = () => setProgress((audio.currentTime / audio.duration) * 100 || 0);
-    const onPlay = () => {
-      setIsPlaying(true);
-      setNeedsGesture(false);
-    };
-    const onPause = () => setIsPlaying(false);
-    audio.addEventListener('timeupdate', update);
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
-    audio.volume = 0.4;
-    audio.loop = true;
+  const move = (delta: number) => {
+    if (!song) return;
+    const index = rolloutSongs.findIndex((track) => track.slug === song.slug);
+    const next = rolloutSongs[(index + delta + rolloutSongs.length) % rolloutSongs.length];
+    if (next) navigate(`/song/${next.slug}`);
+  };
 
-    void audio.play().catch(() => setNeedsGesture(true));
+  const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    if (event.pointerType === 'mouse') return;
+    touchStart.current = event.clientX;
+  };
 
-    return () => {
-      audio.removeEventListener('timeupdate', update);
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
-    };
-  }, [song]);
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      void audio.play().catch(() => setNeedsGesture(true));
-    }
+  const onPointerUp = (event: ReactPointerEvent<HTMLElement>) => {
+    if (touchStart.current === null) return;
+    const distance = event.clientX - touchStart.current;
+    touchStart.current = null;
+    if (distance < -56) move(1);
+    if (distance > 56) move(-1);
   };
 
   if (!song) {
@@ -64,82 +73,132 @@ export function SongPage() {
         <main className="songDetailPage notFound">
           <div className="songPanel">
             <h1>Track unavailable</h1>
-            <button className="bigAction" type="button" onClick={() => navigate('/music')}>
+            <Link className="bigAction" to="/music">
               Back to music
-            </button>
+            </Link>
           </div>
         </main>
       </PublicLayout>
     );
   }
 
+  const progress = music.duration > 0 ? (music.currentTime / music.duration) * 100 : 0;
+  const embed = officialVideo
+    ? `${youtubeEmbedUrl(officialVideo.videoId)}&autoplay=1&mute=1&controls=0&loop=1&playlist=${officialVideo.videoId}&playsinline=1`
+    : '';
+
   return (
     <PublicLayout variant={song.wallpaper || 'vortex'}>
-      <main className="songDetailPage">
-        <button className="backBtn" type="button" onClick={() => navigate('/music')}>
-          ← Back to Collection
-        </button>
-
-        <div className="songHero">
-          <div
-            className="heroVisual songHeroArt"
-            style={{
-              backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.15), rgba(2,4,5,0.92)), url(${song.coverImage})`,
-            }}
-          >
-            <img className="songHeroCover" src={song.coverImage} alt={`${song.title} album art`} />
-            <div className="songMetaBig">
-              <div className="genrePill">{song.genre}</div>
-              <h1 className="glitchText" data-text={song.title}>
-                {song.title}
-              </h1>
-              <p>
-                {song.artist} • {song.duration}
-              </p>
-            </div>
-          </div>
+      <main
+        className="songDetailPage cinematicSongPage"
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+      >
+        <div className="songPageTopline">
+          <button className="backBtn" type="button" onClick={() => navigate('/music')}>
+            ← Collection
+          </button>
+          <span>Swipe left or right · {rolloutSongs.length} verified releases</span>
         </div>
 
-        <div className="playerSection" data-reveal>
-          <audio ref={audioRef} src={song.fullAudio} preload="auto" loop />
+        <section
+          className={`songCinema ${
+            officialVideo &&
+            revealedVideoId === officialVideo.videoId &&
+            readyVideoId === officialVideo.videoId
+              ? 'is-video'
+              : 'is-art'
+          }`}
+          aria-label={`${song.title} visual experience`}
+        >
+          <div
+            className="songCinemaGlow"
+            style={{ backgroundImage: `url(${song.coverImage})` }}
+            aria-hidden="true"
+          />
+          <img
+            className="songCinemaCover"
+            src={song.coverImage}
+            alt={`${song.title} album artwork`}
+          />
+          {officialVideo ? (
+            <iframe
+              className="songCinemaVideo"
+              src={embed}
+              title={`${song.title} official video`}
+              allow="autoplay; encrypted-media; picture-in-picture"
+              onLoad={() => setReadyVideoId(officialVideo.videoId)}
+            />
+          ) : null}
+          <div className="songCinemaShade" aria-hidden="true" />
+          <div className="songCinemaMeta">
+            <span className="genrePill">
+              {officialVideo ? 'Official video' : 'Official release'}
+            </span>
+            <h1>{song.title}</h1>
+            <p>
+              {song.artist} · {song.genre}
+            </p>
+          </div>
+          <button
+            className="songSwipe previous"
+            type="button"
+            onClick={() => move(-1)}
+            aria-label="Previous song"
+          >
+            ‹
+          </button>
+          <button
+            className="songSwipe next"
+            type="button"
+            onClick={() => move(1)}
+            aria-label="Next song"
+          >
+            ›
+          </button>
+        </section>
 
-          <div className="playerControls">
-            <button className="playBig" type="button" onClick={togglePlay}>
-              {isPlaying ? '❚❚' : '▶'}
-            </button>
-            <div className="progressBar">
+        <section className="playerSection songControlGlass">
+          <button
+            className="playBig"
+            type="button"
+            onClick={music.toggle}
+            aria-label={music.isPlaying ? 'Pause' : 'Play'}
+          >
+            {music.isPlaying ? '❚❚' : '▶'}
+          </button>
+          <div className="songProgressGroup">
+            <div
+              className="progressBar"
+              role="progressbar"
+              aria-label="Playback progress"
+              aria-valuenow={Math.round(progress)}
+            >
               <div className="fill" style={{ width: `${progress}%` }} />
             </div>
-            <div className="playerMeta">
-              {needsGesture ? 'Tap play to start audio' : 'Full track looping · wallpaper synced to this song'}
-            </div>
+            <p>
+              {music.isPlaying
+                ? 'Audio-reactive experience live'
+                : 'Press play to activate the visual environment'}
+            </p>
           </div>
-
-          <div className="interactionsBig">
-            <button
-              type="button"
-              onClick={() => {
-                setLiked(!liked);
-                if (!liked) setHearts((h) => h + 1);
-              }}
-              className={`bigAction ${liked ? 'active' : ''}`}
+          {officialVideo ? (
+            <a
+              className="bigAction"
+              href={youtubeWatchUrl(officialVideo.videoId)}
+              target="_blank"
+              rel="noreferrer"
             >
-              ❤️ {hearts}
-            </button>
-            <button type="button" onClick={() => window.location.reload()} className="bigAction">
-              ↻ Restart Vibe
-            </button>
-            <Link className="bigAction" to="/music">
-              Full catalog
-            </Link>
-          </div>
-        </div>
+              Watch on YouTube
+            </a>
+          ) : null}
+        </section>
 
-        <div className="songDescription" data-reveal>
-          <h3>About this track</h3>
+        <section className="songDescription">
+          <h2>About this release</h2>
           <p>{song.description}</p>
-          <p className="vibe">Vibe: {song.vibe}</p>
-        </div>
+          <p className="vibe">{song.vibe}</p>
+        </section>
       </main>
     </PublicLayout>
   );

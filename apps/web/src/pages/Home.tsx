@@ -1,4 +1,13 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { rolloutSongs, type SongPalette } from '../data/music';
@@ -48,6 +57,7 @@ const navItems = [
   { to: '/sponsors', label: 'Sponsors', icon: '◆', hint: 'Partners' },
   { to: '/about', label: 'About', icon: '◇', hint: 'The studio' },
   { to: '/contact', label: 'Contact', icon: '✉', hint: 'Book us' },
+  { to: '/admin', label: 'Admin', icon: '⚙', hint: 'Owner control' },
 ] as const;
 
 function navIsActive(pathname: string, to: string) {
@@ -88,11 +98,15 @@ type RequestIdea = {
 };
 
 function safeDate(value: string) {
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
+  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(
+    new Date(value),
+  );
 }
 
 function playPop() {
-  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  const AudioCtx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioCtx) return;
   const ctx = new AudioCtx();
   const osc = ctx.createOscillator();
@@ -138,7 +152,13 @@ function StudioButton({
   }
   if (href) {
     return (
-      <a className={className} href={href} onClick={handleClick} rel={href.startsWith('http') ? 'noreferrer' : undefined} target={href.startsWith('http') ? '_blank' : undefined}>
+      <a
+        className={className}
+        href={href}
+        onClick={handleClick}
+        rel={href.startsWith('http') ? 'noreferrer' : undefined}
+        target={href.startsWith('http') ? '_blank' : undefined}
+      >
         {children}
       </a>
     );
@@ -166,7 +186,12 @@ function BeatDancingTitle({ text }: { text: string }) {
   return (
     <motion.h1 className="beatGoldTitle" variants={fadeUp} aria-label={text}>
       {Array.from(text).map((char, index) => (
-        <span key={`${char}-${index}`} className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter'} style={{ '--letter-index': index } as CSSProperties} aria-hidden="true">
+        <span
+          key={`${char}-${index}`}
+          className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter'}
+          style={{ '--letter-index': index } as CSSProperties}
+          aria-hidden="true"
+        >
           {char}
         </span>
       ))}
@@ -191,7 +216,14 @@ function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; label?:
   return (
     <aside className="adsenseSlot" aria-label={label}>
       <span>{label}</span>
-      <ins className="adsbygoogle" style={{ display: 'block' }} data-ad-client={ADSENSE_CLIENT} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true" />
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block' }}
+        data-ad-client={ADSENSE_CLIENT}
+        data-ad-slot={slot}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
     </aside>
   );
 }
@@ -213,13 +245,25 @@ function useStoredList<T>(key: string, fallback: T[]) {
   return [items, setItems] as const;
 }
 
-export function PublicLayout({ children, variant = 'spiral', compact = false }: { children: ReactNode; variant?: string; compact?: boolean }) {
+export function PublicLayout({
+  children,
+  variant = 'spiral',
+  compact = false,
+}: {
+  children: ReactNode;
+  variant?: string;
+  compact?: boolean;
+}) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState<{ wallpaper: string; cover?: string; palette?: SongPalette }>({ wallpaper: variant });
+  const [theme, setTheme] = useState<{ wallpaper: string; cover?: string; palette?: SongPalette }>({
+    wallpaper: variant,
+  });
 
   useEffect(() => {
-    const id = window.setTimeout(() => { setTheme((prev) => ({ ...prev, wallpaper: variant })); }, 0);
+    const id = window.setTimeout(() => {
+      setTheme((prev) => ({ ...prev, wallpaper: variant }));
+    }, 0);
     return () => window.clearTimeout(id);
   }, [variant]);
 
@@ -235,8 +279,16 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
 
   useEffect(() => {
     const onTheme = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { wallpaper?: string; cover?: string; palette?: SongPalette };
-      setTheme((prev) => ({ wallpaper: detail.wallpaper || prev.wallpaper || variant, cover: detail.cover || prev.cover, palette: detail.palette || prev.palette }));
+      const detail = (e as CustomEvent).detail as {
+        wallpaper?: string;
+        cover?: string;
+        palette?: SongPalette;
+      };
+      setTheme((prev) => ({
+        wallpaper: detail.wallpaper || prev.wallpaper || variant,
+        cover: detail.cover || prev.cover,
+        palette: detail.palette || prev.palette,
+      }));
     };
     window.addEventListener('3000-song-theme', onTheme as EventListener);
     return () => window.removeEventListener('3000-song-theme', onTheme as EventListener);
@@ -245,27 +297,48 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
   const wallpaperVariant = theme.wallpaper || variant;
 
   return (
-    <div className={`vipSite vipSite-${variant} vipSite-live${open ? ' is-nav-open' : ''}${compact ? ' is-compact' : ''}`} data-page-wallpaper={variant} data-song-wallpaper={wallpaperVariant}>
+    <div
+      className={`vipSite vipSite-${variant} vipSite-live${open ? ' is-nav-open' : ''}${compact ? ' is-compact' : ''}`}
+      data-page-wallpaper={variant}
+      data-song-wallpaper={wallpaperVariant}
+    >
       <div className="filmLetterbox top" aria-hidden="true" />
       <div className="filmLetterbox bottom" aria-hidden="true" />
       <div className="filmGrain" aria-hidden="true" />
       <div className="filmScan" aria-hidden="true" />
-      <AudioReactiveWallpaper variant={wallpaperVariant} palette={theme.palette} coverUrl={theme.cover} />
+      <AudioReactiveWallpaper
+        variant={wallpaperVariant}
+        palette={theme.palette}
+        coverUrl={theme.cover}
+      />
       <MouseFX />
       <ZombieFX />
       <ScrollFX />
       <div className="scrollProgress" aria-hidden="true" />
       <header className="vipHeader vipHeader--epic">
         <ChromeWallpaper zone="header" />
-        <Link className="vipLogo" to="/" onClick={() => setOpen(false)} aria-label="3000 Studios VIP home">
-          <img className="officialProfileLogo" src="/media/official-3000-studios-profile.png" alt="" />
+        <Link
+          className="vipLogo"
+          to="/"
+          onClick={() => setOpen(false)}
+          aria-label="3000 Studios VIP home"
+        >
+          <img
+            className="officialProfileLogo"
+            src="/media/official-3000-studios-profile.png"
+            alt=""
+          />
           <span className="logoStack">
             <strong className="logoWordmark">3000 Studios</strong>
             <small className="logoSub">VIP Media · Live · Music</small>
           </span>
         </Link>
 
-        <nav id="vip-primary-nav" className={open ? 'vipNav vipNav--rail open' : 'vipNav vipNav--rail'} aria-label="Primary navigation">
+        <nav
+          id="vip-primary-nav"
+          className={open ? 'vipNav vipNav--rail open' : 'vipNav vipNav--rail'}
+          aria-label="Primary navigation"
+        >
           <div className="vipNavMobileHead">
             <span className="vipNavMobileKicker">Navigate the VIP</span>
             <strong>3000 Studios</strong>
@@ -274,8 +347,21 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
             {navItems.map((item, index) => {
               const active = navIsActive(location.pathname, item.to);
               return (
-                <Link key={item.to} to={item.to} className={active ? 'vipNavLink is-active' : 'vipNavLink'} data-active={active ? 'true' : undefined} style={{ '--nav-i': index } as CSSProperties} onClick={() => { playPop(); setOpen(false); }} aria-current={active ? 'page' : undefined}>
-                  <span className="vipNavIcon" aria-hidden="true">{item.icon}</span>
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={active ? 'vipNavLink is-active' : 'vipNavLink'}
+                  data-active={active ? 'true' : undefined}
+                  style={{ '--nav-i': index } as CSSProperties}
+                  onClick={() => {
+                    playPop();
+                    setOpen(false);
+                  }}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <span className="vipNavIcon" aria-hidden="true">
+                    {item.icon}
+                  </span>
                   <span className="vipNavCopy">
                     <span className="vipNavLabel">{item.label}</span>
                     <span className="vipNavHint">{item.hint}</span>
@@ -286,23 +372,46 @@ export function PublicLayout({ children, variant = 'spiral', compact = false }: 
             })}
           </div>
           <div className="vipNavMobileFoot">
-            <a href={`mailto:${OWNER_EMAIL}`} className="vipNavCta">Book / License</a>
+            <a href={`mailto:${OWNER_EMAIL}`} className="vipNavCta">
+              Book / License
+            </a>
           </div>
         </nav>
 
         <GlobalMusicToggle className="vipHeaderMusic" />
 
-        <button className={open ? 'vipMenu is-open' : 'vipMenu'} type="button" aria-expanded={open} aria-controls="vip-primary-nav" onClick={() => setOpen((value) => !value)}>
-          <span className="vipMenuBars" aria-hidden="true"><i /><i /><i /></span>
+        <button
+          className={open ? 'vipMenu is-open' : 'vipMenu'}
+          type="button"
+          aria-expanded={open}
+          aria-controls="vip-primary-nav"
+          onClick={() => setOpen((value) => !value)}
+        >
+          <span className="vipMenuBars" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
           <span className="vipMenuText">{open ? 'Close' : 'Menu'}</span>
         </button>
 
-        <button type="button" className={open ? 'vipNavBackdrop is-open' : 'vipNavBackdrop'} aria-label="Close navigation" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
+        <button
+          type="button"
+          className={open ? 'vipNavBackdrop is-open' : 'vipNavBackdrop'}
+          aria-label="Close navigation"
+          tabIndex={open ? 0 : -1}
+          onClick={() => setOpen(false)}
+        />
       </header>
       {children}
       {compact ? null : <div className="vipEnergyDivider" aria-hidden="true" />}
       <footer className={compact ? 'vipFooter vipFooter--slim' : 'vipFooter'}>
         <ChromeWallpaper zone="footer" />
+        <div className="footerReactive" aria-hidden="true">
+          {Array.from({ length: 36 }, (_, index) => (
+            <i key={index} style={{ '--footer-energy': (index % 7) * 0.045 } as CSSProperties} />
+          ))}
+        </div>
         <PlatformLogos />
         {compact ? null : (
           <>
@@ -334,13 +443,31 @@ export function Home() {
           <video src={INTRO_VIDEO} autoPlay muted loop playsInline preload="auto" />
           <div className="carpetDepth" aria-hidden="true" />
           <ParticleField />
-          <motion.div className="heroCopy heroCopy--yt" initial="hidden" animate="show" variants={stagger}>
-            <motion.span className="vipKicker" variants={fadeUp}>YouTube · DistroKid · Official artist</motion.span>
+          <motion.div
+            className="heroCopy heroCopy--yt"
+            initial="hidden"
+            animate="show"
+            variants={stagger}
+          >
+            <motion.span className="vipKicker" variants={fadeUp}>
+              YouTube · DistroKid · Official artist
+            </motion.span>
             <BeatDancingTitle text="3000 Studios" />
-            <motion.p variants={fadeUp}>Official music videos and DistroKid releases. Everything streams free. Subscribe so YouTube puts the next drop in your feed.</motion.p>
+            <motion.p variants={fadeUp}>
+              Official music videos and DistroKid releases. Everything streams free. Subscribe so
+              YouTube puts the next drop in your feed.
+            </motion.p>
             <motion.div className="heroFeature" variants={fadeUp}>
-              <a className="heroFeatureCard" href="https://www.youtube.com/watch?v=tIY1WU9N_RU" target="_blank" rel="noreferrer">
-                <img src="/media/covers/not-giving-up-tonight.jpg" alt="Not Giving Up Tonight official video" />
+              <a
+                className="heroFeatureCard"
+                href="https://www.youtube.com/watch?v=tIY1WU9N_RU"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  src="/media/covers/not-giving-up-tonight.jpg"
+                  alt="Not Giving Up Tonight official video"
+                />
                 <span>
                   <small>Live on DistroKid + YouTube</small>
                   <strong>Not Giving Up Tonight</strong>
@@ -348,9 +475,18 @@ export function Home() {
               </a>
             </motion.div>
             <motion.div className="heroActions" variants={fadeUp}>
-              <MagneticButton className="studioButton ytCta" href="https://www.youtube.com/@3000Studio?sub_confirmation=1">Subscribe on YouTube</MagneticButton>
-              <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">Watch the video</StudioButton>
-              <StudioButton to="/music" variant="ghost">Full catalog</StudioButton>
+              <MagneticButton
+                className="studioButton ytCta"
+                href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
+              >
+                Subscribe on YouTube
+              </MagneticButton>
+              <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">
+                Watch the video
+              </StudioButton>
+              <StudioButton to="/music" variant="ghost">
+                Full catalog
+              </StudioButton>
             </motion.div>
           </motion.div>
         </section>
@@ -359,31 +495,75 @@ export function Home() {
           <div className="ytSubscribeInner">
             <p className="ytSubscribeKicker">Official artist channel</p>
             <h2>Watch the videos. Subscribe @3000Studio.</h2>
-            <p>New official videos, DistroKid releases, and 3000 Studios drops. Tap subscribe so YouTube actually shows you the next one.</p>
+            <p>
+              New official videos, DistroKid releases, and 3000 Studios drops. Tap subscribe so
+              YouTube actually shows you the next one.
+            </p>
             <div className="heroActions">
-              <StudioButton href="https://www.youtube.com/@3000Studio?sub_confirmation=1">Subscribe</StudioButton>
-              <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">Not Giving Up Tonight</StudioButton>
+              <StudioButton href="https://www.youtube.com/@3000Studio?sub_confirmation=1">
+                Subscribe
+              </StudioButton>
+              <StudioButton href="https://www.youtube.com/watch?v=tIY1WU9N_RU" variant="secondary">
+                Not Giving Up Tonight
+              </StudioButton>
             </div>
           </div>
         </section>
 
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_HOME_SLOT} />
 
-        <motion.section className="vipSection featureRail" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
-          {[['Music Showcase', 'Original tracks, full streams, and official videos — all free.'], ['Live Stream', 'Cloudflare Stream-ready playback plus a protected owner stream console.'], ['Community Chat', 'Visitor chat and song ideas that can upgrade to Firebase or D1 persistence.'], ['Sponsor Inventory', 'Clear placements for launch partners, video sponsors, and creator tools.']].map(([title, copy]) => (
-            <motion.article className="vipCard" key={title} variants={fadeUp}><h2>{title}</h2><p>{copy}</p></motion.article>
+        <motion.section
+          className="vipSection featureRail"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.18 }}
+          variants={stagger}
+        >
+          {[
+            ['Music Showcase', 'Original tracks, full streams, and official videos — all free.'],
+            [
+              'Live Stream',
+              'Cloudflare Stream-ready playback plus a protected owner stream console.',
+            ],
+            [
+              'Community Chat',
+              'Visitor chat and song ideas that can upgrade to Firebase or D1 persistence.',
+            ],
+            [
+              'Sponsor Inventory',
+              'Clear placements for launch partners, video sponsors, and creator tools.',
+            ],
+          ].map(([title, copy]) => (
+            <motion.article className="vipCard" key={title} variants={fadeUp}>
+              <h2>{title}</h2>
+              <p>{copy}</p>
+            </motion.article>
           ))}
         </motion.section>
 
-        <motion.section className="vipSection networkSection" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>3000 Studios Network</motion.span>
+        <motion.section
+          className="vipSection networkSection"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.18 }}
+          variants={stagger}
+        >
+          <motion.span className="vipKicker" variants={fadeUp}>
+            3000 Studios Network
+          </motion.span>
           <motion.h2 variants={fadeUp}>All doors open for VIP members</motion.h2>
           <div className="networkGrid">
             {networkSites.map((site) => (
               <motion.article className="vipCard networkCard" key={site.name} variants={fadeUp}>
                 <span className="networkTag">{site.tag}</span>
                 <h3>{site.name}</h3>
-                <StudioButton to={site.url.startsWith('http') ? undefined : site.url} href={site.url.startsWith('http') ? site.url : undefined} variant="secondary">Enter</StudioButton>
+                <StudioButton
+                  to={site.url.startsWith('http') ? undefined : site.url}
+                  href={site.url.startsWith('http') ? site.url : undefined}
+                  variant="secondary"
+                >
+                  Enter
+                </StudioButton>
               </motion.article>
             ))}
           </div>
@@ -465,10 +645,12 @@ export function MusicShowcase() {
                   type="button"
                   key={song.videoId}
                   className={offset === 0 ? 'dkSlide is-active' : 'dkSlide'}
-                  style={{
-                    '--offset': offset,
-                    zIndex: 40 - abs,
-                  } as CSSProperties}
+                  style={
+                    {
+                      '--offset': offset,
+                      zIndex: 40 - abs,
+                    } as CSSProperties
+                  }
                   onClick={() => pick(index)}
                   aria-current={offset === 0 ? 'true' : undefined}
                   aria-label={song.title}
@@ -480,13 +662,28 @@ export function MusicShowcase() {
           </div>
 
           <div className="dkPlayer">
-            <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex - 1)} aria-label="Previous song">
+            <button
+              type="button"
+              className="dkPlayerBtn"
+              onClick={() => pick(activeIndex - 1)}
+              aria-label="Previous song"
+            >
               ‹
             </button>
-            <button type="button" className="dkPlayMain" onClick={music.toggle} aria-label={music.isPlaying ? 'Pause' : 'Play'}>
+            <button
+              type="button"
+              className="dkPlayMain"
+              onClick={music.toggle}
+              aria-label={music.isPlaying ? 'Pause' : 'Play'}
+            >
               {music.isPlaying ? '❚❚' : '▶'}
             </button>
-            <button type="button" className="dkPlayerBtn" onClick={() => pick(activeIndex + 1)} aria-label="Next song">
+            <button
+              type="button"
+              className="dkPlayerBtn"
+              onClick={() => pick(activeIndex + 1)}
+              aria-label="Next song"
+            >
               ›
             </button>
             <div className="dkPlayerMeta">
@@ -506,7 +703,12 @@ export function MusicShowcase() {
               />
               <span>{formatClock(music.duration)}</span>
             </label>
-            <a className="studioButton secondary dkWatch" href={youtubeWatchUrl(yt)} target="_blank" rel="noreferrer">
+            <a
+              className="studioButton secondary dkWatch"
+              href={youtubeWatchUrl(yt)}
+              target="_blank"
+              rel="noreferrer"
+            >
               Open video
             </a>
           </div>
@@ -519,19 +721,46 @@ export function MusicShowcase() {
 export function VideoPage() {
   const [featuredVideoId] = useState(officialReleaseVideos[0].videoId);
   const playerRef = useRef<HTMLDivElement | null>(null);
-  const featured = officialReleaseVideos.find((video) => video.videoId === featuredVideoId) ?? officialReleaseVideos[0];
+  const featured =
+    officialReleaseVideos.find((video) => video.videoId === featuredVideoId) ??
+    officialReleaseVideos[0];
   return (
     <PublicLayout variant="electric">
       <main className="vipMain videoPage">
         <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Official music videos</motion.span>
-          <motion.h1 variants={fadeUp}>Watch here. Support the official 3000 Studios channel.</motion.h1>
-          <motion.p variants={fadeUp}>Only DistroKid-confirmed releases matched to the Official Artist Channel are included.</motion.p>
+          <motion.span className="vipKicker" variants={fadeUp}>
+            Official music videos
+          </motion.span>
+          <motion.h1 variants={fadeUp}>
+            Watch here. Support the official 3000 Studios channel.
+          </motion.h1>
+          <motion.p variants={fadeUp}>
+            Only DistroKid-confirmed releases matched to the Official Artist Channel are included.
+          </motion.p>
         </motion.section>
         <section className="officialCinema">
           <div className="officialCinemaFeature" ref={playerRef}>
-            <iframe src={youtubeEmbedUrl(featured.videoId)} title={`${featured.title} official music video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
-            <div><span className="vipKicker">Now screening</span><h2>{featured.title}</h2><p>{featured.release} · {featured.duration}</p><a className="studioButton secondary" href={youtubeWatchUrl(featured.videoId)} target="_blank" rel="noreferrer">Open on YouTube</a></div>
+            <iframe
+              src={youtubeEmbedUrl(featured.videoId)}
+              title={`${featured.title} official music video`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+            <div>
+              <span className="vipKicker">Now screening</span>
+              <h2>{featured.title}</h2>
+              <p>
+                {featured.release} · {featured.duration}
+              </p>
+              <a
+                className="studioButton secondary"
+                href={youtubeWatchUrl(featured.videoId)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open on YouTube
+              </a>
+            </div>
           </div>
         </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_VIDEO_SLOT} />
@@ -545,15 +774,32 @@ export function LivePage() {
     <PublicLayout variant="blackhole">
       <main className="vipMain">
         <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Live stream</motion.span>
-          <motion.h1 variants={fadeUp}>Watch 3000 Studios live when the broadcast is active.</motion.h1>
-          <motion.p variants={fadeUp}>Public playback is powered by Cloudflare's hosted Stream Player. When you go live from the owner admin console or OBS, this embed serves the Stream feed. Stream keys stay in Cloudflare and OBS only.</motion.p>
+          <motion.span className="vipKicker" variants={fadeUp}>
+            Live stream
+          </motion.span>
+          <motion.h1 variants={fadeUp}>
+            Watch 3000 Studios live when the broadcast is active.
+          </motion.h1>
+          <motion.p variants={fadeUp}>
+            Public playback is powered by Cloudflare's hosted Stream Player. When you go live from
+            the owner admin console or OBS, this embed serves the Stream feed. Stream keys stay in
+            Cloudflare and OBS only.
+          </motion.p>
           <motion.div className="heroActions" variants={fadeUp}>
             <StudioButton to={ADMIN_PATH}>Owner Admin Console</StudioButton>
-            <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20live%20stream`} variant="secondary">Stream Inquiry</StudioButton>
+            <StudioButton
+              href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20live%20stream`}
+              variant="secondary"
+            >
+              Stream Inquiry
+            </StudioButton>
           </motion.div>
         </motion.section>
-        <section className="streamPublicPanel"><div className="cfStreamShell"><CloudflareStreamPlayer title="3000 Studios live stream" /></div></section>
+        <section className="streamPublicPanel">
+          <div className="cfStreamShell">
+            <CloudflareStreamPlayer title="3000 Studios live stream" />
+          </div>
+        </section>
         <AdSenseUnit slot={import.meta.env.VITE_ADSENSE_LIVE_SLOT} />
       </main>
     </PublicLayout>
@@ -567,25 +813,58 @@ export function CommunityPage() {
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!message.trim()) return;
-    setMessages((current) => [{ id: crypto.randomUUID(), name: name.trim() || 'VIP Guest', message: message.trim().slice(0, 280), createdAt: new Date().toISOString() }, ...current]);
+    setMessages((current) => [
+      {
+        id: crypto.randomUUID(),
+        name: name.trim() || 'VIP Guest',
+        message: message.trim().slice(0, 280),
+        createdAt: new Date().toISOString(),
+      },
+      ...current,
+    ]);
     setMessage('');
   }
   return (
     <PublicLayout variant="pulse">
       <main className="vipMain">
-        <motion.section className="vipPageHero compact" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Community chat room</motion.span>
-          <motion.h1 variants={fadeUp}>Talk music, videos, live drops, and next-song ideas.</motion.h1>
+        <motion.section
+          className="vipPageHero compact"
+          initial="hidden"
+          animate="show"
+          variants={stagger}
+        >
+          <motion.span className="vipKicker" variants={fadeUp}>
+            Community chat room
+          </motion.span>
+          <motion.h1 variants={fadeUp}>
+            Talk music, videos, live drops, and next-song ideas.
+          </motion.h1>
         </motion.section>
         <section className="interactionGrid">
           <form className="vipForm" onSubmit={submit}>
-            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Display name" maxLength={42} />
-            <textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Write a clean community message" maxLength={280} />
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Display name"
+              maxLength={42}
+            />
+            <textarea
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              placeholder="Write a clean community message"
+              maxLength={280}
+            />
             <StudioButton>Post Message</StudioButton>
           </form>
           <div className="messageList">
             {messages.length === 0 ? <p>No messages on this device yet. Start the room.</p> : null}
-            {messages.map((item) => (<article className="messageCard" key={item.id}><strong>{item.name}</strong><span>{safeDate(item.createdAt)}</span><p>{item.message}</p></article>))}
+            {messages.map((item) => (
+              <article className="messageCard" key={item.id}>
+                <strong>{item.name}</strong>
+                <span>{safeDate(item.createdAt)}</span>
+                <p>{item.message}</p>
+              </article>
+            ))}
           </div>
         </section>
       </main>
@@ -601,19 +880,43 @@ export function RequestsPage() {
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!idea.trim()) return;
-    setIdeas((current) => [{ id: crypto.randomUUID(), name: name.trim() || 'VIP Listener', mood, idea: idea.trim().slice(0, 360), votes: 1, createdAt: new Date().toISOString() }, ...current]);
+    setIdeas((current) => [
+      {
+        id: crypto.randomUUID(),
+        name: name.trim() || 'VIP Listener',
+        mood,
+        idea: idea.trim().slice(0, 360),
+        votes: 1,
+        createdAt: new Date().toISOString(),
+      },
+      ...current,
+    ]);
     setIdea('');
   }
   return (
     <PublicLayout variant="goldwave">
       <main className="vipMain">
-        <motion.section className="vipPageHero compact" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Song request board</motion.span>
-          <motion.h1 variants={fadeUp}>Tell 3000 Studios what the next song should be about.</motion.h1>
+        <motion.section
+          className="vipPageHero compact"
+          initial="hidden"
+          animate="show"
+          variants={stagger}
+        >
+          <motion.span className="vipKicker" variants={fadeUp}>
+            Song request board
+          </motion.span>
+          <motion.h1 variants={fadeUp}>
+            Tell 3000 Studios what the next song should be about.
+          </motion.h1>
         </motion.section>
         <section className="interactionGrid">
           <form className="vipForm" onSubmit={submit}>
-            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Name" maxLength={42} />
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Name"
+              maxLength={42}
+            />
             <select value={mood} onChange={(event) => setMood(event.target.value)}>
               <option value="cinematic">Cinematic</option>
               <option value="street">Street anthem</option>
@@ -621,7 +924,12 @@ export function RequestsPage() {
               <option value="spiritual">Spiritual</option>
               <option value="story">Storytelling</option>
             </select>
-            <textarea value={idea} onChange={(event) => setIdea(event.target.value)} placeholder="The next song should be about..." maxLength={360} />
+            <textarea
+              value={idea}
+              onChange={(event) => setIdea(event.target.value)}
+              placeholder="The next song should be about..."
+              maxLength={360}
+            />
             <StudioButton>Submit Idea</StudioButton>
           </form>
           <div className="messageList">
@@ -629,8 +937,23 @@ export function RequestsPage() {
             {ideas.map((item) => (
               <article className="messageCard requestCard" key={item.id}>
                 <strong>{item.idea}</strong>
-                <span>{item.name} / {item.mood} / {safeDate(item.createdAt)}</span>
-                <button type="button" onClick={() => setIdeas((current) => current.map((ideaItem) => (ideaItem.id === item.id ? { ...ideaItem, votes: ideaItem.votes + 1 } : ideaItem)))}>Vote {item.votes}</button>
+                <span>
+                  {item.name} / {item.mood} / {safeDate(item.createdAt)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setIdeas((current) =>
+                      current.map((ideaItem) =>
+                        ideaItem.id === item.id
+                          ? { ...ideaItem, votes: ideaItem.votes + 1 }
+                          : ideaItem,
+                      ),
+                    )
+                  }
+                >
+                  Vote {item.votes}
+                </button>
               </article>
             ))}
           </div>
@@ -646,19 +969,46 @@ export function BlogPage() {
     <PublicLayout variant="nebula">
       <main className="vipMain">
         <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Daily auto blog</motion.span>
-          <motion.h1 variants={fadeUp}>Search-ready music, video, live stream, and sponsor content.</motion.h1>
-          <motion.p variants={fadeUp}>Cards refresh once per day with site-update stories and SEO evergreen posts — including images and video when available.</motion.p>
+          <motion.span className="vipKicker" variants={fadeUp}>
+            Daily auto blog
+          </motion.span>
+          <motion.h1 variants={fadeUp}>
+            Search-ready music, video, live stream, and sponsor content.
+          </motion.h1>
+          <motion.p variants={fadeUp}>
+            Cards refresh once per day with site-update stories and SEO evergreen posts — including
+            images and video when available.
+          </motion.p>
         </motion.section>
         <section className="blogGrid blogGrid--media">
           {posts.map((post) => (
             <article className="blogCard blogCard--media" key={post.id} data-reveal>
               <div className="blogMedia">
-                {post.video ? (<video src={post.video} muted playsInline loop autoPlay preload="metadata" poster={post.image} />) : (<img src={post.image} alt="" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.svg'; }} />)}
+                {post.video ? (
+                  <video
+                    src={post.video}
+                    muted
+                    playsInline
+                    loop
+                    autoPlay
+                    preload="metadata"
+                    poster={post.image}
+                  />
+                ) : (
+                  <img
+                    src={post.image}
+                    alt=""
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/favicon.svg';
+                    }}
+                  />
+                )}
                 <span className="blogCat">{post.category}</span>
               </div>
               <span className="blogDate">{safeDate(post.date)}</span>
-              <h2>{post.title}</h2><p>{post.summary}</p>
+              <h2>{post.title}</h2>
+              <p>{post.summary}</p>
               <strong className="blogKeywords">{post.keywords}</strong>
             </article>
           ))}
@@ -675,14 +1025,33 @@ export function SponsorsPage() {
     <PublicLayout variant="chrome">
       <main className="vipMain">
         <motion.section className="vipPageHero" initial="hidden" animate="show" variants={stagger}>
-          <motion.span className="vipKicker" variants={fadeUp}>Sponsorships</motion.span>
-          <motion.h1 variants={fadeUp}>Sponsor the next 3000 Studios music and video rollout.</motion.h1>
-          <motion.p variants={fadeUp}>Built for music brands, creator tools, local businesses, labels, production partners, and stream sponsors.</motion.p>
-          <motion.div variants={fadeUp}><StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20sponsorship`}>Request Sponsor Package</StudioButton></motion.div>
+          <motion.span className="vipKicker" variants={fadeUp}>
+            Sponsorships
+          </motion.span>
+          <motion.h1 variants={fadeUp}>
+            Sponsor the next 3000 Studios music and video rollout.
+          </motion.h1>
+          <motion.p variants={fadeUp}>
+            Built for music brands, creator tools, local businesses, labels, production partners,
+            and stream sponsors.
+          </motion.p>
+          <motion.div variants={fadeUp}>
+            <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20sponsorship`}>
+              Request Sponsor Package
+            </StudioButton>
+          </motion.div>
         </motion.section>
         <section className="sponsorMarquee" aria-label="Sponsor inventory">
           <div className="sponsorMarqueeTrack">
-            {loop.map((item, i) => (<article className="vipCard sponsorMarqueeCard" key={`${item}-${i}`}><h2>{item}</h2><p>Available for approved partners only. Placement, usage, and disclosures are reviewed before publication.</p></article>))}
+            {loop.map((item, i) => (
+              <article className="vipCard sponsorMarqueeCard" key={`${item}-${i}`}>
+                <h2>{item}</h2>
+                <p>
+                  Available for approved partners only. Placement, usage, and disclosures are
+                  reviewed before publication.
+                </p>
+              </article>
+            ))}
           </div>
         </section>
       </main>
@@ -697,7 +1066,10 @@ export function AboutPage() {
         <section className="vipPageHero">
           <span className="vipKicker">About</span>
           <h1>3000 Studios is a music, video, and creator media brand.</h1>
-          <p>Built for original releases, live moments, fan feedback, sponsor packages, and premium digital rollouts.</p>
+          <p>
+            Built for original releases, live moments, fan feedback, sponsor packages, and premium
+            digital rollouts.
+          </p>
         </section>
       </main>
     </PublicLayout>
@@ -711,14 +1083,24 @@ export function ContactPage() {
         <section className="vipPageHero">
           <span className="vipKicker">Contact Us</span>
           <h1>Book music, video, sponsorship, licensing, or live stream support.</h1>
-          <p>Reach 3000 Studios directly by email for releases, budgets, timelines, rights, Spotify account access, and booking.</p>
+          <p>
+            Reach 3000 Studios directly by email for releases, budgets, timelines, rights, Spotify
+            account access, and booking.
+          </p>
         </section>
         <section className="contactEmailBlock" aria-label="Contact email">
           <div className="contactEmailInner">
             <p className="contactEmailLabel">Primary contact email</p>
-            <p className="contactEmailValue"><a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a></p>
-            <p className="contactEmailNote">Owner / artist: 3000 Studios · Write to <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a> with your project details.</p>
-            <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20contact`}>Email {OWNER_EMAIL}</StudioButton>
+            <p className="contactEmailValue">
+              <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a>
+            </p>
+            <p className="contactEmailNote">
+              Owner / artist: 3000 Studios · Write to{' '}
+              <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a> with your project details.
+            </p>
+            <StudioButton href={`mailto:${OWNER_EMAIL}?subject=3000%20Studios%20contact`}>
+              Email {OWNER_EMAIL}
+            </StudioButton>
           </div>
         </section>
       </main>
@@ -726,13 +1108,32 @@ export function ContactPage() {
   );
 }
 
-export function LegalPage({ type }: { type: 'privacy' | 'terms' | 'copyright' | 'cookies' | 'disclaimer' }) {
+export function LegalPage({
+  type,
+}: {
+  type: 'privacy' | 'terms' | 'copyright' | 'cookies' | 'disclaimer';
+}) {
   const content = {
-    privacy: { title: 'Privacy Policy', text: '3000 Studios VIP limits personal data collection to contact requests, site operations, security, analytics, advertising measurement, legal compliance, and optional community submissions. Google AdSense may use cookies or similar technologies to serve and measure ads when ad serving is active. Do not submit sensitive personal information in public forms.' },
-    terms: { title: 'Terms Of Use', text: 'By using this site you agree to lawful use, respectful community behavior, no scraping or abuse, and no unauthorized copying of music, videos, visuals, source code, private streams, or protected admin content.' },
-    copyright: { title: 'Copyright And DMCA', text: 'All original music, video, graphics, branding, and site content are owned by 3000 Studios or their respective rights holders. For takedown or licensing requests, send a detailed notice to the contact email.' },
-    cookies: { title: 'Cookie Notice', text: 'The site may use necessary storage for preferences, local community entries, playback settings, security, analytics, AdSense advertising, fraud prevention, and advertising review. Browser controls can clear local data at any time.' },
-    disclaimer: { title: 'Legal Disclaimer', text: 'The site provides music, media, entertainment, community, and business information. It is not legal, financial, medical, or professional advice. Sponsorships and offers require separate written approval.' },
+    privacy: {
+      title: 'Privacy Policy',
+      text: '3000 Studios VIP limits personal data collection to contact requests, site operations, security, analytics, advertising measurement, legal compliance, and optional community submissions. Google AdSense may use cookies or similar technologies to serve and measure ads when ad serving is active. Do not submit sensitive personal information in public forms.',
+    },
+    terms: {
+      title: 'Terms Of Use',
+      text: 'By using this site you agree to lawful use, respectful community behavior, no scraping or abuse, and no unauthorized copying of music, videos, visuals, source code, private streams, or protected admin content.',
+    },
+    copyright: {
+      title: 'Copyright And DMCA',
+      text: 'All original music, video, graphics, branding, and site content are owned by 3000 Studios or their respective rights holders. For takedown or licensing requests, send a detailed notice to the contact email.',
+    },
+    cookies: {
+      title: 'Cookie Notice',
+      text: 'The site may use necessary storage for preferences, local community entries, playback settings, security, analytics, AdSense advertising, fraud prevention, and advertising review. Browser controls can clear local data at any time.',
+    },
+    disclaimer: {
+      title: 'Legal Disclaimer',
+      text: 'The site provides music, media, entertainment, community, and business information. It is not legal, financial, medical, or professional advice. Sponsorships and offers require separate written approval.',
+    },
   }[type];
 
   return (
@@ -742,7 +1143,9 @@ export function LegalPage({ type }: { type: 'privacy' | 'terms' | 'copyright' | 
           <span className="vipKicker">Legal</span>
           <h1>{content.title}</h1>
           <p>{content.text}</p>
-          <p>Contact: <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a></p>
+          <p>
+            Contact: <a href={`mailto:${OWNER_EMAIL}`}>{OWNER_EMAIL}</a>
+          </p>
         </section>
       </main>
     </PublicLayout>
