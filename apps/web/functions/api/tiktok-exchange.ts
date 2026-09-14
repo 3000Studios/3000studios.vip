@@ -3,19 +3,30 @@ export const onRequestPost: PagesFunction = async ({ request }) => {
   if (origin !== 'https://3000studios.vip') {
     return Response.json({ error: 'origin_not_allowed' }, { status: 403 });
   }
-  const upstream = await fetch(
-    'https://apex-citadel-api.mr-jwswain.workers.dev/tiktok/oauth/exchange',
-    {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', origin },
-      body: request.body,
-    },
-  );
-  const payload = (await upstream.json()) as { ok?: boolean; session?: string; error?: string };
+  let upstream: Response;
+  try {
+    upstream = await fetch(
+      'https://apex-citadel-api.mr-jwswain.workers.dev/tiktok/oauth/exchange',
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', origin },
+        body: request.body,
+      },
+    );
+  } catch {
+    return Response.json({ error: 'tiktok_service_unavailable' }, { status: 502 });
+  }
+  const text = await upstream.text();
+  let payload: { ok?: boolean; session?: string; error?: string } = {};
+  try {
+    payload = text ? JSON.parse(text) : {};
+  } catch {
+    payload = {};
+  }
   if (!upstream.ok || !payload.session) {
     return Response.json(
-      { error: payload.error || 'tiktok_exchange_failed' },
-      { status: upstream.status },
+      { error: payload.error || 'tiktok_service_unavailable' },
+      { status: upstream.ok ? 502 : upstream.status },
     );
   }
   return Response.json(

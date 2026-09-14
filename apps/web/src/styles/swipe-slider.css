@@ -2,7 +2,7 @@
   background: #2d3042;
   color: #efefef;
   text-align: center;
-  min-height: 100vh;
+  min-height: 0;
 }
 
 .slickHome .main-slider {
@@ -31,7 +31,7 @@
 }
 
 .slickHome .slick-slide::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: #000;
@@ -84,9 +84,15 @@
   transform: translate(-50%, 0);
   transition: all 0.7s cubic-bezier(0.32, 0.34, 0, 1.62) 0.35s;
 }
-.slickHome .slick-active .caption.cap-1 { transform: translate(-50%, 0) scale(1.04); }
-.slickHome .slick-active .caption.cap-2 { letter-spacing: 0.08em; }
-.slickHome .slick-active .caption.cap-3 { transform: translate(-50%, 0) rotate(-1.2deg); }
+.slickHome .slick-active .caption.cap-1 {
+  transform: translate(-50%, 0) scale(1.04);
+}
+.slickHome .slick-active .caption.cap-2 {
+  letter-spacing: 0.08em;
+}
+.slickHome .slick-active .caption.cap-3 {
+  transform: translate(-50%, 0) rotate(-1.2deg);
+}
 
 .slickHome .buyBtn {
   position: absolute;
@@ -128,8 +134,12 @@
   animation: vizPulse 0.38s ease-in-out infinite alternate;
 }
 @keyframes vizPulse {
-  from { transform: scaleY(0.45); }
-  to { transform: scaleY(1); }
+  from {
+    transform: scaleY(0.45);
+  }
+  to {
+    transform: scaleY(1);
+  }
 }
 
 .slickHome .slick-dots {
@@ -174,14 +184,18 @@
   cursor: pointer;
 }
 
-.slickHome .slickArrow.prev { left: 0; }
-.slickHome .slickArrow.next { right: 0; }
+.slickHome .slickArrow.prev {
+  left: 0;
+}
+.slickHome .slickArrow.next {
+  right: 0;
+}
 
 .slickHome .container.slickCopy {
   background: #f2f2f2;
   color: #444;
   line-height: 1.6;
-  padding: 36px 0 80px;
+  padding: clamp(20px, 3vw, 36px) 0 clamp(28px, 5vw, 56px);
 }
 
 .slickHome .slickCopy .content {
@@ -195,10 +209,35 @@
 }
 
 @keyframes slickSlideIn {
-  from { filter: blur(15px); }
-  to { filter: blur(0); }
+  from {
+    filter: blur(15px);
+  }
+  to {
+    filter: blur(0);
+  }
 }
 
 .vipSite .vipHeaderMusic {
   z-index: 20;
+}
+
+@media (min-width: 1800px) {
+  .slickHome .main-slider {
+    height: min(68vh, 920px);
+  }
+
+  .slickHome .caption {
+    font-size: clamp(44px, 2.6vw, 72px);
+  }
+
+  .slickHome .buyBtn {
+    min-height: 48px;
+    padding-inline: 28px;
+    font-size: 1rem;
+  }
+
+  .slickHome .slickArrow {
+    width: 64px;
+    height: 96px;
+  }
 }

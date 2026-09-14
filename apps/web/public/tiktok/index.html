@@ -123,6 +123,16 @@
         color: #7dffb3;
         display: none;
       }
+      .notice {
+        display: none;
+        margin: 0 0 18px;
+        padding: 12px 14px;
+        border: 1px solid rgba(255, 111, 137, 0.38);
+        border-radius: 12px;
+        background: rgba(102, 17, 38, 0.24);
+        color: #ffd7df;
+        line-height: 1.45;
+      }
       .row {
         margin-top: 18px;
       }
@@ -179,6 +189,7 @@
         </div>
       </div>
       <div class="card">
+        <div id="notice" class="notice" role="status" aria-live="polite"></div>
         <div class="row">
           <button id="connect">Connect TikTok</button>
           <span class="ok" id="connected">Connected · user.info.basic</span>
@@ -217,6 +228,20 @@
       const clientKey = 'sbawunwbiuohnfsdsc';
       const redirect = 'https://3000studios.vip/tiktok';
       const api = '';
+      const notice = document.getElementById('notice');
+      const showError = (message) => {
+        notice.textContent = message;
+        notice.style.display = 'block';
+      };
+      const readJson = async (response) => {
+        const text = await response.text();
+        if (!text) return {};
+        try {
+          return JSON.parse(text);
+        } catch {
+          return {};
+        }
+      };
       document.getElementById('connect').onclick = () => {
         const stateBytes = crypto.getRandomValues(new Uint8Array(24));
         const state = Array.from(stateBytes, (b) => b.toString(16).padStart(2, '0')).join('');
@@ -247,13 +272,18 @@
             body: JSON.stringify({ code, redirectUri: redirect }),
           })
             .then(async (response) => {
-              const result = await response.json();
-              if (!response.ok) throw new Error(result.error || 'Authorization failed');
+              const result = await readJson(response);
+              if (!response.ok || !result.ok) {
+                throw new Error(result.error || 'TikTok connection is temporarily unavailable');
+              }
               sessionStorage.setItem('tiktokConnected', '1');
               location.replace('/tiktok/');
             })
             .catch((error) => {
-              document.getElementById('connect').textContent = error.message;
+              history.replaceState({}, '', '/tiktok/');
+              showError(`${error.message}. Please reconnect TikTok and try again.`);
+              document.getElementById('connect').disabled = false;
+              document.getElementById('connect').textContent = 'Reconnect TikTok';
             });
         }
       }
@@ -300,13 +330,13 @@
             headers: { 'content-type': f.type || 'video/mp4' },
             body: f,
           });
-          const result = await response.json();
+          const result = await readJson(response);
           if (!response.ok) throw new Error(result.error || 'Upload failed');
           document.getElementById('uploaded').style.display = 'inline';
           button.textContent = 'Draft sent to TikTok inbox';
           sessionStorage.removeItem('tiktokConnected');
         } catch (error) {
-          alert(error.message);
+          showError(`${error.message}. No video was posted.`);
           button.disabled = false;
           button.textContent = 'Upload draft to TikTok inbox';
         }
