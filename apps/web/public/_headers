@@ -8,3 +8,15 @@
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/
+  Cache-Control: no-cache, must-revalidate
+
+/index.html
+  Cache-Control: no-cache, must-revalidate
+
+/tiktok
+  Cache-Control: no-store
+
+/tiktok/*
+  Cache-Control: no-store
