@@ -27,7 +27,8 @@ function Get-Sha256Hex {
     $bytes = [System.Text.Encoding]::UTF8.GetBytes($Value)
     $hash = $sha.ComputeHash($bytes)
     return ($hash | ForEach-Object { $_.ToString('x2') }) -join ''
-  } finally {
+  }
+  finally {
     $sha.Dispose()
   }
 }
@@ -41,7 +42,7 @@ function Invoke-CloudflareApi {
   )
 
   $headers = @{
-    Authorization = "Bearer $script:CloudflareToken"
+    Authorization  = "Bearer $script:CloudflareToken"
     'Content-Type' = 'application/json'
   }
 
@@ -53,7 +54,8 @@ function Invoke-CloudflareApi {
 
     $json = $Body | ConvertTo-Json -Depth 20
     return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers -Body $json
-  } catch {
+  }
+  catch {
     $response = $_.Exception.Response
     if ($response -and $response.GetResponseStream()) {
       $reader = New-Object System.IO.StreamReader($response.GetResponseStream())
@@ -69,7 +71,7 @@ function Invoke-CloudflareApi {
 function New-PagesEnvVar {
   param([string]$Value, [bool]$Secret)
   @{
-    type = $(if ($Secret) { 'secret_text' } else { 'plain_text' })
+    type  = $(if ($Secret) { 'secret_text' } else { 'plain_text' })
     value = $Value
   }
 }
@@ -107,30 +109,37 @@ if (-not $answerHash) {
 }
 
 $pagesValues = [ordered]@{
-  NODE_VERSION = Get-EnvValue -Names @('NODE_VERSION') -Default '22'
-  APP_ENV = Get-EnvValue -Names @('APP_ENV') -Default 'production'
-  ACCESS_REQUIRED = Get-EnvValue -Names @('ACCESS_REQUIRED') -Default '1'
-  VITE_API_BASE = Get-EnvValue -Names @('VITE_API_BASE', 'VITE_API_BASE_URL') -Default 'https://api.3000studios.vip'
-  VITE_VAULT_USERNAME = Get-EnvValue -Names @('VITE_VAULT_USERNAME', 'OWNER_ADMIN_EMAIL', 'OWNER_EMAIL', 'ADMIN_EMAIL') -Default 'Mr.jwswain@gmail.com'
-  VITE_VAULT_PASSCODE_SHA256 = $passcodeHash
+  NODE_VERSION                    = Get-EnvValue -Names @('NODE_VERSION') -Default '22'
+  APP_ENV                         = Get-EnvValue -Names @('APP_ENV') -Default 'production'
+  ACCESS_REQUIRED                 = Get-EnvValue -Names @('ACCESS_REQUIRED') -Default '1'
+  VITE_API_BASE                   = Get-EnvValue -Names @('VITE_API_BASE', 'VITE_API_BASE_URL') -Default 'https://api.3000studios.vip'
+  GEMINI_API_KEY                  = Get-EnvValue -Names @('GEMINI_API_KEY', 'VITE_GEMINI_API_KEY') -Default $null
+  VITE_FIREBASE_API_KEY           = Get-EnvValue -Names @('VITE_FIREBASE_API_KEY') -Default $null
+  VITE_VAULT_USERNAME             = Get-EnvValue -Names @('VITE_VAULT_USERNAME', 'OWNER_ADMIN_EMAIL', 'OWNER_EMAIL', 'ADMIN_EMAIL') -Default 'Mr.jwswain@gmail.com'
+  VITE_VAULT_PASSCODE_SHA256      = $passcodeHash
   VITE_VAULT_SECRET_ANSWER_SHA256 = $answerHash
-  VITE_STREAM_CUSTOMER_CODE = Get-EnvValue -Names @('VITE_STREAM_CUSTOMER_CODE', 'STREAM_CUSTOMER_CODE') -Default $null
-  VITE_STREAM_LIVE_INPUT_ID = Get-EnvValue -Names @('VITE_STREAM_LIVE_INPUT_ID', 'STREAM_LIVE_INPUT_ID') -Default $null
-  VITE_STREAM_PLAYER_UID = Get-EnvValue -Names @('VITE_STREAM_PLAYER_UID', 'STREAM_PLAYER_UID', 'STREAM_VIDEO_UID') -Default $null
-  VITE_STREAM_TITLE = Get-EnvValue -Names @('VITE_STREAM_TITLE') -Default '3000 Studios Private Stream'
-  VITE_STRIPE_PAYMENT_LINK = Get-EnvValue -Names @('VITE_STRIPE_PAYMENT_LINK', 'STRIPE_PAYMENT_LINK_PRO') -Default $null
-  VITE_STRIPE_BASIC_LINK = Get-EnvValue -Names @('VITE_STRIPE_BASIC_LINK', 'STRIPE_PAYMENT_LINK_STARTER') -Default $null
-  VITE_ADSENSE_CLIENT_ID = Get-EnvValue -Names @('VITE_ADSENSE_CLIENT_ID', 'ADSENSE_CLIENT_ID') -Default 'ca-pub-5800977493749262'
-  VITE_ADSENSE_HOME_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_HOME_SLOT', 'ADSENSE_HOME_SLOT') -Default $null
-  VITE_ADSENSE_MUSIC_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_MUSIC_SLOT', 'ADSENSE_MUSIC_SLOT') -Default $null
-  VITE_ADSENSE_VIDEO_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_VIDEO_SLOT', 'ADSENSE_VIDEO_SLOT') -Default $null
-  VITE_ADSENSE_LIVE_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_LIVE_SLOT', 'ADSENSE_LIVE_SLOT') -Default $null
-  VITE_ADSENSE_BLOG_SLOT = Get-EnvValue -Names @('VITE_ADSENSE_BLOG_SLOT', 'ADSENSE_BLOG_SLOT') -Default $null
+  STREAM_ADMIN_PASSCODE           = Get-EnvValue -Names @('STREAM_ADMIN_PASSCODE') -Default $null
+  STREAM_WHIP_URL                 = Get-EnvValue -Names @('STREAM_WHIP_URL', 'VITE_STREAM_WHIP_URL') -Default $null
+  VITE_STREAM_CUSTOMER_CODE       = Get-EnvValue -Names @('VITE_STREAM_CUSTOMER_CODE', 'STREAM_CUSTOMER_CODE') -Default $null
+  VITE_STREAM_LIVE_INPUT_ID       = Get-EnvValue -Names @('VITE_STREAM_LIVE_INPUT_ID', 'STREAM_LIVE_INPUT_ID') -Default $null
+  VITE_STREAM_PLAYER_UID          = Get-EnvValue -Names @('VITE_STREAM_PLAYER_UID', 'STREAM_PLAYER_UID', 'STREAM_VIDEO_UID') -Default $null
+  VITE_STREAM_TITLE               = Get-EnvValue -Names @('VITE_STREAM_TITLE') -Default '3000 Studios Private Stream'
+  VITE_STRIPE_PAYMENT_LINK        = Get-EnvValue -Names @('VITE_STRIPE_PAYMENT_LINK', 'STRIPE_PAYMENT_LINK_PRO') -Default $null
+  VITE_STRIPE_BASIC_LINK          = Get-EnvValue -Names @('VITE_STRIPE_BASIC_LINK', 'STRIPE_PAYMENT_LINK_STARTER') -Default $null
+  VITE_ADSENSE_CLIENT_ID          = Get-EnvValue -Names @('VITE_ADSENSE_CLIENT_ID', 'ADSENSE_CLIENT_ID') -Default 'ca-pub-5800977493749262'
+  VITE_ADSENSE_HOME_SLOT          = Get-EnvValue -Names @('VITE_ADSENSE_HOME_SLOT', 'ADSENSE_HOME_SLOT') -Default $null
+  VITE_ADSENSE_MUSIC_SLOT         = Get-EnvValue -Names @('VITE_ADSENSE_MUSIC_SLOT', 'ADSENSE_MUSIC_SLOT') -Default $null
+  VITE_ADSENSE_VIDEO_SLOT         = Get-EnvValue -Names @('VITE_ADSENSE_VIDEO_SLOT', 'ADSENSE_VIDEO_SLOT') -Default $null
+  VITE_ADSENSE_LIVE_SLOT          = Get-EnvValue -Names @('VITE_ADSENSE_LIVE_SLOT', 'ADSENSE_LIVE_SLOT') -Default $null
+  VITE_ADSENSE_BLOG_SLOT          = Get-EnvValue -Names @('VITE_ADSENSE_BLOG_SLOT', 'ADSENSE_BLOG_SLOT') -Default $null
 }
 
 $secretPageNames = @(
+  'GEMINI_API_KEY',
   'VITE_VAULT_PASSCODE_SHA256',
   'VITE_VAULT_SECRET_ANSWER_SHA256',
+  'STREAM_ADMIN_PASSCODE',
+  'STREAM_WHIP_URL',
   'VITE_STREAM_CUSTOMER_CODE',
   'VITE_STREAM_LIVE_INPUT_ID'
 )
@@ -147,10 +156,10 @@ foreach ($entry in $pagesValues.GetEnumerator()) {
 
 $workerSecrets = [ordered]@{
   CLOUDFLARE_ACCOUNT_ID = $accountId
-  CLOUDFLARE_API_TOKEN = $script:CloudflareToken
-  ALERT_FROM_EMAIL = Get-EnvValue -Names @('ALERT_FROM_EMAIL') -Default 'alerts@3000studios.vip'
-  MAILCHANNELS_API_KEY = Get-EnvValue -Names @('MAILCHANNELS_API_KEY') -Default $null
-  DUDE_SYNC_TOKEN = Get-EnvValue -Names @('DUDE_SYNC_TOKEN', 'X_ORCH_TOKEN', 'ORCH_TOKEN') -Default $null
+  CLOUDFLARE_API_TOKEN  = $script:CloudflareToken
+  ALERT_FROM_EMAIL      = Get-EnvValue -Names @('ALERT_FROM_EMAIL') -Default 'alerts@3000studios.vip'
+  MAILCHANNELS_API_KEY  = Get-EnvValue -Names @('MAILCHANNELS_API_KEY') -Default $null
+  DUDE_SYNC_TOKEN       = Get-EnvValue -Names @('DUDE_SYNC_TOKEN', 'X_ORCH_TOKEN', 'ORCH_TOKEN') -Default $null
 }
 
 $missingWorker = New-Object System.Collections.Generic.List[string]
@@ -161,10 +170,10 @@ foreach ($entry in $workerSecrets.GetEnumerator()) {
     continue
   }
   $workerSecretPayloads.Add(@{
-    name = $entry.Key
-    text = $entry.Value
-    type = 'secret_text'
-  }) | Out-Null
+      name = $entry.Key
+      text = $entry.Value
+      type = 'secret_text'
+    }) | Out-Null
 }
 
 Write-Output "Loaded $($loaded.Names.Count) env names from $($loaded.Path). Values are masked."
@@ -185,7 +194,7 @@ if ($DryRun) {
 $pagesBody = @{
   deployment_configs = @{
     production = @{ env_vars = $envVars }
-    preview = @{ env_vars = $envVars }
+    preview    = @{ env_vars = $envVars }
   }
 }
 

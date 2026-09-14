@@ -17,7 +17,13 @@ export async function onRequestPost({ request, env }: { request: Request; env: E
     body = {};
   }
 
-  const expected = env.STREAM_ADMIN_PASSCODE || '3000';
+  const expected = env.STREAM_ADMIN_PASSCODE?.trim();
+  if (!expected) {
+    return new Response(JSON.stringify({ ok: false, error: 'stream_admin_not_configured' }), {
+      status: 503,
+      headers: JSON_HEADERS,
+    });
+  }
   if (body.passcode !== expected) {
     return new Response(JSON.stringify({ ok: false }), {
       status: 401,
@@ -25,9 +31,7 @@ export async function onRequestPost({ request, env }: { request: Request; env: E
     });
   }
 
-  const whipUrl =
-    env.STREAM_WHIP_URL?.trim() ||
-    'https://customer-wx8j23tjjjpkb37k.cloudflarestream.com/aec35a431bd94081d29586ba38b83e25k3e4ea5b57e0ce5cc54fd519ba2b7ae7d/webRTC/publish';
+  const whipUrl = env.STREAM_WHIP_URL?.trim() || '';
   return new Response(
     JSON.stringify({
       ok: Boolean(whipUrl),
