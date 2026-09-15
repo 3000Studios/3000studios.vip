@@ -48,6 +48,10 @@ body,
   overflow-x: hidden;
 }
 
+:root {
+  --css-build-revision: 20260914;
+}
+
 img,
 video,
 canvas,
