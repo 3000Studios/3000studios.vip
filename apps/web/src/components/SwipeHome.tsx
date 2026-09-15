@@ -6,7 +6,6 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { Link } from 'react-router-dom';
-import { useGlobalMusic } from './GlobalMusic';
 import { playSwoosh } from './StageFX';
 import { publishedSongs, publishedToCatalog } from '../data/publishedSongs';
 import { youtubeArtworkUrl } from '../data/officialReleases';
@@ -23,7 +22,6 @@ function SlideViz() {
 }
 
 export function SwipeHome() {
-  const music = useGlobalMusic();
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -123,15 +121,9 @@ export function SwipeHome() {
                   : '/media/official-3000-studios-profile.png');
               const active = i === index;
               return (
-                <div
-                  key={`${s.slug}-${i}`}
-                  className={`slick-slide item image${active ? ' slick-active' : ''}`}
-                >
+                <div key={`${s.slug}-${i}`} className={`slick-slide item image${active ? ' slick-active' : ''}`}>
                   <figure>
-                    <div
-                      className="slide-image slide-media show"
-                      style={{ backgroundImage: `url('${cover}')` }}
-                    />
+                    <div className="slide-image slide-media show" style={{ backgroundImage: `url('${cover}')` }} />
                     {active && s.youtubeId ? (
                       <iframe
                         className="slideVideo"
