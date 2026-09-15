@@ -32,6 +32,7 @@
 @import './styles/premium-shell.css';
 @import './styles/mobile-polish.css';
 @import './styles/platform-finish.css';
+@import './styles/stage-fx.css';
 
 .routeLoader {
   min-height: 100vh;

@@ -9,6 +9,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminFab } from './components/AdminFab';
 import { SparkClickFX } from './components/SparkClickFX';
+import { StageFX } from './components/StageFX';
 import { YouTubeSubscriberPerk } from './components/YouTubeSubscriberPerk';
 import {
   AboutPage,
@@ -76,6 +77,7 @@ function RootLayout() {
   return (
     <>
       <SparkClickFX />
+      <StageFX />
       <YouTubeSubscriberPerk />
       <SampleGate />
       <Outlet />
