@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { rmSync } from 'node:fs'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { rmSync } from 'node:fs';
 
 const pagesAssetLimitPlugin = {
   name: 'pages-asset-limit',
@@ -8,13 +8,32 @@ const pagesAssetLimitPlugin = {
     // Keep the lossless studio master in source control, but do not copy it to
     // Pages: it exceeds Pages' per-file asset limit. The public player uses
     // the MP3 release rendition instead.
-    rmSync(new URL('./dist/media/BIG_OLD_HANDS_Tore_up_the_hole_Krust.wav', import.meta.url), { force: true })
+    rmSync(new URL('./dist/media/BIG_OLD_HANDS_Tore_up_the_hole_Krust.wav', import.meta.url), {
+      force: true,
+    });
   },
-}
+};
+
+const sameOriginStylesPlugin = {
+  name: 'same-origin-styles',
+  enforce: 'post' as const,
+  transformIndexHtml: {
+    order: 'post' as const,
+    handler(html: string) {
+      // Vite adds crossorigin to generated stylesheet links. The production
+      // stylesheet is same-origin, so remove the unnecessary CORS request mode;
+      // it has caused Chrome to abort the CSS request before applying the sheet.
+      return html.replace(
+        /<link rel="stylesheet" crossorigin href="(\/assets\/[^"]+\.css)">/g,
+        '<link rel="stylesheet" href="$1">',
+      );
+    },
+  },
+};
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), pagesAssetLimitPlugin],
+  plugins: [react(), pagesAssetLimitPlugin, sameOriginStylesPlugin],
   build: {
     rollupOptions: {
       output: {
@@ -36,4 +55,4 @@ export default defineConfig({
       },
     },
   },
-})
+});
