@@ -7,7 +7,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { Link } from 'react-router-dom';
-import { playSwoosh } from './StageFX';
+import { playSwoosh } from './stageSfx';
 import { publishedSongs } from '../data/publishedSongs';
 import {
   officialReleaseVideos,
