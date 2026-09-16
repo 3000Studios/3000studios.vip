@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Memory Match Hustle — 60s Brain Test | 3000 Studios</title>
+<meta name="description" content="12 cards, 60 seconds. Clear the board. Free brain-bait TikTok mini-game." />
+<link rel="canonical" href="https://3000studios.vip/tiktok-games/memory-hustle.html" />
+<style>
+:root{color-scheme:dark;--pink:#FE2C55;--cyan:#25F4EE}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#010204;color:#fff;font-family:Inter,system-ui,sans-serif;text-align:center}
+.wrap{max-width:460px;margin:0 auto;padding:16px}.eyebrow{color:var(--cyan);font-size:.7rem;font-weight:800;letter-spacing:.15em}
+#hud{display:flex;justify-content:space-between;font-weight:800;margin:8px 0}
+#grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.card{aspect-ratio:.78;background:#0d1120;border:1px solid #26305a;border-radius:12px;font-size:1.7rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.card.open{background:#16204a}.card.hit{background:#0fa968;border-color:#0fa968}
+button{background:var(--pink);color:#fff;border:0;font-weight:800;padding:14px;border-radius:12px;width:100%;margin-top:10px;font-size:1rem}
+button.ghost{background:#1a2140}#cap{font-size:.78rem;color:#a7a7b3;background:#070a16;border-radius:10px;padding:10px;margin-top:10px}
+a{color:var(--cyan);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="eyebrow">TIKTOK GAME 6 • BRAIN BAIT • @3000STUDIOS.VIP</div>
+<h1>🧠 MEMORY MATCH HUSTLE</h1>
+<div id="hud"><span>⏱ <span id="t">60</span>s</span><span>✅ <span id="m">0</span>/6 pairs</span><span>👑 <span id="b">—</span></span></div>
+<div id="grid"></div>
+<button id="play">▶ START (60s)</button>
+<div id="cap">Caption: I cleared __/6 pairs in 60s 🧠 Beat me @3000studios.vip #memorymatch #braintest #3000studios</div>
+<button class="ghost" id="copy">COPY CAPTION</button>
+<div style="margin-top:8px"><a href="./">← all 6 games</a></div>
+</div>
+<script>
+const EM=['🎵','🎮','💰','🔥','⚡','👑'];let order=[],first=null,lock=false,pairs=0,sec=60,timer=null,run=false;
+let best=localStorage.getItem('mem_best')||null;if(best)document.getElementById('b').textContent=best+'s left';
+const g=document.getElementById('grid');
+function board(){g.innerHTML='';order=[...EM,...EM].sort(()=>Math.random()-.5);pairs=0;first=null;document.getElementById('m').textContent='0';
+order.forEach(e=>{const d=document.createElement('div');d.className='card';d.dataset.e=e;d.textContent='?';d.onclick=()=>flip(d);g.appendChild(d);});}
+function flip(d){if(!run||lock||d.classList.contains('open'))return;d.classList.add('open');d.textContent=d.dataset.e;
+if(!first){first=d;return}lock=true;const a=first;first=null;
+setTimeout(()=>{if(a.dataset.e===d.dataset.e){a.classList.add('hit');d.classList.add('hit');pairs++;document.getElementById('m').textContent=pairs;
+if(pairs===6)win();}else{a.classList.remove('open');d.classList.remove('open');a.textContent='?';d.textContent='?';}lock=false;},420);}
+function win(){run=false;clearInterval(timer);const leftE=sec;if(!best||leftE>+best){best=leftE;localStorage.setItem('mem_best',best)}
+document.getElementById('b').textContent=best+'s left';
+document.getElementById('cap').textContent='Caption: I cleared 6/6 with '+sec+'s LEFT 🧠👑 Beat that @3000studios.vip #memorymatch #3000studios';}
+function lose(){run=false;document.getElementById('cap').textContent='Caption: I only got '+pairs+'/6 pairs in 60s 🧠 I\'m cooked — beat me @3000studios.vip #memorymatch #3000studios';}
+document.getElementById('play').onclick=()=>{board();sec=60;run=true;document.getElementById('t').textContent=sec;clearInterval(timer);
+timer=setInterval(()=>{sec--;document.getElementById('t').textContent=sec;if(sec<=0){clearInterval(timer);lose();}},1000);};
+document.getElementById('copy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('cap').textContent)};
+board();
+</script>
+<!-- ADSENSE: memory-hustle slot -->
+</body>
+</html>

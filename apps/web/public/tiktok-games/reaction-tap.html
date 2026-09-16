@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Reaction Tap Test — What's Your MS? | 3000 Studios</title>
+<meta name="description" content="Test your reaction speed in ms. Best-of-5. Comment your score. Free TikTok mini-game." />
+<link rel="canonical" href="https://3000studios.vip/tiktok-games/reaction-tap.html" />
+<style>
+:root{color-scheme:dark;--pink:#FE2C55;--cyan:#25F4EE}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#fff;text-align:center;user-select:none}
+#pad{min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#b3261e;cursor:pointer;padding:30px;touch-action:none}
+#pad.wait{background:#b3261e}#pad.go{background:#0fa968}#pad.done{background:#0d1120}
+.eyebrow{color:var(--cyan);font-size:.7rem;font-weight:800;letter-spacing:.15em}
+h1{margin:.3rem 0}#big{font-size:3rem;font-weight:900}#sub{color:#d7d7de}
+.panel{background:#010204;padding:18px}.row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.pill{background:#0d1120;border:1px solid #26305a;border-radius:99px;padding:8px 14px;font-size:.85rem}
+button{background:var(--pink);color:#fff;border:0;font-weight:800;padding:14px 22px;border-radius:12px;width:100%;max-width:340px;margin-top:10px;font-size:1rem}
+button.ghost{background:#1a2140}#cap{font-size:.78rem;color:#a7a7b3;background:#070a16;border-radius:10px;padding:10px;margin:10px auto;max-width:340px}
+a{color:var(--cyan);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="panel"><div class="eyebrow">TIKTOK GAME 3 • COMMENT BAIT • @3000STUDIOS.VIP</div><h1>🟢 REACTION TAP TEST</h1><div>Best of 5 • tap when GREEN • early tap = foul</div></div>
+<div id="pad" class="wait"><div id="big">TAP TO START</div><div id="sub">wait for green… then smash it</div></div>
+<div class="panel"><div class="row" id="rounds"></div>
+<button id="copy">COPY RESULT CAPTION</button>
+<div id="cap">Caption: My reaction is __ms 🟢 What's yours? @3000studios.vip #reactiontest #3000studios</div>
+<div><a href="./">← all 6 games</a> • <a href="https://www.tiktok.com/@3000studios.vip" target="_blank" rel="noopener">tiktok</a></div></div>
+<script>
+const pad=document.getElementById('pad'),big=document.getElementById('big'),sub=document.getElementById('sub'),rounds=document.getElementById('rounds');
+let state='idle',t0=0,timer=null,scores=[],best=+(localStorage.getItem('react_best')||9999);
+function render(){rounds.innerHTML=scores.map(s=>'<span class="pill">'+s+'ms</span>').join('')+(best<9999?'<span class="pill">👑 best '+best+'ms</span>':'');}
+render();
+function startRound(){state='wait';pad.className='wait';big.textContent='WAIT…';sub.textContent='red = wait. green = TAP!';
+timer=setTimeout(()=>{state='go';pad.className='go';big.textContent='TAP! 🟢';t0=performance.now()},1200+Math.random()*3000);}
+pad.addEventListener('pointerdown',()=>{if(state==='idle'||state==='done'){if(scores.length>=5)scores=[];startRound();return}
+if(state==='wait'){clearTimeout(timer);big.textContent='TOO EARLY! 😅';sub.textContent='foul — tap to retry';state='idle';return}
+if(state==='go'){const ms=Math.round(performance.now()-t0);scores.push(ms);best=Math.min(best,ms);localStorage.setItem('react_best',best);
+const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+big.textContent=ms+'ms';sub.textContent=scores.length+'/5 • avg '+avg+'ms — tap for next';
+document.getElementById('cap').textContent='Caption: My reaction is '+ms+'ms (avg '+avg+'ms) 🟢 Can you beat '+best+'ms? @3000studios.vip #reactiontest #3000studios';
+state=scores.length>=5?'done':'idle';pad.className=scores.length>=5?'done':pad.className;render();
+if(scores.length>=5){big.textContent='AVG '+avg+'ms 🏁';sub.textContent='5 rounds done — screenshot this, post it, bait the comments';}}});
+document.getElementById('copy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('cap').textContent)};
+</script>
+<!-- ADSENSE: reaction bottom slot -->
+</body>
+</html>

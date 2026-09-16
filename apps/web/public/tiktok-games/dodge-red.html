@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Dodge The Red — Survive 30s | 3000 Studios</title>
+<meta name="description" content="Survive 30 seconds. 99% fail at 17s. Free vertical TikTok mini-game by 3000 Studios." />
+<link rel="canonical" href="https://3000studios.vip/tiktok-games/dodge-red.html" />
+<style>
+:root{color-scheme:dark;--pink:#FE2C55;--cyan:#25F4EE}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#010204;color:#fff;font-family:Inter,system-ui,sans-serif;text-align:center;overflow:hidden;user-select:none}
+#top{padding:10px}.eyebrow{color:var(--cyan);font-size:.7rem;font-weight:800;letter-spacing:.15em}
+h1{margin:.2rem 0;font-size:1.3rem}#score{font-size:2.2rem;font-weight:900}#time{color:#a7a7b3;font-size:.9rem}
+canvas{display:block;margin:0 auto;background:#05070f;border-top:1px solid #1c2340;border-bottom:1px solid #1c2340;touch-action:none}
+#msg{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);z-index:5;padding:20px}
+#msg.hidden{display:none}.box{background:#0d1120;border:1px solid #26305a;border-radius:18px;padding:26px;max-width:340px}
+button{background:var(--pink);color:#fff;border:0;font-weight:800;font-size:1.05rem;padding:14px 28px;border-radius:12px;width:100%;margin-top:10px}
+button.ghost{background:#1a2140}#cap{font-size:.78rem;color:#a7a7b3;background:#070a16;border-radius:10px;padding:10px;margin-top:10px}
+a{color:var(--cyan);font-size:.85rem}.hint{color:#a7a7b3;font-size:.8rem;padding:8px}
+</style>
+</head>
+<body>
+<div id="top"><div class="eyebrow">TIKTOK GAME 2 • 30-SEC CHALLENGE</div><h1>☄️ DODGE THE RED</h1><div id="score">0.0s</div><div id="time">drag to move • survive 30s • best <span id="best">0</span>s</div></div>
+<canvas id="c" width="420" height="600"></canvas>
+<div class="hint">99% fail at 17s. Record it. Post the fail face. 📱</div>
+<div id="msg"><div class="box">
+<div class="eyebrow" id="mt">SURVIVE 30 SECONDS</div>
+<p id="mx">Drag your cyan dot. Red eats you. 30s = legend. Fail = clip it anyway, fails go viral.</p>
+<button id="play">▶ START</button>
+<div id="cap">Caption: I survived __s on Dodge The Red ☄️ 99% fail at 17s @3000studios.vip #dodgethered #survival #3000studios</div>
+<button class="ghost" id="copy">COPY CAPTION</button>
+<div style="margin-top:10px"><a href="./">← all 6 games</a></div>
+</div></div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),S=document.getElementById('score');
+function fit(){const r=Math.min(innerWidth/420,(innerHeight-210)/600);cv.style.width=420*r+'px';cv.style.height=600*r+'px'}addEventListener('resize',fit);fit();
+let px=210,py=500,tx=210,ty=500,reds=[],t=0,run=false,dead=false,best=+(localStorage.getItem('dodge_best')||0);
+document.getElementById('best').textContent=best.toFixed(1);
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();tx=(e.clientX-r.left)/r.width*420;ty=(e.clientY-r.top)/r.height*600});
+cv.addEventListener('pointerdown',e=>{const r=cv.getBoundingClientRect();tx=(e.clientX-r.left)/r.width*420;ty=(e.clientY-r.top)/r.height*600});
+let last=0;function frame(ts){requestAnimationFrame(frame);if(!run||dead)return;const dt=Math.min(.05,(ts-last)/1000||.016);last=ts;t+=dt;
+if(Math.random()<.06+t*.004)reds.push({x:Math.random()*400,y:-20,v:120+t*14,r:10+Math.random()*14+t*.3});
+reds.forEach(r=>r.y+=r.v*dt);px+=(tx-px)*.2;py+=(ty-py)*.2;
+for(const r of reds){const dx=px-r.x,dy=py-r.y;if(Math.hypot(dx,dy)<r.r+9){die();return}}
+reds=reds.filter(r=>r.y<640);S.textContent=t.toFixed(1)+'s';
+if(t>=30){win();return}
+x.clearRect(0,0,420,600);x.fillStyle='#25F4EE';x.font='700 12px Inter';x.fillText('▮ SURVIVE 30s • DRAG FAST',8,16);
+x.fillStyle='#FE2C55';reds.forEach(r=>{x.beginPath();x.arc(r.x,r.y,r.r,0,7);x.fill()});
+x.fillStyle='#25F4EE';x.beginPath();x.arc(px,py,9,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(px,py,4,0,7);x.fill();}requestAnimationFrame(frame);
+function die(){dead=true;run=false;best=Math.max(best,t);localStorage.setItem('dodge_best',best);
+mt('YOU DIED AT '+t.toFixed(1)+'s 💀','Best '+best.toFixed(1)+'s. Post the fail — fails get more comments than wins.','I survived '+t.toFixed(1)+'s on Dodge The Red ☄️ 99% fail at 17s @3000studios.vip #dodgethered #survival #3000studios');}
+function win(){dead=true;run=false;best=30;localStorage.setItem('dodge_best',30);
+mt('30s LEGEND 👑','You did what 99% can\'t. Post the proof. Tag @3000studios.vip.','I SURVIVED 30s on Dodge The Red ☄️👑 Can anyone beat that? @3000studios.vip #dodgethered #3000studios');}
+function mt(a,b,c){document.getElementById('mt').textContent=a;document.getElementById('mx').textContent=b;document.getElementById('cap').textContent='Caption: '+c;document.getElementById('best').textContent=best.toFixed(1);document.getElementById('msg').classList.remove('hidden');}
+document.getElementById('play').onclick=e=>{e.stopPropagation();document.getElementById('msg').classList.add('hidden');reds=[];t=0;dead=false;run=true;last=performance.now();px=tx=210;py=ty=500};
+document.getElementById('copy').onclick=e=>{e.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('cap').textContent)};
+</script>
+<!-- ADSENSE: dodge-red bottom banner slot -->
+</body>
+</html>

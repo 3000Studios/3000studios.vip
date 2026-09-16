@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Stack Tower Rage — TikTok Game 1 | 3000 Studios</title>
+<meta name="description" content="One-tap stacking tower. How high before you rage? Free TikTok mini-game. Clip it and tag @3000studios.vip" />
+<link rel="canonical" href="https://3000studios.vip/tiktok-games/stack-rage.html" />
+<style>
+:root{color-scheme:dark;--pink:#FE2C55;--cyan:#25F4EE}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#010204;color:#fff;font-family:Inter,system-ui,sans-serif;text-align:center;overflow:hidden;user-select:none}
+#top{padding:10px}.eyebrow{color:var(--cyan);font-size:.7rem;font-weight:800;letter-spacing:.15em}
+h1{margin:.2rem 0;font-size:1.3rem}#score{font-size:2.2rem;font-weight:900}#best{color:#a7a7b3;font-size:.85rem}
+canvas{display:block;margin:0 auto;background:linear-gradient(#05070f,#0a0f24);border-top:1px solid #1c2340;border-bottom:1px solid #1c2340;touch-action:none}
+#msg{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);z-index:5;padding:20px}
+#msg.hidden{display:none}.box{background:#0d1120;border:1px solid #26305a;border-radius:18px;padding:26px;max-width:340px}
+button{background:var(--pink);color:#fff;border:0;font-weight:800;font-size:1.05rem;padding:14px 28px;border-radius:12px;cursor:pointer;width:100%;margin-top:10px}
+button.ghost{background:#1a2140}#cap{font-size:.78rem;color:#a7a7b3;background:#070a16;border-radius:10px;padding:10px;margin-top:10px;word-break:break-word}
+a{color:var(--cyan);font-size:.85rem}
+.hint{color:#a7a7b3;font-size:.8rem;padding:8px}
+</style>
+</head>
+<body>
+<div id="top"><div class="eyebrow">TIKTOK GAME 1 • @3000STUDIOS.VIP</div><h1>🧱 STACK TOWER RAGE</h1><div id="score">0</div><div id="best">BEST 0 • TAP anywhere to drop</div></div>
+<canvas id="c" width="420" height="600"></canvas>
+<div class="hint">Screen-record vertical → post 30s clip → caption below 👇 Keep score above bottom 220px.</div>
+<div id="msg"><div class="box">
+<div class="eyebrow" id="mtitle">HOW HIGH BEFORE YOU RAGE?</div>
+<p id="mtext">Tap to drop the moving block. Stack it. Miss = slice. 3 slices and you cry. 😤</p>
+<button id="play">▶ TAP TO START</button>
+<div id="cap">Caption: I got LEVEL __ on Stack Tower Rage 🧱 Can you beat me? @3000studios.vip #stackrage #minigames #3000studios</div>
+<button class="ghost" id="copy">COPY CAPTION</button>
+<div style="margin-top:10px"><a href="./">← all 6 games</a> • <a href="https://www.tiktok.com/@3000studios.vip" target="_blank" rel="noopener">tiktok</a></div>
+</div></div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+const S=document.getElementById('score'),B=document.getElementById('best'),M=document.getElementById('msg');
+let W=420,H=600;function fit(){const r=Math.min(innerWidth/420,(innerHeight-190)/600);cv.style.width=(420*r)+'px';cv.style.height=(600*r)+'px'}addEventListener('resize',fit);fit();
+let blocks=[],cur=null,lvl=0,best=+(localStorage.getItem('stackrage_best')||0),dir=1,speed=3,over=false,started=false;
+B.textContent='BEST '+best+' • TAP anywhere to drop';
+function reset(){blocks=[{x:60,y:H-40,w:300,h:28}];lvl=0;speed=3;over=false;spawn();}
+function spawn(){const p=blocks[blocks.length-1];cur={x:0,y:p.y-30,w:p.w,h:28};dir=1;speed=Math.min(9,3+lvl*0.35);}
+function drop(){if(!started||over)return;const p=blocks[blocks.length-1];
+let nx=cur.x,nw=cur.w;if(nx<p.x){nw=cur.w-(p.x-nx);nx=p.x}const right=nx+nw,pr=p.x+p.w;if(right>pr)nw-=right-pr;
+if(nw<12){gameOver();return}cur.x=nx;cur.w=nw;blocks.push(cur);lvl++;S.textContent=lvl;spawn();}
+function gameOver(){over=true;best=Math.max(best,lvl);localStorage.setItem('stackrage_best',best);
+document.getElementById('mtitle').textContent='YOU RAGED AT '+lvl+' 😭';
+document.getElementById('mtext').textContent='Best: '+best+'. Screen-record your retry, post it, tag @3000studios.vip — rage clips go viral.';
+document.getElementById('cap').textContent='Caption: I got LEVEL '+lvl+' on Stack Tower Rage 🧱 Can you beat me? @3000studios.vip #stackrage #minigames #3000studios';
+M.classList.remove('hidden');}
+function loop(){x.clearRect(0,0,W,H);
+x.fillStyle='#25F4EE';x.font='700 12px Inter';x.fillText('▮ CLIP THIS • SCORE TOP = SAFE',8,16);
+blocks.forEach((b,i)=>{const g=x.createLinearGradient(b.x,0,b.x+b.w,0);g.addColorStop(0,'#FE2C55');g.addColorStop(1,'#25F4EE');x.fillStyle=g;x.fillRect(b.x,b.y,b.w,b.h);x.fillStyle='rgba(0,0,0,.25)';x.fillRect(b.x,b.y+b.h-6,b.w,6);});
+if(cur&&!over){cur.x+=dir*speed;if(cur.x<=0||cur.x+cur.w>=W)dir*=-1;const g=x.createLinearGradient(cur.x,0,cur.x+cur.w,0);g.addColorStop(0,'#fff');g.addColorStop(1,'#25F4EE');x.fillStyle=g;x.fillRect(cur.x,cur.y,cur.w,cur.h);}
+requestAnimationFrame(loop)}loop();
+addEventListener('pointerdown',e=>{if(!M.classList.contains('hidden'))return;if(!started){started=true}drop()});
+document.getElementById('play').onclick=e=>{e.stopPropagation();M.classList.add('hidden');if(over||!started){started=true;S.textContent='0';reset()}};
+document.getElementById('copy').onclick=e=>{e.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('cap').textContent)};
+reset();
+</script>
+<!-- ADSENSE: stack-rage bottom banner slot -->
+</body>
+</html>

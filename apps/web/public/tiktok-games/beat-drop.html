@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Catch The Beat Drop — Rhythm Tap | 3000 Studios</title>
+<meta name="description" content="Tap exactly on the beat drop. 10 rounds, scored. Free rhythm TikTok mini-game tied to 3000 Studios music." />
+<link rel="canonical" href="https://3000studios.vip/tiktok-games/beat-drop.html" />
+<style>
+:root{color-scheme:dark;--pink:#FE2C55;--cyan:#25F4EE}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#010204;color:#fff;font-family:Inter,system-ui,sans-serif;text-align:center;user-select:none}
+.wrap{max-width:480px;margin:0 auto;padding:16px}.eyebrow{color:var(--cyan);font-size:.7rem;font-weight:800;letter-spacing:.15em}
+#ring{width:220px;height:220px;border-radius:50%;margin:18px auto;display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:900;background:radial-gradient(circle,#141a36,#05070f);border:6px solid #26305a;cursor:pointer;touch-action:none;transition:transform .06s}
+#ring.hit{transform:scale(.93);border-color:var(--cyan)}#score{font-size:2rem;font-weight:900}
+.bar{height:10px;background:#141a36;border-radius:99px;overflow:hidden;margin:12px 0}#fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink))}
+button{background:var(--pink);color:#fff;border:0;font-weight:800;padding:14px;border-radius:12px;width:100%;font-size:1rem;margin-top:8px}
+button.ghost{background:#1a2140}#cap{font-size:.78rem;color:#a7a7b3;background:#070a16;border-radius:10px;padding:10px;margin-top:10px}
+a{color:var(--cyan);font-size:.85rem}.log{min-height:1.6em;color:#a7a7b3}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="eyebrow">TIKTOK GAME 4 • MUSIC HOOK • @3000STUDIOS.VIP</div>
+<h1>🎵 CATCH THE BEAT DROP</h1>
+<div id="score">0</div><div class="log" id="log">10 drops • tap the circle EXACTLY on PINK</div>
+<div class="bar"><div id="fill"></div></div>
+<div id="ring">TAP</div>
+<div class="log">Rounds: <span id="rd">0/10</span> • Best: <span id="best">0</span></div>
+<button id="play">▶ START SET</button>
+<div id="cap">Caption: I scored __ on Catch The Beat Drop 🎵 @3000studios.vip #beatdrop #rhythm #3000studios</div>
+<button class="ghost" id="copy">COPY CAPTION</button>
+<div style="margin-top:8px"><a href="./">← all 6 games</a> • <a href="https://3000studios.vip/music">hear the real drops 🎧</a></div>
+</div>
+<script>
+const ring=document.getElementById('ring'),log=document.getElementById('log'),sc=document.getElementById('score'),fill=document.getElementById('fill'),rd=document.getElementById('rd');
+let round=0,score=0,best=+(localStorage.getItem('beat_best')||0),live=false,phase=0,ptimer=null;
+document.getElementById('best').textContent=best;
+let AC=null;function beep(f,d){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.18,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+function next(){if(round>=10){end();return}round++;rd.textContent=round+'/10';phase=0;ring.style.borderColor='#26305a';ring.textContent='WAIT';log.textContent='listen… wait for it…';
+let ticks=3+Math.floor(Math.random()*3),i=0;
+const step=()=>{if(i<ticks){beep(220,.12);ring.textContent='…';i++;ptimer=setTimeout(step,420);}else{phase=1;ring.style.borderColor='#FE2C55';ring.style.boxShadow='0 0 40px #FE2C55';ring.textContent='NOW!';beep(880,.3);t0=performance.now();ptimer=setTimeout(()=>{if(phase===1){judge(999)}},600)}};step();}
+let t0=0;
+function judge(dt){phase=0;clearTimeout(ptimer);ring.style.boxShadow='none';
+let pts=0,label='MISS';if(dt<=70){pts=100;label='PERFECT 👑'}else if(dt<=150){pts=60;label='GREAT'}else if(dt<=280){pts=25;label='LATE'}else{pts=0;label='MISS 💀'}
+score+=pts;sc.textContent=score;log.textContent='Round '+round+': '+label+' ('+Math.round(dt)+'ms) +'+pts;fill.style.width=(round*10)+'%';ring.textContent=label;setTimeout(next,650);}
+ring.addEventListener('pointerdown',()=>{if(!live)return;ring.classList.add('hit');setTimeout(()=>ring.classList.remove('hit'),80);
+if(phase!==1){score=Math.max(0,score-20);sc.textContent=score;log.textContent='EARLY! -20 😅';return}judge(performance.now()-t0);});
+function end(){live=false;best=Math.max(best,score);localStorage.setItem('beat_best',best);document.getElementById('best').textContent=best;
+log.textContent='SET OVER: '+score+'/1000. Best '+best+'. Post your score 🏆';
+document.getElementById('cap').textContent='Caption: I scored '+score+'/1000 on Catch The Beat Drop 🎵 Beat me @3000studios.vip #beatdrop #rhythm #3000studios';}
+document.getElementById('play').onclick=()=>{round=0;score=0;sc.textContent='0';fill.style.width='0';live=true;next()};
+document.getElementById('copy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('cap').textContent)};
+</script>
+<!-- ADSENSE: beat-drop slot + music cross-promo pays here -->
+</body>
+</html>
