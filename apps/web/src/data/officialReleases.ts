@@ -65,12 +65,7 @@ const curatedReleaseVideos: OfficialReleaseVideo[] = [
     release: '3000 Studios Originals',
     duration: '3:18',
   },
-  {
-    title: 'The Peepers',
-    videoId: 'l5iOwuK0RcE',
-    release: '3000 Studios Originals',
-    duration: '2:41',
-  },
+  // The Peepers uses its generated video id (no curated override; keeps ids unique).
   {
     title: 'Tropical Bass Land',
     videoId: 'sGdAIxIi1IM',

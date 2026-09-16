@@ -760,6 +760,19 @@ export function VideoPage() {
               >
                 Open on YouTube
               </a>
+              <div className="videoPageActions">
+                <a
+                  className="studioButton"
+                  href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Subscribe @3000Studio
+                </a>
+                <a className="studioButton secondary" href="https://3000studios.vip">
+                  3000studios.vip
+                </a>
+              </div>
             </div>
           </div>
         </section>
