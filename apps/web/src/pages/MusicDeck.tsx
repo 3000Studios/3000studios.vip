@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { rolloutSongs } from '../data/music';
 import {
@@ -38,10 +38,28 @@ export function MusicDeck() {
 
   const yt = active.videoId;
   const art = youtubeArtworkUrl(yt);
+  const dragX = useRef<number | null>(null);
+
+  const onSwipeStart = (e: ReactPointerEvent) => {
+    if ((e.target as HTMLElement).closest('a,button,input')) return;
+    dragX.current = e.clientX;
+  };
+  const onSwipeEnd = (e: ReactPointerEvent) => {
+    if (dragX.current === null) return;
+    const dx = e.clientX - dragX.current;
+    dragX.current = null;
+    if (dx < -48) pick(activeIndex + 1);
+    else if (dx > 48) pick(activeIndex - 1);
+  };
 
   return (
     <PublicLayout variant="electric">
-      <main className="vipMain dkMusicPage musicDeckPage">
+      <main
+        className="vipMain dkMusicPage musicDeckPage"
+        onPointerDown={onSwipeStart}
+        onPointerUp={onSwipeEnd}
+        onPointerCancel={() => (dragX.current = null)}
+      >
         <div className="dkArtFill" style={{ backgroundImage: `url(${art})` }} aria-hidden="true" />
         <div className="dkVideoStage" aria-hidden="true">
           <iframe
@@ -78,6 +96,14 @@ export function MusicDeck() {
               <span>{formatTime(music.duration)}</span>
             </label>
             <a className="studioButton secondary dkWatch" href={youtubeWatchUrl(yt)} target="_blank" rel="noreferrer">Open video</a>
+          </div>
+          <p className="dkSwipeHint" aria-hidden="true">
+            Swipe ← → for the next video · {catalog.length} official drops
+          </p>
+          <div className="dkMoneyRow">
+            <a className="studioButton" href="https://buy.stripe.com/6oUcN52Kx8yW14YcEabAs0T">Own it $0.99</a>
+            <a className="studioButton secondary" href="https://buy.stripe.com/28EbJ15WJg1oeVO1ZwbAs0U">VIP $3.99/mo</a>
+            <a className="studioButton secondary" href={youtubeWatchUrl(yt)} target="_blank" rel="noreferrer">YouTube</a>
           </div>
         </section>
       </main>
