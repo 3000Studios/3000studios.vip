@@ -78,7 +78,7 @@ function New-PagesEnvVar {
 
 $loaded = Import-GlobalEnv -Path $EnvFile
 
-$script:CloudflareToken = Get-EnvValue -Names @('CLOUDFLARE_API_ALL', 'CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_API_TOKEN') -Default $null
+$script:CloudflareToken = Get-EnvValue -Names @('CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_API_ALL', 'CLOUDFLARE_ACCOUNT_API_TOKEN') -Default $null
 $accountId = Get-EnvValue -Names @('CLOUDFLARE_ACCOUNT_ID') -Default $null
 $projectName = Get-EnvValue -Names @('CF_PAGES_PROJECT') -Default '3000studios-vip'
 if ($PagesProject) {
