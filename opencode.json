@@ -30,6 +30,13 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "echo *": "allow",
+          "set *": "allow",
+          "findstr *": "allow",
+          "if exist *": "allow",
+          "if defined *": "allow",
+          "where *": "allow",
+          "whoami *": "allow",
           "npm run dev*": "allow",
           "npm run build*": "allow",
           "npm run lint*": "allow",

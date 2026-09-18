@@ -25,6 +25,8 @@ import { SwipeHome } from './components/SwipeHome';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
+import { ConsentManager } from './components/ConsentManager';
+import { usePrefersReducedMotion } from './lib/mediaQuery';
 import { PhoneGoLive } from './pages/PhoneGoLive';
 import { MusicDeck } from './pages/MusicDeck';
 import { ShopPage } from './pages/Shop';
@@ -73,17 +75,26 @@ function RouteLoader({ children }: { children: ReactNode }) {
   );
 }
 
+function FxGate({ children }: { children: React.ReactNode }) {
+  const reduced = usePrefersReducedMotion();
+  if (reduced) return null;
+  return <>{children}</>;
+}
+
 function RootLayout() {
   return (
     <>
-      <SparkClickFX />
-      <StageFX />
+      <FxGate>
+        <SparkClickFX />
+        <StageFX />
+      </FxGate>
       <YouTubeSubscriberPerk />
       <SampleGate />
       <Outlet />
       <MusicDock />
       <BottomDock />
       <AdminFab />
+      <ConsentManager />
     </>
   );
 }

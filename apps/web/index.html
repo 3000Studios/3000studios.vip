@@ -4,14 +4,6 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DH1WBK8YWK"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-DH1WBK8YWK');
-    </script>
     <meta
       name="description"
       content="3000 Studios VIP is a premium music and video content platform with live streaming, 3D coverflow music catalog, community chat, and official release media."
@@ -34,15 +26,21 @@
       content="Full-length music catalog, live stream stage, official videos, and VIP visuals from 3000 Studios."
     />
     <meta property="og:url" content="https://3000studios.vip/" />
-    <meta property="og:image" content="https://3000studios.vip/media/official-3000-studios-profile.png" />
-    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
+    <meta
+      property="og:image"
+      content="https://3000studios.vip/media/official-3000-studios-profile.png"
+    />
+    <meta name="google-adsense-account" content="%VITE_ADSENSE_CLIENT_ID%" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="3000 Studios VIP — Official Music & Live Stage" />
     <meta
       name="twitter:description"
       content="Full-length music catalog, live stream stage, official videos, and VIP visuals from 3000 Studios."
     />
-    <meta name="twitter:image" content="https://3000studios.vip/media/official-3000-studios-profile.png" />
+    <meta
+      name="twitter:image"
+      content="https://3000studios.vip/media/official-3000-studios-profile.png"
+    />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -57,34 +55,16 @@
             "@type": "MusicGroup",
             "name": "3000 Studios",
             "url": "https://3000studios.vip/",
-            "sameAs": [
-              "https://www.youtube.com/@3000Studio"
-            ]
+            "sameAs": ["https://www.youtube.com/@3000Studio"]
           }
         ]
       }
     </script>
     <title>3000 Studios VIP — Official Music & Live Stage</title>
-    <script>
-      (function () {
-        var path = window.location.pathname || "/";
-        var isOwnerRoute =
-          path === "/admin" ||
-          path.indexOf("/admin/") === 0 ||
-          path === "/vault" ||
-          path.indexOf("/vault/") === 0 ||
-          path === "/live";
-        if (isOwnerRoute) return;
-        var script = document.createElement("script");
-        script.async = true;
-        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262";
-        script.crossOrigin = "anonymous";
-        document.head.appendChild(script);
-      })();
-    </script>
-</head>
+  </head>
   <body>
     <div id="root"></div>
+    <div id="consent-banner"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

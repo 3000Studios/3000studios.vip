@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../lib/auth';
 import { WHIP_URL_STORAGE_KEY, validateWhipUrl } from '../lib/webrtcStream';
 import { StreamStudioPanel } from '../components/StreamStudioPanel';
 import { STREAM_CUSTOMER_CODE, STREAM_LIVE_INPUT_ID } from '../lib/streamConfig';
@@ -11,8 +12,6 @@ import { AdminActivityLog } from '../components/AdminActivityLog';
 import { PublicLayout } from './Home';
 import '../styles/discover.css';
 
-const ADMIN_PASSCODE = '3000';
-const AUTH_KEY = '3000-admin-auth-v1';
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 const NOTES_KEY = '3000-admin-rundown';
 const SESS_KEY = '3000-admin-sessions';
@@ -48,9 +47,12 @@ function detectDevice(): DeviceKind {
 }
 
 export function Admin() {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem(AUTH_KEY) === '1');
+  const { isAuthenticated, login, logout, ownerUsername } = useAuth();
+  const [email, setEmail] = useState(ownerUsername);
   const [passcode, setPasscode] = useState('');
+  const [secretAnswer, setSecretAnswer] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [device, setDevice] = useState<DeviceKind>(() => detectDevice());
   const [isLive, setIsLive] = useState(() => readHostLiveFlag());
   const [broadcasting, setBroadcasting] = useState(false);
@@ -97,26 +99,30 @@ export function Admin() {
     };
   }, [refreshDevice]);
 
-  function handleUnlock(e: FormEvent) {
+  async function handleUnlock(e: React.FormEvent) {
     e.preventDefault();
-    if (passcode.trim() === ADMIN_PASSCODE) {
-      sessionStorage.setItem(AUTH_KEY, '1');
-      setAuthed(true);
-      setError(null);
+    setError(null);
+    setBusy(true);
+    const ok = await login(email, passcode, secretAnswer);
+    setBusy(false);
+    if (ok) {
       setPasscode('');
+      setSecretAnswer('');
+      setError(null);
     } else {
-      setError('Incorrect passcode. Try again.');
+      setError('Incorrect owner credentials. Try again.');
       setPasscode('');
     }
   }
 
   function handleLock() {
     if (broadcasting) {
-      setStudioError('End the live stream before locking the console so the camera and microphone are not stopped accidentally.');
+      setStudioError(
+        'End the live stream before locking the console so the camera and microphone are not stopped accidentally.',
+      );
       return;
     }
-    sessionStorage.removeItem(AUTH_KEY);
-    setAuthed(false);
+    logout();
     setBroadcasting(false);
     setHostLiveFlag(false);
     void publishServerLiveFlag(false);
@@ -158,7 +164,7 @@ export function Admin() {
     [device],
   );
 
-  if (!authed) {
+  if (!isAuthenticated) {
     return (
       <PublicLayout variant="blackhole">
         <div className="adminScrim adminEasyShell adminWithNav">
@@ -167,24 +173,56 @@ export function Admin() {
             <h2>Go Live Console</h2>
             <p>Unlock, access camera, pick a look, hit Go Live. Viewers watch /live.</p>
             <label>
+              <span>Email</span>
+              <input
+                type="email"
+                autoComplete="username"
+                autoFocus
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError(null);
+                }}
+                placeholder="owner@example.com"
+              />
+            </label>
+            <label>
               <span>Passcode</span>
               <input
                 type="password"
                 inputMode="numeric"
                 autoComplete="current-password"
-                autoFocus
                 value={passcode}
                 onChange={(e) => {
                   setPasscode(e.target.value);
                   setError(null);
                 }}
                 placeholder="Enter passcode"
-                maxLength={12}
+                maxLength={32}
+              />
+            </label>
+            <label>
+              <span>Secret answer</span>
+              <input
+                type="password"
+                autoComplete="off"
+                value={secretAnswer}
+                onChange={(e) => {
+                  setSecretAnswer(e.target.value);
+                  setError(null);
+                }}
+                placeholder="Enter secret answer"
+                maxLength={120}
               />
             </label>
             {error ? <div className="adminError">{error}</div> : null}
-            <button type="submit" className="cBtn primary" style={{ width: '100%' }}>
-              Unlock
+            <button
+              type="submit"
+              className="cBtn primary"
+              style={{ width: '100%' }}
+              disabled={busy}
+            >
+              {busy ? 'Unlocking…' : 'Unlock'}
             </button>
             <Link to="/" className="adminBackLink">
               ← Back to public site

@@ -16,7 +16,7 @@
 
 /** customer-*.cloudflarestream.com subdomain code */
 export const STREAM_CUSTOMER_CODE =
-  import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() || 'wx8j23tjjjpkb37k';
+  import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() || '';
 
 /**
  * Hosted Stream Player video / asset UID (from Stream dashboard → Embed).
@@ -25,12 +25,11 @@ export const STREAM_CUSTOMER_CODE =
 export const STREAM_PLAYER_UID =
   import.meta.env.VITE_STREAM_PLAYER_UID?.toString().trim() ||
   import.meta.env.VITE_STREAM_VIDEO_UID?.toString().trim() ||
-  '3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
+  '';
 
 /** Live input for WHIP/RTMPS publish and WHEP playback (phone + admin). */
 export const STREAM_LIVE_INPUT_ID =
-  import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() ||
-  '3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
+  import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() || '';
 
 /**
  * Browser ultra-low latency **publish** (WHIP) is intentionally not exported
@@ -40,21 +39,33 @@ export const STREAM_LIVE_INPUT_ID =
 
 // ─── URL builders ─────────────────────────────
 
-export function buildStreamPlayerUrl(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
+export function buildStreamPlayerUrl(
+  uid = STREAM_PLAYER_UID,
+  customer = STREAM_CUSTOMER_CODE,
+): string {
   return `https://customer-${customer}.cloudflarestream.com/${uid}/iframe`;
 }
 
-export function buildStreamWatchUrl(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
+export function buildStreamWatchUrl(
+  uid = STREAM_PLAYER_UID,
+  customer = STREAM_CUSTOMER_CODE,
+): string {
   return `https://customer-${customer}.cloudflarestream.com/${uid}/watch`;
 }
 
 /** HLS manifest for custom web / mobile players */
-export function buildStreamManifestHls(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
+export function buildStreamManifestHls(
+  uid = STREAM_PLAYER_UID,
+  customer = STREAM_CUSTOMER_CODE,
+): string {
   return `https://customer-${customer}.cloudflarestream.com/${uid}/manifest/video.m3u8`;
 }
 
 /** DASH manifest for custom web / mobile players */
-export function buildStreamManifestDash(uid = STREAM_PLAYER_UID, customer = STREAM_CUSTOMER_CODE): string {
+export function buildStreamManifestDash(
+  uid = STREAM_PLAYER_UID,
+  customer = STREAM_CUSTOMER_CODE,
+): string {
   return `https://customer-${customer}.cloudflarestream.com/${uid}/manifest/video.mpd`;
 }
 
@@ -62,7 +73,10 @@ export function buildStreamManifestDash(uid = STREAM_PLAYER_UID, customer = STRE
  * WebRTC WHEP playback (sub-second). Use the live input id, not the hosted player asset UID.
  * Dashboard: …/{liveInputId}/webRTC/play
  */
-export function buildStreamWhepUrl(liveInputId = STREAM_LIVE_INPUT_ID, customer = STREAM_CUSTOMER_CODE): string {
+export function buildStreamWhepUrl(
+  liveInputId = STREAM_LIVE_INPUT_ID,
+  customer = STREAM_CUSTOMER_CODE,
+): string {
   return `https://customer-${customer}.cloudflarestream.com/${liveInputId}/webRTC/play`;
 }
 
@@ -79,8 +93,7 @@ export function buildStreamSrtPlaybackUrl(uid = STREAM_PLAYER_UID): string {
 
 /** RTMPS playback server (pro tools). */
 export const STREAM_RTMPS_PLAYBACK_SERVER =
-  import.meta.env.VITE_STREAM_RTMPS_PLAYBACK_SERVER?.toString().trim() ||
-  'rtmps://live.cloudflare.com:443/live/';
+  import.meta.env.VITE_STREAM_RTMPS_PLAYBACK_SERVER?.toString().trim() || '';
 
 /**
  * RTMPS playback stream key for the featured asset.

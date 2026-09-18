@@ -1,14 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-const AUTH_KEY = '3000-admin-auth-v1';
-const PASSCODE = '3000';
+import { useAuth } from '../lib/auth';
 
 export function AdminFab() {
+  const { login } = useAuth();
   const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [secret, setSecret] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,17 +27,20 @@ export function AdminFab() {
     return null;
   }
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
-    if (code.trim() === PASSCODE) {
-      sessionStorage.setItem(AUTH_KEY, '1');
+    setError(null);
+    setBusy(true);
+    const ok = await login(email, code, secret);
+    setBusy(false);
+    if (ok) {
       setOpen(false);
       setCode('');
-      setError(null);
+      setSecret('');
       navigate('/admin');
       return;
     }
-    setError('Incorrect passcode');
+    setError('Incorrect owner credentials');
     setCode('');
   }
 
@@ -51,49 +56,79 @@ export function AdminFab() {
           setOpen(true);
         }}
       >
-        <span className="adminFabIcon">⚙</span>
+        <span className="adminFabIcon" aria-hidden="true">
+          ⚙
+        </span>
         <span className="adminFabLabel">Admin</span>
       </button>
 
       {open
         ? createPortal(
-        <div className="adminScrim" role="dialog" aria-modal="true" aria-label="Admin passcode" onClick={() => setOpen(false)}>
-          <form className="adminCodeModal" onSubmit={submit} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="modalClose"
-              aria-label="Close"
+            <div
+              className="adminScrim"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Owner admin access"
               onClick={() => setOpen(false)}
             >
-              ×
-            </button>
-            <span>3000 Studios · Owner</span>
-            <h2>Admin Access</h2>
-            <p>Enter passcode to open the stream setup console.</p>
-            <label>
-              Passcode
-              <input
-                type="password"
-                inputMode="numeric"
-                autoFocus
-                autoComplete="current-password"
-                value={code}
-                maxLength={12}
-                placeholder="••••"
-                onChange={(e) => {
-                  setCode(e.target.value);
-                  setError(null);
-                }}
-              />
-            </label>
-            {error ? <div className="adminCodeError">{error}</div> : null}
-            <button type="submit" className="adminUnlockBtn">
-              Unlock Admin
-            </button>
-          </form>
-        </div>,
-        document.body,
-      )
+              <form
+                className="adminCodeModal"
+                onSubmit={submit}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  className="modalClose"
+                  aria-label="Close"
+                  onClick={() => setOpen(false)}
+                >
+                  ×
+                </button>
+                <span>3000 Studios · Owner</span>
+                <h2>Admin Access</h2>
+                <p>Enter owner credentials to open the stream setup console.</p>
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    autoComplete="username"
+                    autoFocus
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="owner@example.com"
+                  />
+                </label>
+                <label>
+                  Passcode
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    autoComplete="current-password"
+                    value={code}
+                    maxLength={32}
+                    placeholder="••••"
+                    onChange={(e) => setCode(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Secret answer
+                  <input
+                    type="password"
+                    autoComplete="off"
+                    value={secret}
+                    maxLength={120}
+                    placeholder="••••"
+                    onChange={(e) => setSecret(e.target.value)}
+                  />
+                </label>
+                {error ? <div className="adminCodeError">{error}</div> : null}
+                <button type="submit" className="adminUnlockBtn" disabled={busy}>
+                  {busy ? 'Unlocking…' : 'Unlock Admin'}
+                </button>
+              </form>
+            </div>,
+            document.body,
+          )
         : null}
     </>
   );

@@ -58,11 +58,16 @@ export function SongDrop() {
         fetch(`${API}/music/catalog`, { credentials: 'include' }),
         fetch(`${API}/music/site-edits`, { credentials: 'include' }),
       ]);
-      if (!jobsResponse.ok || !catalogResponse.ok || !editsResponse.ok) throw Error('owner_access_required');
-      const jobsData = await jobsResponse.json();
-      const catalogData = await catalogResponse.json();
-      const editsData = await editsResponse.json();
-      setJobs((jobsData.jobs || []).reverse());
+      if (!jobsResponse.ok || !catalogResponse.ok || !editsResponse.ok)
+        throw Error('owner_access_required');
+      const jobsData = (await jobsResponse.json()) as { jobs?: unknown[] };
+      const catalogData = (await catalogResponse.json()) as {
+        songs?: CatalogSong[];
+        scannedFiles?: number;
+        totalBytes?: number;
+      };
+      const editsData = (await editsResponse.json()) as { edits?: SiteEdit[] };
+      setJobs(((jobsData.jobs || []) as Job[]).reverse());
       setSongs(catalogData.songs || []);
       setCatalogStats({
         scannedFiles: catalogData.scannedFiles || 0,
@@ -104,9 +109,9 @@ export function SongDrop() {
         },
         body: file,
       });
-      const data = await r.json();
+      const data = (await r.json()) as { error?: string; id?: string };
       if (!r.ok) throw Error(data.error || 'Upload failed');
-      setNotice(`Job ${data.id.slice(0, 8)} queued successfully.`);
+      setNotice(`Job ${(data.id ?? '').slice(0, 8)} queued successfully.`);
       setFile(null);
       setPhrase('');
       await load();
@@ -129,7 +134,7 @@ export function SongDrop() {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ mode, publishConfirmation: phrase }),
       });
-      const data = await response.json();
+      const data = (await response.json()) as { error?: string };
       if (!response.ok) throw Error(data.error || 'Queue failed');
       setNotice(`${song.title} queued as a ${mode.replace('_', ' ')} job.`);
       await load();
@@ -325,20 +330,33 @@ export function SongDrop() {
                   {song.duplicateCount ? ` · ${song.duplicateCount} duplicate copies skipped` : ''}
                 </small>
               </div>
-              <button className="cBtn sm" disabled={busy} onClick={() => void queueCatalogSong(song)}>
+              <button
+                className="cBtn sm"
+                disabled={busy}
+                onClick={() => void queueCatalogSong(song)}
+              >
                 Queue {mode === 'dry_run' ? 'dry run' : mode === 'build_only' ? 'build' : 'publish'}
               </button>
             </article>
           ))}
-          {!songs.length && <div className="sdEmpty"><b>Catalog sync pending</b><small>The workstation will index your Songs folder.</small></div>}
-          {songs.length > 100 && <p className="sdNotice">Showing the first 100 matches. Search to find any song.</p>}
+          {!songs.length && (
+            <div className="sdEmpty">
+              <b>Catalog sync pending</b>
+              <small>The workstation will index your Songs folder.</small>
+            </div>
+          )}
+          {songs.length > 100 && (
+            <p className="sdNotice">Showing the first 100 matches. Search to find any song.</p>
+          )}
         </div>
       </section>
       <section className="cPanel sdEditDesk">
         <div className="cPanelHead">
           <div>
             <h2>DUDE site edit desk</h2>
-            <span className="cSub">Describe an update, review the ticket, then approve trusted execution</span>
+            <span className="cSub">
+              Describe an update, review the ticket, then approve trusted execution
+            </span>
           </div>
         </div>
         <div className="cPanelBody">
@@ -347,15 +365,32 @@ export function SongDrop() {
             onChange={(event) => setEditRequest(event.target.value)}
             placeholder="Example: Add a featured release card for The Peepers to the home page."
           />
-          <button className="cBtn primary" onClick={() => void submitEdit()}>Create edit request</button>
+          <button className="cBtn primary" onClick={() => void submitEdit()}>
+            Create edit request
+          </button>
           <div className="sdEdits">
             {edits.slice(0, 8).map((edit) => (
               <article key={edit.id}>
-                <div><b>{edit.request}</b><small>{edit.state.replace('_', ' ')}</small></div>
-                {edit.state === 'awaiting_approval' && <div>
-                  <button className="cBtn sm" onClick={() => void decideEdit(edit.id, 'approved')}>Approve</button>
-                  <button className="cBtn sm ghost" onClick={() => void decideEdit(edit.id, 'rejected')}>Reject</button>
-                </div>}
+                <div>
+                  <b>{edit.request}</b>
+                  <small>{edit.state.replace('_', ' ')}</small>
+                </div>
+                {edit.state === 'awaiting_approval' && (
+                  <div>
+                    <button
+                      className="cBtn sm"
+                      onClick={() => void decideEdit(edit.id, 'approved')}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="cBtn sm ghost"
+                      onClick={() => void decideEdit(edit.id, 'rejected')}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                )}
               </article>
             ))}
           </div>

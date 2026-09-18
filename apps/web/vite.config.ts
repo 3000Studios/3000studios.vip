@@ -41,6 +41,18 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-router-dom')) {
             return 'react';
           }
+          if (id.includes('node_modules/framer-motion')) {
+            return 'framer-motion';
+          }
+          if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
+            return 'three';
+          }
+          if (id.includes('node_modules/dashjs') || id.includes('node_modules/hls.js')) {
+            return 'video-players';
+          }
+          if (id.includes('node_modules/howler')) {
+            return 'audio';
+          }
           return undefined;
         },
       },

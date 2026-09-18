@@ -57,8 +57,7 @@ export type ZoneSnapshot = {
   zone_id: string;
   zone_name: string;
   captured_at: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data: Record<string, unknown>;
 };
 
 export type SiteOverview = {
@@ -112,7 +111,7 @@ export type DudeChatMessage = {
 const API_BASE =
   import.meta.env.VITE_API_BASE?.toString() || 'https://apex-citadel-api.mr-jwswain.workers.dev';
 
-async function apiFetch(path: string, init?: RequestInit) {
+async function apiFetch<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
@@ -121,7 +120,7 @@ async function apiFetch(path: string, init?: RequestInit) {
     const text = await res.text().catch(() => '');
     throw new Error(`api:${res.status}:${text || res.statusText}`);
   }
-  return res.json();
+  return res.json() as Promise<T>;
 }
 
 export async function getStats(): Promise<{
@@ -134,11 +133,11 @@ export async function getStats(): Promise<{
 }
 
 export async function listSites(): Promise<{ sites: Site[] }> {
-  return apiFetch('/sites');
+  return apiFetch<{ sites: Site[] }>('/sites');
 }
 
 export async function getSite(id: string): Promise<SiteDetail> {
-  return apiFetch(`/sites/${encodeURIComponent(id)}`);
+  return apiFetch<SiteDetail>(`/sites/${encodeURIComponent(id)}`);
 }
 
 export async function upsertSite(input: {
@@ -162,59 +161,74 @@ export async function upsertSite(input: {
   revenue_source?: string | null;
   enabled?: boolean;
 }): Promise<{ ok: boolean; id: string }> {
-  return apiFetch('/sites', { method: 'POST', body: JSON.stringify(input) });
+  return apiFetch<{ ok: boolean; id: string }>('/sites', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
 }
 
 export async function deleteSite(id: string): Promise<{ ok: boolean }> {
-  return apiFetch(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  return apiFetch<{ ok: boolean }>(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
 
 export async function runSiteChecks(id: string): Promise<Record<string, unknown>> {
-  return apiFetch(`/sites/${encodeURIComponent(id)}/run`, { method: 'POST', body: '{}' });
-}
-
-export async function runDeployHook(id: string): Promise<Record<string, unknown>> {
-  return apiFetch(`/sites/${encodeURIComponent(id)}/playbooks/deploy-hook`, {
+  return apiFetch<Record<string, unknown>>(`/sites/${encodeURIComponent(id)}/run`, {
     method: 'POST',
     body: '{}',
   });
 }
 
-export async function getCatalog(): Promise<{ catalog: Array<Record<string, unknown>>; sites: Site[] }> {
-  return apiFetch('/ops/catalog');
+export async function runDeployHook(id: string): Promise<Record<string, unknown>> {
+  return apiFetch<Record<string, unknown>>(
+    `/sites/${encodeURIComponent(id)}/playbooks/deploy-hook`,
+    {
+      method: 'POST',
+      body: '{}',
+    },
+  );
+}
+
+export async function getCatalog(): Promise<{
+  catalog: Array<Record<string, unknown>>;
+  sites: Site[];
+}> {
+  return apiFetch<{ catalog: Array<Record<string, unknown>>; sites: Site[] }>('/ops/catalog');
 }
 
 export async function seedNetwork(): Promise<{ ok: boolean; seeded: number }> {
-  return apiFetch('/ops/seed-network', { method: 'POST', body: '{}' });
+  return apiFetch<{ ok: boolean; seeded: number }>('/ops/seed-network', {
+    method: 'POST',
+    body: '{}',
+  });
 }
 
 export async function listZones(): Promise<{ zones: ZoneSummary[]; error?: string }> {
-  return apiFetch('/ops/zones');
+  return apiFetch<{ zones: ZoneSummary[]; error?: string }>('/ops/zones');
 }
 
 export async function getZoneAnalytics(zoneId: string): Promise<Record<string, unknown>> {
-  return apiFetch(`/ops/analytics/${encodeURIComponent(zoneId)}`);
+  return apiFetch<Record<string, unknown>>(`/ops/analytics/${encodeURIComponent(zoneId)}`);
 }
 
 export async function listZoneSnapshots(): Promise<{ snapshots: ZoneSnapshot[] }> {
-  return apiFetch('/ops/analytics');
+  return apiFetch<{ snapshots: ZoneSnapshot[] }>('/ops/analytics');
 }
 
 export async function inspectBridge(origin: string): Promise<Record<string, unknown>> {
   const encoded = encodeURIComponent(origin);
-  return apiFetch(`/ops/bridge-inspect?origin=${encoded}`);
+  return apiFetch<Record<string, unknown>>(`/ops/bridge-inspect?origin=${encoded}`);
 }
 
 export async function getSiteOverview(): Promise<{ overview: SiteOverview[] }> {
-  return apiFetch('/ops/sites/overview');
+  return apiFetch<{ overview: SiteOverview[] }>('/ops/sites/overview');
 }
 
 export async function listBridgeSnapshots(): Promise<{ snapshots: BridgeSnapshot[] }> {
-  return apiFetch('/ops/bridges');
+  return apiFetch<{ snapshots: BridgeSnapshot[] }>('/ops/bridges');
 }
 
 export async function restartAdsense(siteId: string): Promise<Record<string, unknown>> {
-  return apiFetch(`/sites/${encodeURIComponent(siteId)}/adsense/restart`, {
+  return apiFetch<Record<string, unknown>>(`/sites/${encodeURIComponent(siteId)}/adsense/restart`, {
     method: 'POST',
     body: '{}',
   });
@@ -224,7 +238,7 @@ export async function runNaturalCommand(input: {
   siteId?: string | null;
   command: string;
 }): Promise<CommandResult> {
-  return apiFetch('/ops/command', {
+  return apiFetch<CommandResult>('/ops/command', {
     method: 'POST',
     body: JSON.stringify({
       siteId: input.siteId ?? null,
@@ -238,7 +252,7 @@ export async function sendDudeChat(input: {
   message: string;
   history: DudeChatMessage[];
 }): Promise<{ reply: string; learned?: boolean }> {
-  return apiFetch('/dude/chat', {
+  return apiFetch<{ reply: string; learned?: boolean }>('/dude/chat', {
     method: 'POST',
     headers: { 'x-owner-email': input.ownerEmail },
     body: JSON.stringify({

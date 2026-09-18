@@ -14,6 +14,7 @@ export interface OfficialReleaseVideo {
  * must exist in DistroKid and its video must live on the official channel.
  */
 const curatedReleaseVideos: OfficialReleaseVideo[] = [
+  { title: "I'm Feelin' It", videoId: 'aqbImIx7S-s', release: 'Single', duration: '2:40' },
   { title: 'Not Giving Up Tonight', videoId: 'tIY1WU9N_RU', release: 'Single', duration: '3:49' },
   { title: 'Always Feel Like', videoId: 'GRokxtfSu9s', release: 'Single', duration: '3:26' },
   {
@@ -89,9 +90,16 @@ const curatedReleaseVideos: OfficialReleaseVideo[] = [
 const curatedByTitle = new Map(
   curatedReleaseVideos.map((video) => [video.title.toLowerCase(), video]),
 );
-export const officialReleaseVideos: OfficialReleaseVideo[] = (
-  generated as OfficialReleaseVideo[]
-).map((video) => curatedByTitle.get(video.title.toLowerCase()) ?? video);
+const generatedReleaseVideos = (generated as OfficialReleaseVideo[]).map(
+  (video) => curatedByTitle.get(video.title.toLowerCase()) ?? video,
+);
+
+const featuredRelease = curatedReleaseVideos[0];
+
+export const officialReleaseVideos: OfficialReleaseVideo[] = [
+  featuredRelease,
+  ...generatedReleaseVideos.filter((video) => video.videoId !== featuredRelease.videoId),
+];
 
 export const youtubeEmbedUrl = (videoId: string) =>
   `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;

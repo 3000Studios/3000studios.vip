@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { youtubeArtworkUrl, youtubeEmbedUrl } from '../data/officialReleases';
+import { youtubeArtworkUrl } from '../data/officialReleases';
+import { LazyYouTube } from './LazyYouTube';
 
 export function VideoWallpaperCard({
   videoId,
@@ -36,13 +37,10 @@ export function VideoWallpaperCard({
   }, []);
 
   const poster = youtubeArtworkUrl(videoId);
-  const src = `${youtubeEmbedUrl(videoId)}&autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&playsinline=1&modestbranding=1`;
   const inner = (
     <>
       <div className="vwPoster" style={{ backgroundImage: `url(${poster})` }} aria-hidden="true" />
-      {active ? (
-        <iframe className="vwFrame" src={src} title="" tabIndex={-1} allow="autoplay; encrypted-media" />
-      ) : null}
+      {active ? <LazyYouTube className="vwFrame" videoId={videoId} title={title} playlist /> : null}
       <div className="vwShade" aria-hidden="true" />
       <div className="vwCopy">
         {kicker ? <span>{kicker}</span> : null}
@@ -55,7 +53,13 @@ export function VideoWallpaperCard({
   const cls = `vwCard ${className}`.trim();
   if (href) {
     return (
-      <a ref={ref as never} className={cls} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+      <a
+        ref={ref as never}
+        className={cls}
+        href={href}
+        target={href.startsWith('http') ? '_blank' : undefined}
+        rel="noreferrer"
+      >
         {inner}
       </a>
     );

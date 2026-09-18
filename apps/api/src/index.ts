@@ -36,19 +36,42 @@ import {
   toDudeMessages,
 } from './dude';
 import { requireOwnerAccess } from './access';
+import {
+  getBearerToken,
+  issueOwnerSessionToken,
+  verifyOwnerCredentials,
+  verifyOwnerSessionToken,
+} from './auth';
 
 const app = new Hono<{ Bindings: Env }>();
+
+const ALLOWED_ORIGINS = new Set([
+  'https://3000studios.vip',
+  'https://www.3000studios.vip',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+]);
+
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  // Allow local wrangler/pages dev origins without hardcoding every port.
+  if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) return true;
+  return false;
+}
 
 app.use(
   '*',
   cors({
-    origin: '*',
+    origin: (origin) => (isAllowedOrigin(origin) ? origin : ''),
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: [
       'content-type',
+      'authorization',
       'cf-access-jwt-assertion',
       'x-owner-email',
       'x-music-device-token',
+      'x-dude-sync-token',
       'x-file-name',
       'x-pipeline-mode',
       'x-publish-confirmation',
@@ -57,38 +80,105 @@ app.use(
   }),
 );
 
+const MUSIC_DEVICE_PUBLIC_READ = new Set([
+  '/music/catalog',
+  // `/music/jobs/:id` and `/music/jobs/:id/input` are handled inline below.
+]);
+
+function isMusicDeviceReadPath(path: string): boolean {
+  if (MUSIC_DEVICE_PUBLIC_READ.has(path)) return true;
+  if (/^\/music\/jobs\/[0-9a-f-]{36}$/i.test(path)) return true;
+  if (/^\/music\/jobs\/[0-9a-f-]{36}\/input$/i.test(path)) return true;
+  return false;
+}
+
 app.use('*', async (c, next) => {
   const env = c.env;
-  if (env.APP_ENV === 'production' && env.ACCESS_REQUIRED === '1') {
-    const deviceToken = c.req.header('x-music-device-token') ?? '';
-    const musicDeviceAllowed =
-      c.req.path.startsWith('/music/') &&
-      Boolean(env.MUSIC_DEVICE_TOKEN) &&
-      deviceToken.length >= 32 &&
-      deviceToken === env.MUSIC_DEVICE_TOKEN;
-    const publicTikTokFlow = c.req.path.startsWith('/tiktok/');
-    if (publicTikTokFlow) {
-      if (c.req.header('origin') !== 'https://3000studios.vip') {
-        return c.json({ error: 'origin_not_allowed' }, 403);
-      }
-      await next();
-      return;
-    }
-    if (musicDeviceAllowed) {
-      await next();
-      return;
-    }
-    if (
-      c.req.path === '/dude/learn' &&
-      isSyncTokenAllowed(c.req.header('x-dude-sync-token'), env.DUDE_SYNC_TOKEN)
-    ) {
-      await next();
-      return;
-    }
-    const access = await requireOwnerAccess(c.req.raw, env);
-    if (!access.ok) return c.json({ error: access.error }, access.status as 401 | 403 | 503);
+  if (env.APP_ENV !== 'production' || env.ACCESS_REQUIRED !== '1') {
+    await next();
+    return;
   }
+
+  const path = c.req.path;
+
+  // Public health check.
+  if (path === '/health') {
+    await next();
+    return;
+  }
+
+  // Public owner session login (no auth required to obtain a token).
+  if (path === '/auth/login' && c.req.method === 'POST') {
+    await next();
+    return;
+  }
+
+  // TikTok OAuth/upload flows are public by design but origin-locked.
+  if (path.startsWith('/tiktok/')) {
+    if (c.req.header('origin') !== 'https://3000studios.vip') {
+      return c.json({ error: 'origin_not_allowed' }, 403);
+    }
+    await next();
+    return;
+  }
+
+  // Music device token: read-only public catalog/job access only.
+  const deviceToken = c.req.header('x-music-device-token') ?? '';
+  if (
+    env.MUSIC_DEVICE_TOKEN &&
+    deviceToken.length >= 32 &&
+    deviceToken === env.MUSIC_DEVICE_TOKEN &&
+    path.startsWith('/music/') &&
+    isMusicDeviceReadPath(path)
+  ) {
+    await next();
+    return;
+  }
+
+  // DUDE memory sync from approved runners.
+  if (
+    path === '/dude/learn' &&
+    isSyncTokenAllowed(c.req.header('x-dude-sync-token'), env.DUDE_SYNC_TOKEN)
+  ) {
+    await next();
+    return;
+  }
+
+  const access = await requireOwnerAccess(c.req.raw, env);
+  if (!access.ok) return c.json({ error: access.error }, access.status as 401 | 403 | 503);
   await next();
+});
+
+const AuthLoginSchema = z.object({
+  email: z.string().email().max(120),
+  passcode: z.string().min(1).max(120),
+  secretAnswer: z.string().max(120).default(''),
+});
+
+app.post('/auth/login', async (c) => {
+  const origin = c.req.header('origin');
+  if (origin && !isAllowedOrigin(origin)) {
+    return c.json({ error: 'origin_not_allowed' }, 403);
+  }
+  const body = AuthLoginSchema.parse(await c.req.json().catch(() => ({})));
+  const creds = await verifyOwnerCredentials(body.email, body.passcode, body.secretAnswer, c.env);
+  if (!creds.ok) {
+    return c.json({ error: creds.error }, 401);
+  }
+  const token = await issueOwnerSessionToken(creds.normalizedEmail, c.env);
+  if (!token) {
+    return c.json({ error: 'owner_auth_not_configured' }, 503);
+  }
+  c.header('cache-control', 'no-store');
+  return c.json({ ok: true, token, email: creds.normalizedEmail });
+});
+
+app.get('/auth/verify', async (c) => {
+  const token = getBearerToken(c.req.raw.headers);
+  if (!token) return c.json({ ok: false, error: 'missing_token' }, 401);
+  const session = await verifyOwnerSessionToken(token, c.env);
+  if (!session.ok) return c.json({ ok: false, error: session.error }, 401);
+  return c.json({ ok: true, email: session.email });
 });
 
 app.get('/health', (c) => c.json({ ok: true, at: nowIso() }));
@@ -364,15 +454,16 @@ app.post('/music/jobs', async (c) => {
 });
 
 app.get('/music/jobs', async (c) => {
-  if (!c.env.MUSIC_JOBS) return c.json({ error: 'music_storage_not_configured' }, 503);
-  const listed = await c.env.MUSIC_JOBS.list({ prefix: 'music-jobs/', delimiter: '/' });
+  const storage = c.env.MUSIC_JOBS;
+  if (!storage) return c.json({ error: 'music_storage_not_configured' }, 503);
+  const listed = await storage.list({ prefix: 'music-jobs/', delimiter: '/' });
   const ids = listed.delimitedPrefixes
     .map((prefix) => prefix.split('/')[1])
     .filter(Boolean)
     .slice(-50);
   const jobs = await Promise.all(
     ids.map(async (id) => {
-      const object = await c.env.MUSIC_JOBS.get(musicJobKey(id, 'status.json'));
+      const object = await storage.get(musicJobKey(id, 'status.json'));
       return object ? object.json() : null;
     }),
   );

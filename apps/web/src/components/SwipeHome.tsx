@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { Link } from 'react-router-dom';
 import { playSwoosh } from './stageSfx';
+import { LazyYouTube } from './LazyYouTube';
 import { publishedSongs } from '../data/publishedSongs';
 import {
   officialReleaseVideos,
@@ -32,7 +33,11 @@ type Slide = {
 };
 
 const norm = (s: string) =>
-  s.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  s
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 
 function buildSlides(): Slide[] {
   return officialReleaseVideos.map((v) => {
@@ -175,22 +180,15 @@ export function SwipeHome() {
         {/* ===== CINEMATIC HERO ===== */}
         <section className="md-hero" aria-label="3000 Studios VIP">
           <div className="md-hero-media" aria-hidden="true">
-            {hero ? (
-              <img
-                src={hero.poster}
-                alt=""
-                fetchPriority="high"
-                decoding="async"
-              />
-            ) : null}
+            {hero ? <img src={hero.poster} alt="" fetchPriority="high" decoding="async" /> : null}
           </div>
           <div className="md-hero-veil" aria-hidden="true" />
           <div className="md-hero-copy">
             <span className="md-kicker">YouTube · DistroKid · Official Artist</span>
             <h1 className="md-title">3000 Studios</h1>
             <p className="md-sub">
-              {n} official music videos. Swipe through every drop — everything
-              streams free. Subscribe so YouTube puts the next release in your feed.
+              {n} official music videos. Swipe through every drop — everything streams free.
+              Subscribe so YouTube puts the next release in your feed.
             </p>
             <div className="md-cta-row">
               <a
@@ -231,9 +229,7 @@ export function SwipeHome() {
               className="md-track"
               style={{
                 transform: `translateX(calc(${-index * 100}% + ${drag}px))`,
-                transition: isDragging
-                  ? 'none'
-                  : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)',
+                transition: isDragging ? 'none' : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)',
               }}
             >
               {slides.map((s, i) => {
@@ -255,12 +251,11 @@ export function SwipeHome() {
                       decoding="async"
                     />
                     {active ? (
-                      <iframe
+                      <LazyYouTube
                         className="md-slide-video"
+                        videoId={s.videoId}
                         title={`${s.title} — official music video`}
-                        src={`https://www.youtube-nocookie.com/embed/${s.videoId}?autoplay=1&mute=${soundOn ? 0 : 1}&controls=${soundOn ? 1 : 0}&loop=1&playlist=${s.videoId}&playsinline=1&rel=0&modestbranding=1`}
-                        allow="autoplay; encrypted-media; picture-in-picture"
-                        allowFullScreen
+                        playlist
                       />
                     ) : null}
                     <div className="md-slide-shade" aria-hidden="true" />
@@ -339,8 +334,8 @@ export function SwipeHome() {
                 margin: 0,
               }}
             >
-              <strong style={{ color: '#f4efe2' }}>{song.title}</strong> — swipe for the
-              next video · <Link to="/music">full catalog</Link> ·{' '}
+              <strong style={{ color: '#f4efe2' }}>{song.title}</strong> — swipe for the next video
+              · <Link to="/music">full catalog</Link> ·{' '}
               <a href="https://distrokid.com/hyperfollow/3000studios">HyperFollow</a>
             </p>
           ) : null}
@@ -360,8 +355,8 @@ export function SwipeHome() {
           <span className="md-kicker">Fuel the next drop</span>
           <h2>Six ways to get paid — pick one.</h2>
           <p>
-            Music streams free forever. Money comes from ownership: downloads, VIP
-            passes, sync licenses, sponsors, and merch.
+            Music streams free forever. Money comes from ownership: downloads, VIP passes, sync
+            licenses, sponsors, and merch.
           </p>
           <div className="md-money-grid">
             <article className="md-pay-card">

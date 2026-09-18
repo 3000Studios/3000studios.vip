@@ -5,7 +5,9 @@ Merch: hoodie $44, tee $24, cap $28, stickers $8. Sponsor homepage slot $99/30 d
 Live: /live Cloudflare Stream. Games: https://getnexa.space. YouTube: @3000Studio.
 Give short, specific campaigns. Never print API keys, tokens, passcodes, or env values.`;
 
-export const onRequestPost: PagesFunction = async ({ request, env }) => {
+import type { PagesEnv } from '../env';
+
+export const onRequestPost: PagesFunction<PagesEnv> = async ({ request, env }) => {
   const key = String(env.GEMINI_API_KEY || env.VITE_GEMINI_API_KEY || '');
   const model = String(env.VITE_GEMINI_MODEL || 'gemini-2.0-flash');
   if (!key) {
@@ -23,7 +25,9 @@ export const onRequestPost: PagesFunction = async ({ request, env }) => {
   const message = (body.message || '').slice(0, 2000);
   if (!message) return new Response(JSON.stringify({ ok: false, error: 'empty' }), { status: 400 });
   const contents = [
-    ...((body.history || []).slice(-8).map((h) => ({ role: h.role === 'advisor' ? 'model' : 'user', parts: [{ text: h.text }] }))),
+    ...(body.history || [])
+      .slice(-8)
+      .map((h) => ({ role: h.role === 'advisor' ? 'model' : 'user', parts: [{ text: h.text }] })),
     { role: 'user', parts: [{ text: message }] },
   ];
   const res = await fetch(
@@ -38,8 +42,14 @@ export const onRequestPost: PagesFunction = async ({ request, env }) => {
       }),
     },
   );
-  const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-  const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('\n').trim() || 'No reply.';
+  const data = (await res.json()) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+  };
+  const text =
+    data.candidates?.[0]?.content?.parts
+      ?.map((p) => p.text || '')
+      .join('\n')
+      .trim() || 'No reply.';
   return new Response(JSON.stringify({ ok: true, text }), {
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
   });

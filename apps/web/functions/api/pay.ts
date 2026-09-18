@@ -9,12 +9,17 @@ const STRIPE: Record<string, string> = {
   sponsor: 'https://buy.stripe.com/00w14n70NaH414YeMibAs10',
 };
 
-export const onRequestGet: PagesFunction = async ({ request }) => {
+import type { PagesEnv } from '../env';
+
+export const onRequestGet: PagesFunction<PagesEnv> = async ({ request }) => {
   const url = new URL(request.url);
   const sku = (url.searchParams.get('sku') || '').toLowerCase();
   if (!sku) {
     const links = Object.fromEntries(
-      Object.entries(STRIPE).map(([id, href]) => [id, { site: `https://3000studios.vip/api/pay?sku=${id}`, stripe: href }]),
+      Object.entries(STRIPE).map(([id, href]) => [
+        id,
+        { site: `https://3000studios.vip/api/pay?sku=${id}`, stripe: href },
+      ]),
     );
     return new Response(JSON.stringify({ ok: true, processor: 'stripe', links }, null, 2), {
       headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },

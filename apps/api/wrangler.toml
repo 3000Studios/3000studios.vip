@@ -7,7 +7,9 @@ account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 APP_ENV = "production"
 ACCESS_REQUIRED = "1"
 OWNER_EMAIL = "mr.jwswain@gmail.com"
-TIKTOK_CLIENT_KEY = "sbawunwbiuohnfsdsc"
+# TIKTOK_CLIENT_KEY is now a secret: wrangler secret put TIKTOK_CLIENT_KEY
+# VAULT_PASSCODE_SHA256, VAULT_SECRET_ANSWER_SHA256, and AUTH_JWT_SECRET
+# are also stored as Worker secrets and are never exposed to the browser.
 
 [ai]
 binding = "AI"

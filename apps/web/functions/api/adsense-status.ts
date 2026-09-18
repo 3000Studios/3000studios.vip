@@ -1,19 +1,33 @@
-export const onRequestGet: PagesFunction = async () => {
-  const adsTxt = 'google.com, pub-5800977493749262, DIRECT, f08c47fec0942fa0';
-  const slot = (globalThis as { ADSENSE_HOME_SLOT?: string }).ADSENSE_HOME_SLOT || '';
+import type { PagesEnv } from '../env';
+
+export const onRequestGet: PagesFunction<PagesEnv> = async ({ env }) => {
+  const publisher = (env.VITE_ADSENSE_CLIENT_ID as string | undefined)?.trim() || '';
+  const adsTxt = publisher
+    ? `google.com, ${publisher.replace('ca-pub-', 'pub-')}, DIRECT, f08c47fec0942fa0`
+    : '';
+  const homeSlot = (env.VITE_ADSENSE_HOME_SLOT as string | undefined)?.trim() || '';
   const body = {
     ok: true,
-    publisher: 'ca-pub-5800977493749262',
+    publisher,
     adsTxtExpected: adsTxt,
-    homeSlotConfigured: Boolean(slot),
+    homeSlotConfigured: Boolean(homeSlot),
     notes: [
       'ads.txt is live at https://3000studios.vip/ads.txt',
       'pagead script and google-adsense-account meta are in index.html',
-      slot ? 'Home ad slot env is set' : 'VITE_ADSENSE_HOME_SLOT is empty — no display units render. Create an ad unit in AdSense and set the slot on Cloudflare Pages.',
-      'Same publisher ID is used on myappai.net. That is valid if both sites sit on one AdSense account.',
+      homeSlot
+        ? 'Home ad slot env is set'
+        : 'VITE_ADSENSE_HOME_SLOT is empty — no display units render. Create an ad unit in AdSense and set the slot on Cloudflare Pages.',
+      publisher
+        ? 'Publisher ID is configured via VITE_ADSENSE_CLIENT_ID.'
+        : 'VITE_ADSENSE_CLIENT_ID is empty — AdSense script will not load.',
       'Approval needs real content, ads.txt, privacy policy, and at least one ad unit. Empty slot = nothing for Google to fill.',
     ],
-    checklist: { adsTxt: true, privacyPolicy: true, scriptTag: true, displaySlot: Boolean(slot) },
+    checklist: {
+      adsTxt: Boolean(publisher),
+      privacyPolicy: true,
+      scriptTag: Boolean(publisher),
+      displaySlot: Boolean(homeSlot),
+    },
   };
   return new Response(JSON.stringify(body), {
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },

@@ -8,8 +8,13 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { featureSong, getSongBySrc, getSongByTitle, rolloutSongs, type CatalogSong } from '../data/music';
-
+import {
+  featureSong,
+  getSongBySrc,
+  getSongByTitle,
+  rolloutSongs,
+  type CatalogSong,
+} from '../data/music';
 
 const MUSIC_ON_KEY = '3000-music-on';
 
@@ -93,19 +98,33 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   const connectAnalyzer = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || analyserRef.current) return;
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    ctxRef.current = ctx;
-    const source = ctx.createMediaElementSource(audio);
-    sourceRef.current = source;
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 64;
-    source.connect(analyser);
-    analyser.connect(ctx.destination);
-    analyserRef.current = analyser;
+    if (!audio) return;
+    if (!ctxRef.current) {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      ctxRef.current = new AudioCtx();
+    }
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+    if (!analyserRef.current) {
+      try {
+        const source = ctx.createMediaElementSource(audio);
+        sourceRef.current = source;
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+        analyser.connect(ctx.destination);
+        analyserRef.current = analyser;
+      } catch {
+        // Already connected or CORS/autoplay policy blocked setup.
+        return;
+      }
+    }
+    const analyser = analyserRef.current;
     const data = new Uint8Array(analyser.frequencyBinCount);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     const tick = () => {
       analyser.getByteFrequencyData(data);
       const avg = data.reduce((sum, value) => sum + value, 0) / data.length / 255;
@@ -118,7 +137,8 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   const playIndex = useCallback(
     (i: number, opts?: { autoplay?: boolean }) => {
-      const song = rolloutSongs[((i % rolloutSongs.length) + rolloutSongs.length) % rolloutSongs.length];
+      const song =
+        rolloutSongs[((i % rolloutSongs.length) + rolloutSongs.length) % rolloutSongs.length];
       if (!song) return;
       const audio = audioRef.current;
       if (!audio) return;
@@ -134,7 +154,10 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       connectAnalyzer();
       void ctxRef.current?.resume();
       if (opts?.autoplay === true) {
-        void audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+        void audio
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch(() => setIsPlaying(false));
       } else {
         audio.pause();
         setIsPlaying(false);
@@ -155,7 +178,10 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       if (!audio) return;
       if (!audio.src.endsWith(src)) audio.src = src;
       connectAnalyzer();
-      void audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+      void audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
     },
     [playIndex, connectAnalyzer],
   );
@@ -165,7 +191,10 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     if (!audio) return;
     connectAnalyzer();
     void ctxRef.current?.resume();
-    void audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    void audio
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false));
   }, [connectAnalyzer]);
 
   const pause = useCallback(() => {
@@ -220,6 +249,16 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     playIndex(startIndex, { autoplay: false });
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      try {
+        sourceRef.current?.disconnect();
+        analyserRef.current?.disconnect();
+        void ctxRef.current?.close();
+      } catch {
+        /* ignore */
+      }
+      ctxRef.current = null;
+      analyserRef.current = null;
+      sourceRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -349,7 +388,9 @@ export function GlobalMusicToggle({ className = '' }: { className?: string }) {
       aria-label={isPlaying ? 'Turn music off' : 'Turn music on'}
       title={isPlaying ? `Music on · ${activeTitle}` : 'Music off'}
     >
-      <span className="globalMusicToggleIcon" aria-hidden="true">{isPlaying ? '♪' : '⊘'}</span>
+      <span className="globalMusicToggleIcon" aria-hidden="true">
+        {isPlaying ? '♪' : '⊘'}
+      </span>
       <span className="globalMusicToggleLabel">{isPlaying ? 'Music on' : 'Music off'}</span>
     </button>
   );

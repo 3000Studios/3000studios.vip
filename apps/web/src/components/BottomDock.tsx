@@ -10,22 +10,39 @@ const items = [
 
 export function BottomDock() {
   const { pathname } = useLocation();
-  if (pathname.startsWith('/admin') || pathname.startsWith('/vault') || pathname.startsWith('/agent')) return null;
+  if (
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/vault') ||
+    pathname.startsWith('/agent')
+  )
+    return null;
   return (
     <nav className="bottomDock ytPerkSafe" aria-label="Primary mobile navigation">
       {items.map((item) => {
         const external = 'external' in item && item.external;
-        const active = !external && (item.to === '/' ? pathname === '/' : pathname.startsWith(item.to));
+        const active =
+          !external && (item.to === '/' ? pathname === '/' : pathname.startsWith(item.to));
         if (external) {
           return (
-            <a key={item.label} className="dockItem" href={item.to} target="_blank" rel="noreferrer">
+            <a
+              key={item.label}
+              className="dockItem"
+              href={item.to}
+              target="_blank"
+              rel="noreferrer"
+            >
               <span aria-hidden="true">{item.icon}</span>
               {item.label}
             </a>
           );
         }
         return (
-          <Link key={item.label} className={active ? 'dockItem is-active' : 'dockItem'} to={item.to}>
+          <Link
+            key={item.label}
+            className={active ? 'dockItem is-active' : 'dockItem'}
+            to={item.to}
+            aria-current={active ? 'page' : undefined}
+          >
             <span aria-hidden="true">{item.icon}</span>
             {item.label}
           </Link>

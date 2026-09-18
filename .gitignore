@@ -14,6 +14,13 @@ global.env
 *.crt
 apps/web/preview-*.png
 
+# Android build artifacts
+**/app/build/
+**/.gradle/
+**/local.properties
+**/*.apk
+**/*.aab
+**/*.dex
 
 # Shared media is served from the central R2/Worker CDN - never commit local copies
 shared-media/
