@@ -5,12 +5,17 @@ param(
 $ErrorActionPreference = 'Stop'
 
 function Get-DefaultGlobalEnvPath {
-  $candidate = 'C:\Users\MrJws\Documents\global.env'
-  if (Test-Path -LiteralPath $candidate) {
-    return $candidate
+  $candidates = @(
+    'C:\Documents2\global.env'
+    'C:\Users\MrJws\Documents\global.env'
+  )
+  foreach ($candidate in $candidates) {
+    if (Test-Path -LiteralPath $candidate) {
+      return $candidate
+    }
   }
 
-  throw 'No global.env file was found at C:\Users\MrJws\Documents\global.env.'
+  throw 'No global.env file was found at C:\Documents2\global.env or C:\Users\MrJws\Documents\global.env.'
 }
 
 function Import-GlobalEnv {
