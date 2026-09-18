@@ -1,0 +1,1 @@
+export { SponsorsPage } from './LegacyPages';
