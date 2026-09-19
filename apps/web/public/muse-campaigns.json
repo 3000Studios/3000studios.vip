@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-19",
+  "artist": "3000 Studios",
+  "youtubeChannelId": "UCTQnEFZUIutrFuDlxGj9cDA",
+  "site": "https://3000studios.vip",
+  "instagram": "https://www.instagram.com/3000studios.vip",
+  "youtubeSubscribe": "https://www.youtube.com/@3000Studio?sub_confirmation=1",
+  "globalCampaignInstructions": [
+    "Process every release below, not just the first one.",
+    "For each release, optimize the full YouTube video metadata using the exact final description and tag list below when account authorization permits.",
+    "Locate finished existing promos first. If additional promos are needed and source media is accessible, create 2-5 materially different 9:16 cuts using different hooks/moments.",
+    "Distribute each eligible campaign across TikTok, Instagram Reels, the official 3000 Studios Facebook Page/Reels, Pinterest and YouTube Shorts, avoiding duplicate posts to the same account.",
+    "Prepare one 3-8 second 9:16 Spotify Canvas loop for every release and upload through Spotify for Artists when authorized, otherwise save it to the Spotify Canvas queue.",
+    "Every short-form caption should identify the song and 3000 Studios, include a direct listen/watch/follow/subscribe call to action, and use only relevant hashtags.",
+    "Record every live URL, draft receipt, metadata update, Canvas status or authorization blocker."
+  ],
+  "releases": [
+    {
+      "videoId": "aqbImIx7S-s",
+      "title": "I'm Feelin' It",
+      "youtubeUrl": "https://www.youtube.com/watch?v=aqbImIx7S-s",
+      "priority": "high",
+      "reason": "Newest full release and its matching Short is already showing strong traction relative to the newest Shorts.",
+      "finalDescription": "🔥 ‘I'm Feelin' It’ — official music video by 3000 Studios.\n\nIf this one hits, watch it through, share it, and subscribe for the next release.\n\n🎧 Stream 3000 Studios on Spotify, Apple Music & YouTube Music.\n🌐 Official site: https://3000studios.vip\n📲 Instagram: https://www.instagram.com/3000studios.vip\n🔔 Subscribe: https://www.youtube.com/@3000Studio?sub_confirmation=1\n\n#3000Studios #ImFeelinIt #NewMusic #OriginalMusic #IndependentArtist",
+      "tags": ["I'm Feelin' It","3000 Studios","3000Studios","original music","new music","independent artist","original song","official music video","electronic music","pop music","indie music","music discovery","new song","emerging artist","3000 Studios music"],
+      "campaignJobs": ["Keep the existing I'm Feelin' It Short linked to this full video.","Create additional distinct promo hooks only if finished promos are available or a materially different cut can be made.","Cross-post suitable vertical promos to TikTok, Instagram Reels, Facebook Reels and Pinterest.","Prepare/upload a matching Spotify Canvas."]
+    },
+    {
+      "videoId": "IUS0IHNmdlQ",
+      "title": "So fresh tribute",
+      "youtubeUrl": "https://www.youtube.com/watch?v=IUS0IHNmdlQ",
+      "priority": "normal",
+      "finalDescription": "🔥 ‘So fresh tribute’ — official music video by 3000 Studios.\n\nOriginal music from 3000 Studios. If you feel it, share it and subscribe for new releases and Shorts.\n\n🎧 Stream 3000 Studios on Spotify, Apple Music & YouTube Music.\n🌐 Official site: https://3000studios.vip\n📲 Instagram: https://www.instagram.com/3000studios.vip\n🔔 Subscribe: https://www.youtube.com/@3000Studio?sub_confirmation=1\n\n#3000Studios #SoFreshTribute #OriginalMusic #HipHop #IndependentArtist",
+      "tags": ["So fresh tribute","3000 Studios","3000Studios","original music","new music","independent artist","original song","official music video","hip hop","hip hop music","rap music","music video","new song","music discovery","3000 Studios music"],
+      "campaignJobs": ["Create/find 2-5 vertical promo cuts.","Post across supported short-form destinations with distinct captions.","Create a Pinterest Video Pin linking to this full video or the official site.","Prepare/upload a matching Spotify Canvas."]
+    },
+    {
+      "videoId": "qxq6gBUoEgc",
+      "title": "DON’T TELL ME WHAT THAT IS",
+      "youtubeUrl": "https://www.youtube.com/watch?v=qxq6gBUoEgc",
+      "priority": "normal",
+      "finalDescription": "🔥 ‘DON’T TELL ME WHAT THAT IS’ — official music video by 3000 Studios.\n\nOriginal music with 3000 Studios energy. Watch the full video, share the track, and subscribe for the next drop.\n\n🎧 Stream 3000 Studios on Spotify, Apple Music & YouTube Music.\n🌐 Official site: https://3000studios.vip\n📲 Instagram: https://www.instagram.com/3000studios.vip\n🔔 Subscribe: https://www.youtube.com/@3000Studio?sub_confirmation=1\n\n#3000Studios #DontTellMeWhatThatIs #NewMusic #HipHop #OriginalMusic",
+      "tags": ["DON’T TELL ME WHAT THAT IS","Don't Tell Me What That Is","3000 Studios","3000Studios","original music","new music","independent artist","original song","official music video","hip hop","electronic music","pop music","rap music","new song","3000 Studios music"],
+      "campaignJobs": ["Create/find 2-5 vertical promo cuts using different memorable moments.","Cross-post to TikTok, Instagram Reels, Facebook Reels, Pinterest and YouTube Shorts.","Prepare/upload a matching Spotify Canvas."]
+    },
+    {
+      "videoId": "k5W1rUtbFbA",
+      "title": "More Mass",
+      "youtubeUrl": "https://www.youtube.com/watch?v=k5W1rUtbFbA",
+      "priority": "normal",
+      "finalDescription": "🔥 ‘More Mass’ — official music video by 3000 Studios.\n\nTurn it up, watch the full video, and follow 3000 Studios for more original releases.\n\n🎧 Stream 3000 Studios on Spotify, Apple Music & YouTube Music.\n🌐 Official site: https://3000studios.vip\n📲 Instagram: https://www.instagram.com/3000studios.vip\n🔔 Subscribe: https://www.youtube.com/@3000Studio?sub_confirmation=1\n\n#3000Studios #MoreMass #BassMusic #NewMusic #OriginalMusic",
+      "tags": ["More Mass","3000 Studios","3000Studios","original music","new music","independent artist","original song","official music video","electronic music","bass music","new song","music video","indie music","music discovery","3000 Studios music"],
+      "campaignJobs": ["Create/find multiple vertical bass-focused hooks.","Cross-post once per official platform with platform-native captions.","Create a Pinterest Video Pin and a Spotify Canvas."]
+    },
+    {
+      "videoId": "NYoaRy3i5XA",
+      "title": "Still Learning",
+      "youtubeUrl": "https://www.youtube.com/watch?v=NYoaRy3i5XA",
+      "priority": "normal",
+      "finalDescription": "‘Still Learning’ — official music video by 3000 Studios.\n\nWatch the full release, share it with somebody who connects with it, and subscribe for more original 3000 Studios music.\n\n🎧 Stream 3000 Studios on Spotify, Apple Music & YouTube Music.\n🌐 Official site: https://3000studios.vip\n📲 Instagram: https://www.instagram.com/3000studios.vip\n🔔 Subscribe: https://www.youtube.com/@3000Studio?sub_confirmation=1\n\n#3000Studios #StillLearning #OriginalMusic #IndependentMusic #NewMusic",
+      "tags": ["Still Learning","3000 Studios","3000Studios","original music","new music","independent artist","independent music","original song","official music video","emotional music","new song","music video","music discovery","emerging artist","3000 Studios music"],
+      "campaignJobs": ["Find/create emotional or memorable vertical hooks that make sense without full-song context.","Cross-post to supported short-form platforms.","Create a Pinterest Video Pin and a Spotify Canvas."]
+    },
+    {
+      "videoId": "xRepf64J9H4",
+      "title": "Always Feel like",
+      "youtubeUrl": "https://www.youtube.com/watch?v=xRepf64J9H4",
+      "priority": "highest",
+      "reason": "This is currently the strongest-performing newest full music video in the current channel snapshot and should receive additional distinct promotion rather than being left with minimal metadata.",
+      "finalDescription": "🔥 ‘Always Feel like’ — official music video by 3000 Studios.\n\nThis release is already getting attention—watch the full video, share it, and subscribe for more original 3000 Studios music.\n\n🎧 Stream 3000 Studios on Spotify, Apple Music & YouTube Music.\n🌐 Official site: https://3000studios.vip\n📲 Instagram: https://www.instagram.com/3000studios.vip\n🔔 Subscribe: https://www.youtube.com/@3000Studio?sub_confirmation=1\n\n#3000Studios #AlwaysFeelLike #NewMusic #OriginalMusic #ElectronicMusic",
+      "tags": ["Always Feel like","Always Feel Like","3000 Studios","3000Studios","original music","new music","independent artist","original song","official music video","electronic music","hip hop music","pop music","new song","music discovery","3000 Studios music"],
+      "campaignJobs": ["Prioritize additional materially different vertical promo cuts from this full video.","Cross-post to all supported official destinations and link back to this full video.","Create a fresh Pinterest Video Pin rather than repeating an identical Pin.","Prepare/upload a matching Spotify Canvas."]
+    }
+  ],
+  "shortFormTemplate": {
+    "captionPattern": "[HOOK] — ‘[SONG]’ by 3000 Studios. Watch/stream the full release. [small relevant hashtag set]",
+    "youtubeDescriptionPattern": "🔥 ‘[SONG]’ — 3000 Studios\nWatch the full video: [FULL_VIDEO_URL]\n🎧 Stream 3000 Studios on Spotify, Apple Music & YouTube Music\n🌐 https://3000studios.vip\n🔔 https://www.youtube.com/@3000Studio?sub_confirmation=1\n\n#3000Studios #NewMusic #Shorts",
+    "pinterestRule": "Use an original Pin title based on the exact song and hook, a useful keyword-rich description, and a destination link. Do not paste a wall of hashtags.",
+    "facebookInstagramRule": "Use concise natural captions and only a handful of relevant hashtags; do not dump the full YouTube tag list into social captions."
+  },
+  "completionDefinition": "A release campaign is complete only when all currently-authorized platforms have been handled, required drafts are created, metadata work is recorded, Canvas is uploaded or queued, and every blocked platform has an explicit pending authorization/approval status."
+}
