@@ -1,60 +1,95 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "updatedAt": "2026-09-19",
   "brand": "3000 Studios",
-  "purpose": "Standing instructions for Meta Muse to distribute finished 3000 Studios music promo videos without recreating or altering the approved master unless requested.",
-  "queue": {
-    "source": "Google Drive > promo > READY TO POST - MUSE",
-    "postedArchive": "Google Drive > promo > POSTED - MUSE",
+  "authoritativeCampaignIndex": "https://3000studios.vip/muse-campaigns.json",
+  "purpose": "Standing instructions for Muse to turn every finished 3000 Studios music release into a complete cross-platform promotion campaign using already-approved music assets first.",
+  "objectives": [
+    "Grow qualified views, subscribers, followers, saves, shares and streams.",
+    "Send viewers from short-form promos to the matching full video, Spotify release and 3000studios.vip.",
+    "Increase monetizable watch time and legitimate streaming traffic without fake or purchased engagement.",
+    "Reuse each finished master intelligently across every supported platform instead of creating one-off posts."
+  ],
+  "queues": {
+    "ready": "Google Drive > promo > READY TO POST - MUSE",
+    "campaignAssets": "Google Drive > promo > CAMPAIGN ASSETS - MUSE",
+    "spotifyCanvas": "Google Drive > promo > SPOTIFY CANVAS - READY",
+    "fullVideoSeo": "Google Drive > promo > FULL VIDEO SEO - MUSE",
+    "posted": "Google Drive > promo > POSTED - MUSE",
     "receipts": "Google Drive > promo > POST RECEIPTS - MUSE"
   },
-  "eligibility": [
-    "Use only completed music promo, Short, Reel, teaser, visualizer, or music-video clip files that belong to 3000 Studios.",
-    "Do not post the same finished asset twice to the same account unless the user explicitly asks for a repost.",
-    "Do not invent a missing video. If the source file cannot be opened, report it as missing and continue with the next ready item."
-  ],
-  "workflow": [
-    "Read the READY TO POST - MUSE queue before creating anything new.",
-    "For each ready asset, identify the song title and use 3000 Studios as the artist name.",
-    "Prepare a concise platform-native caption with the song title, a clear listen/follow/subscribe call to action, and only relevant hashtags.",
-    "Use the connected official 3000 Studios social account for each platform.",
-    "Before a public publish action, present the final asset, caption, destination account, and platform for approval when the platform or Muse requires approval.",
-    "After a successful publish, save the live URL or platform receipt in POST RECEIPTS - MUSE and move the source asset to POSTED - MUSE.",
-    "If a platform fails, leave the source in READY TO POST - MUSE and record the failure instead of silently skipping it."
+  "releaseCampaign": [
+    "Detect each newest full 3000 Studios music video and its matching song.",
+    "Optimize the full video's description, relevant tags and cross-links using the current campaign index. Never stuff unrelated keywords.",
+    "Use an existing finished vertical promo first. If none exists and source media is accessible, make 2-5 distinct vertical promo cuts from strong moments rather than duplicate copies.",
+    "Each vertical promo should normally be 9:16, hook immediately, identify the song visually when useful, include a clear call to action and preserve the original music.",
+    "Create one Spotify Canvas candidate per release: 3-8 seconds, 9:16 vertical, 720-1080px high, MP4 or JPG, seamless or intentional loop, no unnecessary song-title/artist text, no fake lyric-sync.",
+    "Distribute eligible promos to TikTok, Instagram Reels, the official 3000 Studios Facebook Page/Reels, Pinterest, YouTube Shorts and Threads when connected.",
+    "Cross-link every Short/Reel/Pin to the matching full video, streaming destination or 3000studios.vip when the platform allows it.",
+    "After each successful action record the platform, account, asset, caption, timestamp and live URL or receipt. Never claim success without evidence."
   ],
   "platforms": {
+    "youtube": {
+      "enabled": true,
+      "channelId": "UCTQnEFZUIutrFuDlxGj9cDA",
+      "shorts": "Publish eligible vertical music promos as Shorts. Add a concise description, relevant tags and a direct path to the matching full video whenever available.",
+      "fullVideos": "For newest official music videos, apply the exact final SEO description and tags from muse-campaigns.json after verifying the video ID. Keep keywords natural and song-specific.",
+      "cta": "Prefer Subscribe, Watch the full video and Stream 3000 Studios calls to action."
+    },
     "tiktok": {
       "enabled": true,
       "officialTool": "https://3000studios.vip/tiktok/",
       "currentMode": "draft-upload",
-      "instructions": "Use the site's authorized TikTok Promo Studio for the MP4. Direct public posting is used only after TikTok approves video.publish; until then, send the finished promo to the TikTok inbox as a draft and return the receipt."
+      "instructions": "Use the site's authorized TikTok Promo Studio for finished MP4 promos. Until TikTok approves video.publish, send the promo to the TikTok inbox as a draft; once Direct Post is approved, use it for authorized 3000 Studios campaigns."
     },
     "instagram": {
       "enabled": true,
-      "instructions": "Post eligible vertical promos as Reels using the connected official 3000 Studios Instagram account."
+      "instructions": "Post finished vertical music promos as Reels to the official 3000 Studios Instagram account. Use a short hook, song title, relevant hashtags and a listen/watch CTA. If the account is not connected, open the account-authorization step, mark the campaign pending-auth and do not silently skip it."
     },
     "facebook": {
       "enabled": true,
-      "instructions": "Post eligible vertical promos as Reels/video posts using the connected official 3000 Studios Facebook account."
+      "instructions": "Post finished music promos to the official 3000 Studios Facebook Page as Reels/video posts. Use the matching full-video or site link when available. Never post to a personal profile unless explicitly selected."
     },
-    "youtube": {
+    "pinterest": {
       "enabled": true,
-      "instructions": "Upload eligible vertical promos to the official 3000 Studios YouTube account as Shorts when appropriate; preserve the finished master and avoid duplicate uploads."
+      "instructions": "Create a fresh Video Pin for each eligible release/promo. Prefer a vertical 9:16 asset, a descriptive title up to 100 characters, a useful description up to 800 characters, relevant keywords and a destination link to the matching full video, song page or 3000studios.vip. Do not duplicate the same Pin repeatedly."
+    },
+    "spotifyCanvas": {
+      "enabled": true,
+      "instructions": "Prepare a Canvas for every eligible Spotify track using a 3-8 second 9:16 vertical loop, 720-1080px high, MP4 or JPG. Keep it visually tied to the release. Upload through Spotify for Artists when artist-team access is available; otherwise leave the finished Canvas in SPOTIFY CANVAS - READY with the exact track name and report the authorization blocker."
+    },
+    "spotifyFullVideo": {
+      "enabledWhenAvailable": true,
+      "instructions": "If Spotify for Artists exposes full-length video upload for this artist, use the rights-controlled official music video: music-first, landscape 16:9, over 30 seconds, under 20 minutes, under 50 GB and at least 1920x1080. Link it to the correct catalog track."
     },
     "threads": {
       "enabled": true,
-      "instructions": "Use a compatible teaser/video post when the connected account supports the asset format; otherwise publish the promo link and matching caption."
+      "instructions": "Publish a compatible teaser/video or release post from the connected official account, pointing people to the matching song/full video."
     }
   },
-  "captionRules": {
+  "metadataRules": {
     "artist": "3000 Studios",
-    "tone": "direct, memorable, energetic, not spammy",
-    "cta": "Prefer listen, watch, follow, or subscribe calls to action.",
-    "hashtags": "Use a small set of relevant song, genre, artist, and discovery hashtags; never stuff unrelated trending tags."
+    "description": "Lead with the exact song and artist, add one concise reason to watch/listen, then streaming/site/full-video links as applicable, followed by a small relevant hashtag set.",
+    "tags": "Use the exact song title, 3000 Studios, original music, new music, independent artist, official music video/Shorts when applicable, plus only genre/topic terms supported by the actual release.",
+    "hashtags": "Use a small platform-native set. Never use unrelated trending tags merely for reach.",
+    "duplicatePolicy": "One asset may be distributed once to each official platform/account. Reposting to the same destination requires an intentional new caption/edit or explicit repost instruction."
+  },
+  "monetizationLoop": [
+    "Use Shorts/Reels/TikToks/Pins to drive qualified traffic toward the matching full video and streaming release.",
+    "Use 3000studios.vip as the owned destination when it gives the viewer a useful music experience; do not send people to thin or unrelated pages merely to create ad impressions.",
+    "Preserve YouTube watch-time opportunities by linking Shorts to full videos and promoting the strongest current releases again with materially different promo cuts.",
+    "Use Spotify Canvas and eligible Spotify video features to deepen engagement with tracks.",
+    "Review real platform analytics and receipts, then make more promos from releases and hooks that actually outperform the channel baseline.",
+    "Never promise revenue. Optimize legitimate reach, retention, streams, subscribers and monetizable activity."
+  ],
+  "authorization": {
+    "standingIntent": "The owner wants finished 3000 Studios music promotion distributed broadly across official accounts.",
+    "rule": "Complete actions automatically where the connected platform permits it. When a platform requires login, OAuth, account selection, final confirmation or API review, take the workflow to that exact step, mark it pending-auth/approval and continue every independent action that is available."
   },
   "safety": [
-    "Never buy, fake, automate, or misrepresent views, likes, comments, subscribers, follows, or engagement.",
-    "Never replace a finished promo with an AI-regenerated version unless the user asks for a new edit.",
-    "Never expose account credentials, tokens, cookies, API keys, or private Drive links in captions or public posts."
+    "Never buy, fake, automate or misrepresent views, likes, comments, followers, subscribers, saves or streams.",
+    "Never expose credentials, tokens, cookies, API keys or private Drive links in public content.",
+    "Never post non-music personal/security videos from the user's libraries as 3000 Studios promotions.",
+    "Never claim a post, Canvas, metadata update or upload succeeded without a platform receipt, visible state or live URL."
   ]
 }
