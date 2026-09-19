@@ -42,8 +42,13 @@ function Invoke-CloudflareApi {
   )
 
   $headers = @{
-    Authorization  = "Bearer $script:CloudflareToken"
     'Content-Type' = 'application/json'
+  }
+  if ($script:AuthMode -eq 'token') {
+    $headers['Authorization'] = "Bearer $script:CloudflareToken"
+  } else {
+    $headers['X-Auth-Email'] = $script:CloudflareEmail
+    $headers['X-Auth-Key'] = $script:CloudflareToken
   }
 
   $uri = "https://api.cloudflare.com/client/v4$Path"
@@ -78,15 +83,26 @@ function New-PagesEnvVar {
 
 $loaded = Import-GlobalEnv -Path $EnvFile
 
-$script:CloudflareToken = Get-EnvValue -Names @('CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_API_ALL', 'CLOUDFLARE_ACCOUNT_API_TOKEN') -Default $null
+$apiToken = Get-EnvValue -Names @('CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_API_ALL', 'CLOUDFLARE_ACCOUNT_API_TOKEN') -Default $null
+$globalKey = Get-EnvValue -Names @('CLOUDFLARE_GLOBAL_API_KEY') -Default $null
 $accountId = Get-EnvValue -Names @('CLOUDFLARE_ACCOUNT_ID') -Default $null
 $projectName = Get-EnvValue -Names @('CF_PAGES_PROJECT') -Default '3000studios-vip'
 if ($PagesProject) {
   $projectName = $PagesProject
 }
 
-if (-not $script:CloudflareToken) {
-  throw 'Missing CLOUDFLARE_API_ALL, CLOUDFLARE_API_TOKEN, or CLOUDFLARE_ACCOUNT_API_TOKEN in global.env.'
+if ($globalKey) {
+  $script:CloudflareToken = $globalKey
+  $script:CloudflareEmail = Get-EnvValue -Names @('OWNER_EMAIL', 'ADMIN_EMAIL', 'CLOUDFLARE_EMAIL') -Default $null
+  $script:AuthMode = 'global_key'
+  if (-not $script:CloudflareEmail) {
+    throw 'Using CLOUDFLARE_GLOBAL_API_KEY requires OWNER_EMAIL, ADMIN_EMAIL, or CLOUDFLARE_EMAIL in global.env.'
+  }
+} elseif ($apiToken) {
+  $script:CloudflareToken = $apiToken
+  $script:AuthMode = 'token'
+} else {
+  throw 'Missing CLOUDFLARE_API_TOKEN, CLOUDFLARE_API_ALL, CLOUDFLARE_ACCOUNT_API_TOKEN, or CLOUDFLARE_GLOBAL_API_KEY in global.env.'
 }
 if (-not $accountId) {
   throw 'Missing CLOUDFLARE_ACCOUNT_ID in global.env.'

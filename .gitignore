@@ -13,6 +13,7 @@ global.env
 *.pfx
 *.crt
 apps/web/preview-*.png
+.playwright-mcp/
 
 # Android build artifacts
 **/app/build/
