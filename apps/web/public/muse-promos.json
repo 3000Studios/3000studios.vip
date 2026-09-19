@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-19",
+  "brand": "3000 Studios",
+  "purpose": "Standing instructions for Meta Muse to distribute finished 3000 Studios music promo videos without recreating or altering the approved master unless requested.",
+  "queue": {
+    "source": "Google Drive > promo > READY TO POST - MUSE",
+    "postedArchive": "Google Drive > promo > POSTED - MUSE",
+    "receipts": "Google Drive > promo > POST RECEIPTS - MUSE"
+  },
+  "eligibility": [
+    "Use only completed music promo, Short, Reel, teaser, visualizer, or music-video clip files that belong to 3000 Studios.",
+    "Do not post the same finished asset twice to the same account unless the user explicitly asks for a repost.",
+    "Do not invent a missing video. If the source file cannot be opened, report it as missing and continue with the next ready item."
+  ],
+  "workflow": [
+    "Read the READY TO POST - MUSE queue before creating anything new.",
+    "For each ready asset, identify the song title and use 3000 Studios as the artist name.",
+    "Prepare a concise platform-native caption with the song title, a clear listen/follow/subscribe call to action, and only relevant hashtags.",
+    "Use the connected official 3000 Studios social account for each platform.",
+    "Before a public publish action, present the final asset, caption, destination account, and platform for approval when the platform or Muse requires approval.",
+    "After a successful publish, save the live URL or platform receipt in POST RECEIPTS - MUSE and move the source asset to POSTED - MUSE.",
+    "If a platform fails, leave the source in READY TO POST - MUSE and record the failure instead of silently skipping it."
+  ],
+  "platforms": {
+    "tiktok": {
+      "enabled": true,
+      "officialTool": "https://3000studios.vip/tiktok/",
+      "currentMode": "draft-upload",
+      "instructions": "Use the site's authorized TikTok Promo Studio for the MP4. Direct public posting is used only after TikTok approves video.publish; until then, send the finished promo to the TikTok inbox as a draft and return the receipt."
+    },
+    "instagram": {
+      "enabled": true,
+      "instructions": "Post eligible vertical promos as Reels using the connected official 3000 Studios Instagram account."
+    },
+    "facebook": {
+      "enabled": true,
+      "instructions": "Post eligible vertical promos as Reels/video posts using the connected official 3000 Studios Facebook account."
+    },
+    "youtube": {
+      "enabled": true,
+      "instructions": "Upload eligible vertical promos to the official 3000 Studios YouTube account as Shorts when appropriate; preserve the finished master and avoid duplicate uploads."
+    },
+    "threads": {
+      "enabled": true,
+      "instructions": "Use a compatible teaser/video post when the connected account supports the asset format; otherwise publish the promo link and matching caption."
+    }
+  },
+  "captionRules": {
+    "artist": "3000 Studios",
+    "tone": "direct, memorable, energetic, not spammy",
+    "cta": "Prefer listen, watch, follow, or subscribe calls to action.",
+    "hashtags": "Use a small set of relevant song, genre, artist, and discovery hashtags; never stuff unrelated trending tags."
+  },
+  "safety": [
+    "Never buy, fake, automate, or misrepresent views, likes, comments, subscribers, follows, or engagement.",
+    "Never replace a finished promo with an AI-regenerated version unless the user asks for a new edit.",
+    "Never expose account credentials, tokens, cookies, API keys, or private Drive links in captions or public posts."
+  ]
+}
