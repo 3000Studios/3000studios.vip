@@ -34,6 +34,9 @@
 @import './styles/platform-finish.css';
 @import './styles/stage-fx.css';
 @import './styles/million-dollar.css';
+@import './styles/music-deck.css';
+@import './styles/song-drop.css';
+@import './styles/swipe-slider.css';
 
 .routeLoader {
   min-height: 100vh;
