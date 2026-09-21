@@ -14,6 +14,7 @@ import {
   youtubeWatchUrl,
 } from '../data/officialReleases';
 import { getSongBySlug } from '../data/songs';
+import { getStudioOsRelease } from '../data/studioOsCatalog';
 import { PublicLayout } from './Home';
 
 const REVEAL_DELAY_MS = 2000;
@@ -30,6 +31,7 @@ export function SongPage() {
     () => (song ? getOfficialVideoForTitle(song.title) : undefined),
     [song],
   );
+  const osRelease = song ? getStudioOsRelease(song.slug) : undefined;
 
   useEffect(() => {
     if (!song) return;
@@ -196,9 +198,46 @@ export function SongPage() {
 
         <section className="songDescription">
           <h2>About this release</h2>
-          <p>{song.description}</p>
+          <p>{osRelease?.story || osRelease?.description || song.description}</p>
+          {osRelease?.releaseDate ? <p>Released {osRelease.releaseDate}</p> : null}
+          {osRelease?.duration ? <p>{osRelease.duration}</p> : null}
           <p className="vibe">{song.vibe}</p>
         </section>
+
+        {osRelease?.lyrics ? (
+          <section className="songDescription">
+            <h2>Lyrics</h2>
+            <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{osRelease.lyrics}</pre>
+          </section>
+        ) : null}
+
+        {osRelease?.credits && osRelease.credits.length > 0 ? (
+          <section className="songDescription">
+            <h2>Credits</h2>
+            <ul>
+              {osRelease.credits.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {osRelease?.streaming && Object.keys(osRelease.streaming).length > 0 ? (
+          <section className="songDescription">
+            <h2>Listen</h2>
+            <ul>
+              {Object.entries(osRelease.streaming).map(([k, url]) =>
+                url ? (
+                  <li key={k}>
+                    <a href={url} target="_blank" rel="noreferrer">
+                      {k}
+                    </a>
+                  </li>
+                ) : null,
+              )}
+            </ul>
+          </section>
+        ) : null}
       </main>
     </PublicLayout>
   );

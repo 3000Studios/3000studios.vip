@@ -1,0 +1,29 @@
+{
+  "name": "studio-os",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "3000 Studios master orchestrator, cost router, and release state machine",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "node -e \"process.exit(0)\"",
+    "format": "node -e \"process.exit(0)\"",
+    "audit:site": "node --import tsx src/cli.ts audit-site",
+    "ngut": "node --import tsx src/cli.ts ngut"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
+  }
+}

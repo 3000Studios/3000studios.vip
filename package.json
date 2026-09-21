@@ -21,7 +21,10 @@
     "music-video:package": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Create-MusicVideoPackage.ps1",
     "env:sync": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Sync-CloudflareEnv.ps1",
     "deploy:cloudflare": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Deploy-Cloudflare.ps1",
-    "hooks:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Install-GitDeployHooks.ps1"
+    "hooks:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Install-GitDeployHooks.ps1",
+    "os:test": "npm run test -w studio-os",
+    "os:job": "npm run job -w release-machine --",
+    "os:audit": "npm run audit:site -w studio-os"
   },
   "repository": {
     "type": "git",

@@ -15,6 +15,7 @@ import {
   rolloutSongs,
   type CatalogSong,
 } from '../data/music';
+import { frameFromByteFrequency } from '../lib/audioAnalyzer';
 
 const MUSIC_ON_KEY = '3000-music-on';
 
@@ -127,9 +128,10 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     const tick = () => {
       analyser.getByteFrequencyData(data);
-      const avg = data.reduce((sum, value) => sum + value, 0) / data.length / 255;
-      document.documentElement.style.setProperty('--beat', Math.max(0.04, avg).toFixed(3));
-      document.documentElement.style.setProperty('--player-beat', avg.toFixed(3));
+      const frame = frameFromByteFrequency(data);
+      document.documentElement.style.setProperty('--beat', Math.max(0.04, frame.energy).toFixed(3));
+      document.documentElement.style.setProperty('--player-beat', frame.energy.toFixed(3));
+      window.dispatchEvent(new CustomEvent('3000-analyzer-frame', { detail: frame }));
       rafRef.current = requestAnimationFrame(tick);
     };
     tick();
@@ -319,7 +321,13 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       if (live) pause();
     };
     window.addEventListener('3000-host-live', onLive);
-    return () => window.removeEventListener('3000-host-live', onLive);
+    window.addEventListener('3000-video-start', onLive);
+    window.addEventListener('3000-live-start', () => pause());
+    return () => {
+      window.removeEventListener('3000-host-live', onLive);
+      window.removeEventListener('3000-video-start', onLive);
+      window.removeEventListener('3000-live-start', pause);
+    };
   }, [pause]);
 
   const api = useMemo<MusicApi>(

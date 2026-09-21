@@ -41,3 +41,13 @@
 - Verify build/lint/typecheck/test where available.
 - Produce a final report.
 - For Google login, use Google Identity Services instead of deprecated Google Sign-In libraries.
+
+# Studio OS (music empire)
+
+- Public website production path is **`apps/web`**. Do not move it to `apps/website`.
+- Master orchestrator lives in `packages/studio-os`. Agents must not assign work to each other.
+- Songwriting must load `SONGWRITING.md`. Human approval before any release job.
+- DistroKid has no upload API. Never auto-submit or invent ISRCs.
+- Cost order: deterministic local → Ollama → configured cheap APIs → premium AI (off by default).
+- Large WAV/video stay outside Git; manifests store checksums and paths.
+- Secrets: `Documents\global.env` and local `.env` only. Never print values.
