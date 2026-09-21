@@ -32,3 +32,6 @@ shared-media/
 music/releases/**/assets/
 reports/*.html
 reports/*.lighthouse.json
+reports/phase3-baseline/*.report.json
+reports/phase3-baseline/*.report.html
+apps/web/test-results/
