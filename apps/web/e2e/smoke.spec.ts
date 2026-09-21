@@ -11,8 +11,19 @@ test.describe('smoke', () => {
       const res = await page.goto(route, { waitUntil: 'domcontentloaded' });
       expect(res?.ok() || res?.status() === 304).toBeTruthy();
       expect(errors.filter((m) => !m.includes('play()'))).toEqual([]);
+      const broken = await page.evaluate(() =>
+        [...document.images].filter((img) => img.naturalWidth === 0 && img.src && !img.src.startsWith('data:')).map((img) => img.src),
+      );
+      expect(broken.filter((s) => s.includes('/media/covers/'))).toEqual([]);
     });
   }
+
+  test('NGUT mp3 and player control exist', async ({ page }) => {
+    const audio = await page.request.head('/media/not-giving-up-tonight.mp3');
+    expect(audio.ok()).toBeTruthy();
+    await page.goto('/song/not-giving-up-tonight', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('button', { name: /Play|Pause/i })).toBeVisible();
+  });
 
   for (const w of widths) {
     test(`music no overflow ${w}`, async ({ page }) => {
