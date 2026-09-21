@@ -18,11 +18,20 @@ test.describe('smoke', () => {
     });
   }
 
+  test('home static hero is in first HTML', async ({ page }) => {
+    const res = await page.goto('/', { waitUntil: 'commit' });
+    expect(res?.ok()).toBeTruthy();
+    const html = await res!.text();
+    expect(html).toContain('id="home-lcp"');
+    expect(html).toContain('id="home-shell"');
+    expect(html).toContain('3000 Studios');
+  });
+
   test('NGUT mp3 and player control exist', async ({ page }) => {
     const audio = await page.request.head('/media/not-giving-up-tonight.mp3');
     expect(audio.ok()).toBeTruthy();
     await page.goto('/song/not-giving-up-tonight', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: /Play|Pause/i })).toBeVisible();
+    await expect(page.getByRole('main').getByRole('button', { name: 'Play', exact: true })).toBeVisible();
   });
 
   for (const w of widths) {
