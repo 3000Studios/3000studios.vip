@@ -16,29 +16,13 @@ const MedallionScene = lazy(() => import('./MedallionScene'));
 export function MedallionHost({ coverUrl }: { coverUrl: string }) {
   const reduced = usePrefersReducedMotion();
   const [tier] = useState<QualityTier>(() => detectQualityTier());
-  const [ready, setReady] = useState(false);
   const [webgl] = useState(() => hasWebGL());
+  const ready = true;
 
   useEffect(() => {
-    const boot = () => setReady(true);
-    const onPlay = () => {
-      setMedallionEnhanced(true);
-      boot();
-    };
-    const onIntent = () => boot();
+    const onPlay = () => setMedallionEnhanced(true);
     window.addEventListener('3000-play-track', onPlay);
-    window.addEventListener('pointerdown', onIntent, { once: true, passive: true });
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (window.scrollY > 48) boot();
-      },
-      { passive: true },
-    );
-    return () => {
-      window.removeEventListener('3000-play-track', onPlay);
-      window.removeEventListener('pointerdown', onIntent);
-    };
+    return () => window.removeEventListener('3000-play-track', onPlay);
   }, []);
 
   useEffect(() => {

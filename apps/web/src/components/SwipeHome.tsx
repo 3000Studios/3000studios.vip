@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from 'react';
 import { Link } from 'react-router-dom';
 import { playSwoosh } from './stageSfx';
@@ -22,7 +23,6 @@ import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
 import '../styles/swipe-slider.css';
 import { BelowFold } from './BelowFold';
-import { MedallionHost } from '../experience/medallion';
 import { HOME_HERO } from '../data/homeHero';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
@@ -61,6 +61,31 @@ function buildSlides(): Slide[] {
       stream: match?.buy || 'https://distrokid.com/hyperfollow/3000studios',
     };
   });
+}
+
+function MedallionSlot({ coverUrl }: { coverUrl: string }) {
+  const [node, setNode] = useState<ReactNode>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      void import('../experience/medallion').then(({ MedallionHost }) => {
+        if (!cancelled) setNode(<MedallionHost coverUrl={coverUrl} />);
+      });
+    };
+    const onScroll = () => {
+      if (window.scrollY > 48) load();
+    };
+    window.addEventListener('3000-play-track', load);
+    window.addEventListener('pointerdown', load, { once: true, passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelled = true;
+      window.removeEventListener('3000-play-track', load);
+      window.removeEventListener('pointerdown', load);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [coverUrl]);
+  return <>{node}</>;
 }
 
 function stripeFor(id: string) {
@@ -189,7 +214,7 @@ export function SwipeHome() {
       <div className="md-scope">
         {/* ===== CINEMATIC HERO ===== */}
         <div className="md-hero-spacer" aria-hidden="true">
-          <MedallionHost coverUrl={HOME_HERO.playCover} />
+          <MedallionSlot coverUrl={HOME_HERO.playCover} />
         </div>
         <nav className="md-cta-row md-hero-extra" aria-label="More ways in">
           <a className="md-btn md-btn-ghost" href="#watch">

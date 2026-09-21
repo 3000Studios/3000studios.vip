@@ -117,9 +117,8 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-router-dom')) {
             return 'react';
           }
-          if (id.includes('node_modules/framer-motion')) {
-            return 'framer-motion';
-          }
+          // Keep framer-motion in the lazy route chunks that actually import it.
+          // A dedicated manual chunk was being preloaded on Home even when unused.
           if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
             return 'three';
           }
