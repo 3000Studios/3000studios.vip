@@ -58,6 +58,11 @@
   </head>
   <body>
     <!--HOME_SHELL-->
+    <script>
+      if (location.pathname === '/' || location.pathname === '') {
+        document.documentElement.classList.add('is-home-lcp');
+      }
+    </script>
     <div id="root"></div>
     <div id="consent-banner"></div>
     <script type="module" src="/src/main.tsx"></script>

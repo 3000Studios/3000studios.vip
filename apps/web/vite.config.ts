@@ -20,27 +20,32 @@ const hero = JSON.parse(
 };
 
 function homeShellHtml() {
+  const ctaAttrs = hero.ctaHref.startsWith('http')
+    ? ` href="${hero.ctaHref}" target="_blank" rel="noreferrer"`
+    : ` href="${hero.ctaHref}"`;
   return `<div id="home-shell" class="homeShell">
   <img id="home-lcp" src="${hero.src}" srcset="${hero.srcSet}" sizes="${hero.sizes}" width="${hero.width}" height="${hero.height}" alt="" fetchpriority="high" decoding="async" />
   <div class="homeShellCopy">
     <p class="homeShellKicker">${hero.kicker}</p>
     <h1>${hero.headline}</h1>
     <p class="homeShellSub">${hero.sub}</p>
-    <a class="homeShellCta" href="${hero.ctaHref}">${hero.ctaLabel}</a>
+    <a class="homeShellCta"${ctaAttrs}>${hero.ctaLabel}</a>
   </div>
 </div>`;
 }
 
 function homeShellCriticalCss() {
-  return `#home-shell.homeShell{position:relative;min-height:100svh;background:#05060a;color:#f4efe2;overflow:hidden}
-#home-shell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;aspect-ratio:16/9}
-.homeShellCopy{position:relative;z-index:1;max-width:42rem;padding:clamp(5rem,18vh,8rem) 1.25rem 6rem}
+  return `#home-shell.homeShell{position:absolute;top:0;left:0;right:0;height:100svh;z-index:0;background:#05060a;color:#f4efe2;overflow:hidden;pointer-events:none}
+#home-lcp{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;aspect-ratio:1/1}
+#home-shell::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,6,10,.25) 0%,rgba(5,6,10,.55) 55%,rgba(5,6,10,.94) 100%)}
+.homeShellCopy{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:flex-end;min-height:100svh;max-width:42rem;padding:clamp(5rem,18vh,8rem) 1.25rem 6rem;box-sizing:border-box;pointer-events:auto}
 .homeShellKicker{letter-spacing:.18em;text-transform:uppercase;font-size:.72rem;opacity:.8}
 #home-shell h1{margin:.4rem 0;font:700 clamp(2.2rem,8vw,4.2rem)/1.05 Georgia,serif}
 .homeShellSub{max-width:36rem;opacity:.88}
-.homeShellCta{display:inline-flex;align-items:center;min-height:44px;padding:0 1.1rem;margin-top:1rem;border-radius:999px;background:#d4af37;color:#111;font-weight:800;text-decoration:none}
-html.is-app-ready #home-shell{display:none}
-#root{min-height:100svh}`;
+.homeShellCta{display:inline-flex;align-items:center;min-height:44px;padding:0 1.1rem;margin-top:1rem;border-radius:999px;background:#d4af37;color:#111;font-weight:800;text-decoration:none;width:fit-content}
+html.is-app-ready #home-shell{background:transparent}
+#root{position:relative;z-index:1;min-height:100svh;background:transparent;max-width:100%;overflow-x:clip;min-width:0}
+html.is-home-lcp .vipSite,html.is-home-lcp .md-scope,html.is-home-lcp .md-hero{background:transparent!important}`;
 }
 
 const pagesAssetLimitPlugin = {

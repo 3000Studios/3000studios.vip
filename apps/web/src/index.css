@@ -28,7 +28,16 @@ html,
 body,
 #root {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+#root,
+.vipSite,
+.md-scope,
+.md-hero,
+.md-track-viewport {
+  min-width: 0;
+  max-width: 100%;
 }
 
 :root {

@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -20,7 +21,6 @@ import { PLATFORMS } from '../lib/commerce';
 import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
 import '../styles/swipe-slider.css';
-import { HOME_HERO } from '../data/homeHero';
 import { BelowFold } from './BelowFold';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
@@ -108,11 +108,11 @@ export function SwipeHome() {
 
   useReveal();
 
-  useEffect(() => {
-    const id = window.requestAnimationFrame(() => {
-      document.documentElement.classList.add('is-app-ready');
-    });
-    return () => window.cancelAnimationFrame(id);
+  useLayoutEffect(() => {
+    document.documentElement.classList.add('is-home-lcp', 'is-app-ready');
+    return () => {
+      document.documentElement.classList.remove('is-home-lcp');
+    };
   }, []);
 
   const go = useCallback(
@@ -186,46 +186,15 @@ export function SwipeHome() {
     <PublicLayout variant="spiral" compact>
       <div className="md-scope">
         {/* ===== CINEMATIC HERO ===== */}
-        <section className="md-hero" aria-label="3000 Studios VIP">
-          <div className="md-hero-media" aria-hidden="true">
-            <img
-              src={HOME_HERO.src}
-              srcSet={HOME_HERO.srcSet}
-              sizes={HOME_HERO.sizes}
-              width={HOME_HERO.width}
-              height={HOME_HERO.height}
-              alt=""
-              fetchPriority="high"
-              decoding="async"
-            />
-          </div>
-          <div className="md-hero-veil" aria-hidden="true" />
-          <div className="md-medallion" aria-hidden="true" />
-          <div className="md-hero-copy">
-            <span className="md-kicker">{HOME_HERO.kicker}</span>
-            <h1 className="md-title">{HOME_HERO.headline}</h1>
-            <p className="md-sub">
-              {n} official music videos. {HOME_HERO.sub} Subscribe so YouTube puts the next release
-              in your feed.
-            </p>
-            <div className="md-cta-row">
-              <a
-                className="md-btn md-btn-gold"
-                href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Subscribe on YouTube
-              </a>
-              <a className="md-btn md-btn-ghost" href="#watch">
-                Swipe the videos
-              </a>
-              <Link className="md-btn md-btn-ghost" to="/shop">
-                Shop the drop
-              </Link>
-            </div>
-          </div>
-        </section>
+        <div className="md-hero-spacer" aria-hidden="true" />
+        <nav className="md-cta-row md-hero-extra" aria-label="More ways in">
+          <a className="md-btn md-btn-ghost" href="#watch">
+            Swipe the videos
+          </a>
+          <Link className="md-btn md-btn-ghost" to="/shop">
+            Shop the drop
+          </Link>
+        </nav>
 
         {/* ===== SWIPE VIDEO STAGE — ALL VIDEOS ===== */}
         <section className="md-stage" id="watch" aria-label="All music videos, swipe to play">
