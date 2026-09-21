@@ -56,3 +56,9 @@ try {
 }
 
 npx wrangler pages deploy apps/web/dist --project-name $projectName --branch main --commit-dirty=true
+
+Write-Output 'Running post-deploy sitemap smoke (HTTP 200 required on every loc)...'
+node "$repoRoot\scripts\smoke-sitemap.mjs"
+if ($LASTEXITCODE -ne 0) {
+  throw 'Post-deploy sitemap smoke failed: one or more URLs did not return HTTP 200.'
+}

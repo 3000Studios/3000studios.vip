@@ -7,10 +7,9 @@
 /listen  /listen.html  200
 /tiktok  /tiktok/index.html  200
 /tiktok/  /tiktok/index.html  200
-/privacy  /privacy.html  200
-/privacy/  /privacy.html  200
-/terms  /terms.html  200
-/terms/  /terms.html  200
+
+# Do not 200-rewrite /privacy or /terms to *.html. Pages pretty-URLs already
+# serve privacy.html at /privacy; rewriting to .html 308-loops (AdSense reject).
 
 # Pages Functions under /api must not fall through to the SPA
 /api/*  /api/:splat  200
