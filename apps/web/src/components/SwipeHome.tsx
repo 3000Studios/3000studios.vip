@@ -17,7 +17,7 @@ import {
 } from '../data/officialReleases';
 import { MERCH_ITEMS } from '../data/merch';
 import { PLATFORMS } from '../lib/commerce';
-import { PublicLayout } from '../pages/Home';
+import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
@@ -180,9 +180,19 @@ export function SwipeHome() {
         {/* ===== CINEMATIC HERO ===== */}
         <section className="md-hero" aria-label="3000 Studios VIP">
           <div className="md-hero-media" aria-hidden="true">
-            {hero ? <img src={hero.poster} alt="" fetchPriority="high" decoding="async" /> : null}
+            {hero ? (
+              <img
+                src={hero.poster}
+                alt=""
+                width={480}
+                height={360}
+                fetchPriority="high"
+                decoding="async"
+              />
+            ) : null}
           </div>
           <div className="md-hero-veil" aria-hidden="true" />
+          <div className="md-medallion" aria-hidden="true" />
           <div className="md-hero-copy">
             <span className="md-kicker">YouTube · DistroKid · Official Artist</span>
             <h1 className="md-title">3000 Studios</h1>
@@ -235,6 +245,9 @@ export function SwipeHome() {
               {slides.map((s, i) => {
                 const active = i === index;
                 const near = Math.abs(i - index) <= 1;
+                if (!near) {
+                  return <article key={s.videoId} className="md-slide md-slide-empty" aria-hidden="true" />;
+                }
                 return (
                   <article
                     key={s.videoId}
@@ -246,8 +259,10 @@ export function SwipeHome() {
                       className="md-slide-poster"
                       src={s.poster}
                       alt=""
+                      width={480}
+                      height={360}
                       draggable={false}
-                      loading={near ? 'eager' : 'lazy'}
+                      loading={active ? 'eager' : 'lazy'}
                       decoding="async"
                     />
                     {active ? (
@@ -256,6 +271,7 @@ export function SwipeHome() {
                         videoId={s.videoId}
                         title={`${s.title} — official music video`}
                         playlist
+                        clickToPlay
                       />
                     ) : null}
                     <div className="md-slide-shade" aria-hidden="true" />

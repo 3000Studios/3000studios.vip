@@ -9,7 +9,7 @@ import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { AdminObservability } from '../components/AdminObservability';
 import { MarketingAdvisor } from '../components/MarketingAdvisor';
 import { AdminActivityLog } from '../components/AdminActivityLog';
-import { PublicLayout } from './Home';
+import { PublicLayout } from './PublicLayout';
 import '../styles/discover.css';
 
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';

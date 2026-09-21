@@ -153,14 +153,16 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       applySongTheme(song);
       audio.volume = volume;
       audio.muted = muted;
-      connectAnalyzer();
-      void ctxRef.current?.resume();
       if (opts?.autoplay === true) {
+        connectAnalyzer();
+        void ctxRef.current?.resume();
         void audio
           .play()
           .then(() => setIsPlaying(true))
           .catch(() => setIsPlaying(false));
       } else {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
         audio.pause();
         setIsPlaying(false);
       }
@@ -202,6 +204,8 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   const pause = useCallback(() => {
     audioRef.current?.pause();
     setIsPlaying(false);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
   }, []);
 
   const toggle = useCallback(() => {

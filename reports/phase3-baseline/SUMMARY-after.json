@@ -1,0 +1,58 @@
+{
+  "before": {
+    "home": {
+      "url": "http://127.0.0.1:4174/",
+      "performance": 29,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcp_ms": 17595,
+      "cls": 0,
+      "tbt_ms": 53640,
+      "fcp_ms": 3237
+    },
+    "ngut": {
+      "url": "http://127.0.0.1:4174/song/not-giving-up-tonight",
+      "performance": 57,
+      "accessibility": 96,
+      "bestPractices": 96,
+      "seo": 100,
+      "lcp_ms": 17679,
+      "cls": 0.004517554475576229,
+      "tbt_ms": 0,
+      "fcp_ms": 7928
+    }
+  },
+  "after": {
+    "home": {
+      "url": "http://127.0.0.1:4176/",
+      "performance": 40,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcp_ms": 17585,
+      "cls": 0.005053810235512888,
+      "tbt_ms": 2922,
+      "fcp_ms": 2817
+    },
+    "ngut": {
+      "url": "http://127.0.0.1:4176/song/not-giving-up-tonight",
+      "performance": 60,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcp_ms": 6583,
+      "cls": 0.0001256075997084321,
+      "tbt_ms": 472,
+      "fcp_ms": 3012
+    }
+  },
+  "bundle": {
+    "indexJsKb": 143,
+    "indexGzipKb": 34.5,
+    "was": {
+      "js": 211,
+      "gzip": 51
+    }
+  }
+}

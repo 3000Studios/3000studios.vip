@@ -61,3 +61,25 @@ html {
     line-height: 1.15;
   }
 }
+
+.md-medallion {
+  position: absolute;
+  right: clamp(1rem, 6vw, 4rem);
+  bottom: clamp(1rem, 8vw, 4rem);
+  width: min(18vw, 120px);
+  height: min(18vw, 120px);
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 32% 28%, #fff6c8, #d4af37 42%, #7a5a12 100%);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.45),
+    inset 0 0 18px rgba(255, 255, 255, 0.35);
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-medallion {
+    display: none;
+  }
+}

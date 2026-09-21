@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { PublicLayout } from './Home';
+import { PublicLayout } from './PublicLayout';
 import { MERCH_ITEMS, paypalBuyUrl, type MerchItem } from '../data/merch';
 import { formatMoney, grantPlan, grantTrack } from '../lib/commerce';
 import '../styles/discover.css';

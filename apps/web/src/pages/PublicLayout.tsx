@@ -105,6 +105,28 @@ export function ReducedMotionGate({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+function IdleFx({ children }: { children: ReactNode }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    let id = 0;
+    if (w.requestIdleCallback) {
+      id = w.requestIdleCallback(() => setReady(true), { timeout: 2200 });
+    } else {
+      id = w.setTimeout(() => setReady(true), 400);
+    }
+    return () => {
+      if (w.cancelIdleCallback) w.cancelIdleCallback(id);
+      else w.clearTimeout(id);
+    };
+  }, []);
+  if (!ready) return null;
+  return <>{children}</>;
+}
+
 export function AudioReactiveWallpaper({
   variant = 'spiral',
   palette,
@@ -225,14 +247,16 @@ export function PublicLayout({
       <div className="filmGrain" aria-hidden="true" />
       <div className="filmScan" aria-hidden="true" />
       <ReducedMotionGate>
-        <AudioReactiveWallpaper
-          variant={wallpaperVariant}
-          palette={theme.palette}
-          coverUrl={theme.cover}
-        />
-        <MouseFX />
-        <ZombieFX />
-        <ScrollFX />
+        <IdleFx>
+          <AudioReactiveWallpaper
+            variant={wallpaperVariant}
+            palette={theme.palette}
+            coverUrl={theme.cover}
+          />
+          <MouseFX />
+          <ZombieFX />
+          <ScrollFX />
+        </IdleFx>
       </ReducedMotionGate>
       <div className="scrollProgress" aria-hidden="true" />
       <header className="vipHeader vipHeader--epic">

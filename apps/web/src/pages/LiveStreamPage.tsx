@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PublicLayout } from './Home';
+import { PublicLayout } from './PublicLayout';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { streamPlayerIframeSrc } from '../lib/streamConfig';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';

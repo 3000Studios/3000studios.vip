@@ -1,31 +1,18 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-} from 'react';
+import { useEffect, useMemo, useRef, type PointerEvent as ReactPointerEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { rolloutSongs } from '../data/music';
-import {
-  getOfficialVideoForTitle,
-  youtubeEmbedUrl,
-  youtubeWatchUrl,
-} from '../data/officialReleases';
+import { getOfficialVideoForTitle, youtubeWatchUrl } from '../data/officialReleases';
+import { LazyYouTube } from '../components/LazyYouTube';
 import { getSongBySlug } from '../data/songs';
 import { getStudioOsRelease } from '../data/studioOsCatalog';
-import { PublicLayout } from './Home';
-
-const REVEAL_DELAY_MS = 2000;
+import { PublicLayout } from './PublicLayout';
 
 export function SongPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const music = useGlobalMusic();
   const song = getSongBySlug(slug || '');
-  const [readyVideoId, setReadyVideoId] = useState('');
-  const [revealedVideoId, setRevealedVideoId] = useState('');
   const touchStart = useRef<number | null>(null);
   const officialVideo = useMemo(
     () => (song ? getOfficialVideoForTitle(song.title) : undefined),
@@ -40,14 +27,6 @@ export function SongPage() {
       music.playIndex(index, { autoplay: music.isPlaying });
     }
   }, [song, music]);
-
-  useEffect(() => {
-    if (!officialVideo) return;
-    const timer = window.setTimeout(() => {
-      setRevealedVideoId(officialVideo.videoId);
-    }, REVEAL_DELAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [officialVideo]);
 
   const move = (delta: number) => {
     if (!song) return;
@@ -85,9 +64,6 @@ export function SongPage() {
   }
 
   const progress = music.duration > 0 ? (music.currentTime / music.duration) * 100 : 0;
-  const embed = officialVideo
-    ? `${youtubeEmbedUrl(officialVideo.videoId)}&autoplay=1&mute=1&controls=0&loop=1&playlist=${officialVideo.videoId}&playsinline=1`
-    : '';
 
   return (
     <PublicLayout variant={song.wallpaper || 'vortex'}>
@@ -104,13 +80,7 @@ export function SongPage() {
         </div>
 
         <section
-          className={`songCinema ${
-            officialVideo &&
-            revealedVideoId === officialVideo.videoId &&
-            readyVideoId === officialVideo.videoId
-              ? 'is-video'
-              : 'is-art'
-          }`}
+          className="songCinema is-art"
           aria-label={`${song.title} visual experience`}
         >
           <div
@@ -124,13 +94,14 @@ export function SongPage() {
             alt={`${song.title} album artwork`}
           />
           {officialVideo ? (
-            <iframe
-              className="songCinemaVideo"
-              src={embed}
-              title={`${song.title} official video`}
-              allow="autoplay; encrypted-media; picture-in-picture"
-              onLoad={() => setReadyVideoId(officialVideo.videoId)}
-            />
+            <div className="songCinemaVideo">
+              <LazyYouTube
+                videoId={officialVideo.videoId}
+                title={`${song.title} official video`}
+                playlist
+                clickToPlay
+              />
+            </div>
           ) : null}
           <div className="songCinemaShade" aria-hidden="true" />
           <div className="songCinemaMeta">

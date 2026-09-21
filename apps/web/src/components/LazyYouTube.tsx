@@ -9,21 +9,20 @@ export function LazyYouTube({
   title,
   playlist,
   className = '',
+  clickToPlay = true,
 }: {
   videoId: string;
   title: string;
   playlist?: boolean;
   className?: string;
+  clickToPlay?: boolean;
 }) {
   const [load, setLoad] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (load) return;
-    if (!('IntersectionObserver' in window)) {
-      const id = setTimeout(() => setLoad(true), 0);
-      return () => clearTimeout(id);
-    }
+    if (load || clickToPlay) return;
+    if (!('IntersectionObserver' in window)) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -31,12 +30,12 @@ export function LazyYouTube({
           observer.disconnect();
         }
       },
-      { rootMargin: '200px' },
+      { rootMargin: '80px' },
     );
     const el = ref.current;
     if (el) observer.observe(el);
     return () => observer.disconnect();
-  }, [load]);
+  }, [load, clickToPlay]);
 
   const src = `https://www.youtube-nocookie.com/embed/${videoId}?${[
     'autoplay=1',
@@ -51,7 +50,7 @@ export function LazyYouTube({
     .filter(Boolean)
     .join('&')}`;
 
-  const poster = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+  const poster = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
   return (
     <div ref={ref} className={`lazyYouTube ${className}`.trim()}>
