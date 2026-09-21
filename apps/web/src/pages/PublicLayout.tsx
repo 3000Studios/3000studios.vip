@@ -8,6 +8,7 @@ import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { PlatformLogos } from '../components/PlatformLogos';
 import { ChromeWallpaper } from '../components/ChromeWallpaper';
+import { DeferredFxStyles } from '../components/DeferredFxStyles';
 import { type SongPalette } from '../data/music';
 import { adsenseClientId } from '../lib/adsense';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
@@ -248,6 +249,7 @@ export function PublicLayout({
       <div className="filmScan" aria-hidden="true" />
       <ReducedMotionGate>
         <IdleFx>
+          <DeferredFxStyles />
           <AudioReactiveWallpaper
             variant={wallpaperVariant}
             palette={theme.palette}

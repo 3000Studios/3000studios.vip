@@ -11,6 +11,10 @@ import { MarketingAdvisor } from '../components/MarketingAdvisor';
 import { AdminActivityLog } from '../components/AdminActivityLog';
 import { PublicLayout } from './PublicLayout';
 import '../styles/discover.css';
+import '../styles/console.css';
+import '../styles/admin-easy.css';
+import '../styles/app.css';
+import '../styles/lock.css';
 
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 const NOTES_KEY = '3000-admin-rundown';

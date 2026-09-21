@@ -19,6 +19,7 @@ import { MERCH_ITEMS } from '../data/merch';
 import { PLATFORMS } from '../lib/commerce';
 import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
+import '../styles/swipe-slider.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -172,24 +173,22 @@ export function SwipeHome() {
     }
   };
 
-  const hero = slides[0];
-
   return (
     <PublicLayout variant="spiral" compact>
       <div className="md-scope">
         {/* ===== CINEMATIC HERO ===== */}
         <section className="md-hero" aria-label="3000 Studios VIP">
           <div className="md-hero-media" aria-hidden="true">
-            {hero ? (
-              <img
-                src={hero.poster}
-                alt=""
-                width={480}
-                height={360}
-                fetchPriority="high"
-                decoding="async"
-              />
-            ) : null}
+            <img
+              src="/media/hero-lcp-480.webp"
+              srcSet="/media/hero-lcp-480.webp 400w, /media/hero-lcp.webp 720w"
+              sizes="100vw"
+              width={1280}
+              height={720}
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+            />
           </div>
           <div className="md-hero-veil" aria-hidden="true" />
           <div className="md-medallion" aria-hidden="true" />

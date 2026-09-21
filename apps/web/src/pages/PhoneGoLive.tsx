@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { WHIP_URL_STORAGE_KEY, WhipPublisher, validateWhipUrl } from '../lib/webrtcStream';
 import { setHostLiveFlag } from '../lib/streamScene';
+import '../styles/hero-golive.css';
 
 export function PhoneGoLive() {
   const videoRef = useRef<HTMLVideoElement | null>(null);

@@ -1,0 +1,27 @@
+{
+  "css": {
+    "beforeKb": 245,
+    "afterKb": 103,
+    "gzipAfter": 25.3
+  },
+  "home": {
+    "performance": 33,
+    "accessibility": 96,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcp_ms": 16828,
+    "cls": 0.17400849513308891,
+    "tbt_ms": 2932,
+    "fcp_ms": 2683
+  },
+  "ngut": {
+    "performance": 67,
+    "accessibility": 96,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcp_ms": 5737,
+    "cls": 0.002361302470109354,
+    "tbt_ms": 350,
+    "fcp_ms": 2559
+  }
+}

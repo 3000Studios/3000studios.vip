@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { DudeAgent } from './DudeAgent';
+import '../styles/app.css';
+import '../styles/console.css';
 
 const NAV = [
   {

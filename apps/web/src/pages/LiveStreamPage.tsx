@@ -7,6 +7,8 @@ import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
 import { LiveChatPanel, TipJar, ViewerCount, useLiveRoom } from '../components/LiveInteraction';
 import '../styles/discover.css';
+import '../styles/stream-studio.css';
+import '../styles/live-experience.css';
 
 const INQUIRY_EMAIL = 'Team@3000studios.vip';
 const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}`;
