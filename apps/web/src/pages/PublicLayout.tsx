@@ -1,5 +1,4 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { GlobalMusicToggle } from '../components/GlobalMusic';
 import { LiveWallpaper } from '../components/LiveWallpaper';
@@ -12,7 +11,7 @@ import { DeferredFxStyles } from '../components/DeferredFxStyles';
 import { type SongPalette } from '../data/music';
 import { adsenseClientId } from '../lib/adsense';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
-import { fadeUp } from './PageMotion';
+
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -142,18 +141,9 @@ export function AudioReactiveWallpaper({
 
 export function BeatDancingTitle({ text }: { text: string }) {
   return (
-    <motion.h1 className="beatGoldTitle" variants={fadeUp} aria-label={text}>
-      {Array.from(text).map((char, index) => (
-        <span
-          key={`${char}-${index}`}
-          className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter'}
-          style={{ '--letter-index': index } as CSSProperties}
-          aria-hidden="true"
-        >
-          {char}
-        </span>
-      ))}
-    </motion.h1>
+    <h1 className="beatGoldTitle" aria-label={text}>
+      {text}
+    </h1>
   );
 }
 

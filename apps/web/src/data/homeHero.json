@@ -1,0 +1,12 @@
+{
+  "src": "/media/hero-lcp-480.webp",
+  "srcSet": "/media/hero-lcp-480.webp 400w, /media/hero-lcp.webp 720w",
+  "sizes": "100vw",
+  "width": 1280,
+  "height": 720,
+  "kicker": "YouTube · DistroKid · Official Artist",
+  "headline": "3000 Studios",
+  "sub": "Official music videos. Swipe through every drop — everything streams free.",
+  "ctaLabel": "Enter the catalog",
+  "ctaHref": "#stage"
+}

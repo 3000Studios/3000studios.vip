@@ -20,6 +20,8 @@ import { PLATFORMS } from '../lib/commerce';
 import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
 import '../styles/swipe-slider.css';
+import { HOME_HERO } from '../data/homeHero';
+import { BelowFold } from './BelowFold';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -106,6 +108,13 @@ export function SwipeHome() {
 
   useReveal();
 
+  useEffect(() => {
+    const id = window.requestAnimationFrame(() => {
+      document.documentElement.classList.add('is-app-ready');
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, []);
+
   const go = useCallback(
     (next: number, dir?: 'fwd' | 'rev') => {
       if (!n) return;
@@ -180,11 +189,11 @@ export function SwipeHome() {
         <section className="md-hero" aria-label="3000 Studios VIP">
           <div className="md-hero-media" aria-hidden="true">
             <img
-              src="/media/hero-lcp-480.webp"
-              srcSet="/media/hero-lcp-480.webp 400w, /media/hero-lcp.webp 720w"
-              sizes="100vw"
-              width={1280}
-              height={720}
+              src={HOME_HERO.src}
+              srcSet={HOME_HERO.srcSet}
+              sizes={HOME_HERO.sizes}
+              width={HOME_HERO.width}
+              height={HOME_HERO.height}
               alt=""
               fetchPriority="high"
               decoding="async"
@@ -193,11 +202,11 @@ export function SwipeHome() {
           <div className="md-hero-veil" aria-hidden="true" />
           <div className="md-medallion" aria-hidden="true" />
           <div className="md-hero-copy">
-            <span className="md-kicker">YouTube · DistroKid · Official Artist</span>
-            <h1 className="md-title">3000 Studios</h1>
+            <span className="md-kicker">{HOME_HERO.kicker}</span>
+            <h1 className="md-title">{HOME_HERO.headline}</h1>
             <p className="md-sub">
-              {n} official music videos. Swipe through every drop — everything streams free.
-              Subscribe so YouTube puts the next release in your feed.
+              {n} official music videos. {HOME_HERO.sub} Subscribe so YouTube puts the next release
+              in your feed.
             </p>
             <div className="md-cta-row">
               <a
@@ -365,6 +374,7 @@ export function SwipeHome() {
           </div>
         </div>
 
+        <BelowFold>
         {/* ===== MONEY RAIL ===== */}
         <section className="md-money md-reveal" aria-label="Support 3000 Studios">
           <span className="md-kicker">Fuel the next drop</span>
@@ -442,6 +452,7 @@ export function SwipeHome() {
             </a>
           ))}
         </section>
+        </BelowFold>
       </div>
     </PublicLayout>
   );

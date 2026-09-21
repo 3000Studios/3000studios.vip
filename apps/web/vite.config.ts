@@ -1,6 +1,47 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { rmSync } from 'node:fs';
+import { readFileSync, rmSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const hero = JSON.parse(
+  readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'src/data/homeHero.json'), 'utf8'),
+) as {
+  src: string;
+  srcSet: string;
+  sizes: string;
+  width: number;
+  height: number;
+  kicker: string;
+  headline: string;
+  sub: string;
+  ctaLabel: string;
+  ctaHref: string;
+};
+
+function homeShellHtml() {
+  return `<div id="home-shell" class="homeShell">
+  <img id="home-lcp" src="${hero.src}" srcset="${hero.srcSet}" sizes="${hero.sizes}" width="${hero.width}" height="${hero.height}" alt="" fetchpriority="high" decoding="async" />
+  <div class="homeShellCopy">
+    <p class="homeShellKicker">${hero.kicker}</p>
+    <h1>${hero.headline}</h1>
+    <p class="homeShellSub">${hero.sub}</p>
+    <a class="homeShellCta" href="${hero.ctaHref}">${hero.ctaLabel}</a>
+  </div>
+</div>`;
+}
+
+function homeShellCriticalCss() {
+  return `#home-shell.homeShell{position:relative;min-height:100svh;background:#05060a;color:#f4efe2;overflow:hidden}
+#home-shell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;aspect-ratio:16/9}
+.homeShellCopy{position:relative;z-index:1;max-width:42rem;padding:clamp(5rem,18vh,8rem) 1.25rem 6rem}
+.homeShellKicker{letter-spacing:.18em;text-transform:uppercase;font-size:.72rem;opacity:.8}
+#home-shell h1{margin:.4rem 0;font:700 clamp(2.2rem,8vw,4.2rem)/1.05 Georgia,serif}
+.homeShellSub{max-width:36rem;opacity:.88}
+.homeShellCta{display:inline-flex;align-items:center;min-height:44px;padding:0 1.1rem;margin-top:1rem;border-radius:999px;background:#d4af37;color:#111;font-weight:800;text-decoration:none}
+html.is-app-ready #home-shell{display:none}
+#root{min-height:100svh}`;
+}
 
 const pagesAssetLimitPlugin = {
   name: 'pages-asset-limit',
@@ -11,6 +52,18 @@ const pagesAssetLimitPlugin = {
     rmSync(new URL('./dist/media/BIG_OLD_HANDS_Tore_up_the_hole_Krust.wav', import.meta.url), {
       force: true,
     });
+  },
+};
+
+const homeShellPlugin = {
+  name: 'home-first-paint-shell',
+  transformIndexHtml: {
+    order: 'pre' as const,
+    handler(html: string) {
+      return html
+        .replace('<!--HOME_SHELL_CSS-->', `<style>${homeShellCriticalCss()}</style>`)
+        .replace('<!--HOME_SHELL-->', homeShellHtml());
+    },
   },
 };
 
@@ -33,7 +86,7 @@ const sameOriginStylesPlugin = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), pagesAssetLimitPlugin, sameOriginStylesPlugin],
+  plugins: [react(), homeShellPlugin, pagesAssetLimitPlugin, sameOriginStylesPlugin],
   build: {
     rollupOptions: {
       output: {

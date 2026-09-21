@@ -9,7 +9,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminFab } from './components/AdminFab';
 import { SwipeHome } from './components/SwipeHome';
 import { BottomDock } from './components/BottomDock';
-import { MusicDock } from './components/MusicDock';
+const MusicDock = lazy(() => import('./components/MusicDock').then((m) => ({ default: m.MusicDock })));
 import { ConsentManager } from './components/ConsentManager';
 import { usePrefersReducedMotion } from './lib/mediaQuery';
 import { AuthProvider } from './lib/auth';
@@ -92,7 +92,9 @@ function RootLayout() {
         <SampleGate />
       </Suspense>
       <Outlet />
-      <MusicDock />
+      <Suspense fallback={null}>
+        <MusicDock />
+      </Suspense>
       <BottomDock />
       <AdminFab />
       <ConsentManager />
@@ -235,6 +237,10 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
+if (typeof location !== 'undefined' && location.pathname !== '/') {
+  document.documentElement.classList.add('is-app-ready');
+}
 
 initVelvetMachine();
 
