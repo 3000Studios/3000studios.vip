@@ -8,5 +8,9 @@
   "headline": "3000 Studios",
   "sub": "Official music videos. Swipe through every drop — everything streams free. Subscribe so YouTube puts the next release in your feed.",
   "ctaLabel": "Subscribe on YouTube",
-  "ctaHref": "https://www.youtube.com/@3000Studio?sub_confirmation=1"
+  "ctaHref": "https://www.youtube.com/@3000Studio?sub_confirmation=1",
+  "playLabel": "Play latest",
+  "playTitle": "Not Giving Up Tonight",
+  "playSrc": "/media/not-giving-up-tonight.mp3",
+  "playCover": "/media/covers/not-giving-up-tonight.jpg"
 }

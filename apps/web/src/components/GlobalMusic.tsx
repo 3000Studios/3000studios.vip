@@ -158,7 +158,11 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
         void ctxRef.current?.resume();
         void audio
           .play()
-          .then(() => setIsPlaying(true))
+          .then(() => {
+            setIsPlaying(true);
+            document.documentElement.classList.remove('is-music-paused');
+            document.documentElement.classList.add('is-cinematic-active');
+          })
           .catch(() => setIsPlaying(false));
       } else {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -184,7 +188,11 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       connectAnalyzer();
       void audio
         .play()
-        .then(() => setIsPlaying(true))
+        .then(() => {
+          setIsPlaying(true);
+          document.documentElement.classList.remove('is-music-paused');
+          document.documentElement.classList.add('is-cinematic-active');
+        })
         .catch(() => setIsPlaying(false));
     },
     [playIndex, connectAnalyzer],
@@ -197,13 +205,18 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     void ctxRef.current?.resume();
     void audio
       .play()
-      .then(() => setIsPlaying(true))
+      .then(() => {
+        setIsPlaying(true);
+        document.documentElement.classList.remove('is-music-paused');
+        document.documentElement.classList.add('is-cinematic-active');
+      })
       .catch(() => setIsPlaying(false));
   }, [connectAnalyzer]);
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
     setIsPlaying(false);
+    document.documentElement.classList.add('is-music-paused');
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = null;
   }, []);

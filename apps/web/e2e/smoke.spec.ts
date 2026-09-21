@@ -25,6 +25,7 @@ test.describe('smoke', () => {
     expect(html).toContain('id="home-lcp"');
     expect(html).toContain('id="home-shell"');
     expect(html).toContain('3000 Studios');
+    expect(html).toContain('id="home-play-latest"');
   });
 
   test('NGUT mp3 and player control exist', async ({ page }) => {

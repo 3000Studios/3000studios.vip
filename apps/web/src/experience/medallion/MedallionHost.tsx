@@ -1,0 +1,97 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
+import type { AnalyzerFrame } from '../../lib/audioAnalyzer';
+import { usePrefersReducedMotion } from '../../lib/mediaQuery';
+import { detectQualityTier, type QualityTier } from './quality';
+import {
+  medallionRuntime,
+  setMedallionAudio,
+  setMedallionEnhanced,
+  setMedallionPointer,
+  setMedallionScroll,
+} from './runtime';
+import { hasWebGL } from './webgl';
+
+const MedallionScene = lazy(() => import('./MedallionScene'));
+
+export function MedallionHost({ coverUrl }: { coverUrl: string }) {
+  const reduced = usePrefersReducedMotion();
+  const [tier] = useState<QualityTier>(() => detectQualityTier());
+  const [ready, setReady] = useState(false);
+  const [webgl] = useState(() => hasWebGL());
+
+  useEffect(() => {
+    const boot = () => setReady(true);
+    const onPlay = () => {
+      setMedallionEnhanced(true);
+      boot();
+    };
+    const onIntent = () => boot();
+    window.addEventListener('3000-play-track', onPlay);
+    window.addEventListener('pointerdown', onIntent, { once: true, passive: true });
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (window.scrollY > 48) boot();
+      },
+      { passive: true },
+    );
+    return () => {
+      window.removeEventListener('3000-play-track', onPlay);
+      window.removeEventListener('pointerdown', onIntent);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onPointer = (e: PointerEvent) => {
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      const ny = -((e.clientY / window.innerHeight) * 2 - 1);
+      setMedallionPointer(nx, ny);
+    };
+    const onScroll = () => {
+      const t = window.scrollY / Math.max(1, window.innerHeight * 0.92);
+      setMedallionScroll(t);
+    };
+    const onAudio = (e: Event) => {
+      const frame = (e as CustomEvent<AnalyzerFrame>).detail;
+      if (!frame) return;
+      const playing = !document.documentElement.classList.contains('is-music-paused');
+      setMedallionAudio(
+        {
+          bass: frame.bass,
+          mid: frame.mid,
+          treble: frame.treble,
+          energy: frame.energy,
+          beat: frame.beat,
+        },
+        playing,
+      );
+    };
+    window.addEventListener('pointermove', onPointer, { passive: true });
+    window.addEventListener('pointerdown', onPointer, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('3000-analyzer-frame', onAudio as EventListener);
+    onScroll();
+    return () => {
+      window.removeEventListener('pointermove', onPointer);
+      window.removeEventListener('pointerdown', onPointer);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('3000-analyzer-frame', onAudio as EventListener);
+    };
+  }, []);
+
+  if (reduced || !webgl || !ready) {
+    return <div className="medallionHost medallionHost--fallback" aria-hidden="true" />;
+  }
+
+  return (
+    <div
+      className={`medallionHost is-${tier.toLowerCase()}${medallionRuntime.enhanced ? ' is-enhanced' : ''}`}
+      data-quality={tier}
+      aria-hidden="true"
+    >
+      <Suspense fallback={null}>
+        <MedallionScene tier={tier} coverUrl={coverUrl} />
+      </Suspense>
+    </div>
+  );
+}

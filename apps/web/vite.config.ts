@@ -17,6 +17,10 @@ const hero = JSON.parse(
   sub: string;
   ctaLabel: string;
   ctaHref: string;
+  playLabel: string;
+  playTitle: string;
+  playSrc: string;
+  playCover: string;
 };
 
 function homeShellHtml() {
@@ -30,8 +34,19 @@ function homeShellHtml() {
     <h1>${hero.headline}</h1>
     <p class="homeShellSub">${hero.sub}</p>
     <a class="homeShellCta"${ctaAttrs}>${hero.ctaLabel}</a>
+    <button type="button" class="homeShellPlay" id="home-play-latest" data-src="${hero.playSrc}" data-title="${hero.playTitle}">${hero.playLabel}</button>
   </div>
-</div>`;
+</div>
+<script>
+(function(){
+  var b=document.getElementById('home-play-latest');
+  if(!b) return;
+  b.addEventListener('click', function(){
+    window.dispatchEvent(new CustomEvent('3000-play-track',{detail:{src:b.getAttribute('data-src'),title:b.getAttribute('data-title')}}));
+    document.documentElement.classList.add('is-cinematic-active');
+  });
+})();
+</script>`;
 }
 
 function homeShellCriticalCss() {
@@ -42,7 +57,10 @@ function homeShellCriticalCss() {
 .homeShellKicker{letter-spacing:.18em;text-transform:uppercase;font-size:.72rem;opacity:.8}
 #home-shell h1{margin:.4rem 0;font:700 clamp(2.2rem,8vw,4.2rem)/1.05 Georgia,serif}
 .homeShellSub{max-width:36rem;opacity:.88}
-.homeShellCta{display:inline-flex;align-items:center;min-height:44px;padding:0 1.1rem;margin-top:1rem;border-radius:999px;background:#d4af37;color:#111;font-weight:800;text-decoration:none;width:fit-content}
+.homeShellCta,.homeShellPlay{display:inline-flex;align-items:center;min-height:44px;padding:0 1.1rem;margin-top:1rem;margin-right:.6rem;border-radius:999px;font-weight:800;text-decoration:none;width:fit-content;border:0;cursor:pointer}
+.homeShellCta{background:#d4af37;color:#111}
+.homeShellPlay{background:transparent;color:#f4efe2;border:1px solid rgba(212,175,55,.55)}
+html.is-cinematic-active #home-lcp{opacity:.38;transition:opacity .8s ease}
 html.is-app-ready #home-shell{background:transparent}
 #root{position:relative;z-index:1;min-height:100svh;background:transparent;max-width:100%;overflow-x:clip;min-width:0}
 html.is-home-lcp .vipSite,html.is-home-lcp .md-scope,html.is-home-lcp .md-hero{background:transparent!important}`;

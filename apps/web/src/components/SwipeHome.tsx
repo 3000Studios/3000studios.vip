@@ -22,6 +22,8 @@ import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
 import '../styles/swipe-slider.css';
 import { BelowFold } from './BelowFold';
+import { MedallionHost } from '../experience/medallion';
+import { HOME_HERO } from '../data/homeHero';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -186,7 +188,9 @@ export function SwipeHome() {
     <PublicLayout variant="spiral" compact>
       <div className="md-scope">
         {/* ===== CINEMATIC HERO ===== */}
-        <div className="md-hero-spacer" aria-hidden="true" />
+        <div className="md-hero-spacer" aria-hidden="true">
+          <MedallionHost coverUrl={HOME_HERO.playCover} />
+        </div>
         <nav className="md-cta-row md-hero-extra" aria-label="More ways in">
           <a className="md-btn md-btn-ghost" href="#watch">
             Swipe the videos
@@ -195,6 +199,26 @@ export function SwipeHome() {
             Shop the drop
           </Link>
         </nav>
+        <section className="md-latest" id="latest" aria-label="Latest release">
+          <img src={HOME_HERO.playCover} width={88} height={88} alt="" />
+          <div>
+            <span className="md-kicker">Now on DistroKid</span>
+            <h2>{HOME_HERO.playTitle}</h2>
+          </div>
+          <button
+            type="button"
+            className="md-btn md-btn-gold"
+            onClick={() => {
+              window.dispatchEvent(
+                new CustomEvent('3000-play-track', {
+                  detail: { src: HOME_HERO.playSrc, title: HOME_HERO.playTitle },
+                }),
+              );
+            }}
+          >
+            {HOME_HERO.playLabel}
+          </button>
+        </section>
 
         {/* ===== SWIPE VIDEO STAGE — ALL VIDEOS ===== */}
         <section className="md-stage" id="watch" aria-label="All music videos, swipe to play">
