@@ -1,1 +1,1 @@
-LOAD_FROM_/tmp/swipe_content.txt
+@/tmp/swipe_out_for_mcp.tsx
