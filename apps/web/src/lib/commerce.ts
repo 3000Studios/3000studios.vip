@@ -16,7 +16,7 @@ export const PLATFORMS = [
   { id: 'facebook', label: 'Facebook', url: 'https://www.facebook.com/3000Studios.comm/' },
   { id: 'live', label: 'Live', url: 'https://3000studios.vip/live' },
   { id: 'site', label: '3000 Studios', url: 'https://3000studios.vip' },
-  { id: 'games', label: 'Games · Nexa', url: 'https://getnexa.space' },
+  { id: 'games', label: 'Games · Arcade', url: '/tiktok-games/' },
 ] as const;
 
 const ENTITLEMENT_KEY = '3000-music-entitlement-v1';

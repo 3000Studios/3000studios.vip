@@ -14,6 +14,22 @@ const pagesAssetLimitPlugin = {
   },
 };
 
+
+const adsenseHtmlGuardPlugin = {
+  name: 'adsense-html-guard',
+  enforce: 'post' as const,
+  transformIndexHtml: {
+    order: 'post' as const,
+    handler(html: string) {
+      // Vite leaves %VITE_ADSENSE_CLIENT_ID% when the env var is unset. Do not
+      // ship that literal (or an empty publisher meta) — omit the tag instead.
+      return html
+        .replace(/\s*<meta\s+name="google-adsense-account"\s+content="%VITE_ADSENSE_CLIENT_ID%"\s*\/?>/i, '')
+        .replace(/\s*<meta\s+name="google-adsense-account"\s+content=""\s*\/?>/i, '');
+    },
+  },
+};
+
 const sameOriginStylesPlugin = {
   name: 'same-origin-styles',
   enforce: 'post' as const,
@@ -33,7 +49,7 @@ const sameOriginStylesPlugin = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), pagesAssetLimitPlugin, sameOriginStylesPlugin],
+  plugins: [react(), pagesAssetLimitPlugin, sameOriginStylesPlugin, adsenseHtmlGuardPlugin],
   build: {
     rollupOptions: {
       output: {

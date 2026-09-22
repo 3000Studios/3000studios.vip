@@ -1,107 +1,73 @@
-# the3000studios.Vip — Apex Citadel
+# 3000 Studios VIP — Official Music & Live Stage
 
-Owner-only control center for monitoring and self-healing across the 3000 Studios site portfolio.
+Cinematic music universe for **3000 Studios**: full-length catalog, live stage, official videos, shop, and on-site arcade — served at [3000studios.vip](https://3000studios.vip).
+
+Public product surface (organic only — no paid ads required for core UX):
+
+- **Music** — coverflow deck + song pages (`/music`, `/song/:slug`)
+- **Live** — Cloudflare Stream stage (`/live`)
+- **Video** — official release hub (`/video`)
+- **Shop** — merch + Stripe/PayPal helpers (`/shop`)
+- **Arcade** — TikTok mini-games (`/tiktok-games/`)
+- **Blog / About / Contact** — editorial and legal pages
+
+Owner ops live under a protected vault (see below) — they are not the public product.
 
 ## Architecture
 
-This is a Turborepo monorepo with the following structure:
+Turborepo monorepo (npm workspaces):
 
-- **apps/api** - Cloudflare Workers API (Hono, TypeScript, D1 database)
-  - Site management and health checks
-  - Incident tracking with email alerts
-  - Cloudflare zone analytics
-  - Bridge inspection for origin monitoring
-  - Natural language command parsing
-
-- **apps/web** - React 19 web application (Vite, React Router)
-  - Protected dashboard with Cloudflare Access authentication
-  - Site monitoring and management UI
-  - Real-time health check results
-  - Deploy hook triggers
-
-- **packages/shared** - Shared TypeScript types and utilities
+| Package | Role |
+|---------|------|
+| `apps/web` | React 19 + Vite 8 + React Router → Cloudflare Pages (`3000studios-vip`) |
+| `apps/api` | Hono Worker `apex-citadel-api` + D1 + R2 (owner/ops API) |
+| `apps/web/functions` | Cloudflare Pages Functions (`/api/*` live-room, stream-config, pay, …) |
+| `packages/shared` | Shared Zod types |
 
 ## Local dev
 
-1. Install dependencies:
+Requires **Node ≥ 22** (`.nvmrc`). Node 20 may install/build with `EBADENGINE` warnings.
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+npm run dev          # turbo: web + api
+npm run build
+npm run test -- --filter=web
+npm run lint -- --filter=web
+```
 
-2. API (Cloudflare Workers):
+Web only:
 
-   ```bash
-   cd apps/api
-   npx wrangler dev --local
-   ```
+```bash
+cd apps/web && npm run dev
+```
 
-3. Web (Vite dev server):
+Catalog path audit / repair (media hygiene):
 
-   ```bash
-   cd apps/web
-   npm run dev
-   ```
+```bash
+node apps/web/scripts/audit-catalog-paths.mjs --json ../website/catalog_path_audit.json
+node apps/web/scripts/repair-catalog-paths.mjs   # copies DistroKid-named MP3s → /media/{slug}.mp3
+```
 
-4. Run tests:
+## Owner vault / ops (Apex Citadel)
 
-   ```bash
-   npm run test
-   ```
+Protected routes (`/vault`, `/agent`) and the Worker API are the **owner monitoring / self-healing control center** for the site portfolio. Fail-closed Cloudflare Access is intentional — do not weaken it for public music playback.
 
-5. Build:
-   ```bash
-   npm run build
-   ```
+Vault features: site health, incidents, Stream vault, Dude agent, AdSense observability.
 
-## Features
+## Deploy (Cloudflare Pages)
 
-- **Health Checks**: Automated site monitoring with configurable timeouts and thresholds
-- **Incident Management**: Automatic incident creation and email alerts via MailChannels
-- **Cloudflare Integration**: Zone analytics, DNS management, and deploy hooks
-- **Bridge Inspection**: Monitor origin configuration and endpoint status
-- **Natural Language Commands**: Parse and execute operations via text commands
-- **Self-Healing**: Automatic deploy hook triggers for failed checks
+- GitHub is source control; push to `main` auto-deploys Pages project `3000studios-vip`.
+- Build: `npm ci && npm run build` → output `apps/web/dist`.
+- Pages Functions live in `apps/web/functions`. Root directory must be `apps/web` (or pass `--functions apps/web/functions` on wrangler deploy). See `docs/secrets-and-deploy.md` and `/workspace` ops notes if `/api/*` returns SPA HTML.
+- Do not commit secrets. Use Cloudflare Pages env + Worker secrets (`global.env` on the owner machine only).
 
-## Deploy (Cloudflare)
+### Web build env (names)
 
-Deployments run directly through Cloudflare Pages and Workers. GitHub is source control only.
+- `VITE_API_BASE`, `VITE_VAULT_*`, Stream `VITE_STREAM_*`
+- Stripe (read by `apps/web/src/lib/commerce.ts`): `VITE_STRIPE_TRACK_LINK`, `VITE_STRIPE_MONTHLY_LINK`, `VITE_STRIPE_YEARLY_LINK`
+- AdSense: `VITE_ADSENSE_CLIENT_ID` (+ optional slot vars). If unset, the AdSense meta tag is omitted from HTML (no `%VITE_…%` placeholder).
 
-- `CLOUDFLARE_API_TOKEN` - Cloudflare API token
-- `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account ID
-- `CF_PAGES_PROJECT` - Cloudflare Pages project name
-- `VITE_API_BASE` - API base URL for web app
-- `VITE_VAULT_USERNAME` - Owner username for the hidden vault entry
-- `VITE_VAULT_PASSCODE_SHA256` - SHA-256 hash of the owner passcode
-- `VITE_VAULT_SECRET_ANSWER_SHA256` - SHA-256 hash of the secret-question answer
-- `OWNER_EMAIL` - Email for alerts
-- `ALERT_FROM_EMAIL` - From email for alerts
-- `MAILCHANNELS_API_KEY` - MailChannels API key
+## License / contact
 
-## Environment Variables
-
-### API
-
-- `APP_ENV` - Environment (production/development)
-- `ACCESS_REQUIRED` - Whether Cloudflare Access is required (1/0)
-- `DB` - D1 database binding
-- `MAILCHANNELS_API_KEY` - MailChannels API key for email alerts
-
-### Web
-
-- `VITE_API_BASE` - API base URL
-- `VITE_VAULT_USERNAME` - Owner username for the hidden vault entry
-- `VITE_VAULT_PASSCODE_SHA256` - SHA-256 hash of the owner passcode
-- `VITE_VAULT_SECRET_ANSWER_SHA256` - SHA-256 hash of the secret-question answer
-- `VITE_STREAM_CUSTOMER_CODE` - Optional Cloudflare Stream customer code
-- `VITE_STREAM_LIVE_INPUT_ID` - Optional Cloudflare Stream live input ID
-- `VITE_STREAM_TITLE` - Optional private stream title
-
-## Tech Stack
-
-- **API**: Hono, Zod, Cloudflare Workers, D1, Wrangler
-- **Web**: React 19, Vite, React Router, Three.js, Framer Motion
-- **Testing**: Vitest, Testing Library
-- **Build**: Turborepo, TypeScript
-
-<!-- deploy trigger: 2026-07-15 19:49 -->
+Owner: 3000 Studios · site https://3000studios.vip

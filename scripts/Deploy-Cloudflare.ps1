@@ -55,7 +55,12 @@ try {
   Pop-Location
 }
 
-npx wrangler pages deploy apps/web/dist --project-name $projectName --branch main --commit-dirty=true
+Push-Location apps\web
+try {
+  npx wrangler pages deploy dist --project-name $projectName --branch main --commit-dirty=true
+} finally {
+  Pop-Location
+}
 
 Write-Output 'Running post-deploy sitemap smoke (HTTP 200 required on every loc)...'
 node "$repoRoot\scripts\smoke-sitemap.mjs"

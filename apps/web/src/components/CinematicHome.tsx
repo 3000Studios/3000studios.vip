@@ -57,7 +57,7 @@ export function CinematicHome() {
           <Link className="cinePortal" to="/live">
             <small>Broadcast</small>
             <strong>Live</strong>
-            <span>On air when the host is live.</span>
+            <span>On air when the host is live. Player stays ready.</span>
           </Link>
         </section>
 
@@ -107,9 +107,9 @@ export function CinematicHome() {
           <div className="platformTiles">
             {PLATFORMS.map((p) =>
               p.id === 'games' ? (
-                <a key={p.id} className="platformTile gamesTile" href={p.url} target="_blank" rel="noreferrer">
+                <a key={p.id} className="platformTile gamesTile" href={p.url}>
                   <strong>Games</strong>
-                  <span>getnexa.space</span>
+                  <span>tiktok-games</span>
                 </a>
               ) : (
                 <a key={p.id} className="platformTile" href={p.url} target={p.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer">

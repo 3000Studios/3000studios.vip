@@ -12,7 +12,7 @@ const stories = [
   { id: officialReleaseVideos[1]?.videoId || featured.videoId, label: 'New video', to: '/video' },
   { id: officialReleaseVideos[2]?.videoId || featured.videoId, label: 'Behind beat', to: '/music' },
   { id: officialReleaseVideos[3]?.videoId || featured.videoId, label: 'Merch', to: '/shop' },
-  { id: officialReleaseVideos[4]?.videoId || featured.videoId, label: 'Games', href: 'https://getnexa.space' },
+  { id: officialReleaseVideos[4]?.videoId || featured.videoId, label: 'Games', to: '/tiktok-games/' },
 ];
 
 export function DiscoverHome() {
@@ -24,19 +24,12 @@ export function DiscoverHome() {
     <PublicLayout variant="spiral">
       <main className="discoverPage">
         <section className="discoverStories" aria-label="Quick lanes">
-          {stories.map((story) =>
-            story.href ? (
-              <a key={story.label} className="storyBubble" href={story.href} target="_blank" rel="noreferrer">
-                <img src={`https://i.ytimg.com/vi/${story.id}/mqdefault.jpg`} alt="" />
-                <span>{story.label}</span>
-              </a>
-            ) : (
+          {stories.map((story) => (
               <Link key={story.label} className="storyBubble" to={story.to || '/'}>
                 <img src={`https://i.ytimg.com/vi/${story.id}/mqdefault.jpg`} alt="" />
                 <span>{story.label}</span>
               </Link>
-            ),
-          )}
+          ))}
         </section>
         <section className="bentoHome" aria-label="Home bento">
           <VideoWallpaperCard className="discoverHero bentoFeature" videoId={featured.videoId} kicker="Featured official video" title="Watch the videos. Own the drop." href={youtubeWatchUrl(featured.videoId)}>
@@ -93,7 +86,7 @@ export function DiscoverHome() {
           <div className="platformTiles">
             {PLATFORMS.map((p) =>
               p.id === 'games' ? (
-                <a key={p.id} className="platformTile gamesTile" href={p.url} target="_blank" rel="noreferrer"><strong>Games</strong><span>getnexa.space</span></a>
+                <Link key={p.id} className="platformTile gamesTile" to={p.url}><strong>Games</strong><span>tiktok-games</span></Link>
               ) : (
                 <a key={p.id} className="platformTile" href={p.url} target={p.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer"><strong>{p.label}</strong><span>Open</span></a>
               ),
