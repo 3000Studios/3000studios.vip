@@ -12,7 +12,7 @@ test.describe('smoke', () => {
       expect(res?.ok() || res?.status() === 304).toBeTruthy();
       expect(errors.filter((m) => !m.includes('play()'))).toEqual([]);
       const broken = await page.evaluate(() =>
-        [...document.images].filter((img) => img.naturalWidth === 0 && img.src && !img.src.startsWith('data:')).map((img) => img.src),
+        [...document.images].filter((img) => img.complete && img.naturalWidth === 0 && img.src && !img.src.startsWith('data:')).map((img) => img.src),
       );
       expect(broken.filter((s) => s.includes('/media/covers/'))).toEqual([]);
     });
