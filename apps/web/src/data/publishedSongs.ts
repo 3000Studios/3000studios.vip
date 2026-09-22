@@ -1,6 +1,14 @@
 import generated from './publishedSongs.generated.json';
+import mediaPathMap from './mediaPathMap.generated.json';
 import { officialReleaseVideos } from './officialReleases';
 import { rolloutSongs, type CatalogSong } from './music';
+
+const MEDIA_MAP = mediaPathMap as Record<string, string>;
+
+function encodeMediaPath(path: string): string {
+  if (!path.startsWith('/media/')) return path;
+  return '/media/' + encodeURIComponent(path.slice('/media/'.length));
+}
 
 export type PublishedSong = {
   title: string;
@@ -24,13 +32,14 @@ function youtubeFor(title: string) {
 }
 
 function localSrc(title: string, slug: string) {
+  if (MEDIA_MAP[slug]) return encodeMediaPath(MEDIA_MAP[slug]);
   const fromRollout = rolloutSongs.find((s) => s.slug === slug || norm(s.title) === norm(title));
   return fromRollout?.src;
 }
 
 export const publishedSongs: PublishedSong[] = (generated as PublishedSong[]).map((row) => ({
   ...row,
-  src: localSrc(row.title, row.slug) || row.src,
+  src: localSrc(row.title, row.slug) || row.preview || row.src,
   youtubeId: youtubeFor(row.title) || row.youtubeId,
 }));
 
