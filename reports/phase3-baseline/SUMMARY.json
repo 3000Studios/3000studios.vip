@@ -1,0 +1,30 @@
+{
+  "home": {
+    "url": "http://127.0.0.1:4174/",
+    "performance": 29,
+    "accessibility": 96,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcp_ms": 17595,
+    "cls": 0,
+    "tbt_ms": 53640,
+    "fcp_ms": 3237
+  },
+  "ngut": {
+    "url": "http://127.0.0.1:4174/song/not-giving-up-tonight",
+    "performance": 57,
+    "accessibility": 96,
+    "bestPractices": 96,
+    "seo": 100,
+    "lcp_ms": 17679,
+    "cls": 0.004517554475576229,
+    "tbt_ms": 0,
+    "fcp_ms": 7928
+  },
+  "playwright": "12 passed",
+  "transcription": {
+    "chars": 1359,
+    "skipSecond": true
+  },
+  "approval": "completed then rerun completed"
+}

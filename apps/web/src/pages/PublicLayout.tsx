@@ -1,5 +1,4 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { GlobalMusicToggle } from '../components/GlobalMusic';
 import { LiveWallpaper } from '../components/LiveWallpaper';
@@ -8,10 +7,11 @@ import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { PlatformLogos } from '../components/PlatformLogos';
 import { ChromeWallpaper } from '../components/ChromeWallpaper';
+import { DeferredFxStyles } from '../components/DeferredFxStyles';
 import { type SongPalette } from '../data/music';
 import { adsenseClientId } from '../lib/adsense';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
-import { fadeUp } from './PageMotion';
+
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -105,6 +105,28 @@ export function ReducedMotionGate({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+function IdleFx({ children }: { children: ReactNode }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    let id = 0;
+    if (w.requestIdleCallback) {
+      id = w.requestIdleCallback(() => setReady(true), { timeout: 2200 });
+    } else {
+      id = w.setTimeout(() => setReady(true), 400);
+    }
+    return () => {
+      if (w.cancelIdleCallback) w.cancelIdleCallback(id);
+      else w.clearTimeout(id);
+    };
+  }, []);
+  if (!ready) return null;
+  return <>{children}</>;
+}
+
 export function AudioReactiveWallpaper({
   variant = 'spiral',
   palette,
@@ -119,18 +141,9 @@ export function AudioReactiveWallpaper({
 
 export function BeatDancingTitle({ text }: { text: string }) {
   return (
-    <motion.h1 className="beatGoldTitle" variants={fadeUp} aria-label={text}>
-      {Array.from(text).map((char, index) => (
-        <span
-          key={`${char}-${index}`}
-          className={char === ' ' ? 'beatGoldSpace' : 'beatGoldLetter'}
-          style={{ '--letter-index': index } as CSSProperties}
-          aria-hidden="true"
-        >
-          {char}
-        </span>
-      ))}
-    </motion.h1>
+    <h1 className="beatGoldTitle" aria-label={text}>
+      {text}
+    </h1>
   );
 }
 
@@ -225,14 +238,17 @@ export function PublicLayout({
       <div className="filmGrain" aria-hidden="true" />
       <div className="filmScan" aria-hidden="true" />
       <ReducedMotionGate>
-        <AudioReactiveWallpaper
-          variant={wallpaperVariant}
-          palette={theme.palette}
-          coverUrl={theme.cover}
-        />
-        <MouseFX />
-        <ZombieFX />
-        <ScrollFX />
+        <IdleFx>
+          <DeferredFxStyles />
+          <AudioReactiveWallpaper
+            variant={wallpaperVariant}
+            palette={theme.palette}
+            coverUrl={theme.cover}
+          />
+          <MouseFX />
+          <ZombieFX />
+          <ScrollFX />
+        </IdleFx>
       </ReducedMotionGate>
       <div className="scrollProgress" aria-hidden="true" />
       <header className="vipHeader vipHeader--epic">

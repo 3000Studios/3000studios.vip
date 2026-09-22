@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { officialReleaseVideos, youtubeArtworkUrl, youtubeWatchUrl } from '../data/officialReleases';
 import { rolloutSongs } from '../data/music';
-import { PublicLayout } from '../pages/Home';
+import { PublicLayout } from '../pages/PublicLayout';
 import { PLATFORMS } from '../lib/commerce';
 
 const INTRO = '/media/spotify-signing.mp4';

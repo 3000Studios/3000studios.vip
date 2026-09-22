@@ -1,10 +1,14 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from 'react';
 import { Link } from 'react-router-dom';
 import { playSwoosh } from './stageSfx';
@@ -17,8 +21,13 @@ import {
 } from '../data/officialReleases';
 import { MERCH_ITEMS } from '../data/merch';
 import { PLATFORMS } from '../lib/commerce';
-import { PublicLayout } from '../pages/Home';
+import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
+import '../styles/swipe-slider.css';
+import { BelowFold } from './BelowFold';
+
+const HomeChapters = lazy(() => import('./HomeChapters'));
+import { HOME_HERO } from '../data/homeHero';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -56,6 +65,31 @@ function buildSlides(): Slide[] {
       stream: match?.buy || 'https://distrokid.com/hyperfollow/3000studios',
     };
   });
+}
+
+function MedallionSlot({ coverUrl }: { coverUrl: string }) {
+  const [node, setNode] = useState<ReactNode>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      void import('../experience/medallion').then(({ MedallionHost }) => {
+        if (!cancelled) setNode(<MedallionHost coverUrl={coverUrl} />);
+      });
+    };
+    const onScroll = () => {
+      if (window.scrollY > 48) load();
+    };
+    window.addEventListener('3000-play-track', load);
+    window.addEventListener('pointerdown', load, { once: true, passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelled = true;
+      window.removeEventListener('3000-play-track', load);
+      window.removeEventListener('pointerdown', load);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [coverUrl]);
+  return <>{node}</>;
 }
 
 function stripeFor(id: string) {
@@ -104,6 +138,13 @@ export function SwipeHome() {
   }, [index]);
 
   useReveal();
+
+  useLayoutEffect(() => {
+    document.documentElement.classList.add('is-home-lcp', 'is-app-ready');
+    return () => {
+      document.documentElement.classList.remove('is-home-lcp');
+    };
+  }, []);
 
   const go = useCallback(
     (next: number, dir?: 'fwd' | 'rev') => {
@@ -172,42 +213,52 @@ export function SwipeHome() {
     }
   };
 
-  const hero = slides[0];
-
   return (
     <PublicLayout variant="spiral" compact>
       <div className="md-scope">
         {/* ===== CINEMATIC HERO ===== */}
-        <section className="md-hero" aria-label="3000 Studios VIP">
-          <div className="md-hero-media" aria-hidden="true">
-            {hero ? <img src={hero.poster} alt="" fetchPriority="high" decoding="async" /> : null}
+        <div className="md-hero-spacer" aria-hidden="true">
+          <MedallionSlot coverUrl={HOME_HERO.playCover} />
+        </div>
+        <nav className="md-cta-row md-hero-extra" aria-label="More ways in">
+          <a className="md-btn md-btn-ghost" href="#watch">
+            Swipe the videos
+          </a>
+          <Link className="md-btn md-btn-ghost" to="/shop">
+            Shop the drop
+          </Link>
+        </nav>
+        <section className="md-latest" id="latest" aria-label="Latest release">
+          <img src={HOME_HERO.playCover} width={88} height={88} alt="" />
+          <div>
+            <span className="md-kicker">Now on DistroKid</span>
+            <h2>{HOME_HERO.playTitle}</h2>
           </div>
-          <div className="md-hero-veil" aria-hidden="true" />
-          <div className="md-hero-copy">
-            <span className="md-kicker">YouTube · DistroKid · Official Artist</span>
-            <h1 className="md-title">3000 Studios</h1>
-            <p className="md-sub">
-              {n} official music videos. Swipe through every drop — everything streams free.
-              Subscribe so YouTube puts the next release in your feed.
-            </p>
-            <div className="md-cta-row">
-              <a
-                className="md-btn md-btn-gold"
-                href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Subscribe on YouTube
-              </a>
-              <a className="md-btn md-btn-ghost" href="#watch">
-                Swipe the videos
-              </a>
-              <Link className="md-btn md-btn-ghost" to="/shop">
-                Shop the drop
-              </Link>
-            </div>
-          </div>
+          <button
+            type="button"
+            className="md-btn md-btn-gold"
+            onClick={() => {
+              window.dispatchEvent(
+                new CustomEvent('3000-play-track', {
+                  detail: { src: HOME_HERO.playSrc, title: HOME_HERO.playTitle },
+                }),
+              );
+            }}
+          >
+            {HOME_HERO.playLabel}
+          </button>
         </section>
+        <nav className="md-cta-row md-hero-extra" aria-label="Catalog">
+          <Link className="md-btn md-btn-ghost" to="/music">
+            Music
+          </Link>
+          <a className="md-btn md-btn-ghost" href="#watch">
+            Featured video
+          </a>
+          <Link className="md-btn md-btn-ghost" to="/live">
+            Live
+          </Link>
+        </nav>
 
         {/* ===== SWIPE VIDEO STAGE — ALL VIDEOS ===== */}
         <section className="md-stage" id="watch" aria-label="All music videos, swipe to play">
@@ -235,6 +286,9 @@ export function SwipeHome() {
               {slides.map((s, i) => {
                 const active = i === index;
                 const near = Math.abs(i - index) <= 1;
+                if (!near) {
+                  return <article key={s.videoId} className="md-slide md-slide-empty" aria-hidden="true" />;
+                }
                 return (
                   <article
                     key={s.videoId}
@@ -246,8 +300,10 @@ export function SwipeHome() {
                       className="md-slide-poster"
                       src={s.poster}
                       alt=""
+                      width={480}
+                      height={360}
                       draggable={false}
-                      loading={near ? 'eager' : 'lazy'}
+                      loading={active ? 'eager' : 'lazy'}
                       decoding="async"
                     />
                     {active ? (
@@ -256,6 +312,7 @@ export function SwipeHome() {
                         videoId={s.videoId}
                         title={`${s.title} — official music video`}
                         playlist
+                        clickToPlay
                       />
                     ) : null}
                     <div className="md-slide-shade" aria-hidden="true" />
@@ -350,6 +407,10 @@ export function SwipeHome() {
           </div>
         </div>
 
+        <BelowFold>
+        <Suspense fallback={<div style={{ minHeight: 240 }} aria-hidden="true" />}>
+          <HomeChapters />
+        </Suspense>
         {/* ===== MONEY RAIL ===== */}
         <section className="md-money md-reveal" aria-label="Support 3000 Studios">
           <span className="md-kicker">Fuel the next drop</span>
@@ -427,6 +488,7 @@ export function SwipeHome() {
             </a>
           ))}
         </section>
+        </BelowFold>
       </div>
     </PublicLayout>
   );

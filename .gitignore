@@ -26,3 +26,14 @@ apps/web/preview-*.png
 # Shared media is served from the central R2/Worker CDN - never commit local copies
 shared-media/
 **/shared-media/
+
+# Studio OS local state and large release binaries (checksums + refs only in git)
+.studio-os/
+music/releases/**/assets/
+reports/*.html
+reports/*.lighthouse.json
+reports/phase3-baseline/*.report.json
+reports/phase3-baseline/*.report.html
+apps/web/test-results/
+apps/web/public/hq/
+promotion/campaigns/wifi-fridge-funk/

@@ -10,14 +10,7 @@
     />
     <link rel="canonical" href="https://3000studios.vip/" />
     <meta name="theme-color" content="#05060a" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
-    <link rel="preconnect" href="https://i.ytimg.com" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap"
-    />
+    <link rel="preload" as="image" href="/media/hero-lcp-480.webp" type="image/webp" fetchpriority="high" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="3000 Studios VIP" />
     <meta property="og:title" content="3000 Studios VIP — Official Music & Live Stage" />
@@ -61,8 +54,15 @@
       }
     </script>
     <title>3000 Studios VIP — Official Music & Live Stage</title>
+    <!--HOME_SHELL_CSS-->
   </head>
   <body>
+    <!--HOME_SHELL-->
+    <script>
+      if (location.pathname === '/' || location.pathname === '') {
+        document.documentElement.classList.add('is-home-lcp');
+      }
+    </script>
     <div id="root"></div>
     <div id="consent-banner"></div>
     <script type="module" src="/src/main.tsx"></script>

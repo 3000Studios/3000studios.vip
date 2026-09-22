@@ -23,6 +23,7 @@ import { LiveWallpaper } from '../components/LiveWallpaper';
 import { MouseFX } from '../components/MouseFX';
 import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
+import '../styles/landing.css';
 import {
   ADSENSE_BLOG_SLOT,
   ADSENSE_HOME_SLOT,

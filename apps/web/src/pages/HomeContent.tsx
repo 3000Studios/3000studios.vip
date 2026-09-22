@@ -10,6 +10,9 @@ import {
   StudioButton,
 } from './PublicLayout';
 import { fadeUp, stagger } from './PageMotion';
+import '../styles/landing.css';
+import '../styles/effects.css';
+import '../styles/dj-system.css';
 
 const INTRO_VIDEO = '/media/spotify-signing.mp4';
 const networkSites = [

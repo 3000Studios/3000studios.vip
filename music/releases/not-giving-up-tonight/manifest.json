@@ -1,0 +1,127 @@
+{
+  "release_id": "not-giving-up-tonight",
+  "slug": "not-giving-up-tonight",
+  "title": "Not Giving Up Tonight",
+  "artist": "3000 Studios",
+  "version": 1,
+  "status": "awaiting_publish_approval",
+  "created_at": "2026-09-21T09:46:43.793Z",
+  "updated_at": "2026-09-21T09:46:58.563Z",
+  "audio": {
+    "original": {
+      "path": "C:\\Users\\MrJws\\Workspaces\\3000studios.vip\\apps\\web\\public\\media\\not-giving-up-tonight.mp3",
+      "checksum": "55bbf07cdb2b15b470cc07f0b756a1614afe6530aefa2289426d56833ef8c71f",
+      "bytes": 5477712,
+      "stored": "git"
+    },
+    "master": {
+      "path": "C:\\Users\\MrJws\\Workspaces\\3000studios.vip\\apps\\web\\public\\media\\not-giving-up-tonight.mp3",
+      "checksum": "55bbf07cdb2b15b470cc07f0b756a1614afe6530aefa2289426d56833ef8c71f",
+      "bytes": 5477712,
+      "stored": "git"
+    },
+    "checksum": "55bbf07cdb2b15b470cc07f0b756a1614afe6530aefa2289426d56833ef8c71f",
+    "duration": 228.16,
+    "sample_rate": 44100,
+    "loudness": -14.37,
+    "qc_status": "pass"
+  },
+  "metadata": {
+    "title": "Not Giving Up Tonight",
+    "artist": "3000 Studios",
+    "writers": [],
+    "producers": [],
+    "explicit": false,
+    "copyright": "© 2026 3000 Studios"
+  },
+  "artwork": {
+    "status": "complete",
+    "dimensions": "3000x3000",
+    "qc_status": "pass"
+  },
+  "lyrics": {
+    "status": "pending"
+  },
+  "video": {},
+  "promotion": {
+    "youtube": {
+      "title": "Not Giving Up Tonight | 3000 Studios (Official)",
+      "artist": "3000 Studios",
+      "slug": "not-giving-up-tonight",
+      "cta": "Listen at https://3000studios.vip",
+      "description": "Not Giving Up Tonight by 3000 Studios.\nhttps://3000studios.vip\nhttps://www.youtube.com/@3000Studio",
+      "tags": [
+        "3000Studios",
+        "official",
+        "not-giving-up-tonight"
+      ]
+    },
+    "instagram": {
+      "title": "Not Giving Up Tonight",
+      "artist": "3000 Studios",
+      "slug": "not-giving-up-tonight",
+      "cta": "Listen at https://3000studios.vip",
+      "caption": "Not Giving Up Tonight is live. Full listen on 3000studios.vip",
+      "hashtags": [
+        "#3000Studios",
+        "#NewMusic"
+      ]
+    },
+    "facebook": {
+      "title": "Not Giving Up Tonight",
+      "artist": "3000 Studios",
+      "slug": "not-giving-up-tonight",
+      "cta": "Listen at https://3000studios.vip",
+      "caption": "New from 3000 Studios: Not Giving Up Tonight. Stream on the official site."
+    },
+    "tiktok": {
+      "title": "Not Giving Up Tonight",
+      "artist": "3000 Studios",
+      "slug": "not-giving-up-tonight",
+      "cta": "Listen at https://3000studios.vip",
+      "caption": "Not Giving Up Tonight — official sound. Link in bio / 3000studios.vip",
+      "hashtags": [
+        "#3000Studios",
+        "#fyp"
+      ]
+    }
+  },
+  "distribution": {
+    "status": "prepared",
+    "distributor": "DistroKid",
+    "platform_links": {}
+  },
+  "website": {
+    "release_page": "/song/not-giving-up-tonight",
+    "artwork": "/media/covers/not-giving-up-tonight.jpg",
+    "player": "/media/not-giving-up-tonight.mp3",
+    "seo": "/song/not-giving-up-tonight",
+    "deployment_status": "prepared"
+  },
+  "analytics": {
+    "campaign_metrics": {}
+  },
+  "workflow": {
+    "current_stage": "quality_control",
+    "completed_tasks": [
+      "ingest_master",
+      "audio_qc",
+      "metadata",
+      "artwork",
+      "lyrics",
+      "video",
+      "canvas",
+      "shorts",
+      "reels",
+      "captions",
+      "thumbnails",
+      "website",
+      "distribution",
+      "promotion",
+      "quality_control"
+    ],
+    "failed_tasks": [],
+    "queued_tasks": [],
+    "retries": {}
+  }
+}

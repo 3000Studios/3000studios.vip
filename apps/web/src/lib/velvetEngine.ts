@@ -171,38 +171,36 @@ export const beatEngine = new BeatEngine();
 
 export function initVelvetMachine() {
   if (typeof document === 'undefined') return;
-  applySignatureCss();
-  const scene = (localStorage.getItem(PREF_KEY) as MorphScene | null) || 'jazz';
-  setScene(scene);
+  const boot = () => {
+    applySignatureCss();
+    const scene = (localStorage.getItem(PREF_KEY) as MorphScene | null) || 'jazz';
+    setScene(scene);
 
-  const onMove = (e: PointerEvent) => {
-    const x = (e.clientX / window.innerWidth) * 100;
-    const y = (e.clientY / window.innerHeight) * 100;
-    document.documentElement.style.setProperty('--velvet-x', `${x.toFixed(2)}%`);
-    document.documentElement.style.setProperty('--velvet-y', `${y.toFixed(2)}%`);
+    const onMove = (e: PointerEvent) => {
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      document.documentElement.style.setProperty('--velvet-x', `${x.toFixed(2)}%`);
+      document.documentElement.style.setProperty('--velvet-y', `${y.toFixed(2)}%`);
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+
+    window.addEventListener('3000-play-track', ((e: CustomEvent<{ src?: string; title?: string }>) => {
+      const title = (e.detail?.title || '').toLowerCase();
+      const src = (e.detail?.src || '').toLowerCase();
+      if (title.includes('remix') || src.includes('remix')) setScene('remix');
+      else if (title.includes('jazz') || src.includes('jazz')) setScene('jazz');
+    }) as EventListener);
+
+    document.addEventListener(
+      'play',
+      (e) => {
+        const t = e.target;
+        if (t instanceof HTMLAudioElement) beatEngine.attach(t);
+      },
+      true,
+    );
   };
-  window.addEventListener('pointermove', onMove, { passive: true });
-
-  window.addEventListener('3000-play-track', ((e: CustomEvent<{ src?: string; title?: string }>) => {
-    const title = (e.detail?.title || '').toLowerCase();
-    const src = (e.detail?.src || '').toLowerCase();
-    if (title.includes('remix') || src.includes('remix')) setScene('remix');
-    else if (title.includes('jazz') || src.includes('jazz')) setScene('jazz');
-  }) as EventListener);
-
-  const tryAttach = () => {
-    const audios = Array.from(document.querySelectorAll('audio')) as HTMLAudioElement[];
-    const playing = audios.find((a) => !a.paused && !a.muted);
-    if (playing) beatEngine.attach(playing);
-  };
-  document.addEventListener(
-    'play',
-    (e) => {
-      const t = e.target;
-      if (t instanceof HTMLAudioElement) beatEngine.attach(t);
-    },
-    true,
-  );
-  window.setInterval(tryAttach, 4000);
-  tryAttach();
+  const w = window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number };
+  if (w.requestIdleCallback) w.requestIdleCallback(() => boot(), { timeout: 2500 });
+  else w.setTimeout(boot, 1);
 }

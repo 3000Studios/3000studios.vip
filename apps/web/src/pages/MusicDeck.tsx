@@ -7,8 +7,9 @@ import {
   youtubeEmbedUrl,
   youtubeWatchUrl,
 } from '../data/officialReleases';
-import { PublicLayout } from './Home';
+import { PublicLayout } from './PublicLayout';
 import '../styles/music-deck.css';
+import '../styles/carousel-3d.css';
 
 const normalized = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
 

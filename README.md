@@ -4,22 +4,16 @@ Owner-only control center for monitoring and self-healing across the 3000 Studio
 
 ## Architecture
 
-This is a Turborepo monorepo with the following structure:
+This is a Turborepo monorepo. See `PROJECT_INDEX.md` and `docs/ARCHITECTURE.md`.
 
-- **apps/api** - Cloudflare Workers API (Hono, TypeScript, D1 database)
-  - Site management and health checks
-  - Incident tracking with email alerts
-  - Cloudflare zone analytics
-  - Bridge inspection for origin monitoring
-  - Natural language command parsing
+- **apps/web** — production public site + owner admin (Cloudflare Pages). Not moved.
+- **apps/api** — Cloudflare Workers API (Hono, D1): health, incidents, catalog, Dude agent.
+- **apps/release-machine** — CLI for song package + release jobs (Phase 1).
+- **apps/admin** / **apps/website** — layout aliases; live code stays in `apps/web`.
+- **packages/studio-os** — master orchestrator, cost/fallback routers, manifests, audits.
+- **packages/shared** — shared TypeScript types for the citadel.
 
-- **apps/web** - React 19 web application (Vite, React Router)
-  - Protected dashboard with Cloudflare Access authentication
-  - Site monitoring and management UI
-  - Real-time health check results
-  - Deploy hook triggers
-
-- **packages/shared** - Shared TypeScript types and utilities
+Songwriting canon: `SONGWRITING.md`. Orchestrator: `ORCHESTRATOR.md`.
 
 ## Local dev
 
@@ -47,6 +41,8 @@ This is a Turborepo monorepo with the following structure:
 
    ```bash
    npm run test
+   npm run os:test
+   npm run os:audit
    ```
 
 5. Build:

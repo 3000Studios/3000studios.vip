@@ -34,6 +34,13 @@
     "webhook",
     "webhooks",
     "noopener",
-    "noreferrer"
+    "noreferrer",
+    "orchestrator",
+    "DistroKid",
+    "Ollama",
+    "ffprobe",
+    "idempotent",
+    "Suno",
+    "ISRC"
   ]
 }

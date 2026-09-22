@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { officialReleaseVideos, youtubeWatchUrl } from '../data/officialReleases';
 import { rolloutSongs } from '../data/music';
-import { PublicLayout } from '../pages/Home';
+import { PublicLayout } from '../pages/PublicLayout';
 import { VideoWallpaperCard } from './VideoWallpaperCard';
 import { PLATFORMS } from '../lib/commerce';
 import '../styles/discover.css';

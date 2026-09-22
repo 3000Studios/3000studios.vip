@@ -15,6 +15,7 @@ import {
   rolloutSongs,
   type CatalogSong,
 } from '../data/music';
+import { frameFromByteFrequency } from '../lib/audioAnalyzer';
 
 const MUSIC_ON_KEY = '3000-music-on';
 
@@ -127,9 +128,10 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     const tick = () => {
       analyser.getByteFrequencyData(data);
-      const avg = data.reduce((sum, value) => sum + value, 0) / data.length / 255;
-      document.documentElement.style.setProperty('--beat', Math.max(0.04, avg).toFixed(3));
-      document.documentElement.style.setProperty('--player-beat', avg.toFixed(3));
+      const frame = frameFromByteFrequency(data);
+      document.documentElement.style.setProperty('--beat', Math.max(0.04, frame.energy).toFixed(3));
+      document.documentElement.style.setProperty('--player-beat', frame.energy.toFixed(3));
+      window.dispatchEvent(new CustomEvent('3000-analyzer-frame', { detail: frame }));
       rafRef.current = requestAnimationFrame(tick);
     };
     tick();
@@ -151,14 +153,20 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       applySongTheme(song);
       audio.volume = volume;
       audio.muted = muted;
-      connectAnalyzer();
-      void ctxRef.current?.resume();
       if (opts?.autoplay === true) {
+        connectAnalyzer();
+        void ctxRef.current?.resume();
         void audio
           .play()
-          .then(() => setIsPlaying(true))
+          .then(() => {
+            setIsPlaying(true);
+            document.documentElement.classList.remove('is-music-paused');
+            document.documentElement.classList.add('is-cinematic-active');
+          })
           .catch(() => setIsPlaying(false));
       } else {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
         audio.pause();
         setIsPlaying(false);
       }
@@ -180,7 +188,11 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       connectAnalyzer();
       void audio
         .play()
-        .then(() => setIsPlaying(true))
+        .then(() => {
+          setIsPlaying(true);
+          document.documentElement.classList.remove('is-music-paused');
+          document.documentElement.classList.add('is-cinematic-active');
+        })
         .catch(() => setIsPlaying(false));
     },
     [playIndex, connectAnalyzer],
@@ -193,13 +205,20 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     void ctxRef.current?.resume();
     void audio
       .play()
-      .then(() => setIsPlaying(true))
+      .then(() => {
+        setIsPlaying(true);
+        document.documentElement.classList.remove('is-music-paused');
+        document.documentElement.classList.add('is-cinematic-active');
+      })
       .catch(() => setIsPlaying(false));
   }, [connectAnalyzer]);
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
     setIsPlaying(false);
+    document.documentElement.classList.add('is-music-paused');
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
   }, []);
 
   const toggle = useCallback(() => {
@@ -319,7 +338,13 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       if (live) pause();
     };
     window.addEventListener('3000-host-live', onLive);
-    return () => window.removeEventListener('3000-host-live', onLive);
+    window.addEventListener('3000-video-start', onLive);
+    window.addEventListener('3000-live-start', () => pause());
+    return () => {
+      window.removeEventListener('3000-host-live', onLive);
+      window.removeEventListener('3000-video-start', onLive);
+      window.removeEventListener('3000-live-start', pause);
+    };
   }, [pause]);
 
   const api = useMemo<MusicApi>(
