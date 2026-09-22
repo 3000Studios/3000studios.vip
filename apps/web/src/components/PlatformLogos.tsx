@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 const SPOTIFY = 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik';
 const APPLE = 'https://music.apple.com/us/artist/3000-studios/6802721597';
-const YT_MUSIC = 'https://music.youtube.com/channel/UCTQnEFZUIutrFuDlxGj9cDA';
+const YT_MUSIC = 'https://music.youtube.com/channel/UCnQTLksEH7Paj4teEEBU8qQ';
 const YOUTUBE = 'https://www.youtube.com/@3000Studio';
 
 function LogoMark({ children, className }: { children: ReactNode; className: string }) {
