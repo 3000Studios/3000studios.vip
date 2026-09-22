@@ -1,5 +1,6 @@
 import coverMap from './coverMap.json';
 import publishedGenerated from './publishedSongs.generated.json';
+import mediaPathMap from './mediaPathMap.generated.json';
 
 export type SongPalette = {
   a: string;
@@ -20,6 +21,27 @@ export type CatalogSong = {
   wallpaper: string;
   youtubeId?: string;
 };
+
+/** slug → real /media/*.mp3 path (remap-only; filled by repair-catalog-paths). */
+const MEDIA_MAP = mediaPathMap as Record<string, string>;
+
+/** Encode spaces/apostrophes in DistroKid filenames for audio element src. */
+function encodeMediaPath(path: string): string {
+  if (!path.startsWith('/media/')) return path;
+  return '/media/' + encodeURIComponent(path.slice('/media/'.length));
+}
+
+function resolvePlaybackSrc(
+  release: { slug: string; src: string; preview?: string },
+  existing?: CatalogSong,
+): string {
+  const mapped = MEDIA_MAP[release.slug] || (existing ? MEDIA_MAP[existing.slug] : undefined);
+  if (mapped) return encodeMediaPath(mapped);
+  // No local master — Apple preview is honest fallback; missing files logged in catalog audit.
+  return release.preview || release.src || existing?.src || '';
+}
+
+
 
 const YOUTUBE_BY_SLUG: Record<string, string> = {
   'not-giving-up-tonight': 'tIY1WU9N_RU',
@@ -126,7 +148,7 @@ const vaultSongs: CatalogSong[] = [
 ];
 
 const normalizedTitle = (value: string) =>
-  value.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  value.toLowerCase().replace(/[\u2019']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
 /** Public playback is restricted to titles verified live through DistroKid/Apple. */
 export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, index) => {
@@ -138,7 +160,7 @@ export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, inde
       ...existing,
       rank: index,
       description: 'Verified DistroKid release · 3000 Studios',
-      src: release.preview || release.src || existing.src,
+      src: resolvePlaybackSrc(release, existing),
       cover: release.cover || existing.cover,
       youtubeId: release.youtubeId || existing.youtubeId,
     };
@@ -149,7 +171,7 @@ export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, inde
     slug: release.slug,
     title: release.title,
     description: 'Verified DistroKid release · 3000 Studios',
-    src: release.preview || release.src,
+    src: resolvePlaybackSrc(release),
     cover: release.cover,
     palette: { a: '#171c2b', b: '#d4af37', c: '#ffffff', gold: '#d4af37' },
     wallpaper: 'spiral',

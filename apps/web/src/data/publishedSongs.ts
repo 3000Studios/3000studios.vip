@@ -22,7 +22,7 @@ export type PublishedSong = {
 };
 
 function norm(s: string) {
-  return s.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  return s.toLowerCase().replace(/['\u2019]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
 function youtubeFor(title: string) {
