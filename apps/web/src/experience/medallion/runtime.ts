@@ -11,6 +11,7 @@ export type MedallionRuntime = {
   artworkUrl: string;
   artworkReady: boolean;
   fracture: FracturePhase;
+  forceFracture: boolean;
   audio: Pick<AnalyzerFrame, 'bass' | 'mid' | 'treble' | 'energy' | 'beat'>;
 };
 
@@ -23,6 +24,7 @@ export const medallionRuntime: MedallionRuntime = {
   artworkUrl: '',
   artworkReady: false,
   fracture: 'idle',
+  forceFracture: false,
   audio: { bass: 0, mid: 0, treble: 0, energy: 0, beat: 0 },
 };
 
@@ -50,6 +52,12 @@ export function setMedallionEnhanced(on: boolean) {
 export function setMedallionArtwork(url: string, ready: boolean) {
   medallionRuntime.artworkUrl = url;
   medallionRuntime.artworkReady = ready && Boolean(url);
+}
+
+export function requestForcedFracture() {
+  medallionRuntime.enhanced = true;
+  medallionRuntime.playing = true;
+  medallionRuntime.forceFracture = true;
 }
 
 export function setFracturePhase(phase: FracturePhase) {

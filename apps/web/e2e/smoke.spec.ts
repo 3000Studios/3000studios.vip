@@ -28,6 +28,13 @@ test.describe('smoke', () => {
     expect(html).toContain('id="home-play-latest"');
   });
 
+  test('home discography appears after scroll', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(page.locator('#discography')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('#discography').getByRole('button', { name: 'Play' }).first()).toBeVisible();
+  });
+
   test('NGUT mp3 and player control exist', async ({ page }) => {
     const audio = await page.request.head('/media/not-giving-up-tonight.mp3');
     expect(audio.ok()).toBeTruthy();

@@ -4,6 +4,7 @@ import { usePrefersReducedMotion } from '../../lib/mediaQuery';
 import { detectQualityTier, type QualityTier } from './quality';
 import {
   medallionRuntime,
+  requestForcedFracture,
   setMedallionAudio,
   setMedallionEnhanced,
   setMedallionPointer,
@@ -26,11 +27,14 @@ export function MedallionHost({ coverUrl }: { coverUrl: string }) {
       const cover = (e as CustomEvent<{ cover?: string }>).detail?.cover;
       if (cover) setArt(cover);
     };
+    const onForce = () => requestForcedFracture();
     window.addEventListener('3000-play-track', onPlay);
     window.addEventListener('3000-song-theme', onTheme);
+    window.addEventListener('3000-fracture-force', onForce);
     return () => {
       window.removeEventListener('3000-play-track', onPlay);
       window.removeEventListener('3000-song-theme', onTheme);
+      window.removeEventListener('3000-fracture-force', onForce);
     };
   }, []);
 

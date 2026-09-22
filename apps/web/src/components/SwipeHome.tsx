@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -23,6 +25,8 @@ import { PublicLayout } from '../pages/PublicLayout';
 import '../styles/million-dollar.css';
 import '../styles/swipe-slider.css';
 import { BelowFold } from './BelowFold';
+
+const HomeChapters = lazy(() => import('./HomeChapters'));
 import { HOME_HERO } from '../data/homeHero';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
@@ -404,6 +408,9 @@ export function SwipeHome() {
         </div>
 
         <BelowFold>
+        <Suspense fallback={<div style={{ minHeight: 240 }} aria-hidden="true" />}>
+          <HomeChapters />
+        </Suspense>
         {/* ===== MONEY RAIL ===== */}
         <section className="md-money md-reveal" aria-label="Support 3000 Studios">
           <span className="md-kicker">Fuel the next drop</span>

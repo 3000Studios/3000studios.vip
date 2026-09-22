@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { qualitySettings, type QualityTier } from './quality';
 import { medallionRuntime, setFracturePhase, setMedallionArtwork } from './runtime';
-import { createFractureGate, shouldFireFracture } from './trigger';
+import { createFractureGate, resetFractureGate, shouldFireFracture } from './trigger';
 
 const FractureField = lazy(() => import('./FractureField').then((m) => ({ default: m.FractureField })));
 const fractureGate = createFractureGate();
@@ -179,6 +179,14 @@ function FractureDirector({ dissolve }: { dissolve: boolean }) {
     if (last.current !== fracture) {
       elapsed.current = 0;
       last.current = fracture;
+    }
+    if (fracture === 'idle' && medallionRuntime.forceFracture) {
+      medallionRuntime.forceFracture = false;
+      resetFractureGate(fractureGate);
+      fractureGate.fired = true;
+      fractureGate.lastFireAt = performance.now();
+      setFracturePhase(dissolve ? 'reform' : 'burst');
+      return;
     }
     if (
       fracture === 'idle' &&
