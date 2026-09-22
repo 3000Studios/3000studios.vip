@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGlobalMusic } from './GlobalMusic';
+import { playbackKind } from '../data/music';
 
 function fmt(value: number) {
   if (!Number.isFinite(value) || value < 0) return '0:00';
@@ -27,7 +28,6 @@ export function MusicDock() {
       window.clearTimeout(showTimer);
       if (hideTimer.current !== null) window.clearTimeout(hideTimer.current);
     };
-    // Track changes and playback starts should briefly surface the player.
   }, [music.activeSong.title, music.isPlaying]);
 
   if (pathname.startsWith('/admin') || pathname.startsWith('/vault') || pathname.startsWith('/agent')) {
@@ -35,12 +35,31 @@ export function MusicDock() {
   }
   if (!visible) return null;
 
+  const kind = playbackKind(music.activeSong.src);
+  const streamLabel = music.playbackError
+    ? 'Unavailable'
+    : kind === 'apple-preview'
+      ? 'Apple preview'
+      : kind === 'missing'
+        ? 'Unavailable'
+        : 'Full stream';
+
   return (
-    <div className="musicDock ytPerkSafe" role="region" aria-label="Now playing" onPointerEnter={resetVisibility} onFocus={resetVisibility} onClick={resetVisibility}>
+    <div
+      className="musicDock ytPerkSafe"
+      role="region"
+      aria-label="Now playing"
+      onPointerEnter={resetVisibility}
+      onFocus={resetVisibility}
+      onClick={resetVisibility}
+    >
       <img src={music.activeSong.cover} alt="" />
       <div className="musicDockMeta">
         <strong>{music.activeSong.title}</strong>
-        <span>{fmt(music.currentTime)} / {fmt(music.duration)} · Full stream</span>
+        <span>
+          {fmt(music.currentTime)} / {fmt(music.duration)} · {streamLabel}
+        </span>
+        {music.playbackError ? <em className="musicDockError">{music.playbackError}</em> : null}
       </div>
       <button type="button" className="musicDockPlay" onClick={music.toggle} aria-label={music.isPlaying ? 'Pause' : 'Play'}>
         {music.isPlaying ? '❚❚' : '▶'}
