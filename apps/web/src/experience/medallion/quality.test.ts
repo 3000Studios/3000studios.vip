@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveQualityTier } from './quality';
+import { qualitySettings, resolveQualityTier } from './quality';
 
 describe('resolveQualityTier', () => {
   it('honors an explicit force', () => {
@@ -24,6 +24,14 @@ describe('resolveQualityTier', () => {
         deviceMemory: 8,
       }),
     ).toBe('LOW');
+  });
+
+  it('keeps LOW at zero fragments', () => {
+    expect(qualitySettings('LOW').fragments).toBe(0);
+    expect(qualitySettings('LOW').dissolve).toBe(true);
+    expect(qualitySettings('MEDIUM').fragments).toBe(24);
+    expect(qualitySettings('HIGH').fragments).toBe(64);
+    expect(qualitySettings('ULTRA').fragments).toBe(112);
   });
 
   it('uses MEDIUM on typical phones', () => {

@@ -48,14 +48,14 @@ export function detectQualityTier(): QualityTier {
 export function qualitySettings(tier: QualityTier) {
   switch (tier) {
     case 'LOW':
-      return { dpr: 1, particles: 0, physical: false, shadows: false };
+      return { dpr: 1, particles: 0, physical: false, shadows: false, fragments: 0, dissolve: true };
     case 'MEDIUM':
-      return { dpr: 1.15, particles: 28, physical: true, shadows: false };
+      return { dpr: 1.15, particles: 28, physical: true, shadows: false, fragments: 24, dissolve: false };
     case 'HIGH':
-      return { dpr: 1.5, particles: 72, physical: true, shadows: false };
+      return { dpr: 1.5, particles: 72, physical: true, shadows: false, fragments: 64, dissolve: false };
     case 'ULTRA':
-      return { dpr: 2, particles: 140, physical: true, shadows: true };
+      return { dpr: 2, particles: 140, physical: true, shadows: true, fragments: 112, dissolve: false };
     default:
-      return { dpr: 1.15, particles: 28, physical: true, shadows: false };
+      return { dpr: 1.15, particles: 28, physical: true, shadows: false, fragments: 24, dissolve: false };
   }
 }

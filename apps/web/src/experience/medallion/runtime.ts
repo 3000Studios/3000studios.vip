@@ -1,11 +1,16 @@
 import type { AnalyzerFrame } from '../../lib/audioAnalyzer';
 
+export type FracturePhase = 'idle' | 'burst' | 'reform' | 'art';
+
 export type MedallionRuntime = {
   pointerX: number;
   pointerY: number;
   scroll: number;
   playing: boolean;
   enhanced: boolean;
+  artworkUrl: string;
+  artworkReady: boolean;
+  fracture: FracturePhase;
   audio: Pick<AnalyzerFrame, 'bass' | 'mid' | 'treble' | 'energy' | 'beat'>;
 };
 
@@ -15,6 +20,9 @@ export const medallionRuntime: MedallionRuntime = {
   scroll: 0,
   playing: false,
   enhanced: false,
+  artworkUrl: '',
+  artworkReady: false,
+  fracture: 'idle',
   audio: { bass: 0, mid: 0, treble: 0, energy: 0, beat: 0 },
 };
 
@@ -36,5 +44,17 @@ export function setMedallionEnhanced(on: boolean) {
   medallionRuntime.enhanced = on;
   if (typeof document !== 'undefined') {
     document.documentElement.classList.toggle('is-cinematic-active', on);
+  }
+}
+
+export function setMedallionArtwork(url: string, ready: boolean) {
+  medallionRuntime.artworkUrl = url;
+  medallionRuntime.artworkReady = ready && Boolean(url);
+}
+
+export function setFracturePhase(phase: FracturePhase) {
+  medallionRuntime.fracture = phase;
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.fracture = phase;
   }
 }

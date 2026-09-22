@@ -244,6 +244,17 @@ export function SwipeHome() {
             {HOME_HERO.playLabel}
           </button>
         </section>
+        <nav className="md-cta-row md-hero-extra" aria-label="Catalog">
+          <Link className="md-btn md-btn-ghost" to="/music">
+            Music
+          </Link>
+          <a className="md-btn md-btn-ghost" href="#watch">
+            Featured video
+          </a>
+          <Link className="md-btn md-btn-ghost" to="/live">
+            Live
+          </Link>
+        </nav>
 
         {/* ===== SWIPE VIDEO STAGE — ALL VIDEOS ===== */}
         <section className="md-stage" id="watch" aria-label="All music videos, swipe to play">

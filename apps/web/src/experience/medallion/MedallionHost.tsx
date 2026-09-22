@@ -17,12 +17,21 @@ export function MedallionHost({ coverUrl }: { coverUrl: string }) {
   const reduced = usePrefersReducedMotion();
   const [tier] = useState<QualityTier>(() => detectQualityTier());
   const [webgl] = useState(() => hasWebGL());
+  const [art, setArt] = useState(coverUrl);
   const ready = true;
 
   useEffect(() => {
     const onPlay = () => setMedallionEnhanced(true);
+    const onTheme = (e: Event) => {
+      const cover = (e as CustomEvent<{ cover?: string }>).detail?.cover;
+      if (cover) setArt(cover);
+    };
     window.addEventListener('3000-play-track', onPlay);
-    return () => window.removeEventListener('3000-play-track', onPlay);
+    window.addEventListener('3000-song-theme', onTheme);
+    return () => {
+      window.removeEventListener('3000-play-track', onPlay);
+      window.removeEventListener('3000-song-theme', onTheme);
+    };
   }, []);
 
   useEffect(() => {
@@ -74,7 +83,7 @@ export function MedallionHost({ coverUrl }: { coverUrl: string }) {
       aria-hidden="true"
     >
       <Suspense fallback={null}>
-        <MedallionScene tier={tier} coverUrl={coverUrl} />
+        <MedallionScene tier={tier} coverUrl={art} />
       </Suspense>
     </div>
   );

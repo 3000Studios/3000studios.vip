@@ -1,8 +1,12 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { qualitySettings, type QualityTier } from './quality';
-import { medallionRuntime } from './runtime';
+import { medallionRuntime, setFracturePhase, setMedallionArtwork } from './runtime';
+import { createFractureGate, shouldFireFracture } from './trigger';
+
+const FractureField = lazy(() => import('./FractureField').then((m) => ({ default: m.FractureField })));
+const fractureGate = createFractureGate();
 
 function goldMaterial(physical: boolean) {
   if (physical) {
@@ -46,8 +50,14 @@ function MedallionMesh({ physical }: { physical: boolean }) {
     g.rotation.x += (targetX - g.rotation.x) * 0.08;
     g.rotation.y += (targetY - g.rotation.y) * 0.04;
     const pulse = playing ? audio.energy * 0.035 + audio.beat * 0.02 : 0;
-    const s = 1 + pulse;
-    g.scale.setScalar(s);
+    const frac = medallionRuntime.fracture;
+    if (frac === 'art') {
+      g.visible = false;
+    } else {
+      g.visible = true;
+      const s = frac === 'burst' ? 0.28 : frac === 'reform' ? 0.08 : 1 + pulse;
+      g.scale.setScalar(s);
+    }
     if (key.current) {
       key.current.intensity = 1.15 + (playing ? audio.treble * 0.55 : 0);
     }
@@ -102,23 +112,44 @@ function Dust({ count }: { count: number }) {
 }
 
 function CoverPlane({ url }: { url: string }) {
-  const tex = useMemo(() => {
+  const [tex, setTex] = useState<THREE.Texture | null>(null);
+  useEffect(() => {
+    if (!url) return;
+    let dead = false;
     const loader = new THREE.TextureLoader();
-    const t = loader.load(url);
-    t.colorSpace = THREE.SRGBColorSpace;
-    return t;
+    loader.load(
+      url,
+      (t) => {
+        if (dead) return;
+        t.colorSpace = THREE.SRGBColorSpace;
+        setTex(t);
+        setMedallionArtwork(url, true);
+      },
+      undefined,
+      () => {
+        if (dead) return;
+        setTex(null);
+        setMedallionArtwork(url, false);
+      },
+    );
+    return () => {
+      dead = true;
+    };
   }, [url]);
   const mesh = useRef<THREE.Mesh>(null);
   useFrame(() => {
     const m = mesh.current;
     if (!m) return;
-    const t = medallionRuntime.scroll;
-    const show = Math.max(0, Math.min(1, (t - 0.42) / 0.35));
+    const frac = medallionRuntime.fracture;
+    const scrollShow = Math.max(0, Math.min(1, (medallionRuntime.scroll - 0.42) / 0.35));
+    const artShow = frac === 'art' || frac === 'reform' ? 1 : scrollShow;
+    const show = tex ? artShow : 0;
     m.position.z = -0.2 + show * 0.55;
     const mat = m.material as THREE.MeshBasicMaterial;
     mat.opacity = show * 0.92;
-    m.visible = show > 0.02;
+    m.visible = Boolean(tex) && show > 0.02;
   });
+  if (!tex) return null;
   return (
     <mesh ref={mesh} position={[0, 0, -0.2]}>
       <planeGeometry args={[1.55, 1.55]} />
@@ -130,11 +161,43 @@ function CoverPlane({ url }: { url: string }) {
 function Rig() {
   useFrame(({ camera }) => {
     const t = medallionRuntime.scroll;
-    const z = 4.35 - t * 1.65;
+    const art = medallionRuntime.fracture === 'art' ? 0.2 : 0;
+    const z = 4.35 - t * 1.65 - art;
     const y = 0.12 + t * 0.28;
     camera.position.z += (z - camera.position.z) * 0.08;
     camera.position.y += (y - camera.position.y) * 0.08;
     camera.lookAt(0, 0, 0);
+  });
+  return null;
+}
+
+function FractureDirector({ dissolve }: { dissolve: boolean }) {
+  const elapsed = useRef(0);
+  const last = useRef(medallionRuntime.fracture);
+  useFrame((_, dt) => {
+    const { audio, playing, enhanced, artworkReady, fracture } = medallionRuntime;
+    if (last.current !== fracture) {
+      elapsed.current = 0;
+      last.current = fracture;
+    }
+    if (
+      fracture === 'idle' &&
+      shouldFireFracture(fractureGate, {
+        energy: audio.energy,
+        beat: audio.beat,
+        playing,
+        enhanced,
+        now: performance.now(),
+      })
+    ) {
+      setFracturePhase(dissolve ? 'reform' : 'burst');
+      return;
+    }
+    elapsed.current += dt;
+    if (fracture === 'burst' && elapsed.current > 1.15) setFracturePhase('reform');
+    if (fracture === 'reform' && elapsed.current > (dissolve ? 0.9 : 1.55)) {
+      setFracturePhase(artworkReady ? 'art' : 'idle');
+    }
   });
   return null;
 }
@@ -165,8 +228,14 @@ export default function MedallionScene({
       <ambientLight intensity={0.18} color="#1a2230" />
       <hemisphereLight args={['#4a3a18', '#05060a', 0.35]} />
       <MedallionMesh physical={q.physical} />
-      <CoverPlane url={coverUrl} />
+      <CoverPlane key={coverUrl || 'none'} url={coverUrl} />
       <Dust count={q.particles} />
+      <FractureDirector dissolve={q.dissolve} />
+      {q.fragments > 0 ? (
+        <Suspense fallback={null}>
+          <FractureField count={q.fragments} />
+        </Suspense>
+      ) : null}
       <Rig />
     </Canvas>
   );
