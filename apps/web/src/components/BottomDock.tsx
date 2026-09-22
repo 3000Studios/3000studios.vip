@@ -5,7 +5,7 @@ const items = [
   { to: '/music', label: 'Music', icon: '♪' },
   { to: '/live', label: 'Live', icon: '●' },
   { to: '/shop', label: 'Shop', icon: '▣' },
-  { to: 'https://getnexa.space', label: 'Games', icon: '▶', external: true },
+  { to: '/tiktok-games/', label: 'Games', icon: '▶' },
 ] as const;
 
 export function BottomDock() {

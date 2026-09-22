@@ -1,5 +1,29 @@
 {
   "version": 1,
-  "include": ["/api/*"],
-  "exclude": ["/*"]
+  "include": ["/*"],
+  "exclude": [
+    "/assets/*",
+    "/media/*",
+    "/tiktok-games/*",
+    "/tiktok/*",
+    "/favicon.svg",
+    "/favicon.ico",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/ads.txt",
+    "/privacy.html",
+    "/terms.html",
+    "/listen.html",
+    "/*.png",
+    "/*.jpg",
+    "/*.jpeg",
+    "/*.webp",
+    "/*.mp3",
+    "/*.mp4",
+    "/*.svg",
+    "/*.css",
+    "/*.js",
+    "/*.map",
+    "/*.woff2"
+  ]
 }

@@ -7,11 +7,26 @@
 /listen  /listen.html  200
 /tiktok  /tiktok/index.html  200
 /tiktok/  /tiktok/index.html  200
+/tiktok-games  /tiktok-games/index.html  200
+/tiktok-games/  /tiktok-games/index.html  200
+/tiktok-games/*  /tiktok-games/:splat  200
 
 # Do not 200-rewrite /privacy or /terms to *.html. Pages pretty-URLs already
 # serve privacy.html at /privacy; rewriting to .html 308-loops (AdSense reject).
 
-# Pages Functions under /api must not fall through to the SPA
+# Blueprint aliases — only expose working surfaces (no empty SPA shells)
+/videos  /video  302
+/videos/  /video  302
+/videos/*  /video  302
+/arcade  /tiktok-games/  302
+/arcade/  /tiktok-games/  302
+/arcade/*  /tiktok-games/:splat  302
+/releases  /music  302
+/releases/  /music  302
+/releases/*  /music  302
+
+# Pages Functions under /api must not fall through to the SPA.
+# Prefer Functions (or Worker route) over this rewrite; keep as pass-through guard.
 /api/*  /api/:splat  200
 
 # SPA fallback for client routes only

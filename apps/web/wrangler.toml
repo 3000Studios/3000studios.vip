@@ -1,0 +1,7 @@
+# Cloudflare Pages — web app
+# When deploying from apps/web: functions/ is auto-discovered next to this file.
+# Git integration: set Pages Root directory to `apps/web`, Build output `dist`,
+# Build command from monorepo root (see docs). Do not exclude /api from _routes.json.
+name = "3000studios-vip"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
