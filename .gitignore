@@ -23,6 +23,9 @@ apps/web/preview-*.png
 **/*.aab
 **/*.dex
 
+# OpenCode temp files
+.opencode/tools/tmp_*.py
+
 # Shared media is served from the central R2/Worker CDN - never commit local copies
 shared-media/
 **/shared-media/

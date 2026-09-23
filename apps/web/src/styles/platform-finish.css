@@ -6,39 +6,9 @@
   margin-inline: auto;
 }
 
-.vipNavLink.is-active {
-  color: #dff8ff;
-  background: linear-gradient(145deg, rgba(0, 103, 255, 0.2), rgba(0, 229, 255, 0.08));
-  border-color: rgba(51, 211, 255, 0.7);
-  box-shadow:
-    0 0 0 1px rgba(40, 170, 255, 0.18),
-    0 0 24px rgba(0, 153, 255, 0.28),
-    inset 0 0 18px rgba(0, 195, 255, 0.1);
-}
-
-.vipNavLink.is-active .vipNavLabel {
-  color: #e8fbff;
-  animation: activeNavNeon 2.6s ease-in-out infinite;
-}
-
-.vipNavLink.is-active .vipNavIcon {
-  color: #75e8ff;
-}
-
-@keyframes activeNavNeon {
-  0%,
-  100% {
-    text-shadow:
-      0 0 5px #48cfff,
-      0 0 12px rgba(0, 162, 255, 0.55);
-  }
-  50% {
-    text-shadow:
-      0 0 8px #fff,
-      0 0 18px #16c9ff,
-      0 0 34px rgba(0, 119, 255, 0.85);
-  }
-}
+/* Active nav styling is owned by nav-epic.css (gold cinematic theme).
+   The cyan/blue override that previously lived here conflicted with
+   the brand gold and was removed per the Design.md blueprint. */
 
 .vipFooter {
   position: relative;

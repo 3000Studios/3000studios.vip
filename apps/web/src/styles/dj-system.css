@@ -1,4 +1,6 @@
-/* DJ System: a shared control-surface language for public, live, music and vault routes. */
+/* DJ System: a control-surface language for the CONSOLE (vault) route only.
+   Public VIP pages use the gold cinematic theme from landing.css + million-dollar.css.
+   All selectors below are scoped to .console to prevent blue-token bleed. */
 :root {
   --dj-black: #05070c;
   --dj-surface: rgba(11, 16, 27, 0.84);
@@ -11,7 +13,7 @@
   --dj-grid: rgba(102, 159, 255, 0.065);
 }
 
-.vipSite,
+/* Console-only background (was: .vipSite, .console — now .console only) */
 .console {
   background-color: var(--dj-black);
   background-image:
@@ -22,8 +24,9 @@
   background-size: 28px 28px, 28px 28px, auto, auto;
 }
 
-.vipHeader,
-.vipHeader.vipHeader--epic,
+/* Header — scoped to console so landing.css gold border wins on public */
+.console .vipHeader,
+.console .vipHeader.vipHeader--epic,
 .cTopbar,
 .globalPlayer--pro {
   border-color: var(--dj-line);
@@ -31,7 +34,8 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 -1px rgba(255, 255, 255, 0.035);
 }
 
-.vipHeader::after,
+/* DJ accent line under console header */
+.console .vipHeader::after,
 .cTopbar::after {
   content: '';
   position: absolute;
@@ -58,9 +62,10 @@
   background: rgba(183, 255, 77, 0.07);
 }
 
-.logoWordmark,
-.shimmerText,
-.beatGoldTitle {
+/* Logo wordmark — scoped to console (public uses gold from landing.css) */
+.console .logoWordmark,
+.console .shimmerText,
+.console .beatGoldTitle {
   background: linear-gradient(115deg, #fff 5%, #9fd3ff 30%, var(--dj-blue) 50%, var(--dj-violet) 72%, #fff 96%);
   background-size: 220% auto;
   -webkit-background-clip: text;
@@ -69,14 +74,15 @@
   text-shadow: none;
 }
 
-.vipNavLink,
+/* Nav links — .cNavLink is console-only; .vipNavLink scoped to console */
+.console .vipNavLink,
 .cNavLink {
   border: 1px solid transparent;
   border-radius: 10px;
 }
 
-.vipNavLink:hover,
-.vipNavLink.is-active,
+.console .vipNavLink:hover,
+.console .vipNavLink.is-active,
 .cNavLink:hover,
 .cNavLink.active {
   border-color: var(--dj-line);
@@ -84,12 +90,13 @@
   box-shadow: inset 3px 0 var(--dj-lime), 0 0 18px rgba(78, 156, 255, 0.1);
 }
 
-.studioButton,
-.liveInquiryBtn,
-.phoneGoLiveStart,
-.phoneGoLiveStop,
-.gpBtn,
-.transportControls button {
+/* Buttons — scoped to console (public uses gold from landing.css) */
+.console .studioButton,
+.console .liveInquiryBtn,
+.console .phoneGoLiveStart,
+.console .phoneGoLiveStop,
+.console .gpBtn,
+.console .transportControls button {
   position: relative;
   border: 1px solid rgba(113, 175, 255, 0.55);
   background: linear-gradient(135deg, rgba(78, 156, 255, 0.22), rgba(155, 108, 255, 0.22));
@@ -98,9 +105,9 @@
   letter-spacing: 0.04em;
 }
 
-.studioButton::before,
-.liveInquiryBtn::before,
-.phoneGoLiveStart::before {
+.console .studioButton::before,
+.console .liveInquiryBtn::before,
+.console .phoneGoLiveStart::before {
   content: '';
   display: inline-block;
   width: 0.5rem;
@@ -111,22 +118,23 @@
   box-shadow: 0 0 10px var(--dj-lime);
 }
 
-.studioButton:hover,
-.liveInquiryBtn:hover,
-.phoneGoLiveStart:hover {
+.console .studioButton:hover,
+.console .liveInquiryBtn:hover,
+.console .phoneGoLiveStart:hover {
   transform: translateY(-2px);
   border-color: var(--dj-lime);
   box-shadow: 0 0 0 1px rgba(183, 255, 77, 0.2), 0 12px 26px rgba(0, 0, 0, 0.35);
 }
 
-.vipCard,
-.vipPageHero,
-.spotifyIdentityInner,
-.heroFeatureCard,
-.liveOnlyStage,
-.releaseTile,
-.turntableDeck,
-.phoneGoLiveCard,
+/* Cards — .vipCard scoped to console; console-only classes stay as-is */
+.console .vipCard,
+.console .vipPageHero,
+.console .spotifyIdentityInner,
+.console .heroFeatureCard,
+.console .liveOnlyStage,
+.console .releaseTile,
+.console .turntableDeck,
+.console .phoneGoLiveCard,
 .cCard,
 .dashboardCard,
 .glassPanel {
@@ -135,16 +143,17 @@
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.06), 0 20px 48px rgba(0, 0, 0, 0.28);
 }
 
-.vipCard,
-.releaseTile,
-.turntableDeck,
-.liveOnlyStage {
+.console .vipCard,
+.console .releaseTile,
+.console .turntableDeck,
+.console .liveOnlyStage {
   border-radius: 14px;
 }
 
-.vipCard::after,
-.liveOnlyStage::after,
-.turntableDeck::after {
+/* DJ badge on cards — scoped to console */
+.console .vipCard::after,
+.console .liveOnlyStage::after,
+.console .turntableDeck::after {
   content: 'DJ SYSTEM · 3000';
   position: absolute;
   right: 0.8rem;
@@ -155,9 +164,9 @@
   pointer-events: none;
 }
 
-.vipCard,
-.liveOnlyStage,
-.turntableDeck { position: relative; }
+.console .vipCard,
+.console .liveOnlyStage,
+.console .turntableDeck { position: relative; }
 
 .redCarpetHero::after,
 .livePublicStage::before {
@@ -176,17 +185,18 @@
 .livePublicClean[data-live='1'] .liveOnlyStage { border-color: rgba(183, 255, 77, 0.8); box-shadow: 0 0 0 1px rgba(183, 255, 77, 0.1), 0 0 44px rgba(78, 156, 255, 0.22); }
 .livePublicClean[data-live='1'] .liveOnlyStage::after { content: 'ON AIR · DJ SYSTEM · 3000'; color: var(--dj-lime); }
 
-.phoneGoLive { background: var(--dj-black); }
-.phoneGoLiveDock,
-.phoneGoLiveBar { border-color: var(--dj-line); background: rgba(5, 8, 15, 0.9); }
-.phoneGoLiveDock .is-live { color: var(--dj-lime); font-family: ui-monospace, monospace; letter-spacing: .13em; }
+/* PhoneGoLive — console feature, scoped to console */
+.console .phoneGoLive { background: var(--dj-black); }
+.console .phoneGoLiveDock,
+.console .phoneGoLiveBar { border-color: var(--dj-line); background: rgba(5, 8, 15, 0.9); }
+.console .phoneGoLiveDock .is-live { color: var(--dj-lime); font-family: ui-monospace, monospace; letter-spacing: .13em; }
 
 @media (max-width: 720px) {
-  .vipHeader::after { right: 0.8rem; width: 92px; }
-  .studioButton, .liveInquiryBtn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
-  .vipCard::after, .liveOnlyStage::after, .turntableDeck::after { font-size: .5rem; }
+  .console .vipHeader::after { right: 0.8rem; width: 92px; }
+  .console .studioButton, .console .liveInquiryBtn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .console .vipCard::after, .console .liveOnlyStage::after, .console .turntableDeck::after { font-size: .5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .studioButton:hover, .liveInquiryBtn:hover, .phoneGoLiveStart:hover { transform: none; }
+  .console .studioButton:hover, .console .liveInquiryBtn:hover, .console .phoneGoLiveStart:hover { transform: none; }
 }

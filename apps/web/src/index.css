@@ -103,6 +103,70 @@ svg {
   }
 }
 
+/* Gold-themed consent banner buttons (public VIP).
+   Overrides console.css .cBtn within .consentBanner scope so the
+   cookie bar matches the cinematic gold/black theme instead of
+   falling back to default browser button styles. */
+.consentBanner .cBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.42);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--md-cream, #f4efe2);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  white-space: nowrap;
+}
+
+.consentBanner .cBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(212, 175, 55, 0.65);
+  background: rgba(212, 175, 55, 0.14);
+}
+
+.consentBanner .cBtn:active {
+  transform: scale(0.96);
+}
+
+.consentBanner .cBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.consentBanner .cBtn.primary {
+  background: linear-gradient(135deg, #f6dd8a, #d4af37 55%, #8a6d1c);
+  border-color: transparent;
+  color: #171204;
+  box-shadow: 0 8px 22px -4px rgba(212, 175, 55, 0.3);
+}
+
+.consentBanner .cBtn.primary:hover {
+  filter: brightness(1.08);
+}
+
+.consentBanner .cBtn.ghost {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: var(--md-cream, #f4efe2);
+  backdrop-filter: blur(8px);
+}
+
+.consentBanner .cBtn.ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.consentBanner .cBtn.sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
 .lazyYouTube {
   position: relative;
   width: 100%;

@@ -23,10 +23,10 @@ body {
   animation: siteArrive 0.55s var(--ease-premium) both;
 }
 
-.vipHeader,
-.vipHeader.vipHeader--epic {
-  border-bottom: 0 !important;
-}
+/* vipHeader border-bottom is set by landing.css (gold accent).
+   Only remove it on mobile where the condensed header collides with
+   the sticky scroll shadow. Do NOT use !important — let the cascade
+   decide so desktop always shows the gold border. */
 
 @keyframes siteArrive {
   from { opacity: 0; transform: translateY(8px); }
@@ -164,6 +164,7 @@ body {
   .vipHeader.vipHeader--epic {
     min-height: 64px;
     padding-inline: max(0.75rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-right));
+    border-bottom: 0;
   }
 
   .officialProfileLogo { width: 38px; height: 38px; }
