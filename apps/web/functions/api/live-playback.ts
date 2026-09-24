@@ -1,5 +1,6 @@
 import type { PagesEnv } from '../env';
 import { hasLiveSession } from '../lib/live-access';
+import { getLiveAccessState } from '../lib/live-access-store';
 
 type StreamJwk = JsonWebKey & {
   d: string;
@@ -30,11 +31,12 @@ async function createPlaybackToken(env: LivePlaybackEnv): Promise<string> {
   const inputId = env.STREAM_LIVE_INPUT_ID?.trim();
   const jwkText = env.STREAM_SIGNING_JWK?.trim();
   if (!keyId || !inputId || !jwkText) throw new Error('Stream signing configuration is incomplete');
-  const jwk = JSON.parse(jwkText) as StreamJwk;
+  // Cloudflare returns Stream signing JWKs as base64-encoded JSON.
+  const jwk = JSON.parse(atob(jwkText)) as StreamJwk;
   const now = Math.floor(Date.now() / 1000);
   const header = base64Url(JSON.stringify({ alg: 'RS256', kid: keyId }));
   const payload = base64Url(
-    JSON.stringify({ sub: inputId, kid: keyId, nbf: now - 15, exp: now + 15 * 60 }),
+    JSON.stringify({ sub: inputId, kid: keyId, nbf: now - 15, exp: now + 90 }),
   );
   const unsigned = `${header}.${payload}`;
   const key = await crypto.subtle.importKey(
@@ -49,7 +51,8 @@ async function createPlaybackToken(env: LivePlaybackEnv): Promise<string> {
 }
 
 export async function onRequestGet({ request, env }: { request: Request; env: LivePlaybackEnv }) {
-  if (!(await hasLiveSession(request, env))) {
+  const state = await getLiveAccessState(env);
+  if (state.protected && !(await hasLiveSession(request, env, state.sessionVersion))) {
     return Response.json(
       { ok: false, error: 'live_access_required' },
       { status: 401, headers: { 'cache-control': 'no-store' } },
