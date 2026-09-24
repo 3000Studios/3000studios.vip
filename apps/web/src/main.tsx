@@ -67,6 +67,9 @@ const YouTubeSubscriberPerk = lazy(() =>
 );
 const SparkClickFX = lazy(() => import('./components/SparkClickFX').then((m) => ({ default: m.SparkClickFX })));
 const StageFX = lazy(() => import('./components/StageFX').then((m) => ({ default: m.StageFX })));
+const WallpaperPage = lazy(() =>
+  import('./pages/WallpaperPage').then((m) => ({ default: m.WallpaperPage })),
+);
 
 function RouteLoader({ children }: { children: ReactNode }) {
   return (
@@ -124,6 +127,7 @@ const router = createBrowserRouter([
       { path: '/requests', element: <RouteLoader><RequestsPage /></RouteLoader> },
       { path: '/blog', element: <RouteLoader><BlogPage /></RouteLoader> },
       { path: '/sponsors', element: <RouteLoader><SponsorsPage /></RouteLoader> },
+      { path: '/wallpaper', element: <RouteLoader><WallpaperPage /></RouteLoader> },
       {
         path: '/song/:slug',
         element: (

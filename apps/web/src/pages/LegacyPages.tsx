@@ -63,6 +63,7 @@ const navItems = [
   { to: '/requests', label: 'Requests', icon: '✦', hint: 'Song ideas' },
   { to: '/blog', label: 'Blog', icon: '◈', hint: 'Editorial' },
   { to: '/sponsors', label: 'Sponsors', icon: '◆', hint: 'Partners' },
+  { to: '/wallpaper', label: 'Wallpaper', icon: '🎨', hint: 'Live visuals' },
   { to: '/about', label: 'About', icon: '◇', hint: 'The studio' },
   { to: '/contact', label: 'Contact', icon: '✉', hint: 'Book us' },
   { to: '/admin', label: 'Admin', icon: '⚙', hint: 'Owner control' },
