@@ -20,16 +20,20 @@ html, body, #root {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 100vw;
-  min-height: 72px;
-  padding: 10px clamp(12px, 2.4vw, 28px);
+  gap: 10px;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-height: calc(56px + env(safe-area-inset-top, 0px));
+  height: auto;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 8px max(12px, env(safe-area-inset-left, 0px));
   margin: 0 !important;
+  box-sizing: border-box;
   transform: none !important;
   scale: 1 !important;
-  background: rgba(6, 5, 8, 0.92) !important;
+  background: rgba(6, 5, 8, 0.94) !important;
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.28);
 }
 
 .vipLogo {
@@ -137,13 +141,14 @@ html, body, #root {
 }
 
 .vipFooter {
-  width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin: 0 !important;
   display: grid !important;
   justify-items: center;
   gap: 14px;
-  padding: 28px 16px calc(28px + env(safe-area-inset-bottom));
+  padding: 24px max(16px, env(safe-area-inset-left, 0px)) calc(88px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
   text-align: center;
 }
 .vipFooter .footerLinks {
@@ -154,15 +159,17 @@ html, body, #root {
 }
 
 .musicDock {
-  left: 12px !important;
-  right: 12px !important;
-  width: auto !important;
-  max-width: 720px;
-  margin-inline: auto;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-sizing: border-box;
 }
 
-.ytSubFab { bottom: calc(148px + env(safe-area-inset-bottom)) !important; }
-.adminFab { bottom: calc(148px + env(safe-area-inset-bottom)) !important; }
+.ytSubFab { bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
+.adminFab { bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
 
 @media (max-width: 980px) {
   .vipHeader,
