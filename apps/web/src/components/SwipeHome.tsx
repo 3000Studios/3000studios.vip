@@ -177,7 +177,6 @@ export function SwipeHome() {
   return (
     <PublicLayout variant="spiral" compact>
       <div className="md-scope">
-        {/* ===== CINEMATIC HERO ===== */}
         <section className="md-hero" aria-label="3000 Studios VIP">
           <div className="md-hero-media" aria-hidden="true">
             {hero ? <img src={hero.poster} alt="" fetchPriority="high" decoding="async" /> : null}
@@ -209,7 +208,6 @@ export function SwipeHome() {
           </div>
         </section>
 
-        {/* ===== SWIPE VIDEO STAGE — ALL VIDEOS ===== */}
         <section className="md-stage" id="watch" aria-label="All music videos, swipe to play">
           <div className="md-stage-head">
             <h2>Every video. One swipe.</h2>
@@ -228,7 +226,7 @@ export function SwipeHome() {
             <div
               className="md-track"
               style={{
-                transform: `translateX(calc(${-index * 100}% + ${drag}px))`,
+                transform: `translateX(calc(${-index * 100}vw + ${drag}px))`,
                 transition: isDragging ? 'none' : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)',
               }}
             >
@@ -341,7 +339,6 @@ export function SwipeHome() {
           ) : null}
         </section>
 
-        {/* ===== MARQUEE ===== */}
         <div className="md-marquee" aria-hidden="true">
           <div className="md-marquee-track">
             {Array.from({ length: 2 }).flatMap((_, k) =>
@@ -350,7 +347,6 @@ export function SwipeHome() {
           </div>
         </div>
 
-        {/* ===== MONEY RAIL ===== */}
         <section className="md-money md-reveal" aria-label="Support 3000 Studios">
           <span className="md-kicker">Fuel the next drop</span>
           <h2>Six ways to get paid — pick one.</h2>
@@ -419,7 +415,6 @@ export function SwipeHome() {
           </div>
         </section>
 
-        {/* ===== PLATFORM STRIP ===== */}
         <section className="md-strip md-reveal" aria-label="Stream everywhere">
           {PLATFORMS.map((p) => (
             <a key={p.id} className="md-chip" href={p.url} target="_blank" rel="noreferrer">
