@@ -344,3 +344,126 @@
 .liveOnlyFeed {
   position: relative;
 }
+
+/* ========== MOBILE-FIRST HERO + SPACE FIX (2026-09-24) ========== */
+@media (max-width: 768px) {
+  /* Hero: fill viewport, no giant empty black */
+  .redCarpetHero {
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    height: 100svh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    padding: 0 0 calc(1.25rem + env(safe-area-inset-bottom, 0px)) !important;
+    overflow: hidden !important;
+  }
+
+  .redCarpetHero > video {
+    object-fit: cover !important;
+    object-position: center 30% !important;
+  }
+
+  .heroCopy,
+  .heroCopy--yt {
+    width: min(100% - 28px, 420px) !important;
+    margin: 0 auto 0.5rem !important;
+    padding: 0.85rem 0 0 !important;
+    text-align: center !important;
+  }
+
+  .heroCopy .vipKicker {
+    font-size: 0.68rem !important;
+    letter-spacing: 0.12em !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .heroCopy h1,
+  .heroCopy .beatTitle,
+  .heroCopy [class*="Beat"] {
+    font-size: clamp(1.85rem, 9vw, 2.6rem) !important;
+    line-height: 1.05 !important;
+    margin: 0.15rem 0 0.4rem !important;
+  }
+
+  .heroCopy p {
+    font-size: 0.88rem !important;
+    line-height: 1.35 !important;
+    max-width: 34ch !important;
+    margin: 0 auto 0.75rem !important;
+    opacity: 0.92;
+  }
+
+  .heroFeature {
+    margin: 0.5rem auto 0.85rem !important;
+    max-width: 100% !important;
+  }
+
+  .heroFeatureCard {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    padding: 0.5rem 0.65rem !important;
+    border-radius: 12px !important;
+    background: rgba(0, 0, 0, 0.55) !important;
+    border: 1px solid rgba(255, 215, 0, 0.28) !important;
+  }
+
+  .heroFeatureCard img {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+    object-fit: cover !important;
+  }
+
+  .heroActions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+  }
+
+  .heroActions a,
+  .heroActions button,
+  .heroActions .studioButton,
+  .heroActions .magneticButton {
+    width: 100% !important;
+    min-height: 48px !important;
+    justify-content: center !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Sections after hero: tighter vertical rhythm */
+  .ytSubscribeBar,
+  .vipSection,
+  .featureRail,
+  .networkSection {
+    padding-top: 1.75rem !important;
+    padding-bottom: 1.75rem !important;
+  }
+
+  .vipSection {
+    gap: 0.85rem !important;
+  }
+
+  .vipCard {
+    padding: 1rem 1.1rem !important;
+  }
+
+  /* Cookie / consent: keep it from covering primary CTA */
+  [class*="cookie"],
+  [class*="consent"],
+  [id*="cookie"],
+  .cc-window,
+  .cookie-banner {
+    bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)) !important;
+    max-width: calc(100% - 24px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    margin: 0 auto !important;
+    font-size: 0.78rem !important;
+    z-index: 80 !important;
+  }
+}
