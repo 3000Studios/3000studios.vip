@@ -161,10 +161,24 @@
   transform: translateY(-1px);
 }
 
-/* ── Hero cinematic ── */
+/* ── Hero cinematic — mobile look on all viewports ── */
 .redCarpetHero {
   position: relative;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  min-height: min(88vh, 820px) !important;
+  max-height: 100svh !important;
+  overflow: hidden !important;
+  padding: 0 1.5rem calc(1.75rem + env(safe-area-inset-bottom, 0px)) !important;
 }
+
+.redCarpetHero > video {
+  object-fit: cover !important;
+  object-position: center 28% !important;
+}
+
 .redCarpetHero::after {
   content: '';
   pointer-events: none;
@@ -173,11 +187,86 @@
   z-index: 1;
   background:
     radial-gradient(ellipse 70% 50% at 50% 40%, transparent 20%, rgba(0, 0, 0, 0.35) 70%, rgba(0, 0, 0, 0.75) 100%),
-    linear-gradient(180deg, transparent 50%, #020405 100%);
+    linear-gradient(180deg, transparent 40%, #020405 100%);
 }
-.heroCopy {
+
+.heroCopy,
+.heroCopy--yt {
   z-index: 3 !important;
+  width: min(100%, 560px) !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+  padding-top: 0.5rem !important;
 }
+
+.heroCopy .vipKicker {
+  display: inline-block;
+  margin-bottom: 0.45rem !important;
+}
+
+.heroCopy p {
+  max-width: 42ch !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 0.85rem !important;
+  line-height: 1.4 !important;
+}
+
+.heroFeature {
+  margin: 0.6rem auto 1rem !important;
+  max-width: 100% !important;
+}
+
+.heroFeatureCard {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  padding: 0.55rem 0.8rem !important;
+  border-radius: 12px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(255, 215, 0, 0.28) !important;
+  max-width: 360px !important;
+  margin: 0 auto !important;
+}
+
+.heroFeatureCard img {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 8px !important;
+  object-fit: cover !important;
+  flex-shrink: 0;
+}
+
+.heroActions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 0.6rem !important;
+  width: 100% !important;
+  max-width: 480px !important;
+  margin: 0 auto !important;
+}
+
+.heroActions a,
+.heroActions button,
+.heroActions .studioButton,
+.heroActions .magneticButton {
+  min-height: 48px !important;
+}
+
+/* Tighter rhythm after hero on all sizes */
+.ytSubscribeBar,
+.vipSection,
+.featureRail,
+.networkSection {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+.vipSection {
+  gap: 1rem !important;
+}
+
 .vipKicker {
   background: linear-gradient(135deg, rgba(255, 215, 0, 0.16), rgba(255, 120, 40, 0.08));
   border-color: rgba(255, 215, 0, 0.4);
