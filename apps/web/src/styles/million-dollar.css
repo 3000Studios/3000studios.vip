@@ -1,19 +1,17 @@
 /* ==========================================================================
-   3000 STUDIOS — MILLION-DOLLAR UNIFIED DESIGN SYSTEM
-   Mobile-first. 2026-09-24: solid title, no black void, first-paint content.
+   3000 STUDIOS — MILLION-DOLLAR DESIGN
+   2026-09-24 CRITICAL FIX: md-track was expanding layout to ~4200px,
+   pushing hero copy off-screen (left: 1800px). Contain all widths to 100%.
    ========================================================================== */
 
 :root {
   --md-black: #05060a;
-  --md-ink: #0b0d14;
-  --md-panel: #101319;
   --md-gold: #d4af37;
   --md-gold-hi: #f6dd8a;
   --md-gold-deep: #8a6d1c;
   --md-cream: #f4efe2;
   --md-muted: #b8bdc9;
   --md-line: rgba(212, 175, 55, 0.28);
-  --md-crimson: #e0263c;
   --md-radius: 16px;
   --md-font-display: 'Playfair Display', Georgia, serif;
   --md-font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
@@ -21,19 +19,31 @@
   --md-dock-h: calc(68px + env(safe-area-inset-bottom, 0px));
 }
 
+/* HARD WIDTH LOCK — nothing may expand past viewport */
 .md-scope {
   font-family: var(--md-font-body);
   background: var(--md-black);
   color: var(--md-cream);
   -webkit-tap-highlight-color: transparent;
   padding-bottom: var(--md-dock-h);
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
+  box-sizing: border-box;
 }
-.md-scope img { background: #12141c; display: block; }
+.md-scope *,
+.md-scope *::before,
+.md-scope *::after {
+  box-sizing: border-box;
+}
+.md-scope img { background: #12141c; display: block; max-width: 100%; }
 .md-scope a { color: inherit; }
 
-/* HERO — content on first paint, no empty black column */
+/* HERO */
 .md-hero {
   position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
   min-height: 0;
   height: auto;
   display: block;
@@ -43,12 +53,12 @@
     radial-gradient(100% 80% at 50% 0%, rgba(212, 175, 55, 0.28), transparent 60%),
     linear-gradient(180deg, #12141c 0%, #05060a 100%);
 }
-
 .md-hero-media {
   position: absolute;
   inset: 0;
   z-index: 0;
   background: #12141c;
+  overflow: hidden;
 }
 .md-hero-media img {
   width: 100%;
@@ -63,17 +73,15 @@
   z-index: 1;
   background: linear-gradient(180deg, rgba(5,6,10,0.45) 0%, rgba(5,6,10,0.75) 50%, #05060a 100%);
 }
-
 .md-hero-copy {
   position: relative;
   z-index: 2;
   width: 100%;
   max-width: 640px;
-  margin: 0 auto;
+  margin-left: auto !important;
+  margin-right: auto !important;
   padding: 56px 16px 18px;
-  box-sizing: border-box;
 }
-
 .md-kicker {
   display: inline-flex;
   font-size: 10px;
@@ -85,8 +93,6 @@
   padding: 6px 12px;
   background: rgba(0, 0, 0, 0.45);
 }
-
-/* SOLID gold title — no transparent clip (was invisible on dark) */
 .md-title {
   font-family: var(--md-font-display);
   font-size: clamp(36px, 11vw, 64px);
@@ -100,7 +106,6 @@
   text-shadow: 0 2px 24px rgba(212, 175, 55, 0.35);
   animation: none !important;
 }
-
 .md-sub {
   color: var(--md-muted);
   font-size: 15px;
@@ -108,7 +113,6 @@
   max-width: 34ch;
   margin: 0;
 }
-
 .md-cta-row {
   display: flex;
   flex-direction: column;
@@ -116,7 +120,6 @@
   margin-top: 14px;
   max-width: 320px;
 }
-
 .md-btn {
   appearance: none;
   border: 1px solid var(--md-line);
@@ -131,7 +134,6 @@
   justify-content: center;
   min-height: 48px;
   width: 100%;
-  box-sizing: border-box;
 }
 .md-btn-gold {
   background: linear-gradient(135deg, var(--md-gold-hi), var(--md-gold));
@@ -144,11 +146,14 @@
   color: var(--md-cream);
 }
 
-/* STAGE */
+/* STAGE — CRITICAL width containment */
 .md-stage {
   position: relative;
   background: #000;
   border-top: 1px solid var(--md-line);
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
 }
 .md-stage-head {
   display: flex;
@@ -170,15 +175,29 @@
   flex-shrink: 0;
 }
 
-.md-track-viewport { overflow: hidden; touch-action: pan-y; cursor: grab; }
-.md-track { display: flex; will-change: transform; }
-
+.md-track-viewport {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  touch-action: pan-y;
+  cursor: grab;
+  position: relative;
+}
+.md-track {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+}
+/* Each slide = exactly viewport width of the stage, NOT expanding parent */
 .md-slide {
   position: relative;
   flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
   height: min(58svh, 480px);
   min-height: 320px;
-  overflow: clip;
+  overflow: hidden;
   background: #0a0c12;
 }
 .md-slide-poster {
@@ -273,6 +292,8 @@
   flex-wrap: wrap;
   list-style: none;
   margin: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 .md-dots button {
   width: 16px;
@@ -290,6 +311,9 @@
   padding: 24px 16px 28px;
   background: linear-gradient(180deg, #05060a, #0b0d14);
   border-top: 1px solid var(--md-line);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 .md-money h2 {
   font-family: var(--md-font-display);
@@ -339,10 +363,15 @@
   gap: 8px;
   flex-wrap: wrap;
   padding: 14px 16px 20px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 .md-marquee {
   overflow: hidden;
   white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
   border-top: 1px solid var(--md-line);
   border-bottom: 1px solid var(--md-line);
   padding: 10px 0;
@@ -374,7 +403,6 @@
   .md-slide { height: min(65svh, 560px); }
   .md-money-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
 @media (min-width: 900px) {
   .md-hero { min-height: min(60vh, 560px); }
   .md-hero-copy { padding: 80px 40px 36px; }
@@ -383,7 +411,6 @@
   .md-money { padding: 40px 40px 48px; }
   .md-money-grid { grid-template-columns: repeat(3, 1fr); }
 }
-
 @media (min-width: 1100px) {
   .md-money-grid { grid-template-columns: repeat(6, 1fr); }
 }
@@ -410,7 +437,6 @@
   .md-track { transition: none !important; }
 }
 
-/* Cookie above bottom dock */
 body [class*='consent'],
 body [class*='Consent'],
 body .cookie-banner,
