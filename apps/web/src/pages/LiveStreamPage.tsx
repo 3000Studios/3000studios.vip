@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PublicLayout } from './Home';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
-import { streamPlayerIframeSrc } from '../lib/streamConfig';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
 import { LiveChatPanel, TipJar, ViewerCount, useLiveRoom } from '../components/LiveInteraction';
@@ -18,12 +17,33 @@ export function LiveStreamPage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const liveRoom = useLiveRoom();
+  const [playerUrl, setPlayerUrl] = useState('');
+  const [playbackError, setPlaybackError] = useState('');
 
-  const iframeSrc = `${streamPlayerIframeSrc({
-    autoplay: true,
-    muted: isMuted,
-    primaryColor: 'ffd700',
-  })}${streamPlayerIframeSrc({}).includes('?') ? '&' : '?'}preload=auto`;
+  const iframeSrc = playerUrl
+    ? `${playerUrl}?autoplay=true&muted=${isMuted ? 'true' : 'false'}&primaryColor=ffd700&preload=auto`
+    : '';
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch('/api/live-playback', { credentials: 'same-origin', cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Playback authorization expired');
+        return response.json() as Promise<{ playerUrl?: string }>;
+      })
+      .then((data) => {
+        if (!cancelled && data.playerUrl) setPlayerUrl(data.playerUrl);
+      })
+      .catch(() => {
+        if (!cancelled)
+          setPlaybackError(
+            'Playback authorization is unavailable. Re-lock and enter the code again.',
+          );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => subscribeStreamScene(setScene), []);
 
@@ -51,7 +71,10 @@ export function LiveStreamPage() {
 
   return (
     <PublicLayout variant="blackhole" compact>
-      <div className={`livePublicClean liveWithNav liveWatchLayout discoverLive ${chatOpen ? 'is-chat-open' : ''}`} data-live={live ? '1' : '0'}>
+      <div
+        className={`livePublicClean liveWithNav liveWatchLayout discoverLive ${chatOpen ? 'is-chat-open' : ''}`}
+        data-live={live ? '1' : '0'}
+      >
         <header className="livePublicHeader">
           <p className={live ? 'livePulse' : 'vipKicker'}>{live ? 'On air' : 'Standby'}</p>
           <h1 className="livePublicTitle">3000 Studios Live</h1>
@@ -60,14 +83,21 @@ export function LiveStreamPage() {
         <main className="livePublicMain liveWatchMain">
           <div className="liveOnlyStage livePublicStage mobileSafe liveStageFrame">
             <div className="liveOnlyFeed">
-              <iframe
-                key={isMuted ? 'muted-player' : 'unmuted-player'}
-                title="3000 Studios Live"
-                src={iframeSrc}
-                className="liveStreamIframe"
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
-                allowFullScreen
-              />
+              {iframeSrc ? (
+                <iframe
+                  key={isMuted ? 'muted-player' : 'unmuted-player'}
+                  title="3000 Studios Live"
+                  src={iframeSrc}
+                  className="liveStreamIframe"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  referrerPolicy="same-origin"
+                  allowFullScreen
+                />
+              ) : (
+                <p className="liveStandbyBadge" role="status">
+                  {playbackError || 'Authorizing private stream…'}
+                </p>
+              )}
               {isMuted ? (
                 <button
                   type="button"
@@ -75,10 +105,14 @@ export function LiveStreamPage() {
                   onClick={() => setIsMuted(false)}
                   title="Click to turn on live stream audio"
                 >
-                  <span className="soundIcon" aria-hidden="true">🔊</span>
+                  <span className="soundIcon" aria-hidden="true">
+                    🔊
+                  </span>
                   <div className="soundTextBox">
                     <strong>TAP FOR SOUND</strong>
-                    <span>Stream starts muted for browser autoplay. Tap to listen with full audio.</span>
+                    <span>
+                      Stream starts muted for browser autoplay. Tap to listen with full audio.
+                    </span>
                   </div>
                 </button>
               ) : (
@@ -121,6 +155,11 @@ export function LiveStreamPage() {
             <Link className="liveInquiryBtn" to="/music">
               Music
             </Link>
+            <form method="post" action="/live/logout">
+              <button className="liveInquiryBtn" type="submit">
+                Lock stream
+              </button>
+            </form>
           </aside>
         </main>
         <div className="liveMobileDock">

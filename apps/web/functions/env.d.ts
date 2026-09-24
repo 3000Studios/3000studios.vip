@@ -17,6 +17,12 @@ export type PagesEnv = {
   TIKTOK_CLIENT_KEY?: string;
   TIKTOK_CLIENT_SECRET?: string;
   LIVE_ROOM_API?: string;
+  LIVE_ACCESS_CODE?: string;
+  LIVE_ACCESS_SESSION_SECRET?: string;
+  STREAM_SIGNING_KEY_ID?: string;
+  STREAM_SIGNING_JWK?: string;
+  STREAM_LIVE_INPUT_ID?: string;
+  STREAM_CUSTOMER_CODE?: string;
 };
 
 declare global {
