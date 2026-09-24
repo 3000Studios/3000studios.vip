@@ -9,6 +9,7 @@ import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { AdminObservability } from '../components/AdminObservability';
 import { MarketingAdvisor } from '../components/MarketingAdvisor';
 import { AdminActivityLog } from '../components/AdminActivityLog';
+import { LiveAccessControl } from '../components/LiveAccessControl';
 import { PublicLayout } from './Home';
 import '../styles/discover.css';
 
@@ -268,6 +269,7 @@ export function Admin() {
                   Broadcast: {isLive || broadcasting ? 'ON AIR' : 'offline'}
                 </div>
               </section>
+              <LiveAccessControl />
               <AdminActivityLog />
               <section className="cPanel adminPublicPreviewPanel">
                 <div className="cPanelHead">

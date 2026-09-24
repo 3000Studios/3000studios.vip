@@ -1,10 +1,11 @@
 import type { PagesEnv } from '../env';
 
 const COOKIE_NAME = '__Host-live_access';
-const SESSION_SECONDS = 8 * 60 * 60;
+const REMEMBERED_SESSION_SECONDS = 30 * 24 * 60 * 60;
+const BROWSER_SESSION_SECONDS = 8 * 60 * 60;
 const encoder = new TextEncoder();
 
-type LiveAccessEnv = PagesEnv & {
+type LiveAccessEnv = Pick<PagesEnv, 'LIVE_ACCESS_CODE' | 'LIVE_ACCESS_SESSION_SECRET'> & {
   LIVE_ACCESS_CODE?: string;
   LIVE_ACCESS_SESSION_SECRET?: string;
 };
@@ -57,7 +58,7 @@ function readCookie(request: Request, name: string): string | null {
 }
 
 export function liveAccessConfigured(env: LiveAccessEnv): boolean {
-  return Boolean(env.LIVE_ACCESS_CODE?.trim() && env.LIVE_ACCESS_SESSION_SECRET?.trim());
+  return Boolean(env.LIVE_ACCESS_SESSION_SECRET?.trim());
 }
 
 export async function verifyLiveCode(candidate: string, env: LiveAccessEnv): Promise<boolean> {
@@ -65,11 +66,23 @@ export async function verifyLiveCode(candidate: string, env: LiveAccessEnv): Pro
   return Boolean(expected) && timingSafeEqual(candidate.trim(), expected);
 }
 
-export async function createLiveSession(env: LiveAccessEnv, now = Date.now()): Promise<string> {
+export async function createLiveSession(
+  env: LiveAccessEnv,
+  sessionVersion = 1,
+  rememberViewer = false,
+  now = Date.now(),
+): Promise<string> {
   const secret = env.LIVE_ACCESS_SESSION_SECRET?.trim() || '';
   if (!secret) throw new Error('Live access session secret is not configured');
   const payload = toBase64Url(
-    encoder.encode(JSON.stringify({ exp: Math.floor(now / 1000) + SESSION_SECONDS })),
+    encoder.encode(
+      JSON.stringify({
+        exp:
+          Math.floor(now / 1000) +
+          (rememberViewer ? REMEMBERED_SESSION_SECONDS : BROWSER_SESSION_SECONDS),
+        version: sessionVersion,
+      }),
+    ),
   );
   return `${payload}.${await hmac(payload, secret)}`;
 }
@@ -77,6 +90,7 @@ export async function createLiveSession(env: LiveAccessEnv, now = Date.now()): P
 export async function hasLiveSession(
   request: Request,
   env: LiveAccessEnv,
+  sessionVersion = 1,
   now = Date.now(),
 ): Promise<boolean> {
   const secret = env.LIVE_ACCESS_SESSION_SECRET?.trim() || '';
@@ -86,15 +100,23 @@ export async function hasLiveSession(
   if (!payload || !signature || extra) return false;
   if (!timingSafeEqual(signature, await hmac(payload, secret))) return false;
   try {
-    const data = JSON.parse(new TextDecoder().decode(fromBase64Url(payload))) as { exp?: number };
-    return typeof data.exp === 'number' && data.exp > Math.floor(now / 1000);
+    const data = JSON.parse(new TextDecoder().decode(fromBase64Url(payload))) as {
+      exp?: number;
+      version?: number;
+    };
+    return (
+      typeof data.exp === 'number' &&
+      data.exp > Math.floor(now / 1000) &&
+      data.version === sessionVersion
+    );
   } catch {
     return false;
   }
 }
 
-export function liveSessionCookie(value: string): string {
-  return `${COOKIE_NAME}=${value}; Path=/; Max-Age=${SESSION_SECONDS}; HttpOnly; Secure; SameSite=Strict`;
+export function liveSessionCookie(value: string, rememberViewer = false): string {
+  const maxAge = rememberViewer ? `; Max-Age=${REMEMBERED_SESSION_SECONDS}` : '';
+  return `${COOKIE_NAME}=${value}; Path=/${maxAge}; HttpOnly; Secure; SameSite=Strict`;
 }
 
 export function clearLiveSessionCookie(): string {

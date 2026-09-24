@@ -1,0 +1,139 @@
+.liveAccessHead {
+  align-items: center;
+  gap: 16px;
+}
+.liveAccessStatus {
+  padding: 9px 13px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+}
+.liveAccessStatus.public {
+  color: #07120b;
+  background: #75f0a0;
+}
+.liveAccessStatus.protected {
+  color: #160b05;
+  background: #ffad65;
+}
+.liveAccessBody {
+  display: grid;
+  gap: 20px;
+}
+.liveAccessPrimary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.liveAccessPrimary h3,
+.liveAccessPrimary p {
+  margin: 0;
+}
+.liveAccessPrimary p {
+  margin-top: 6px;
+}
+.liveAccessToggle {
+  min-width: 108px;
+  min-height: 48px;
+  border: 1px solid #6d6d6d;
+  border-radius: 999px;
+  padding: 6px 14px;
+  color: #fff;
+  background: #252525;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+.liveAccessToggle span {
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  margin-right: 8px;
+  border-radius: 50%;
+  vertical-align: -3px;
+  background: #aaa;
+}
+.liveAccessToggle.on {
+  border-color: #ffad65;
+  background: #4a2411;
+}
+.liveAccessToggle.on span {
+  background: #ffad65;
+  box-shadow: 0 0 12px #ffad65;
+}
+.liveAccessRemember {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-height: 48px;
+  cursor: pointer;
+}
+.liveAccessRemember input {
+  width: 22px;
+  height: 22px;
+  accent-color: #f3ca53;
+}
+.liveAccessRemember span {
+  display: grid;
+  gap: 4px;
+}
+.liveAccessRemember small {
+  color: #aaa;
+}
+.liveAccessActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.liveAccessLock {
+  border-color: #ee6868;
+  color: #ffd0d0;
+}
+.liveAccessCode {
+  border-top: 1px solid #ffffff20;
+  padding-top: 16px;
+}
+.liveAccessCode summary {
+  cursor: pointer;
+  font-weight: 850;
+}
+.liveAccessCode form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 12px;
+  margin-top: 16px;
+}
+.liveAccessCode label {
+  display: grid;
+  gap: 7px;
+}
+.liveAccessCode input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #ffffff38;
+  border-radius: 9px;
+  background: #0b0b0b;
+  color: #fff;
+  padding: 10px 12px;
+}
+.liveAccessMessage {
+  margin: 0;
+  color: #f3ca53;
+  font-weight: 700;
+}
+@media (max-width: 720px) {
+  .liveAccessHead,
+  .liveAccessPrimary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .liveAccessToggle {
+    width: 100%;
+  }
+  .liveAccessCode form {
+    grid-template-columns: 1fr;
+  }
+}

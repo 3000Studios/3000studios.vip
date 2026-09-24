@@ -5,3 +5,8 @@
 name = "3000studios-vip"
 pages_build_output_dir = "dist"
 compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "apex_citadel"
+database_id = "6ae6bd18-e43a-4c57-beba-0c3ed1b5a56b"

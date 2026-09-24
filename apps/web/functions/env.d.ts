@@ -1,5 +1,6 @@
 export type PagesEnv = {
   ASSETS?: { fetch: typeof fetch };
+  DB: D1Database;
   VITE_ADSENSE_CLIENT_ID?: string;
   VITE_ADSENSE_HOME_SLOT?: string;
   VITE_ADSENSE_VIDEO_SLOT?: string;
@@ -19,6 +20,7 @@ export type PagesEnv = {
   LIVE_ROOM_API?: string;
   LIVE_ACCESS_CODE?: string;
   LIVE_ACCESS_SESSION_SECRET?: string;
+  API_BASE?: string;
   STREAM_SIGNING_KEY_ID?: string;
   STREAM_SIGNING_JWK?: string;
   STREAM_LIVE_INPUT_ID?: string;

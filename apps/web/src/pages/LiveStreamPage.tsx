@@ -19,6 +19,7 @@ export function LiveStreamPage() {
   const liveRoom = useLiveRoom();
   const [playerUrl, setPlayerUrl] = useState('');
   const [playbackError, setPlaybackError] = useState('');
+  const [accessAllowed, setAccessAllowed] = useState(true);
 
   const iframeSrc = playerUrl
     ? `${playerUrl}?autoplay=true&muted=${isMuted ? 'true' : 'false'}&primaryColor=ffd700&preload=auto`
@@ -26,22 +27,49 @@ export function LiveStreamPage() {
 
   useEffect(() => {
     let cancelled = false;
-    void fetch('/api/live-playback', { credentials: 'same-origin', cache: 'no-store' })
-      .then(async (response) => {
-        if (!response.ok) throw new Error('Playback authorization expired');
-        return response.json() as Promise<{ playerUrl?: string }>;
-      })
-      .then((data) => {
-        if (!cancelled && data.playerUrl) setPlayerUrl(data.playerUrl);
-      })
-      .catch(() => {
-        if (!cancelled)
-          setPlaybackError(
-            'Playback authorization is unavailable. Re-lock and enter the code again.',
-          );
+    let currentPlayerUrl = '';
+    const loadPlayback = () =>
+      fetch('/api/live-playback', { credentials: 'same-origin', cache: 'no-store' })
+        .then(async (response) => {
+          if (!response.ok) throw new Error('Playback authorization expired');
+          return response.json() as Promise<{ playerUrl?: string }>;
+        })
+        .then((data) => {
+          if (!cancelled && data.playerUrl) {
+            currentPlayerUrl = data.playerUrl;
+            setPlayerUrl(data.playerUrl);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setPlayerUrl('');
+            setPlaybackError(
+              'Playback authorization is unavailable. Re-lock and enter the code again.',
+            );
+          }
+        });
+    void loadPlayback();
+    const checkAccess = async () => {
+      const response = await fetch('/api/live-access', {
+        credentials: 'same-origin',
+        cache: 'no-store',
       });
+      const data = (await response.json()) as { authorized?: boolean };
+      if (cancelled) return;
+      const allowed = response.ok && data.authorized === true;
+      setAccessAllowed(allowed);
+      if (!allowed) {
+        currentPlayerUrl = '';
+        setPlayerUrl('');
+        setPlaybackError('This stream has been locked by the host.');
+      } else if (!currentPlayerUrl) {
+        void loadPlayback();
+      }
+    };
+    const accessTimer = window.setInterval(() => void checkAccess(), 5_000);
     return () => {
       cancelled = true;
+      window.clearInterval(accessTimer);
     };
   }, []);
 
@@ -83,7 +111,7 @@ export function LiveStreamPage() {
         <main className="livePublicMain liveWatchMain">
           <div className="liveOnlyStage livePublicStage mobileSafe liveStageFrame">
             <div className="liveOnlyFeed">
-              {iframeSrc ? (
+              {iframeSrc && accessAllowed ? (
                 <iframe
                   key={isMuted ? 'muted-player' : 'unmuted-player'}
                   title="3000 Studios Live"

@@ -11,9 +11,9 @@ import {
   isSameOrigin,
   liveAccessConfigured,
   liveSessionCookie,
-  verifyLiveCode,
 } from './lib/live-access';
 import { liveGatePage } from './lib/live-gate-page';
+import { getLiveAccessState, verifyStoredLiveCode } from './lib/live-access-store';
 
 type AttemptState = { failures: number; blockedUntil: number };
 const LIVE_PATHS = ['/live', '/api/live-room', '/api/live-playback'];
@@ -87,6 +87,9 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
       return new Response('Method not allowed', { status: 405 });
     if (!liveAccessConfigured(env))
       return gateResponse('Live access is temporarily unavailable.', 0, 503);
+    const state = await getLiveAccessState(env);
+    if (!state.protected)
+      return new Response(null, { status: 303, headers: { location: '/live' } });
     const now = Date.now();
     const attempt = await readAttemptState(request);
     if (attempt.blockedUntil > now) {
@@ -94,7 +97,7 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
       return gateResponse('Too many incorrect attempts.', retryAfter, 429);
     }
     const form = await request.formData();
-    const valid = await verifyLiveCode(String(form.get('code') || ''), env);
+    const valid = await verifyStoredLiveCode(String(form.get('code') || ''), env);
     if (!valid) {
       const failures = attempt.failures + 1;
       const delaySeconds = failures >= 5 ? Math.min(900, 30 * 2 ** Math.min(failures - 5, 5)) : 0;
@@ -102,12 +105,12 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
       return gateResponse('Incorrect access code.', delaySeconds, delaySeconds ? 429 : 401);
     }
     await clearAttemptState(request);
-    const session = await createLiveSession(env, now);
+    const session = await createLiveSession(env, state.sessionVersion, state.rememberViewer, now);
     return new Response(null, {
       status: 303,
       headers: {
         location: '/live',
-        'set-cookie': liveSessionCookie(session),
+        'set-cookie': liveSessionCookie(session, state.rememberViewer),
         'cache-control': NO_STORE,
       },
     });
@@ -116,7 +119,8 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
   if (isProtectedLivePath(url.pathname)) {
     if (!liveAccessConfigured(env))
       return gateResponse('Live access is temporarily unavailable.', 0, 503);
-    if (!(await hasLiveSession(request, env))) {
+    const state = await getLiveAccessState(env);
+    if (state.protected && !(await hasLiveSession(request, env, state.sessionVersion))) {
       if (url.pathname.startsWith('/api/')) {
         return Response.json(
           { ok: false, error: 'live_access_required' },
