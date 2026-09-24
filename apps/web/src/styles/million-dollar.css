@@ -1,8 +1,5 @@
-/* ==========================================================================
-   3000 STUDIOS — MILLION-DOLLAR DESIGN
-   2026-09-24 CRITICAL FIX: md-track was expanding layout to ~4200px,
-   pushing hero copy off-screen (left: 1800px). Contain all widths to 100%.
-   ========================================================================== */
+/* 3000 STUDIOS — million-dollar.css
+   CRITICAL: slides MUST use 100vw not 100% or the track expands the page. */
 
 :root {
   --md-black: #05060a;
@@ -19,35 +16,32 @@
   --md-dock-h: calc(68px + env(safe-area-inset-bottom, 0px));
 }
 
-/* HARD WIDTH LOCK — nothing may expand past viewport */
 .md-scope {
   font-family: var(--md-font-body);
   background: var(--md-black);
   color: var(--md-cream);
   -webkit-tap-highlight-color: transparent;
   padding-bottom: var(--md-dock-h);
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: clip !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
   box-sizing: border-box;
+  position: relative;
 }
 .md-scope *,
 .md-scope *::before,
-.md-scope *::after {
-  box-sizing: border-box;
-}
+.md-scope *::after { box-sizing: border-box; }
 .md-scope img { background: #12141c; display: block; max-width: 100%; }
 .md-scope a { color: inherit; }
 
-/* HERO */
 .md-hero {
   position: relative;
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 100vw !important;
   min-height: 0;
   height: auto;
   display: block;
-  overflow: clip;
+  overflow: hidden;
   isolation: isolate;
   background:
     radial-gradient(100% 80% at 50% 0%, rgba(212, 175, 55, 0.28), transparent 60%),
@@ -76,10 +70,8 @@
 .md-hero-copy {
   position: relative;
   z-index: 2;
-  width: 100%;
-  max-width: 640px;
-  margin-left: auto !important;
-  margin-right: auto !important;
+  width: min(100%, 640px);
+  margin: 0 auto;
   padding: 56px 16px 18px;
 }
 .md-kicker {
@@ -98,13 +90,10 @@
   font-size: clamp(36px, 11vw, 64px);
   line-height: 1.02;
   margin: 10px 0 8px;
-  color: var(--md-gold-hi) !important;
+  color: #f6dd8a !important;
+  -webkit-text-fill-color: #f6dd8a !important;
   background: none !important;
-  -webkit-background-clip: unset !important;
-  background-clip: unset !important;
-  -webkit-text-fill-color: var(--md-gold-hi) !important;
   text-shadow: 0 2px 24px rgba(212, 175, 55, 0.35);
-  animation: none !important;
 }
 .md-sub {
   color: var(--md-muted);
@@ -146,13 +135,12 @@
   color: var(--md-cream);
 }
 
-/* STAGE — CRITICAL width containment */
 .md-stage {
   position: relative;
   background: #000;
   border-top: 1px solid var(--md-line);
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 100vw !important;
   overflow: hidden !important;
 }
 .md-stage-head {
@@ -177,7 +165,7 @@
 
 .md-track-viewport {
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 100vw !important;
   overflow: hidden !important;
   touch-action: pan-y;
   cursor: grab;
@@ -185,16 +173,16 @@
 }
 .md-track {
   display: flex;
-  width: 100%;
+  flex-wrap: nowrap;
   will-change: transform;
 }
-/* Each slide = exactly viewport width of the stage, NOT expanding parent */
+/* MUST be 100vw — 100% expands the whole page */
 .md-slide {
   position: relative;
-  flex: 0 0 100%;
-  width: 100%;
-  min-width: 100%;
-  max-width: 100%;
+  flex: 0 0 100vw !important;
+  width: 100vw !important;
+  min-width: 100vw !important;
+  max-width: 100vw !important;
   height: min(58svh, 480px);
   min-height: 320px;
   overflow: hidden;
@@ -306,13 +294,12 @@
 }
 .md-dots .on button { background: var(--md-gold); }
 
-/* MONEY */
 .md-money {
   padding: 24px 16px 28px;
   background: linear-gradient(180deg, #05060a, #0b0d14);
   border-top: 1px solid var(--md-line);
   width: 100%;
-  max-width: 100%;
+  max-width: 100vw;
   overflow: hidden;
 }
 .md-money h2 {
@@ -364,14 +351,14 @@
   flex-wrap: wrap;
   padding: 14px 16px 20px;
   width: 100%;
-  max-width: 100%;
+  max-width: 100vw;
   overflow: hidden;
 }
 .md-marquee {
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
-  max-width: 100%;
+  max-width: 100vw;
   border-top: 1px solid var(--md-line);
   border-bottom: 1px solid var(--md-line);
   padding: 10px 0;
