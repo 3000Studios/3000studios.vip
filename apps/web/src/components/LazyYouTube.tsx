@@ -8,17 +8,25 @@ export function LazyYouTube({
   videoId,
   title,
   playlist,
+  autoLoad = false,
+  muted = true,
   className = '',
 }: {
   videoId: string;
   title: string;
   playlist?: boolean;
+  autoLoad?: boolean;
+  muted?: boolean;
   className?: string;
 }) {
-  const [load, setLoad] = useState(false);
+  const [load, setLoad] = useState(autoLoad);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (autoLoad) {
+      setLoad(true);
+      return;
+    }
     if (load) return;
     if (!('IntersectionObserver' in window)) {
       const id = setTimeout(() => setLoad(true), 0);
@@ -36,11 +44,11 @@ export function LazyYouTube({
     const el = ref.current;
     if (el) observer.observe(el);
     return () => observer.disconnect();
-  }, [load]);
+  }, [autoLoad, load]);
 
   const src = `https://www.youtube-nocookie.com/embed/${videoId}?${[
     'autoplay=1',
-    'mute=1',
+    `mute=${muted ? 1 : 0}`,
     'controls=1',
     'loop=1',
     playlist ? `playlist=${videoId}` : '',

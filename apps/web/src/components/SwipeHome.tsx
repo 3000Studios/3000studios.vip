@@ -17,10 +17,12 @@ import {
 } from '../data/officialReleases';
 import { MERCH_ITEMS } from '../data/merch';
 import { PLATFORMS } from '../lib/commerce';
+import { useGlobalMusic } from './GlobalMusic';
 import { PublicLayout } from '../pages/Home';
 import '../styles/million-dollar.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
+const SOUND_PREFERENCE_KEY = '3000-home-sound-choice';
 
 type Slide = {
   title: string;
@@ -72,13 +74,10 @@ function useReveal() {
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in');
-            io.unobserve(entry.target);
-          }
+          entry.target.classList.toggle('in', entry.isIntersecting);
         }
       },
-      { threshold: 0.12 },
+      { threshold: 0.16, rootMargin: '-8% 0px -8% 0px' },
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -86,12 +85,16 @@ function useReveal() {
 }
 
 export function SwipeHome() {
+  const music = useGlobalMusic();
   const slides = useMemo(() => buildSlides(), []);
   const n = slides.length;
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [soundPromptOpen, setSoundPromptOpen] = useState(
+    () => typeof window !== 'undefined' && !localStorage.getItem(SOUND_PREFERENCE_KEY),
+  );
   const startX = useRef(0);
   const dragging = useRef(false);
   const dragRef = useRef(0);
@@ -174,15 +177,56 @@ export function SwipeHome() {
 
   const hero = slides[0];
 
+  const chooseSiteSound = (enabled: boolean) => {
+    localStorage.setItem(SOUND_PREFERENCE_KEY, enabled ? 'on' : 'off');
+    localStorage.setItem('3000-music-on', enabled ? '1' : '0');
+    if (enabled) music.play();
+    else music.pause();
+    setSoundPromptOpen(false);
+  };
+
   return (
     <PublicLayout variant="spiral" compact>
       <div className="md-scope">
+        {soundPromptOpen ? (
+          <div
+            className="md-sound-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sound-choice-title"
+          >
+            <div className="md-sound-modal__panel">
+              <span className="md-kicker">3000 Studios sound</span>
+              <h2 id="sound-choice-title">Start with sound?</h2>
+              <p>
+                Videos begin muted. Choose whether the site soundtrack should play while you
+                explore.
+              </p>
+              <div className="md-sound-modal__actions">
+                <button
+                  type="button"
+                  className="md-btn md-btn-gold"
+                  onClick={() => chooseSiteSound(true)}
+                >
+                  Turn sound on
+                </button>
+                <button
+                  type="button"
+                  className="md-btn md-btn-ghost"
+                  onClick={() => chooseSiteSound(false)}
+                >
+                  Keep sound off
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
         <section className="md-hero" aria-label="3000 Studios VIP">
           <div className="md-hero-media" aria-hidden="true">
             {hero ? <img src={hero.poster} alt="" fetchPriority="high" decoding="async" /> : null}
           </div>
           <div className="md-hero-veil" aria-hidden="true" />
-          <div className="md-hero-copy">
+          <div className="md-hero-copy md-reveal">
             <span className="md-kicker">YouTube · DistroKid · Official Artist</span>
             <h1 className="md-title">3000 Studios</h1>
             <p className="md-sub">
@@ -198,7 +242,7 @@ export function SwipeHome() {
               >
                 Subscribe on YouTube
               </a>
-              <a className="md-btn md-btn-ghost" href="#watch">
+              <a className="md-btn md-btn-ghost" href="#music">
                 Swipe the videos
               </a>
               <Link className="md-btn md-btn-ghost" to="/shop">
@@ -208,7 +252,11 @@ export function SwipeHome() {
           </div>
         </section>
 
-        <section className="md-stage" id="watch" aria-label="All music videos, swipe to play">
+        <section
+          className="md-stage md-reveal"
+          id="music"
+          aria-label="All music videos, swipe to play"
+        >
           <div className="md-stage-head">
             <h2>Every video. One swipe.</h2>
             <span className="md-count">
@@ -254,6 +302,8 @@ export function SwipeHome() {
                         videoId={s.videoId}
                         title={`${s.title} — official music video`}
                         playlist
+                        autoLoad={active}
+                        muted={!soundOn}
                       />
                     ) : null}
                     <div className="md-slide-shade" aria-hidden="true" />
@@ -339,7 +389,7 @@ export function SwipeHome() {
           ) : null}
         </section>
 
-        <div className="md-marquee" aria-hidden="true">
+        <div className="md-marquee md-reveal" aria-hidden="true">
           <div className="md-marquee-track">
             {Array.from({ length: 2 }).flatMap((_, k) =>
               slides.slice(0, 12).map((s) => <span key={`${k}-${s.videoId}`}>{s.title} ✦</span>),
@@ -349,13 +399,12 @@ export function SwipeHome() {
 
         <section className="md-money md-reveal" aria-label="Support 3000 Studios">
           <span className="md-kicker">Fuel the next drop</span>
-          <h2>Six ways to get paid — pick one.</h2>
           <p>
             Music streams free forever. Money comes from ownership: downloads, VIP passes, sync
             licenses, sponsors, and merch.
           </p>
           <div className="md-money-grid">
-            <article className="md-pay-card">
+            <article className="md-pay-card md-reveal">
               <span className="md-tag">99¢</span>
               <h3>Own any track</h3>
               <p>High-res download + release license. Keep it forever.</p>
@@ -364,7 +413,7 @@ export function SwipeHome() {
                 Buy a track
               </a>
             </article>
-            <article className="md-pay-card">
+            <article className="md-pay-card md-reveal">
               <span className="md-tag">VIP</span>
               <h3>Vault monthly</h3>
               <p>VIP pass + stem downloads for 31 days.</p>
@@ -373,7 +422,7 @@ export function SwipeHome() {
                 Go VIP
               </a>
             </article>
-            <article className="md-pay-card">
+            <article className="md-pay-card md-reveal">
               <span className="md-tag">Best value</span>
               <h3>Vault yearly</h3>
               <p>VIP pass + stems for 365 days. Two months free.</p>
@@ -382,7 +431,7 @@ export function SwipeHome() {
                 Go yearly
               </a>
             </article>
-            <article className="md-pay-card">
+            <article className="md-pay-card md-reveal">
               <span className="md-tag">Sync</span>
               <h3>License a song</h3>
               <p>Film, ads, games, YouTube. Real sync money, direct deal.</p>
@@ -394,7 +443,7 @@ export function SwipeHome() {
                 Request license
               </a>
             </article>
-            <article className="md-pay-card">
+            <article className="md-pay-card md-reveal">
               <span className="md-tag">$99</span>
               <h3>Sponsor this page</h3>
               <p>Your brand on 3000studios.vip for 30 days.</p>
@@ -403,7 +452,7 @@ export function SwipeHome() {
                 Sponsor
               </a>
             </article>
-            <article className="md-pay-card">
+            <article className="md-pay-card md-reveal">
               <span className="md-tag">Merch</span>
               <h3>Wear the brand</h3>
               <p>Hoodies, tees, caps, sticker packs. Limited runs.</p>

@@ -2,7 +2,7 @@
 
 import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
 import './styles/swipe-slider.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -28,7 +28,6 @@ import { SampleGate } from './components/SampleGate';
 import { ConsentManager } from './components/ConsentManager';
 import { usePrefersReducedMotion } from './lib/mediaQuery';
 import { PhoneGoLive } from './pages/PhoneGoLive';
-import { MusicDeck } from './pages/MusicDeck';
 import { ShopPage } from './pages/Shop';
 import { ConceptBoard } from './pages/ConceptBoard';
 import { AuthProvider } from './lib/auth';
@@ -62,9 +61,6 @@ const SongPage = lazy(() =>
   import('./pages/SongPage').then((module) => ({ default: module.SongPage })),
 );
 const Admin = lazy(() => import('./pages/Admin').then((module) => ({ default: module.Admin })));
-const LiveStreamPageLazy = lazy(() =>
-  import('./pages/LiveStreamPage').then((module) => ({ default: module.LiveStreamPage })),
-);
 const AgentCommandCenter = lazy(() =>
   import('./pages/AgentCommandCenter').then((module) => ({ default: module.AgentCommandCenter })),
 );
@@ -104,16 +100,9 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: '/', element: <SwipeHome /> },
-      { path: '/music', element: <MusicDeck /> },
+      { path: '/music', element: <Navigate to="/#music" replace /> },
       { path: '/video', element: <VideoPage /> },
-      {
-        path: '/live',
-        element: (
-          <RouteLoader>
-            <LiveStreamPageLazy />
-          </RouteLoader>
-        ),
-      },
+      { path: '/live', element: <Navigate to="/#music" replace /> },
       { path: '/shop', element: <ShopPage /> },
       { path: '/go-live', element: <PhoneGoLive /> },
       { path: '/concepts', element: <ConceptBoard /> },

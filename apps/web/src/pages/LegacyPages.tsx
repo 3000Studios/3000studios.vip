@@ -55,9 +55,7 @@ const stagger: Variants = {
 
 const navItems = [
   { to: '/', label: 'Home', icon: '⌂', hint: 'VIP lobby' },
-  { to: '/music', label: 'Music', icon: '♪', hint: 'Full catalog' },
   { to: '/video', label: 'Video', icon: '▶', hint: 'Visuals' },
-  { to: '/live', label: 'Live', icon: '●', hint: 'Broadcast' },
   { to: '/community', label: 'Chat', icon: '◎', hint: 'Community' },
   { to: '/requests', label: 'Requests', icon: '✦', hint: 'Song ideas' },
   { to: '/blog', label: 'Blog', icon: '◈', hint: 'Editorial' },
@@ -352,7 +350,7 @@ export function PublicLayout({
         >
           <img
             className="officialProfileLogo"
-            src="/media/official-3000-studios-profile.png"
+            src="/media/official-3000-studios-profile-96.webp"
             alt=""
           />
           <span className="logoStack">

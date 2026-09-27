@@ -29,15 +29,17 @@ The scripts print variable names and counts only. They do not print secret value
 ## Required secrets to inject
 
 ### Cloudflare Pages (production + preview)
+
 - NODE_VERSION=20
 - APP_ENV=production
 - VITE_API_BASE=https://api.3000studios.vip
 - OWNER_EMAIL / VITE_VAULT_USERNAME = Mr.jwswain@gmail.com
-- VITE_VAULT_PASSCODE_SHA256  (sha256 hex of owner passcode)
-- VITE_VAULT_SECRET_ANSWER_SHA256  (sha256 hex of secret answer lowercase)
+- VITE_VAULT_PASSCODE_SHA256 (sha256 hex of owner passcode)
+- VITE_VAULT_SECRET_ANSWER_SHA256 (sha256 hex of secret answer lowercase)
 - VITE_STREAM_CUSTOMER_CODE / VITE_STREAM_LIVE_INPUT_ID / VITE_STREAM_TITLE when Cloudflare Stream is enabled
 
 ### Worker `apex-citadel-api` (deploy with wrangler)
+
 ```bash
 npm run env:sync
 ```
@@ -45,22 +47,27 @@ npm run env:sync
 Vars already in `apps/api/wrangler.toml`: OWNER_EMAIL, APP_ENV, ACCESS_REQUIRED, D1 binding.
 
 ## Google AdSense
+
 - Client: ca-pub-5800977493749262
 - ads.txt present at root and public/
 - Script loaded in index.html
 - Ready for ad units; add `<ins class="adsbygoogle">` blocks in components as needed.
 
 ## Media assets
+
 Place full tracks under `apps/web/public/media/` (or R2 CDN):
+
 - always-feel-like.mp3 (already present)
 - spotify-signing.mp4 (opener, already present)
 - Add the rest of the catalog listed in `src/data/music.ts`
 
 ## Secret admin entrance
+
 1. Tap © at bottom 10 times
 2. Enter code `5555`
 3. Then owner email + passcode + secret answer
 4. Routes to `/vault` dashboard (existing auth preserved)
 
 ## Content / auto blogs / music upload
+
 Dashboard (protected) already supports site ops, AdSense health, stream vault, and command surface. Extend `/vault` with media manager as next iteration using R2.
