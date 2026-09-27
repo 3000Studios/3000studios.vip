@@ -23,11 +23,9 @@
 
 ## 4) Pages Web
 - Pages project name (suggested): `3000studios-vip`
-- Build and deploy:
-  - `cd apps/web`
-  - `npm ci`
-  - `npm run build`
-  - `npx wrangler pages deploy dist --project-name 3000studios-vip`
+- Connect `3000Studios/3000studios.vip` to the Pages project with `apps/web` as its root directory.
+- Configure the build command as `npm ci && npm run build` and the output directory as `dist`.
+- Pushes to `main` build and deploy through Cloudflare Pages Git integration. Do not configure GitHub Actions or manual Wrangler Pages deploys.
 
 ## 5) Custom domain routing (recommended)
 - Map the Pages project to the intended private domain.

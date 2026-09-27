@@ -4,14 +4,11 @@
 
 - GitHub is source control only.
 - Cloudflare Pages project `3000studios-vip` is connected to `3000Studios/3000studios.vip`.
-- **Every push and every PR to `main` auto-builds and deploys.**
-- Local Git hooks can also run Wrangler deploys after commits and before pushes:
-  - `npm run hooks:install`
-  - hooks call `scripts/Deploy-Cloudflare.ps1`
+- **Every push to `main` auto-builds and deploys.**
 - Only one branch: `main`.
 - Build: `npm ci && npm run build` → output `apps/web/dist`
 
-GitHub Actions is not required for production deployment. Cloudflare direct Git integration and Wrangler are the supported production paths.
+GitHub Actions and manual Wrangler Pages deploys are not used. Cloudflare Pages Git integration is the only web release path.
 
 ## global.env source
 
@@ -25,7 +22,6 @@ Run:
 
 ```powershell
 npm run env:sync
-npm run deploy:cloudflare
 ```
 
 The scripts print variable names and counts only. They do not print secret values.
@@ -44,7 +40,6 @@ The scripts print variable names and counts only. They do not print secret value
 ### Worker `apex-citadel-api` (deploy with wrangler)
 ```bash
 npm run env:sync
-npm run deploy:cloudflare
 ```
 
 Vars already in `apps/api/wrangler.toml`: OWNER_EMAIL, APP_ENV, ACCESS_REQUIRED, D1 binding.

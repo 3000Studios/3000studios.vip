@@ -20,7 +20,7 @@
 ## Security and owner approvals
 
 - Never print, commit, upload, or screenshot values from `C:\Users\MrJws\Documents\global.env`; inspect variable names/readiness only.
-- Do not run broad `env:sync` or `deploy:cloudflare` scripts for ordinary Pages releases. Cloudflare Pages Git integration deploys pushes to `main`.
+- Do not run broad environment-sync scripts for ordinary Pages releases. Cloudflare Pages Git integration deploys pushed `main` commits.
 - Require owner approval before credentials, DNS, billing, payments, publishing, account changes, deletions, or other irreversible/public actions.
 - Preserve Cloudflare Access, Defender, firewall, PIA/VPN, and browser protections.
 
