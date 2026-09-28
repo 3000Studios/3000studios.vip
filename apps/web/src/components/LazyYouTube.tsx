@@ -10,6 +10,8 @@ export function LazyYouTube({
   playlist,
   autoLoad = false,
   muted = true,
+  controls = true,
+  decorative = false,
   className = '',
 }: {
   videoId: string;
@@ -17,6 +19,8 @@ export function LazyYouTube({
   playlist?: boolean;
   autoLoad?: boolean;
   muted?: boolean;
+  controls?: boolean;
+  decorative?: boolean;
   className?: string;
 }) {
   const [load, setLoad] = useState(autoLoad);
@@ -46,7 +50,7 @@ export function LazyYouTube({
   const src = `https://www.youtube-nocookie.com/embed/${videoId}?${[
     'autoplay=1',
     `mute=${muted ? 1 : 0}`,
-    'controls=1',
+    `controls=${controls ? 1 : 0}`,
     'loop=1',
     playlist ? `playlist=${videoId}` : '',
     'playsinline=1',
@@ -64,6 +68,8 @@ export function LazyYouTube({
         <iframe
           title={title}
           src={src}
+          aria-hidden={decorative || undefined}
+          tabIndex={decorative ? -1 : undefined}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           loading="lazy"

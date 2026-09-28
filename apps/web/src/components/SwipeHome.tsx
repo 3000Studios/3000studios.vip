@@ -60,6 +60,11 @@ function buildSlides(): Slide[] {
   });
 }
 
+function randomSlideIndex(length: number) {
+  if (length < 2) return 0;
+  return Math.floor(Math.random() * length);
+}
+
 function stripeFor(id: string) {
   return MERCH_ITEMS.find((item) => item.id === id)?.stripe ?? '#';
 }
@@ -88,7 +93,7 @@ export function SwipeHome() {
   const music = useGlobalMusic();
   const slides = useMemo(() => buildSlides(), []);
   const n = slides.length;
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() => randomSlideIndex(slides.length));
   const [drag, setDrag] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
@@ -98,7 +103,7 @@ export function SwipeHome() {
   const startX = useRef(0);
   const dragging = useRef(false);
   const dragRef = useRef(0);
-  const indexRef = useRef(0);
+  const indexRef = useRef(index);
   const viewportRef = useRef<HTMLDivElement>(null);
   const song = slides[index];
 
@@ -175,7 +180,7 @@ export function SwipeHome() {
     }
   };
 
-  const hero = slides[0];
+  const hero = song;
 
   const chooseSiteSound = (enabled: boolean) => {
     localStorage.setItem(SOUND_PREFERENCE_KEY, enabled ? 'on' : 'off');
@@ -222,8 +227,19 @@ export function SwipeHome() {
           </div>
         ) : null}
         <section className="md-hero" aria-label="3000 Studios VIP">
-          <div className="md-hero-media" aria-hidden="true">
-            {hero ? <img src={hero.poster} alt="" fetchPriority="high" decoding="async" /> : null}
+          <div className="md-hero-media">
+            {hero ? (
+              <LazyYouTube
+                className="md-hero-video"
+                videoId={hero.videoId}
+                title={`${hero.title} — official music video`}
+                playlist
+                autoLoad
+                muted
+                controls={false}
+                decorative
+              />
+            ) : null}
           </div>
           <div className="md-hero-veil" aria-hidden="true" />
           <div className="md-hero-copy md-reveal">

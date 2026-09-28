@@ -62,12 +62,28 @@
   background: #12141c;
   overflow: hidden;
 }
-.md-hero-media img {
+.md-hero-video,
+.md-hero-video iframe {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center 25%;
-  opacity: 0.4;
+  display: block;
+}
+.md-hero-video {
+  position: absolute;
+  inset: 0;
+  opacity: 0.52;
+  pointer-events: none;
+}
+.md-hero-video iframe {
+  /* Crop YouTube's 16:9 player to cover tall phone heroes without overflow. */
+  min-width: 177.78%;
+  min-height: 100%;
+  width: 177.78%;
+  height: 100%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 .md-hero-veil {
   position: absolute;
