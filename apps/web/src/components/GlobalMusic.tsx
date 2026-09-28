@@ -249,12 +249,14 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   const seek = seekTo;
 
-  // Load metadata only. Playback must always come from an explicit music control.
+  // Start the site soundtrack on each fresh load. Browsers that disallow audible
+  // autoplay leave the visible music control available for the required tap.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
-    playIndex(startIndex, { autoplay: false });
+    localStorage.setItem(MUSIC_ON_KEY, '1');
+    playIndex(startIndex, { autoplay: true });
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       try {
@@ -386,7 +388,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   return (
     <MusicContext.Provider value={api}>
-      <audio ref={audioRef} preload="metadata" playsInline crossOrigin="anonymous" />
+      <audio ref={audioRef} autoPlay preload="metadata" playsInline crossOrigin="anonymous" />
       {children}
     </MusicContext.Provider>
   );

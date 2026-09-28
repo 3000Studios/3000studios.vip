@@ -631,6 +631,22 @@ body,
   transform: translateX(60%) rotate(12deg);
 }
 
+/* Keep the music state obvious and tappable on every viewport. */
+.vipSite .vipHeaderMusic {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 14px;
+  opacity: 1;
+}
+
+@media (max-width: 760px) {
+  .vipSite .vipHeaderMusic .globalMusicToggleLabel {
+    display: inline;
+  }
+}
+
 .md-pay-card:hover,
 .md-pay-card:focus-within {
   transform: translateY(-8px);

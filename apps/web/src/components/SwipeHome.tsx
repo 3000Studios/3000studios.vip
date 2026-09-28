@@ -17,12 +17,10 @@ import {
 } from '../data/officialReleases';
 import { MERCH_ITEMS } from '../data/merch';
 import { PLATFORMS } from '../lib/commerce';
-import { useGlobalMusic } from './GlobalMusic';
 import { PublicLayout } from '../pages/Home';
 import '../styles/million-dollar.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
-const SOUND_PREFERENCE_KEY = '3000-home-sound-choice';
 
 type Slide = {
   title: string;
@@ -90,16 +88,12 @@ function useReveal() {
 }
 
 export function SwipeHome() {
-  const music = useGlobalMusic();
   const slides = useMemo(() => buildSlides(), []);
   const n = slides.length;
   const [index, setIndex] = useState(() => randomSlideIndex(slides.length));
   const [drag, setDrag] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
-  const [soundPromptOpen, setSoundPromptOpen] = useState(
-    () => typeof window !== 'undefined' && !localStorage.getItem(SOUND_PREFERENCE_KEY),
-  );
   const startX = useRef(0);
   const dragging = useRef(false);
   const dragRef = useRef(0);
@@ -182,50 +176,9 @@ export function SwipeHome() {
 
   const hero = song;
 
-  const chooseSiteSound = (enabled: boolean) => {
-    localStorage.setItem(SOUND_PREFERENCE_KEY, enabled ? 'on' : 'off');
-    localStorage.setItem('3000-music-on', enabled ? '1' : '0');
-    if (enabled) music.play();
-    else music.pause();
-    setSoundPromptOpen(false);
-  };
-
   return (
     <PublicLayout variant="spiral" compact>
       <div className="md-scope">
-        {soundPromptOpen ? (
-          <div
-            className="md-sound-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="sound-choice-title"
-          >
-            <div className="md-sound-modal__panel">
-              <span className="md-kicker">3000 Studios sound</span>
-              <h2 id="sound-choice-title">Start with sound?</h2>
-              <p>
-                Videos begin muted. Choose whether the site soundtrack should play while you
-                explore.
-              </p>
-              <div className="md-sound-modal__actions">
-                <button
-                  type="button"
-                  className="md-btn md-btn-gold"
-                  onClick={() => chooseSiteSound(true)}
-                >
-                  Turn sound on
-                </button>
-                <button
-                  type="button"
-                  className="md-btn md-btn-ghost"
-                  onClick={() => chooseSiteSound(false)}
-                >
-                  Keep sound off
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : null}
         <section className="md-hero" aria-label="3000 Studios VIP">
           <div className="md-hero-media">
             {hero ? (
