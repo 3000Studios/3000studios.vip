@@ -7,21 +7,32 @@ import {
 } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useGlobalMusic } from '../components/GlobalMusic';
+import { LazyYouTube } from '../components/LazyYouTube';
 import { rolloutSongs } from '../data/music';
 import {
   getOfficialVideoForTitle,
   youtubeEmbedUrl,
   youtubeWatchUrl,
 } from '../data/officialReleases';
+import { priorityShorts } from '../data/priorityShorts';
+import { publishedShorts } from '../data/publishedShorts';
 import { getSongBySlug } from '../data/songs';
 import { PublicLayout } from './Home';
 
 const REVEAL_DELAY_MS = 2000;
 
+const normalizeTitle = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/3000 studios/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
 export function SongPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const music = useGlobalMusic();
+  const { playIndex } = music;
   const song = getSongBySlug(slug || '');
   const [readyVideoId, setReadyVideoId] = useState('');
   const [revealedVideoId, setRevealedVideoId] = useState('');
@@ -30,14 +41,24 @@ export function SongPage() {
     () => (song ? getOfficialVideoForTitle(song.title) : undefined),
     [song],
   );
+  const relatedShorts = useMemo(() => {
+    if (!song) return [];
+    const title = normalizeTitle(song.title);
+    const matching = publishedShorts.filter((short) => {
+      const candidate = normalizeTitle(short.title);
+      return title.length > 3 && (candidate.includes(title) || title.includes(candidate));
+    });
+    const candidates = matching.length ? matching : priorityShorts;
+    return candidates
+      .filter((short) => short.videoId !== officialVideo?.videoId)
+      .slice(0, 3);
+  }, [song, officialVideo]);
 
   useEffect(() => {
     if (!song) return;
     const index = rolloutSongs.findIndex((track) => track.slug === song.slug);
-    if (index >= 0 && music.activeSong.slug !== song.slug) {
-      music.playIndex(index, { autoplay: music.isPlaying });
-    }
-  }, [song, music]);
+    if (index >= 0) playIndex(index, { autoplay: true });
+  }, [song, playIndex]);
 
   useEffect(() => {
     if (!officialVideo) return;
@@ -198,6 +219,33 @@ export function SongPage() {
           <h2>About this release</h2>
           <p>{song.description}</p>
           <p className="vibe">{song.vibe}</p>
+        </section>
+
+        <section className="songShorts" aria-labelledby="song-shorts-title">
+          <div className="songShortsHead">
+            <div>
+              <span>Official channel</span>
+              <h2 id="song-shorts-title">Shorts & clips</h2>
+            </div>
+            <a href="https://www.youtube.com/@3000Studio/shorts" target="_blank" rel="noreferrer">
+              All Shorts ↗
+            </a>
+          </div>
+          <div className="songShortsRail">
+            {relatedShorts.map((short) => (
+              <article className="songShortCard" key={short.videoId}>
+                <LazyYouTube
+                  className="songShortFrame"
+                  videoId={short.videoId}
+                  title={short.title}
+                  muted
+                />
+                <a href={youtubeWatchUrl(short.videoId)} target="_blank" rel="noreferrer">
+                  {short.title}
+                </a>
+              </article>
+            ))}
+          </div>
         </section>
       </main>
     </PublicLayout>

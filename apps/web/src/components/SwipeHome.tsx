@@ -28,6 +28,7 @@ type Slide = {
   release: string;
   duration: string;
   poster: string;
+  songPath?: string;
   buy?: string;
   stream?: string;
 };
@@ -52,6 +53,7 @@ function buildSlides(): Slide[] {
       release: v.release,
       duration: v.duration,
       poster: youtubeArtworkUrl(v.videoId),
+      songPath: match ? `/song/${match.slug}` : undefined,
       buy: match?.buy || match?.apple,
       stream: match?.buy || 'https://distrokid.com/hyperfollow/3000studios',
     };
@@ -310,6 +312,15 @@ export function SwipeHome() {
                           >
                             YouTube
                           </a>
+                          {s.songPath ? (
+                            <Link
+                              className="md-chip"
+                              to={s.songPath}
+                              onPointerDown={(ev) => ev.stopPropagation()}
+                            >
+                              Song page
+                            </Link>
+                          ) : null}
                         </div>
                       ) : null}
                     </div>
