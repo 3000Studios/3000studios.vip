@@ -91,6 +91,17 @@
   display: none !important;
 }
 
+/* Keep public-page footers content-sized. Earlier visual layers reserved a
+   large stage and bottom-dock clearance here, leaving a visible blank panel
+   after the legal links on non-compact routes. The dock is fixed, so its
+   clearance belongs to page content rather than the document footer. */
+.vipSite .vipFooter {
+  min-height: 0 !important;
+  min-block-size: 0 !important;
+  align-content: start;
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)) !important;
+}
+
 @keyframes buttonGloss {
   0%, 64% { opacity: 0; transform: translateX(-68%) rotate(12deg); }
   70% { opacity: 0.8; }
