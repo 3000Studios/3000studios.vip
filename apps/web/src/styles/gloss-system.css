@@ -1,0 +1,75 @@
+/* Public visual finish: one type system and restrained moving-gloss treatment. */
+:root {
+  --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --md-font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --md-font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+}
+
+.vipSite :is(h1, h2, h3, .brandName, .cardTitle, .kpiValue) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.vipSite :is(button, .md-btn, .md-chip, .studioButton, .bigAction, .vipNavLink, .vipNavCta, .ytCta, .globalMusicToggle, .songSwipe, .playBig, .cBtn) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.vipSite :is(button, .md-btn, .md-chip, .studioButton, .bigAction, .vipNavLink, .vipNavCta, .ytCta, .globalMusicToggle, .songSwipe, .playBig, .cBtn)::after {
+  content: '';
+  position: absolute;
+  inset: -120% -52%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    108deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.12) 46%,
+    rgba(255, 255, 255, 0.52) 50%,
+    rgba(255, 255, 255, 0.12) 54%,
+    transparent 60%
+  );
+  transform: translateX(-68%) rotate(12deg);
+  animation: buttonGloss 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.vipSite :is(button, .md-btn, .md-chip, .studioButton, .bigAction, .vipNavLink, .vipNavCta, .ytCta, .globalMusicToggle, .songSwipe, .playBig, .cBtn):is(:hover, :focus-visible)::after {
+  animation-duration: 1.25s;
+}
+
+.vipSite :is(button, .md-btn, .md-chip, .studioButton, .bigAction, .vipNavLink, .vipNavCta, .ytCta, .globalMusicToggle, .songSwipe, .playBig, .cBtn) :is(svg, .globalMusicToggleIcon) {
+  filter: drop-shadow(0 0 7px rgba(246, 221, 138, 0.48));
+  transition: filter 220ms ease, transform 220ms var(--md-ease, ease);
+}
+
+.vipSite :is(button, .md-btn, .md-chip, .studioButton, .bigAction, .vipNavLink, .vipNavCta, .ytCta, .globalMusicToggle, .songSwipe, .playBig, .cBtn):is(:hover, :focus-visible) :is(svg, .globalMusicToggleIcon) {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.72)) drop-shadow(0 0 18px rgba(212, 175, 55, 0.64));
+  transform: scale(1.08);
+}
+
+.vipSite .vipHeader,
+.vipSite .vipFooter,
+.vipSite .songShorts,
+.vipSite .md-pay-card {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+@keyframes buttonGloss {
+  0%, 64% { opacity: 0; transform: translateX(-68%) rotate(12deg); }
+  70% { opacity: 0.8; }
+  82% { opacity: 0; transform: translateX(68%) rotate(12deg); }
+  100% { opacity: 0; transform: translateX(68%) rotate(12deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vipSite :is(button, .md-btn, .md-chip, .studioButton, .bigAction, .vipNavLink, .vipNavCta, .ytCta, .globalMusicToggle, .songSwipe, .playBig, .cBtn)::after {
+    animation: none;
+    opacity: 0.22;
+    transform: translateX(0) rotate(12deg);
+  }
+}

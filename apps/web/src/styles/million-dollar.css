@@ -569,8 +569,8 @@ body,
 
 .vipSite.is-compact .vipFooter {
   align-self: end;
-  min-block-size: clamp(12rem, 24vw, 17rem);
-  padding-block: clamp(1.5rem, 4vw, 3.25rem);
+  min-block-size: 0;
+  padding-block: clamp(0.85rem, 2vw, 1.25rem) max(0.85rem, env(safe-area-inset-bottom, 0px));
 }
 
 .md-btn,
@@ -755,9 +755,6 @@ body,
 }
 
 @media (max-width: 640px) {
-  .vipSite.is-compact .vipFooter {
-    min-block-size: 0;
-  }
   .md-sound-modal__actions .md-btn {
     width: 100%;
   }

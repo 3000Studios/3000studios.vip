@@ -38,6 +38,7 @@
 @import './styles/music-deck.css';
 @import './styles/song-drop.css';
 @import './styles/swipe-slider.css';
+@import './styles/gloss-system.css';
 
 .routeLoader {
   min-height: 100vh;
