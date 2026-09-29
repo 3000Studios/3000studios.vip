@@ -16,7 +16,6 @@ import {
   youtubeWatchUrl,
 } from '../data/officialReleases';
 import { MERCH_ITEMS } from '../data/merch';
-import { PLATFORMS } from '../lib/commerce';
 import { PublicLayout } from '../pages/Home';
 import '../styles/million-dollar.css';
 
@@ -444,13 +443,6 @@ export function SwipeHome() {
           </div>
         </section>
 
-        <section className="md-strip md-reveal" aria-label="Stream everywhere">
-          {PLATFORMS.map((p) => (
-            <a key={p.id} className="md-chip" href={p.url} target="_blank" rel="noreferrer">
-              {p.label}
-            </a>
-          ))}
-        </section>
       </div>
     </PublicLayout>
   );
