@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { GlobalMusicToggle } from '../components/GlobalMusic';
 import { LiveWallpaper } from '../components/LiveWallpaper';
-import { MouseFX } from '../components/MouseFX';
 import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { PlatformLogos } from '../components/PlatformLogos';
@@ -228,7 +227,6 @@ export function PublicLayout({
           palette={theme.palette}
           coverUrl={theme.cover}
         />
-        <MouseFX />
         <ZombieFX />
         <ScrollFX />
       </ReducedMotionGate>
