@@ -70,3 +70,47 @@ img, video, iframe { max-width: 100%; }
 @media (min-width: 980px) {
   .musicDock { left: 24%; right: 24%; bottom: 16px; }
 }
+
+/* Universal Viewport & Responsive Polish: Prevent horizontal scroll glitches across all viewports */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body, #root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  overflow-x: clip;
+}
+
+.vipSite {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+/* Ensure live wallpapers scale smoothly without viewport distortion */
+.liveWallpaper {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.liveWallpaperCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .phoneGoLive {
+    min-height: calc(100dvh - 120px);
+  }
+}
+

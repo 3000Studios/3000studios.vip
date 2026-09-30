@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { WHIP_URL_STORAGE_KEY, WhipPublisher, validateWhipUrl } from '../lib/webrtcStream';
 import { setHostLiveFlag } from '../lib/streamScene';
+import { PublicLayout } from './PublicLayout';
 
 export function PhoneGoLive() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -65,79 +66,83 @@ export function PhoneGoLive() {
 
   if (!unlocked) {
     return (
-      <div className="phoneGoLive phoneGoLiveLock">
-        <div className="phoneGoLiveCard">
-          <p>3000 Studios</p>
-          <h1>Owner access required</h1>
-          <p>Open the owner Go Live Console first, then return here to use your phone camera.</p>
-          <Link to="/admin">Open Go Live Console</Link>
-          <Link to="/">Back home</Link>
+      <PublicLayout variant="blackhole">
+        <div className="phoneGoLive phoneGoLiveLock">
+          <div className="phoneGoLiveCard">
+            <p>3000 Studios</p>
+            <h1>Owner access required</h1>
+            <p>Open the owner Go Live Console first, then return here to use your phone camera.</p>
+            <Link to="/admin">Open Go Live Console</Link>
+            <Link to="/">Back home</Link>
+          </div>
         </div>
-      </div>
+      </PublicLayout>
     );
   }
 
   return (
-    <div className="phoneGoLive">
-      <header className="phoneGoLiveBar">
-        <Link to="/">Home</Link>
-        <strong>Phone Go Live</strong>
-        <Link to="/live" target="_blank" rel="noreferrer">
-          Viewers
-        </Link>
-      </header>
-      <video ref={videoRef} className="phoneGoLiveVideo" playsInline muted autoPlay />
-      <div className="phoneGoLiveDock">
-        <p className={status === 'live' ? 'is-live' : ''}>
-          {status === 'live'
-            ? `YOU ARE LIVE ${micMuted ? '· 🔇 MIC MUTED' : '· 🎙️ SOUND ON'}`
-            : 'Preview · one tap to broadcast'}
-        </p>
-        {error ? <p className="phoneGoLiveErr">{error}</p> : null}
-        {!validateWhipUrl(whip).ok ? (
-          <label className="phoneGoLiveWhip">
-            <span>Cloudflare WebRTC publish URL</span>
-            <input
-              type="url"
-              value={whip}
-              onChange={(event) => {
-                const value = event.target.value;
-                setWhip(value);
-                localStorage.setItem(WHIP_URL_STORAGE_KEY, value.trim());
-              }}
-              placeholder="Paste once from Cloudflare Live Inputs"
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </label>
-        ) : null}
-        <div className="phoneGoLiveActions">
-          {status === 'live' ? (
-            <button type="button" className="phoneGoLiveStop" onClick={() => void endLive()}>
-              End live
+    <PublicLayout variant="blackhole" compact>
+      <div className="phoneGoLive">
+        <header className="phoneGoLiveBar">
+          <Link to="/">Home</Link>
+          <strong>Phone Go Live</strong>
+          <Link to="/live" target="_blank" rel="noreferrer">
+            Viewers
+          </Link>
+        </header>
+        <video ref={videoRef} className="phoneGoLiveVideo" playsInline muted autoPlay />
+        <div className="phoneGoLiveDock">
+          <p className={status === 'live' ? 'is-live' : ''}>
+            {status === 'live'
+              ? `YOU ARE LIVE ${micMuted ? '· 🔇 MIC MUTED' : '· 🎙️ SOUND ON'}`
+              : 'Preview · one tap to broadcast'}
+          </p>
+          {error ? <p className="phoneGoLiveErr">{error}</p> : null}
+          {!validateWhipUrl(whip).ok ? (
+            <label className="phoneGoLiveWhip">
+              <span>Cloudflare WebRTC publish URL</span>
+              <input
+                type="url"
+                value={whip}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setWhip(value);
+                  localStorage.setItem(WHIP_URL_STORAGE_KEY, value.trim());
+                }}
+                placeholder="Paste once from Cloudflare Live Inputs"
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </label>
+          ) : null}
+          <div className="phoneGoLiveActions">
+            {status === 'live' ? (
+              <button type="button" className="phoneGoLiveStop" onClick={() => void endLive()}>
+                End live
+              </button>
+            ) : (
+              <button type="button" className="phoneGoLiveStart" disabled={status === 'busy'} onClick={() => void goLive()}>
+                {status === 'busy' ? 'Connecting…' : 'Go Live'}
+              </button>
+            )}
+            <button
+              type="button"
+              className="phoneGoLiveFlip"
+              onClick={() => setFacing((f) => (f === 'user' ? 'environment' : 'user'))}
+            >
+              Flip camera
             </button>
-          ) : (
-            <button type="button" className="phoneGoLiveStart" disabled={status === 'busy'} onClick={() => void goLive()}>
-              {status === 'busy' ? 'Connecting…' : 'Go Live'}
+            <button
+              type="button"
+              className="phoneGoLiveFlip"
+              style={{ background: micMuted ? 'rgba(239, 68, 68, 0.4)' : undefined }}
+              onClick={toggleMic}
+            >
+              {micMuted ? '🔇 Unmute' : '🎙️ Mic on'}
             </button>
-          )}
-          <button
-            type="button"
-            className="phoneGoLiveFlip"
-            onClick={() => setFacing((f) => (f === 'user' ? 'environment' : 'user'))}
-          >
-            Flip camera
-          </button>
-          <button
-            type="button"
-            className="phoneGoLiveFlip"
-            style={{ background: micMuted ? 'rgba(239, 68, 68, 0.4)' : undefined }}
-            onClick={toggleMic}
-          >
-            {micMuted ? '🔇 Unmute' : '🎙️ Mic on'}
-          </button>
+          </div>
         </div>
       </div>
-    </div>
+    </PublicLayout>
   );
 }

@@ -48,10 +48,8 @@ function detectDevice(): DeviceKind {
 }
 
 export function Admin() {
-  const { isAuthenticated, login, logout, ownerUsername } = useAuth();
-  const [email, setEmail] = useState(ownerUsername);
+  const { isAuthenticated, login, logout } = useAuth();
   const [passcode, setPasscode] = useState('');
-  const [secretAnswer, setSecretAnswer] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [device, setDevice] = useState<DeviceKind>(() => detectDevice());
@@ -104,14 +102,13 @@ export function Admin() {
     e.preventDefault();
     setError(null);
     setBusy(true);
-    const ok = await login(email, passcode, secretAnswer);
+    const ok = await login(passcode);
     setBusy(false);
     if (ok) {
       setPasscode('');
-      setSecretAnswer('');
       setError(null);
     } else {
-      setError('Incorrect owner credentials. Try again.');
+      setError('Incorrect access code. Enter 3000 to access.');
       setPasscode('');
     }
   }
@@ -170,61 +167,44 @@ export function Admin() {
       <PublicLayout variant="blackhole">
         <div className="adminScrim adminEasyShell adminWithNav">
           <form className="adminCodeModal" onSubmit={handleUnlock}>
-            <span>3000 Studios · Owner Access</span>
+            <span>3000 STUDIOS · OWNER ACCESS</span>
             <h2>Go Live Console</h2>
-            <p>Unlock, access camera, pick a look, hit Go Live. Viewers watch /live.</p>
-            <label>
-              <span>Email</span>
-              <input
-                type="email"
-                autoComplete="username"
-                autoFocus
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError(null);
-                }}
-                placeholder="owner@example.com"
-              />
-            </label>
-            <label>
-              <span>Passcode</span>
+            <p>Enter access code to unlock live stream studio, camera & owner tools.</p>
+            <label className="adminPasscodeLabel">
+              <span>Access Code (Passcode = 3000)</span>
               <input
                 type="password"
                 inputMode="numeric"
+                pattern="[0-9]*"
                 autoComplete="current-password"
+                autoFocus
                 value={passcode}
                 onChange={(e) => {
                   setPasscode(e.target.value);
                   setError(null);
                 }}
-                placeholder="Enter passcode"
+                placeholder="Enter Passcode (3000)"
                 maxLength={32}
-              />
-            </label>
-            <label>
-              <span>Secret answer</span>
-              <input
-                type="password"
-                autoComplete="off"
-                value={secretAnswer}
-                onChange={(e) => {
-                  setSecretAnswer(e.target.value);
-                  setError(null);
-                }}
-                placeholder="Enter secret answer"
-                maxLength={120}
               />
             </label>
             {error ? <div className="adminError">{error}</div> : null}
             <button
               type="submit"
               className="cBtn primary"
-              style={{ width: '100%' }}
+              style={{ width: '100%', minHeight: '52px', fontSize: '1.05rem', fontWeight: 700 }}
               disabled={busy}
             >
-              {busy ? 'Unlocking…' : 'Unlock'}
+              {busy ? 'Unlocking…' : 'Unlock Admin Console'}
             </button>
+            <div className="adminQuickPinRow" style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+              <button
+                type="button"
+                className="cBtn ghost sm"
+                onClick={() => setPasscode('3000')}
+              >
+                Auto-fill 3000
+              </button>
+            </div>
             <Link to="/" className="adminBackLink">
               ← Back to public site
             </Link>
@@ -240,8 +220,8 @@ export function Admin() {
         <div className="cMain">
           <header className="cTopbar">
             <div className="cTitle">
-              <h1>Go Live</h1>
-              <span className="cTitleSub">Camera · filter · overlay · Go Live</span>
+              <h1>Go Live Console</h1>
+              <span className="cTitleSub">Camera · filter · overlay · broadcast</span>
             </div>
             <div className="cTopbarRight">
               <span className={`cPill ${broadcasting || isLive ? 'live' : 'warn'}`}>
