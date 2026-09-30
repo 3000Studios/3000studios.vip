@@ -5,7 +5,8 @@
  */
 
 export const ADSENSE_PUBLISHER_ID =
-  (import.meta.env.VITE_ADSENSE_CLIENT_ID as string | undefined)?.trim() || '';
+  (import.meta.env.VITE_ADSENSE_CLIENT_ID as string | undefined)?.trim() ||
+  'ca-pub-5800977493749262';
 
 export const ADSENSE_HOME_SLOT =
   (import.meta.env.VITE_ADSENSE_HOME_SLOT as string | undefined)?.trim() || '';

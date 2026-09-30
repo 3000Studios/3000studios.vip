@@ -16,8 +16,12 @@ import {
   youtubeWatchUrl,
 } from '../data/officialReleases';
 import { MERCH_ITEMS } from '../data/merch';
-import { PublicLayout } from '../pages/Home';
+import { PublicLayout, AdSenseUnit } from '../pages/Home';
+import { detectIsLive } from '../lib/streamLiveDetect';
+import { ADSENSE_HOME_SLOT } from '../lib/adsense';
+import { CASH_APP_URL } from '../lib/liveRoom';
 import '../styles/million-dollar.css';
+import '../styles/vip-luxury.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -101,6 +105,21 @@ export function SwipeHome() {
   const indexRef = useRef(index);
   const viewportRef = useRef<HTMLDivElement>(null);
   const song = slides[index];
+  const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const checkLive = async () => {
+      const state = await detectIsLive();
+      if (!cancelled) setIsLive(state.live);
+    };
+    void checkLive();
+    const interval = window.setInterval(checkLive, 10000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     indexRef.current = index;
@@ -197,8 +216,23 @@ export function SwipeHome() {
           </div>
           <div className="md-hero-veil" aria-hidden="true" />
           <div className="md-hero-copy md-reveal">
-            <span className="md-kicker">YouTube · DistroKid · Official Artist</span>
-            <h1 className="md-title">3000 Studios</h1>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+              <span className="md-kicker">YouTube · DistroKid · Official Artist</span>
+              <Link to="/live" className={isLive ? 'vip-live-pill' : 'md-kicker'} style={{ textDecoration: 'none' }}>
+                <span className={isLive ? 'vip-live-dot' : ''} />
+                {isLive ? '● ON AIR NOW' : '○ LIVE STAGE'}
+              </Link>
+            </div>
+            <h1 className="md-title" style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+              <span className="vip-gold-text">3000 Studios</span>
+              <span className="vip-eq-wave" aria-hidden="true">
+                <span className="vip-eq-bar" />
+                <span className="vip-eq-bar" />
+                <span className="vip-eq-bar" />
+                <span className="vip-eq-bar" />
+                <span className="vip-eq-bar" />
+              </span>
+            </h1>
             <p className="md-sub">
               {n} official music videos. Swipe through every drop — everything streams free.
               Subscribe so YouTube puts the next release in your feed.
@@ -212,11 +246,14 @@ export function SwipeHome() {
               >
                 Subscribe on YouTube
               </a>
+              <Link className="md-btn md-btn-ghost" to="/live">
+                {isLive ? '● Watch Live Stream' : 'Live Stream Stage'}
+              </Link>
               <a className="md-btn md-btn-ghost" href="#music">
-                Swipe the videos
+                Swipe 47 Videos
               </a>
               <Link className="md-btn md-btn-ghost" to="/shop">
-                Shop the drop
+                Shop the Drop
               </Link>
             </div>
           </div>
@@ -432,6 +469,21 @@ export function SwipeHome() {
               </a>
             </article>
             <article className="md-pay-card md-reveal">
+              <span className="md-tag" style={{ color: '#00d632', borderColor: 'rgba(0, 214, 50, 0.4)' }}>$Tip</span>
+              <h3>Cash App Tip Jar</h3>
+              <p>Direct artist support via $addcashGift. Instant drop boost.</p>
+              <span className="md-price">Any $</span>
+              <a
+                className="md-btn md-btn-gold"
+                href={CASH_APP_URL}
+                target="_blank"
+                rel="noreferrer"
+                style={{ background: 'linear-gradient(135deg, #00d632, #009922)', color: '#fff' }}
+              >
+                Tip $addcashGift
+              </a>
+            </article>
+            <article className="md-pay-card md-reveal">
               <span className="md-tag">Merch</span>
               <h3>Wear the brand</h3>
               <p>Hoodies, tees, caps, sticker packs. Limited runs.</p>
@@ -441,6 +493,10 @@ export function SwipeHome() {
               </Link>
             </article>
           </div>
+        </section>
+
+        <section style={{ maxWidth: 1200, margin: '24px auto', padding: '0 16px' }}>
+          <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
         </section>
 
       </div>

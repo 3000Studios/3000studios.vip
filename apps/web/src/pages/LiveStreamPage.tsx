@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PublicLayout } from './Home';
+import { PublicLayout, AdSenseUnit } from './Home';
 import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
 import { LiveChatPanel, TipJar, ViewerCount, useLiveRoom } from '../components/LiveInteraction';
 import { STREAM_PLAYER_EMBED_SRC } from '../lib/streamConfig';
+import { ADSENSE_LIVE_SLOT } from '../lib/adsense';
 import '../styles/discover.css';
 import '../styles/live-experience.css';
+import '../styles/vip-luxury.css';
 
 const INQUIRY_EMAIL = 'Team@3000studios.vip';
 const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}`;
@@ -200,6 +202,9 @@ export function LiveStreamPage() {
             Inquiry
           </a>
         </div>
+        <section style={{ maxWidth: 1200, margin: '28px auto 0', padding: '0 16px' }}>
+          <AdSenseUnit slot={ADSENSE_LIVE_SLOT} />
+        </section>
       </div>
     </PublicLayout>
   );

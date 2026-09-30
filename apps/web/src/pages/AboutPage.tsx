@@ -1,59 +1,44 @@
-import { PublicLayout } from './PublicLayout';
+import { Link } from 'react-router-dom';
+import { PublicLayout } from './Home';
+import '../styles/vip-luxury.css';
 
 export function AboutPage() {
   return (
-    <PublicLayout variant="electric">
-      <main className="vipMain">
-        <section className="vipPageHero">
-          <span className="vipKicker">About</span>
-          <h1>About 3000 Studios</h1>
-          <p>
-            3000 Studios is an AI-driven music production brand run by Jeremy Swain from Acworth,
-            Georgia. Every release starts here: original songs written, produced, and finished in
-            the studio, using modern AI tools alongside hands-on arrangement, mixing, and
-            mastering. The studio runs on a simple model: use the best tools available — including
-            artificial intelligence — to make original music faster, without cutting corners on
-            quality.
+    <PublicLayout variant="electric" compact>
+      <main style={{ minHeight: '100vh', padding: '28px 16px 80px', maxWidth: 920, margin: '0 auto' }}>
+        <section className="vip-glass-card" style={{ padding: '36px 24px', textAlign: 'center', marginBottom: 28 }}>
+          <span className="vip-live-pill" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
+            The Story
+          </span>
+          <h1 className="vip-gold-text" style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 6vw, 48px)', margin: '12px 0 8px', fontWeight: 800 }}>
+            About 3000 Studios
+          </h1>
+          <p style={{ color: 'var(--vip-text-muted)', fontSize: 16 }}>
+            Independent AI-driven music production from Acworth, Georgia.
           </p>
-          <p>
-            The catalog is fully independent. Songs are released through DistroKid to Spotify,
-            Apple Music, YouTube, and every other major streaming service, where they are available
-            under the 3000 Studios name. The brand also maintains a library of 47 official music
-            videos, giving each release a visual identity as well as a sound.
+        </section>
+
+        <section className="vip-glass-card" style={{ padding: '36px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <p style={{ color: '#f8f6f0', fontSize: 16, lineHeight: 1.7, margin: 0 }}>
+            <strong style={{ color: '#ffd700' }}>3000 Studios</strong> is an independent music production label and creator media brand founded by Jeremy Swain in Acworth, Georgia. Every release begins in the studio: original songwriting, cutting-edge AI production assistance, and meticulous human arrangement, vocal production, mixing, and mastering.
           </p>
-          <p>
-            3000 Studios operates at the intersection of traditional songwriting and new
-            technology. AI tools accelerate parts of the process — idea generation, arrangement
-            sketches, vocal and instrumental production — but every track is curated and finalized
-            by a human producer. The result is a steady output of original music across genres,
-            from anthemic pop to hip-hop, country, and electronic experiments. Releases span
-            multiple genres because the tools make experimentation affordable: an idea can go from
-            voice memo to full production in days rather than months.
+          <p style={{ color: '#f8f6f0', fontSize: 16, lineHeight: 1.7, margin: 0 }}>
+            Our 47-release catalog is distributed globally across Spotify, Apple Music, YouTube, and all major digital streaming platforms via DistroKid. Every song is paired with a cinematic official music video, creating a rich visual world for our community.
           </p>
-          <p>
-            Beyond the music itself, 3000 Studios is a growing creator community. New songs,
-            videos, and behind-the-scenes clips are shared regularly on TikTok, Instagram, and
-            Facebook, where listeners can follow the process from first demo to finished release.
-            This website serves as the hub: music, videos, live streams, fan requests, and
-            sponsor packages all live in one place.
+          <p style={{ color: '#f8f6f0', fontSize: 16, lineHeight: 1.7, margin: 0 }}>
+            We operate at the leading edge of music technology. Advanced AI accelerates ideation, melody synthesis, and instrumentals, while human artistry shapes each song into an anthemic, unforgettable experience across pop, hip-hop, electronic, rock, and cinematic genres.
           </p>
-          <p>
-            Jeremy started 3000 Studios with a simple belief: independent artists no longer need a
-            label to reach listeners. Distribution is global, the tools are in the studio, and the
-            audience is one click away. What remains is the work — writing songs worth hearing,
-            producing them to a professional standard, and showing up consistently. The goal has
-            never changed: make music people actually want to hear, and keep the independent
-            spirit intact.
-          </p>
-          <p>
-            If you want to get in touch — for collaboration, licensing, press, or just to talk
-            about the music — reach out through the contact page on this site. Every message goes
-            directly to the studio.
-          </p>
-          <p>
-            Welcome to 3000 Studios. The music is original, the videos are official, and there is
-            always something new in the works.
-          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 12, borderTop: '1px solid rgba(255, 215, 0, 0.2)', paddingTop: 20 }}>
+            <Link className="vip-btn-gold" to="/#music">
+              Explore 47 Tracks
+            </Link>
+            <Link className="vip-btn-obsidian" to="/live">
+              Watch Live Stream
+            </Link>
+            <Link className="vip-btn-obsidian" to="/contact">
+              Contact Studio
+            </Link>
+          </div>
         </section>
       </main>
     </PublicLayout>

@@ -1,0 +1,293 @@
+/* ==========================================================================
+   3000 STUDIOS VIP — LUXURY OBSIDIAN & MOLTEN GOLD DESIGN SYSTEM
+   ========================================================================== */
+
+:root {
+  --vip-bg-obsidian: #040508;
+  --vip-bg-card: rgba(10, 13, 22, 0.78);
+  --vip-bg-glass: rgba(14, 18, 30, 0.65);
+  --vip-bg-glass-strong: rgba(7, 10, 18, 0.92);
+  
+  --vip-gold-glow: #ffd700;
+  --vip-gold-light: #fff2a8;
+  --vip-gold-mid: #e5b324;
+  --vip-gold-deep: #8f6c10;
+  --vip-gold-border: rgba(255, 215, 0, 0.24);
+  --vip-gold-border-hi: rgba(255, 215, 0, 0.65);
+  
+  --vip-cyan-neon: #00f0ff;
+  --vip-purple-neon: #a855f7;
+  --vip-crimson-neon: #ff2a5f;
+  
+  --vip-text-main: #f8f6f0;
+  --vip-text-muted: #9da4b6;
+  --vip-text-gold: #f7df8f;
+
+  --vip-radius-sm: 8px;
+  --vip-radius-md: 14px;
+  --vip-radius-lg: 22px;
+  --vip-radius-pill: 9999px;
+
+  --vip-shadow-card: 0 18px 45px -10px rgba(0, 0, 0, 0.85), 0 0 20px rgba(255, 215, 0, 0.05);
+  --vip-shadow-gold: 0 0 30px rgba(255, 215, 0, 0.35), 0 4px 18px rgba(0, 0, 0, 0.7);
+  --vip-shadow-glow: 0 0 35px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.15);
+}
+
+/* Base Body Enhancements */
+body {
+  background-color: var(--vip-bg-obsidian);
+  color: var(--vip-text-main);
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 215, 0, 0.12), transparent 70%),
+    radial-gradient(circle 600px at 90% 40%, rgba(0, 240, 255, 0.04), transparent),
+    radial-gradient(circle 600px at 10% 70%, rgba(168, 85, 247, 0.04), transparent);
+  background-attachment: fixed;
+}
+
+/* Obsidian Glass Card Base */
+.vip-glass-card {
+  background: var(--vip-bg-card);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--vip-gold-border);
+  border-radius: var(--vip-radius-lg);
+  box-shadow: var(--vip-shadow-card);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.vip-glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 242, 168, 0.6), transparent);
+  pointer-events: none;
+}
+
+.vip-glass-card:hover {
+  border-color: var(--vip-gold-border-hi);
+  box-shadow: var(--vip-shadow-glow);
+  transform: translateY(-3px);
+}
+
+/* Gold Shimmer Typography */
+.vip-gold-text {
+  background: linear-gradient(135deg, #ffffff 0%, #fff0a0 25%, #ffd700 50%, #e5a918 80%, #fff4b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 25px rgba(255, 215, 0, 0.35);
+}
+
+.vip-cyan-text {
+  background: linear-gradient(135deg, #ffffff 0%, #00f0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Live On-Air Pill */
+.vip-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--vip-radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: rgba(255, 42, 95, 0.15);
+  border: 1px solid rgba(255, 42, 95, 0.4);
+  color: #ff3366;
+  box-shadow: 0 0 15px rgba(255, 42, 95, 0.3);
+}
+
+.vip-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff2a5f;
+  box-shadow: 0 0 8px #ff2a5f;
+  animation: vipPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes vipPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.55; }
+}
+
+/* Equalizer Bars Animation */
+.vip-eq-wave {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 20px;
+  padding: 0 4px;
+}
+
+.vip-eq-bar {
+  width: 3px;
+  background: linear-gradient(180deg, #fff0a0, #ffd700);
+  border-radius: 2px;
+  animation: vipSoundWave 1.2s ease-in-out infinite alternate;
+}
+
+.vip-eq-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+.vip-eq-bar:nth-child(2) { height: 16px; animation-delay: 0.25s; }
+.vip-eq-bar:nth-child(3) { height: 10px; animation-delay: 0.4s; }
+.vip-eq-bar:nth-child(4) { height: 18px; animation-delay: 0.15s; }
+.vip-eq-bar:nth-child(5) { height: 8px; animation-delay: 0.35s; }
+
+@keyframes vipSoundWave {
+  0% { height: 4px; }
+  100% { height: 20px; }
+}
+
+/* Luxury Buttons */
+.vip-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #fff0a0 0%, #ffd700 40%, #cca012 100%);
+  color: #0b0902;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  padding: 12px 22px;
+  border-radius: var(--vip-radius-pill);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 8px 24px -4px rgba(255, 215, 0, 0.4);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.vip-btn-gold:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(255, 215, 0, 0.6);
+  filter: brightness(1.08);
+}
+
+.vip-btn-obsidian {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(14, 18, 30, 0.7);
+  backdrop-filter: blur(12px);
+  color: var(--vip-text-main);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: var(--vip-radius-pill);
+  border: 1px solid var(--vip-gold-border);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.vip-btn-obsidian:hover {
+  background: rgba(22, 28, 46, 0.85);
+  border-color: var(--vip-gold-border-hi);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Top VIP Hero Banner */
+.vip-hero-hub {
+  position: relative;
+  padding: clamp(32px, 6vw, 64px) clamp(16px, 4vw, 32px);
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.vip-hero-hub h1 {
+  font-family: 'Syne', 'Manrope', sans-serif;
+  font-size: clamp(36px, 7vw, 76px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.vip-hero-hub p {
+  font-size: clamp(15px, 2.2vw, 19px);
+  color: var(--vip-text-muted);
+  max-width: 640px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Quick Action Badge Row */
+.vip-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Tip Jar Component Styles */
+.vip-tip-jar {
+  background: linear-gradient(145deg, rgba(16, 20, 32, 0.9), rgba(8, 10, 18, 0.95));
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: var(--vip-radius-lg);
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.vip-tip-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.vip-tip-chip {
+  padding: 8px 16px;
+  border-radius: var(--vip-radius-pill);
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+  font-weight: 800;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vip-tip-chip:hover {
+  background: #ffd700;
+  color: #05060a;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+  transform: scale(1.05);
+}
+
+/* Mobile Touch & Scroll Fixes */
+@media (max-width: 768px) {
+  .vip-hero-hub {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .vip-badge-row {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+  }
+  .vip-btn-gold, .vip-btn-obsidian {
+    width: 100%;
+  }
+}
