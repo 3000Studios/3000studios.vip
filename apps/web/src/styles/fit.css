@@ -114,3 +114,37 @@ body, #root {
   }
 }
 
+/* Visual Glitch & Filter Stabilization */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img, video, canvas {
+  image-rendering: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Prevent unwanted filter jitter / color flashing during transitions */
+.liveWallpaper,
+.liveWallpaperCanvas,
+.filmGrain,
+.filmScan,
+.filmLetterbox {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Prevent stutter or jitter on camera/studio preview containers */
+.studioCanvas,
+.phoneGoLiveVideo,
+.adminPreviewFrame {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  border-radius: inherit;
+}
+
+
