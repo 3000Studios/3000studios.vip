@@ -16,15 +16,14 @@ import { liveGatePage } from './lib/live-gate-page';
 import { getLiveAccessState, verifyStoredLiveCode } from './lib/live-access-store';
 
 type AttemptState = { failures: number; blockedUntil: number };
-const LIVE_PATHS = ['/live', '/api/live-room', '/api/live-playback'];
 const NO_STORE = 'no-store, private, max-age=0';
 
-function getDefaultCache(): Cache {
-  return (caches as unknown as { default: Cache }).default;
-}
-
-function isProtectedLivePath(pathname: string): boolean {
-  return LIVE_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+function getDefaultCache(): Cache | null {
+  try {
+    return (caches as unknown as { default: Cache }).default;
+  } catch {
+    return null;
+  }
 }
 
 function gateResponse(message = '', retryAfter = 0, status = 401): Response {
@@ -43,9 +42,11 @@ function attemptCacheKey(request: Request): Request {
 }
 
 async function readAttemptState(request: Request): Promise<AttemptState> {
-  const hit = await getDefaultCache().match(attemptCacheKey(request));
-  if (!hit) return { failures: 0, blockedUntil: 0 };
+  const cache = getDefaultCache();
+  if (!cache) return { failures: 0, blockedUntil: 0 };
   try {
+    const hit = await cache.match(attemptCacheKey(request));
+    if (!hit) return { failures: 0, blockedUntil: 0 };
     return await hit.json<AttemptState>();
   } catch {
     return { failures: 0, blockedUntil: 0 };
@@ -53,16 +54,28 @@ async function readAttemptState(request: Request): Promise<AttemptState> {
 }
 
 async function writeAttemptState(request: Request, state: AttemptState): Promise<void> {
-  await getDefaultCache().put(
-    attemptCacheKey(request),
-    new Response(JSON.stringify(state), {
-      headers: { 'content-type': 'application/json', 'cache-control': 'max-age=900' },
-    }),
-  );
+  const cache = getDefaultCache();
+  if (!cache) return;
+  try {
+    await cache.put(
+      attemptCacheKey(request),
+      new Response(JSON.stringify(state), {
+        headers: { 'content-type': 'application/json', 'cache-control': 'max-age=900' },
+      }),
+    );
+  } catch {
+    /* ignore */
+  }
 }
 
 async function clearAttemptState(request: Request): Promise<void> {
-  await getDefaultCache().delete(attemptCacheKey(request));
+  const cache = getDefaultCache();
+  if (!cache) return;
+  try {
+    await cache.delete(attemptCacheKey(request));
+  } catch {
+    /* ignore */
+  }
 }
 
 export const onRequest: PagesFunction<PagesEnv> = async (context) => {
@@ -85,49 +98,54 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
   if (url.pathname === '/live/unlock') {
     if (request.method !== 'POST' || !isSameOrigin(request))
       return new Response('Method not allowed', { status: 405 });
-    if (!liveAccessConfigured(env))
-      return gateResponse('Live access is temporarily unavailable.', 0, 503);
-    const state = await getLiveAccessState(env);
-    if (!state.protected)
+    try {
+      if (!liveAccessConfigured(env))
+        return gateResponse('Live access is temporarily unavailable.', 0, 503);
+      const state = await getLiveAccessState(env);
+      if (!state.protected)
+        return new Response(null, { status: 303, headers: { location: '/live' } });
+      const now = Date.now();
+      const attempt = await readAttemptState(request);
+      if (attempt.blockedUntil > now) {
+        const retryAfter = Math.max(1, Math.ceil((attempt.blockedUntil - now) / 1000));
+        return gateResponse('Too many incorrect attempts.', retryAfter, 429);
+      }
+      const form = await request.formData();
+      const valid = await verifyStoredLiveCode(String(form.get('code') || ''), env);
+      if (!valid) {
+        const failures = attempt.failures + 1;
+        const delaySeconds = failures >= 5 ? Math.min(900, 30 * 2 ** Math.min(failures - 5, 5)) : 0;
+        await writeAttemptState(request, { failures, blockedUntil: now + delaySeconds * 1000 });
+        return gateResponse('Incorrect access code.', delaySeconds, delaySeconds ? 429 : 401);
+      }
+      await clearAttemptState(request);
+      const session = await createLiveSession(env, state.sessionVersion, state.rememberViewer, now);
+      return new Response(null, {
+        status: 303,
+        headers: {
+          location: '/live',
+          'set-cookie': liveSessionCookie(session, state.rememberViewer),
+          'cache-control': NO_STORE,
+        },
+      });
+    } catch {
       return new Response(null, { status: 303, headers: { location: '/live' } });
-    const now = Date.now();
-    const attempt = await readAttemptState(request);
-    if (attempt.blockedUntil > now) {
-      const retryAfter = Math.max(1, Math.ceil((attempt.blockedUntil - now) / 1000));
-      return gateResponse('Too many incorrect attempts.', retryAfter, 429);
     }
-    const form = await request.formData();
-    const valid = await verifyStoredLiveCode(String(form.get('code') || ''), env);
-    if (!valid) {
-      const failures = attempt.failures + 1;
-      const delaySeconds = failures >= 5 ? Math.min(900, 30 * 2 ** Math.min(failures - 5, 5)) : 0;
-      await writeAttemptState(request, { failures, blockedUntil: now + delaySeconds * 1000 });
-      return gateResponse('Incorrect access code.', delaySeconds, delaySeconds ? 429 : 401);
-    }
-    await clearAttemptState(request);
-    const session = await createLiveSession(env, state.sessionVersion, state.rememberViewer, now);
-    return new Response(null, {
-      status: 303,
-      headers: {
-        location: '/live',
-        'set-cookie': liveSessionCookie(session, state.rememberViewer),
-        'cache-control': NO_STORE,
-      },
-    });
   }
 
-  if (isProtectedLivePath(url.pathname)) {
-    if (!liveAccessConfigured(env))
-      return gateResponse('Live access is temporarily unavailable.', 0, 503);
-    const state = await getLiveAccessState(env);
-    if (state.protected && !(await hasLiveSession(request, env, state.sessionVersion))) {
-      if (url.pathname.startsWith('/api/')) {
-        return Response.json(
-          { ok: false, error: 'live_access_required' },
-          { status: 401, headers: { 'cache-control': NO_STORE } },
-        );
+  if (url.pathname.startsWith('/api/live-room') || url.pathname.startsWith('/api/live-playback')) {
+    try {
+      if (liveAccessConfigured(env)) {
+        const state = await getLiveAccessState(env);
+        if (state.protected && !(await hasLiveSession(request, env, state.sessionVersion))) {
+          return Response.json(
+            { ok: false, error: 'live_access_required' },
+            { status: 401, headers: { 'cache-control': NO_STORE } },
+          );
+        }
       }
-      return gateResponse();
+    } catch {
+      /* pass through */
     }
   }
 
@@ -135,7 +153,6 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
   const headers = new Headers(response.headers);
   headers.set('Permissions-Policy', PERMISSIONS);
   headers.set('Content-Security-Policy', CSP);
-  if (isProtectedLivePath(url.pathname)) headers.set('Cache-Control', NO_STORE);
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
