@@ -163,6 +163,9 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
       headers,
     });
   } catch {
-    return context.next();
+    // Never call context.next() twice: re-invoking the downstream chain can
+    // double side-effects (D1 writes, rate-limit counters) and masks the real
+    // error. Fail closed with a plain 500 instead.
+    return new Response('Internal Server Error', { status: 500 });
   }
 };

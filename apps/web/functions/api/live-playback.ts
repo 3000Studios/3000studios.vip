@@ -51,14 +51,18 @@ async function createPlaybackToken(env: LivePlaybackEnv): Promise<string> {
 }
 
 export async function onRequestGet({ request, env }: { request: Request; env: LivePlaybackEnv }) {
-  const state = await getLiveAccessState(env);
-  if (state.protected && !(await hasLiveSession(request, env, state.sessionVersion))) {
-    return Response.json(
-      { ok: false, error: 'live_access_required' },
-      { status: 401, headers: { 'cache-control': 'no-store' } },
-    );
-  }
   try {
+    // NOTE: getLiveAccessState needs the D1 `DB` binding. It must stay inside
+    // the try/catch: when DB (or env) is missing in production this throws, and
+    // an unhandled throw here broke /live with a Worker exception. 503 JSON
+    // keeps the contract instead.
+    const state = await getLiveAccessState(env);
+    if (state.protected && !(await hasLiveSession(request, env, state.sessionVersion))) {
+      return Response.json(
+        { ok: false, error: 'live_access_required' },
+        { status: 401, headers: { 'cache-control': 'no-store' } },
+      );
+    }
     const token = await createPlaybackToken(env);
     const customer = env.STREAM_CUSTOMER_CODE?.trim();
     if (!customer) throw new Error('Stream customer code is not configured');
