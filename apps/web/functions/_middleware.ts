@@ -149,13 +149,20 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
     }
   }
 
-  const response = await context.next();
-  const headers = new Headers(response.headers);
-  headers.set('Permissions-Policy', PERMISSIONS);
-  headers.set('Content-Security-Policy', CSP);
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
+  try {
+    const response = await context.next();
+    if (response.status === 304 || response.status === 204 || response.status === 101) {
+      return response;
+    }
+    const headers = new Headers(response.headers);
+    headers.set('Permissions-Policy', PERMISSIONS);
+    headers.set('Content-Security-Policy', CSP);
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  } catch {
+    return context.next();
+  }
 };
