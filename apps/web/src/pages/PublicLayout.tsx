@@ -16,7 +16,10 @@ const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
 const navItems = [
   { to: '/', label: 'Home', icon: '⌂', hint: 'VIP lobby' },
+  { to: '/#music', label: 'Music', icon: '♪', hint: 'Full catalog' },
+  { to: '/live', label: 'Live', icon: '●', hint: 'Broadcast' },
   { to: '/video', label: 'Video', icon: '▶', hint: 'Visuals' },
+  { to: '/shop', label: 'Shop', icon: '▣', hint: 'Merch' },
   { to: '/community', label: 'Chat', icon: '◎', hint: 'Community' },
   { to: '/requests', label: 'Requests', icon: '✦', hint: 'Song ideas' },
   { to: '/blog', label: 'Blog', icon: '◈', hint: 'Editorial' },

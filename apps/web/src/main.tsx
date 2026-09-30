@@ -21,6 +21,7 @@ import {
   SponsorsPage,
   VideoPage,
 } from './pages/Home';
+import { LiveStreamPage } from './pages/LiveStreamPage';
 import { SwipeHome } from './components/SwipeHome';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
@@ -102,7 +103,7 @@ const router = createBrowserRouter([
       { path: '/', element: <SwipeHome /> },
       { path: '/music', element: <Navigate to="/#music" replace /> },
       { path: '/video', element: <VideoPage /> },
-      { path: '/live', element: <Navigate to="/#music" replace /> },
+      { path: '/live', element: <LiveStreamPage /> },
       { path: '/shop', element: <ShopPage /> },
       { path: '/go-live', element: <PhoneGoLive /> },
       { path: '/concepts', element: <ConceptBoard /> },

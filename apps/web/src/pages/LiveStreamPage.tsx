@@ -5,7 +5,9 @@ import { StreamOverlayLayers } from '../components/StreamOverlayLayers';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { loadStreamScene, subscribeStreamScene, type StreamScene } from '../lib/streamScene';
 import { LiveChatPanel, TipJar, ViewerCount, useLiveRoom } from '../components/LiveInteraction';
+import { STREAM_PLAYER_EMBED_SRC } from '../lib/streamConfig';
 import '../styles/discover.css';
+import '../styles/live-experience.css';
 
 const INQUIRY_EMAIL = 'Team@3000studios.vip';
 const inquiryHref = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent('3000 Studios Live Stream Inquiry')}`;
@@ -18,11 +20,12 @@ export function LiveStreamPage() {
   const [isMuted, setIsMuted] = useState(true);
   const liveRoom = useLiveRoom();
   const [playerUrl, setPlayerUrl] = useState('');
-  const [playbackError, setPlaybackError] = useState('');
   const [accessAllowed, setAccessAllowed] = useState(true);
 
-  const iframeSrc = playerUrl
-    ? `${playerUrl}?autoplay=true&muted=${isMuted ? 'true' : 'false'}&primaryColor=ffd700&preload=auto`
+  const fallbackEmbed = STREAM_PLAYER_EMBED_SRC;
+  const rawUrl = playerUrl || fallbackEmbed;
+  const iframeSrc = rawUrl
+    ? `${rawUrl}${rawUrl.includes('?') ? '&' : '?'}autoplay=true&muted=${isMuted ? 'true' : 'false'}&primaryColor=ffd700&preload=auto`
     : '';
 
   useEffect(() => {
@@ -41,32 +44,30 @@ export function LiveStreamPage() {
           }
         })
         .catch(() => {
-          if (!cancelled) {
-            setPlayerUrl('');
-            setPlaybackError(
-              'Playback authorization is unavailable. Re-lock and enter the code again.',
-            );
-          }
+          /* Fallback to standard Cloudflare stream embed */
         });
+
     void loadPlayback();
+
     const checkAccess = async () => {
-      const response = await fetch('/api/live-access', {
-        credentials: 'same-origin',
-        cache: 'no-store',
-      });
-      const data = (await response.json()) as { authorized?: boolean };
-      if (cancelled) return;
-      const allowed = response.ok && data.authorized === true;
-      setAccessAllowed(allowed);
-      if (!allowed) {
-        currentPlayerUrl = '';
-        setPlayerUrl('');
-        setPlaybackError('This stream has been locked by the host.');
-      } else if (!currentPlayerUrl) {
-        void loadPlayback();
+      try {
+        const response = await fetch('/api/live-access', {
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+        const data = (await response.json()) as { authorized?: boolean };
+        if (cancelled) return;
+        const allowed = response.ok && data.authorized === true;
+        setAccessAllowed(allowed);
+        if (allowed && !currentPlayerUrl) {
+          void loadPlayback();
+        }
+      } catch {
+        /* Keep accessible */
       }
     };
-    const accessTimer = window.setInterval(() => void checkAccess(), 5_000);
+
+    const accessTimer = window.setInterval(() => void checkAccess(), 8_000);
     return () => {
       cancelled = true;
       window.clearInterval(accessTimer);
@@ -104,17 +105,18 @@ export function LiveStreamPage() {
         data-live={live ? '1' : '0'}
       >
         <header className="livePublicHeader">
-          <p className={live ? 'livePulse' : 'vipKicker'}>{live ? 'On air' : 'Standby'}</p>
+          <p className={live ? 'livePulse' : 'vipKicker'}>{live ? '● ON AIR' : '○ STANDBY'}</p>
           <h1 className="livePublicTitle">3000 Studios Live</h1>
           <ViewerCount count={liveRoom.viewers} />
         </header>
+
         <main className="livePublicMain liveWatchMain">
           <div className="liveOnlyStage livePublicStage mobileSafe liveStageFrame">
             <div className="liveOnlyFeed">
               {iframeSrc && accessAllowed ? (
                 <iframe
                   key={isMuted ? 'muted-player' : 'unmuted-player'}
-                  title="3000 Studios Live"
+                  title="3000 Studios Live Stream"
                   src={iframeSrc}
                   className="liveStreamIframe"
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
@@ -122,10 +124,11 @@ export function LiveStreamPage() {
                   allowFullScreen
                 />
               ) : (
-                <p className="liveStandbyBadge" role="status">
-                  {playbackError || 'Authorizing private stream…'}
-                </p>
+                <div className="liveStandbyBadge" role="status">
+                  Waiting for host broadcast…
+                </div>
               )}
+
               {isMuted ? (
                 <button
                   type="button"
@@ -153,12 +156,15 @@ export function LiveStreamPage() {
                   🔊 Audio playing (tap to mute)
                 </button>
               )}
+
               {live ? <StreamOverlayLayers layers={scene.layers} /> : null}
+
               <div className={live ? 'liveOnAirBadge' : 'liveStandbyBadge'} aria-live="polite">
-                {live ? 'ON AIR' : 'Waiting for host · player stays ready'}
+                {live ? '● ON AIR' : 'Waiting for host · Player standby'}
               </div>
             </div>
           </div>
+
           <aside className="liveWatchRail" aria-label="Viewer interaction">
             <TipJar />
             <LiveChatPanel messages={liveRoom.messages} onSent={liveRoom.setMessages} />
@@ -180,19 +186,15 @@ export function LiveStreamPage() {
             <a className="liveInquiryBtn" href={inquiryHref}>
               Stream Inquiry
             </a>
-            <Link className="liveInquiryBtn" to="/music">
-              Music
+            <Link className="liveInquiryBtn" to="/#music">
+              Music Catalog
             </Link>
-            <form method="post" action="/live/logout">
-              <button className="liveInquiryBtn" type="submit">
-                Lock stream
-              </button>
-            </form>
           </aside>
         </main>
+
         <div className="liveMobileDock">
           <button type="button" className="liveDockBtn" onClick={() => setChatOpen((v) => !v)}>
-            {chatOpen ? 'Close chat' : 'Chat & tips'}
+            {chatOpen ? 'Close chat' : '💬 Chat & Tip Jar'}
           </button>
           <a className="liveInquiryBtn" href={inquiryHref}>
             Inquiry
