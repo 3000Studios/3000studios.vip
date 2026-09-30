@@ -10,3 +10,12 @@ compatibility_date = "2026-09-01"
 binding = "DB"
 database_name = "apex_citadel"
 database_id = "6ae6bd18-e43a-4c57-beba-0c3ed1b5a56b"
+
+# R2 bucket for /media/*.mp3 (see functions/media/[[path]].ts).
+# NOTE: with Cloudflare Pages Git integration, bindings must ALSO be set in
+# the dashboard (Pages project → Settings → Functions → R2 bucket bindings):
+# variable MEDIA_BUCKET → bucket studios-vip-media. wrangler.toml alone does
+# not apply to Git-integration deploys.
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "studios-vip-media"

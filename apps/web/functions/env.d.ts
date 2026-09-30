@@ -1,6 +1,7 @@
 export type PagesEnv = {
   ASSETS?: { fetch: typeof fetch };
   DB: D1Database;
+  MEDIA_BUCKET?: R2Bucket;
   VITE_ADSENSE_CLIENT_ID?: string;
   VITE_ADSENSE_HOME_SLOT?: string;
   VITE_ADSENSE_VIDEO_SLOT?: string;
