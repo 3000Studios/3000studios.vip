@@ -27,6 +27,23 @@ function writeConsent(consent: Consent) {
   }
 }
 
+/**
+ * Fired on `window` whenever the stored consent choice changes. Ad units
+ * subscribe to this so they can render (and push their adsbygoogle request)
+ * when a visitor accepts *after* the unit already mounted — an imperative
+ * localStorage read at render time misses that transition, which previously
+ * meant ads never loaded in the session consent was granted.
+ */
+export const CONSENT_CHANGED_EVENT = '3000-consent-changed';
+
+function notifyConsentChanged() {
+  try {
+    window.dispatchEvent(new CustomEvent(CONSENT_CHANGED_EVENT));
+  } catch {
+    /* ignore */
+  }
+}
+
 function loadScript(src: string, attrs: Record<string, string> = {}) {
   if (document.querySelector(`script[src="${src}"]`)) return;
   const script = document.createElement('script');
@@ -98,6 +115,9 @@ export function ConsentManager() {
     writeConsent(next);
     setConsent(next);
     setBannerOpen(false);
+    // Wake up any already-mounted ad units so they render and push their
+    // adsbygoogle request now, not only on the next page load.
+    notifyConsentChanged();
     applyConsent(next);
   };
 
@@ -135,4 +155,19 @@ export function ConsentManager() {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useConsent() {
   return readConsent();
+}
+
+/**
+ * Reactive ads-consent flag for ad units. True only after the visitor accepted
+ * ads; re-renders the caller when the stored choice changes so units mounted
+ * before consent can render their <ins> and push their ad request.
+ */
+export function useAdConsent(): boolean {
+  const [ads, setAds] = useState(() => readConsent()?.ads === true);
+  useEffect(() => {
+    const onChange = () => setAds(readConsent()?.ads === true);
+    window.addEventListener(CONSENT_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(CONSENT_CHANGED_EVENT, onChange);
+  }, []);
+  return ads;
 }

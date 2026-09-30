@@ -28,8 +28,8 @@ import {
   ADSENSE_HOME_SLOT,
   ADSENSE_LIVE_SLOT,
   ADSENSE_VIDEO_SLOT,
-  adsenseClientId,
 } from '../lib/adsense';
+import { AdSenseUnit } from './PublicLayout';
 import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer';
 import { PlatformLogos } from '../components/PlatformLogos';
 import { ChromeWallpaper } from '../components/ChromeWallpaper';
@@ -207,45 +207,6 @@ function BeatDancingTitle({ text }: { text: string }) {
         </span>
       ))}
     </motion.h1>
-  );
-}
-
-function hasAdConsent(): boolean {
-  try {
-    const raw = localStorage.getItem('3000-consent-v1');
-    return raw ? (JSON.parse(raw) as { ads?: boolean }).ads === true : false;
-  } catch {
-    return false;
-  }
-}
-
-function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; label?: string }) {
-  const clientId = adsenseClientId();
-  useEffect(() => {
-    if (!slot || !clientId || !hasAdConsent()) return;
-    try {
-      const target = window as unknown as { adsbygoogle?: unknown[] };
-      target.adsbygoogle = target.adsbygoogle ?? [];
-      target.adsbygoogle.push({});
-    } catch {
-      // Ad blockers or pending AdSense approval can block the client script.
-    }
-  }, [slot, clientId]);
-
-  if (!slot || !clientId || !hasAdConsent()) return null;
-
-  return (
-    <aside className="adsenseSlot" aria-label={label}>
-      <span>{label}</span>
-      <ins
-        className="adsbygoogle"
-        style={{ display: 'block', minHeight: 250 }}
-        data-ad-client={clientId}
-        data-ad-slot={slot}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
-    </aside>
   );
 }
 

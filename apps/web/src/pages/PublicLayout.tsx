@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { GlobalMusicToggle } from '../components/GlobalMusic';
@@ -9,6 +9,7 @@ import { PlatformLogos } from '../components/PlatformLogos';
 import { ChromeWallpaper } from '../components/ChromeWallpaper';
 import { type SongPalette } from '../data/music';
 import { adsenseClientId } from '../lib/adsense';
+import { useAdConsent } from '../components/ConsentManager';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { fadeUp } from './PageMotion';
 
@@ -134,28 +135,24 @@ export function BeatDancingTitle({ text }: { text: string }) {
   );
 }
 
-function hasAdConsent() {
-  try {
-    const raw = localStorage.getItem('3000-consent-v1');
-    return raw ? (JSON.parse(raw) as { ads?: boolean }).ads === true : false;
-  } catch {
-    return false;
-  }
-}
-
 export function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; label?: string }) {
   const clientId = adsenseClientId();
+  // Reactive: re-renders when the visitor accepts ads after this unit already
+  // mounted, so the push below fires in the session consent was granted.
+  const adConsent = useAdConsent();
+  const pushedRef = useRef(false);
   useEffect(() => {
-    if (!slot || !clientId || !hasAdConsent()) return;
+    if (!slot || !clientId || !adConsent || pushedRef.current) return;
     try {
       const target = window as unknown as { adsbygoogle?: unknown[] };
       target.adsbygoogle = target.adsbygoogle ?? [];
       target.adsbygoogle.push({});
+      pushedRef.current = true;
     } catch {
       /* Ad blockers or pending AdSense approval can block the client script. */
     }
-  }, [slot, clientId]);
-  if (!slot || !clientId || !hasAdConsent()) return null;
+  }, [slot, clientId, adConsent]);
+  if (!slot || !clientId || !adConsent) return null;
   return (
     <aside className="adsenseSlot" aria-label={label}>
       <span>{label}</span>

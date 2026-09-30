@@ -5,18 +5,32 @@ export const onRequestGet: PagesFunction<PagesEnv> = async ({ env }) => {
   const adsTxt = publisher
     ? `google.com, ${publisher.replace('ca-pub-', 'pub-')}, DIRECT, f08c47fec0942fa0`
     : '';
-  const homeSlot = (env.VITE_ADSENSE_HOME_SLOT as string | undefined)?.trim() || '';
+  const slotEnvs = [
+    'VITE_ADSENSE_HOME_SLOT',
+    'VITE_ADSENSE_VIDEO_SLOT',
+    'VITE_ADSENSE_LIVE_SLOT',
+    'VITE_ADSENSE_BLOG_SLOT',
+  ] as const;
+  const slots = Object.fromEntries(
+    slotEnvs.map((name) => [name, ((env[name] as string | undefined)?.trim() || '')]),
+  ) as Record<(typeof slotEnvs)[number], string>;
+  const missingSlots = slotEnvs.filter((name) => !slots[name]);
+  const homeSlot = slots.VITE_ADSENSE_HOME_SLOT;
   const body = {
     ok: true,
     publisher,
     adsTxtExpected: adsTxt,
     homeSlotConfigured: Boolean(homeSlot),
+    slots,
+    missingSlots,
     notes: [
       'ads.txt is live at https://3000studios.vip/ads.txt',
-      'pagead script and google-adsense-account meta are in index.html',
-      homeSlot
-        ? 'Home ad slot env is set'
-        : 'VITE_ADSENSE_HOME_SLOT is empty — no display units render. Create an ad unit in AdSense and set the slot on Cloudflare Pages.',
+      'google-adsense-account meta is in index.html; pagead script loads once, only after the visitor accepts ads (ConsentManager)',
+      ...slotEnvs.map((name) =>
+        slots[name]
+          ? `${name} is set`
+          : `${name} is empty — that page's display unit renders nothing. Create an ad unit in AdSense (Ads > By ad unit) and set the slot on Cloudflare Pages, then redeploy.`,
+      ),
       publisher
         ? 'Publisher ID is configured via VITE_ADSENSE_CLIENT_ID.'
         : 'VITE_ADSENSE_CLIENT_ID is empty — AdSense script will not load.',
@@ -27,6 +41,7 @@ export const onRequestGet: PagesFunction<PagesEnv> = async ({ env }) => {
       privacyPolicy: true,
       scriptTag: Boolean(publisher),
       displaySlot: Boolean(homeSlot),
+      allSlotsConfigured: missingSlots.length === 0,
     },
   };
   return new Response(JSON.stringify(body), {
