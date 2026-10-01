@@ -1,3 +1,5 @@
+import generated from './officialReleases.generated.json';
+
 export const OFFICIAL_YOUTUBE_CHANNEL_ID = 'UCTQnEFZUIutrFuDlxGj9cDA';
 export const OFFICIAL_YOUTUBE_CHANNEL_URL = `https://www.youtube.com/channel/${OFFICIAL_YOUTUBE_CHANNEL_ID}`;
 
@@ -9,9 +11,9 @@ export interface OfficialReleaseVideo {
 }
 
 /**
- * Verified 2026-08-28 against the authenticated DistroKid catalog and the
- * 3000 Studios Official Artist Channel. Keep this list evidence-based: a title
- * must exist in DistroKid and its video must live on the official channel.
+ * Verified against the authenticated DistroKid catalog and the
+ * 3000 Studios Official Artist Channel. Title matches are aligned
+ * with published music releases.
  */
 const curatedReleaseVideos: OfficialReleaseVideo[] = [
   { title: "I'm Feelin' It", videoId: 'aqbImIx7S-s', release: 'Single', duration: '2:40' },
@@ -66,7 +68,6 @@ const curatedReleaseVideos: OfficialReleaseVideo[] = [
     release: '3000 Studios Originals',
     duration: '3:18',
   },
-  // The Peepers uses its generated video id (no curated override; keeps ids unique).
   {
     title: 'Tropical Bass Land',
     videoId: 'sGdAIxIi1IM',
@@ -87,19 +88,40 @@ const curatedReleaseVideos: OfficialReleaseVideo[] = [
   },
 ];
 
-const curatedByTitle = new Map(
-  curatedReleaseVideos.map((video) => [video.title.toLowerCase(), video]),
-);
-const generatedReleaseVideos = (generated as OfficialReleaseVideo[]).map(
-  (video) => curatedByTitle.get(video.title.toLowerCase()) ?? video,
-);
+function norm(s: string) {
+  return (s || '')
+    .toLowerCase()
+    .replace(/['\u2019]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
 
-const featuredRelease = curatedReleaseVideos[0];
+function buildUnifiedReleases(): OfficialReleaseVideo[] {
+  const seenIds = new Set<string>();
+  const list: OfficialReleaseVideo[] = [];
 
-export const officialReleaseVideos: OfficialReleaseVideo[] = [
-  featuredRelease,
-  ...generatedReleaseVideos.filter((video) => video.videoId !== featuredRelease.videoId),
-];
+  // Add all curated releases first
+  for (const c of curatedReleaseVideos) {
+    if (!seenIds.has(c.videoId)) {
+      seenIds.add(c.videoId);
+      list.push(c);
+    }
+  }
+
+  // Add generated releases with curated override fallback
+  for (const g of generated as OfficialReleaseVideo[]) {
+    if (!seenIds.has(g.videoId)) {
+      const match = curatedReleaseVideos.find((c) => norm(c.title) === norm(g.title));
+      if (match) continue;
+      seenIds.add(g.videoId);
+      list.push(g);
+    }
+  }
+
+  return list;
+}
+
+export const officialReleaseVideos: OfficialReleaseVideo[] = buildUnifiedReleases();
 
 export const youtubeEmbedUrl = (videoId: string) =>
   `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
@@ -109,22 +131,13 @@ export const youtubeWatchUrl = (videoId: string) => `https://www.youtube.com/wat
 export const youtubeArtworkUrl = (videoId: string) =>
   `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-const normalizeReleaseTitle = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/[’']/g, '')
-    .replace(/3000 studios/g, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-
 export function getOfficialVideoForTitle(title: string) {
-  const wanted = normalizeReleaseTitle(title);
+  const wanted = norm(title);
   return officialReleaseVideos.find((video) => {
-    const candidate = normalizeReleaseTitle(video.title);
+    const candidate = norm(video.title);
     return (
       candidate === wanted ||
-      (wanted.length > 5 && (candidate.includes(wanted) || wanted.includes(candidate)))
+      (wanted.length > 4 && (candidate.includes(wanted) || wanted.includes(candidate)))
     );
   });
 }
-import generated from './officialReleases.generated.json';
