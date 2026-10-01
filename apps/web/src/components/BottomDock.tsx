@@ -2,10 +2,10 @@ import { Link, useLocation } from 'react-router-dom';
 
 const items = [
   { to: '/', label: 'Home', icon: '⌂' },
-  { to: '/#music', label: 'Music', icon: '♪' },
+  { to: '/#music-catalog', label: 'Music', icon: '♪' },
   { to: '/live', label: 'Live', icon: '●' },
+  { to: '/video', label: 'Video', icon: '▶' },
   { to: '/shop', label: 'Shop', icon: '▣' },
-  { to: '/tiktok-games/', label: 'Games', icon: '▶' },
 ] as const;
 
 export function BottomDock() {

@@ -101,7 +101,7 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: '/', element: <SwipeHome /> },
-      { path: '/music', element: <Navigate to="/#music" replace /> },
+      { path: '/music', element: <Navigate to="/#music-catalog" replace /> },
       { path: '/video', element: <VideoPage /> },
       { path: '/live', element: <LiveStreamPage /> },
       { path: '/shop', element: <ShopPage /> },
