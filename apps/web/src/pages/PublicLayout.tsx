@@ -324,7 +324,7 @@ export function PublicLayout({
           onClick={() => setOpen(false)}
         />
       </header>
-      <main style={{ maxWidth: 1240, margin: '0 auto', width: '100%', padding: '0 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <main style={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {children}
       </main>
       {compact ? null : <div className="vipEnergyDivider" aria-hidden="true" />}

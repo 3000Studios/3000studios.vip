@@ -10,8 +10,6 @@ html, body, #root {
   display: grid;
   grid-template-rows: auto 1fr auto;
   width: 100%;
-  max-width: 1240px;
-  margin: 0 auto;
   background: var(--bg);
 }
 
