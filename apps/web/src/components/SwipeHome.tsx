@@ -19,6 +19,9 @@ import { detectIsLive } from '../lib/streamLiveDetect';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import { CASH_APP_URL, cashAppTipUrl } from '../lib/liveRoom';
 import { STREAM_PLAYER_EMBED_SRC } from '../lib/streamConfig';
+import { OFFICIAL_PLATFORM_LINKS } from '../data/platforms';
+import { STUDIO_APPS } from '../data/appsData';
+import { THUNDER_BOSSES } from '../data/thunderDome';
 import { useGlobalMusic } from './GlobalMusic';
 import '../styles/vip-luxury.css';
 import '../styles/million-dollar.css';
@@ -84,7 +87,7 @@ export function SwipeHome() {
             ========================================================================= */}
         <section className="vip-hero-hub">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="md-kicker">✦ OFFICIAL ARTIST PLATFORM</span>
+            <span className="md-kicker">✦ THE DIGITAL STUDIO</span>
             <Link
               to="/live"
               className={isLive ? 'vip-live-pill' : 'md-kicker'}
@@ -106,31 +109,64 @@ export function SwipeHome() {
             </span>
           </h1>
 
-          <p>
-            Original AI-driven music production by Jeremy Swain. 47 official releases, full-length catalog streaming free, live stream broadcast stage, and VIP ownership drops.
+          <p style={{ maxWidth: 700, margin: '0 auto 24px', fontSize: 'clamp(15px, 2.5vw, 18px)' }}>
+            Original AI-driven music production by Jeremy Swain. 47 official master releases, 24-level Thunder Dome flight combat, high-precision audio software, and edge-first digital entertainment.
           </p>
 
           <div className="vip-badge-row">
-            <Link className="vip-btn-gold" to="/live">
-              ● Watch Live Stage
+            <Link className="vip-btn-gold" to="/music">
+              ♪ 47-Song Catalog
             </Link>
-            <a className="vip-btn-obsidian" href="#music-catalog">
-              ♪ 47 Song Catalog
-            </a>
-            <a className="vip-btn-obsidian" href="#video-theater">
+            <Link className="vip-btn-obsidian" to="/thunder-dome">
+              🛸 Play Thunder Dome
+            </Link>
+            <Link className="vip-btn-obsidian" to="/live">
+              ● Live Stage
+            </Link>
+            <Link className="vip-btn-obsidian" to="/video">
               ▶ Official Videos
-            </a>
-            <Link className="vip-btn-obsidian" to="/shop">
-              ▣ Shop VIP Drops
             </Link>
-            <a
-              className="vip-btn-obsidian"
-              href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Subscribe @3000Studio
-            </a>
+            <Link className="vip-btn-obsidian" to="/apps">
+              ⚡ Software Lab
+            </Link>
+            <Link className="vip-btn-obsidian" to="/vip">
+              ★ VIP Passes
+            </Link>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            INFINITE STUDIO MARQUEE
+            ========================================================================= */}
+        <section style={{ maxWidth: 1280, margin: '0 auto 40px', padding: '0 16px', overflow: 'hidden' }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 24,
+              whiteSpace: 'nowrap',
+              padding: '12px 20px',
+              background: 'rgba(10, 13, 22, 0.85)',
+              border: '1px solid rgba(255, 215, 0, 0.3)',
+              borderRadius: 999,
+              fontSize: 13,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              color: 'var(--vip-cream)',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <span>MUSIC LABEL</span>
+            <span style={{ color: '#ffd700' }}>✦</span>
+            <span>47 RELEASES</span>
+            <span style={{ color: '#00f0ff' }}>✦</span>
+            <span>THUNDER DOME 24</span>
+            <span style={{ color: '#ffd700' }}>✦</span>
+            <span>AMPED EAR 3000</span>
+            <span style={{ color: '#a855f7' }}>✦</span>
+            <span>WEBRTC LIVE STAGE</span>
+            <span style={{ color: '#00d632' }}>✦</span>
+            <span>VIP COMMERCE</span>
           </div>
         </section>
 
@@ -263,7 +299,43 @@ export function SwipeHome() {
         </section>
 
         {/* =========================================================================
-            3. 47-TRACK OFFICIAL MUSIC CATALOG
+            3. THUNDER DOME SPOTLIGHT
+            ========================================================================= */}
+        <section style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
+          <div className="vip-glass-card" style={{ padding: '32px', border: '1px solid rgba(0, 240, 255, 0.4)', background: 'linear-gradient(145deg, rgba(6, 12, 22, 0.9), rgba(4, 5, 10, 0.95))' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14, marginBottom: 20 }}>
+              <div>
+                <span className="md-kicker" style={{ color: '#00f0ff', borderColor: 'rgba(0, 240, 255, 0.4)' }}>
+                  Game Universe Spotlight
+                </span>
+                <h2 className="vip-gold-text" style={{ fontSize: 'clamp(24px, 4.5vw, 36px)', margin: '4px 0 0', fontWeight: 800 }}>
+                  Thunder Dome 24: Flight Combat
+                </h2>
+              </div>
+              <Link to="/thunder-dome" className="vip-btn-gold" style={{ background: 'linear-gradient(135deg, #00f0ff, #0088cc)', color: '#05060a' }}>
+                Explore Game Universe ↗
+              </Link>
+            </div>
+
+            <p style={{ color: 'var(--vip-text-muted)', fontSize: 15, lineHeight: 1.6, maxWidth: 720, margin: '0 0 24px' }}>
+              Built for speed. 24 hand-crafted celestial battlefields, 24 lethal bosses, tactile virtual dual-stick controls, and 60 FPS bullet-hell collision performance.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              {THUNDER_BOSSES.slice(0, 4).map((boss) => (
+                <div key={boss.id} style={{ background: 'rgba(0, 0, 0, 0.5)', border: '1px solid rgba(0, 240, 255, 0.25)', borderRadius: 10, padding: '16px' }}>
+                  <div style={{ color: '#00f0ff', fontSize: 11, fontWeight: 800 }}>LEVEL {boss.level} · {boss.threatLevel}</div>
+                  <h3 style={{ color: '#fff', fontSize: 17, margin: '4px 0 2px' }}>{boss.name}</h3>
+                  <div style={{ color: '#ffd700', fontSize: 12, marginBottom: 8 }}>{boss.environment}</div>
+                  <div style={{ color: 'var(--vip-text-muted)', fontSize: 12 }}>{boss.signatureAttack}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            4. 47-TRACK OFFICIAL MUSIC CATALOG
             ========================================================================= */}
         <section id="music-catalog" style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
@@ -278,22 +350,27 @@ export function SwipeHome() {
                 Every track streams in full. Click any song to preview instantly.
               </p>
             </div>
-            <input
-              type="text"
-              placeholder="Search 47 songs..."
-              value={musicSearch}
-              onChange={(e) => setMusicSearch(e.target.value)}
-              style={{
-                background: 'rgba(10, 13, 22, 0.8)',
-                border: '1px solid rgba(255, 215, 0, 0.3)',
-                color: '#fff',
-                padding: '10px 18px',
-                borderRadius: 999,
-                fontSize: 14,
-                outline: 'none',
-                minWidth: 240,
-              }}
-            />
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="Search 47 songs..."
+                value={musicSearch}
+                onChange={(e) => setMusicSearch(e.target.value)}
+                style={{
+                  background: 'rgba(10, 13, 22, 0.8)',
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  color: '#fff',
+                  padding: '10px 18px',
+                  borderRadius: 999,
+                  fontSize: 14,
+                  outline: 'none',
+                  minWidth: 220,
+                }}
+              />
+              <Link to="/music" className="vip-btn-gold" style={{ padding: '10px 18px', fontSize: 13 }}>
+                Open Music Hub ↗
+              </Link>
+            </div>
           </div>
 
           <div
@@ -303,7 +380,7 @@ export function SwipeHome() {
               gap: 20,
             }}
           >
-            {filteredSongs.map((s, idx) => {
+            {filteredSongs.slice(0, 12).map((s, idx) => {
               const isCurrentPlaying = music.activeSong.title === s.title && music.isPlaying;
               return (
                 <article
@@ -414,7 +491,7 @@ export function SwipeHome() {
         </section>
 
         {/* =========================================================================
-            4. OFFICIAL VIDEO CINEMA THEATER
+            5. OFFICIAL VIDEO CINEMA THEATER
             ========================================================================= */}
         <section id="video-theater" style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
           <div className="vip-glass-card" style={{ padding: '28px' }}>
@@ -504,7 +581,44 @@ export function SwipeHome() {
         </section>
 
         {/* =========================================================================
-            5. VIP MONETIZATION TIERS & COMMERCE STORE
+            6. SOFTWARE & APPS LAB SPOTLIGHT
+            ========================================================================= */}
+        <section style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14, marginBottom: 24 }}>
+            <div>
+              <span className="md-kicker" style={{ color: '#00f0ff', borderColor: 'rgba(0, 240, 255, 0.4)' }}>
+                Production Applications
+              </span>
+              <h2 className="vip-gold-text" style={{ fontSize: 'clamp(24px, 4.5vw, 36px)', margin: '4px 0 0', fontWeight: 800 }}>
+                Software Lab & Creative Tools
+              </h2>
+            </div>
+            <Link to="/apps" className="vip-btn-gold" style={{ padding: '8px 18px', fontSize: 13 }}>
+              View All Tools ↗
+            </Link>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+            {STUDIO_APPS.map((app) => (
+              <article key={app.id} className="vip-glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontSize: 24 }}>{app.icon}</span>
+                  <span style={{ color: app.badgeColor, fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>{app.category}</span>
+                </div>
+                <h3 style={{ color: '#fff', fontSize: 19, margin: '0 0 6px' }}>{app.name}</h3>
+                <p style={{ color: 'var(--vip-text-muted)', fontSize: 13, lineHeight: 1.5, margin: '0 0 16px', flex: 1 }}>
+                  {app.tagline}
+                </p>
+                <Link to="/apps" className="vip-btn-obsidian" style={{ padding: '6px 14px', fontSize: 12, textAlign: 'center' }}>
+                  Learn More ↗
+                </Link>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* =========================================================================
+            7. VIP MONETIZATION TIERS & COMMERCE STORE
             ========================================================================= */}
         <section style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -628,14 +742,40 @@ export function SwipeHome() {
         </section>
 
         {/* =========================================================================
-            6. GOOGLE ADSENSE MONETIZATION PLACEMENT
+            8. VERIFIED MUSIC STREAMING PLATFORM WALL
+            ========================================================================= */}
+        <section style={{ maxWidth: 1280, margin: '0 auto 48px', padding: '0 16px' }}>
+          <div className="vip-glass-card" style={{ padding: '24px' }}>
+            <div style={{ textAlign: 'center', marginBottom: 14, fontSize: 13, color: 'var(--vip-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Stream 3000 Studios Across Verified Platforms:
+            </div>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {OFFICIAL_PLATFORM_LINKS.map((p) => (
+                <a
+                  key={p.name}
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="vip-btn-obsidian"
+                  style={{ fontSize: 13, padding: '8px 16px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                >
+                  <span style={{ color: p.color }}>{p.icon}</span>
+                  <span>{p.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            9. GOOGLE ADSENSE MONETIZATION PLACEMENT
             ========================================================================= */}
         <section style={{ maxWidth: 1200, margin: '0 auto 48px', padding: '0 16px' }}>
           <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
         </section>
 
         {/* =========================================================================
-            7. COMMUNITY & SONG REQUEST PREVIEW ROW
+            9. COMMUNITY & SONG REQUEST PREVIEW ROW
             ========================================================================= */}
         <section style={{ maxWidth: 1280, margin: '0 auto 48px', padding: '0 16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>

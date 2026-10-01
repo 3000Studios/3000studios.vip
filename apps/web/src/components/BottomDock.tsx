@@ -2,7 +2,8 @@ import { Link, useLocation } from 'react-router-dom';
 
 const items = [
   { to: '/', label: 'Home', icon: '⌂' },
-  { to: '/#music-catalog', label: 'Music', icon: '♪' },
+  { to: '/music', label: 'Music', icon: '♪' },
+  { to: '/thunder-dome', label: 'Dome', icon: '🛸' },
   { to: '/live', label: 'Live', icon: '●' },
   { to: '/video', label: 'Video', icon: '▶' },
   { to: '/shop', label: 'Shop', icon: '▣' },
@@ -30,12 +31,9 @@ export function BottomDock() {
   return (
     <nav className="bottomDock ytPerkSafe" aria-label="Primary mobile navigation">
       {items.map((item) => {
-        const isMusicHash = item.to === '/#music-catalog';
-        const active = isMusicHash
-          ? pathname === '/' && hash === '#music-catalog'
-          : item.to === '/'
-            ? pathname === '/' && (!hash || hash === '')
-            : pathname.startsWith(item.to);
+        const active = item.to === '/'
+          ? pathname === '/' && (!hash || hash === '')
+          : pathname === item.to || pathname.startsWith(`${item.to}/`);
 
         return (
           <Link
