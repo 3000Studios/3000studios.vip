@@ -324,7 +324,9 @@ export function PublicLayout({
           onClick={() => setOpen(false)}
         />
       </header>
-      {children}
+      <main style={{ maxWidth: 1240, margin: '0 auto', width: '100%', padding: '0 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        {children}
+      </main>
       {compact ? null : <div className="vipEnergyDivider" aria-hidden="true" />}
       <footer className="vipFooter" style={{ background: '#040508', borderTop: '1px solid rgba(255, 215, 0, 0.25)', padding: '48px 20px 100px' }}>
         <ReducedMotionGate>

@@ -15,7 +15,10 @@
     border-color 180ms ease,
     box-shadow 180ms ease,
     background 180ms ease;
-  font: 600 0.94rem/1 Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.94rem;
+  line-height: 1;
   text-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 

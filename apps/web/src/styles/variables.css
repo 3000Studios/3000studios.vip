@@ -29,9 +29,13 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --touch: 44px;
   --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --font-body: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-family: var(--font-body);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, textarea, select, a, span, p, h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body) !important;
 }
