@@ -50,8 +50,18 @@ export const onRequestGet: PagesFunction<MediaEnv> = async (context) => {
     if (!headers.has('content-type')) headers.set('content-type', 'audio/mpeg');
 
     if (obj.range) {
-      const start = obj.range.offset;
-      const end = start + obj.range.length - 1;
+      // R2Range is a union: {offset,length?} | {length,offset?} | {suffix}.
+      // Narrow defensively so every variant yields a correct Content-Range.
+      const r = obj.range as { offset?: number; length?: number; suffix?: number };
+      let start: number;
+      let end: number;
+      if (r.suffix != null) {
+        start = Math.max(0, obj.size - r.suffix);
+        end = obj.size - 1;
+      } else {
+        start = r.offset ?? 0;
+        end = r.length != null ? start + r.length - 1 : obj.size - 1;
+      }
       headers.set('content-range', `bytes ${start}-${end}/${obj.size}`);
       return new Response(obj.body, { status: 206, headers });
     }
