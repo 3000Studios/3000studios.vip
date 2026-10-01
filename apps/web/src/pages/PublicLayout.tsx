@@ -2,7 +2,6 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { GlobalMusicToggle } from '../components/GlobalMusic';
-import { LiveWallpaper } from '../components/LiveWallpaper';
 import { ZombieFX } from '../components/ZombieFX';
 import { ScrollFX } from '../components/ScrollFX';
 import { PlatformLogos } from '../components/PlatformLogos';
@@ -109,16 +108,10 @@ export function ReducedMotionGate({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-export function AudioReactiveWallpaper({
-  variant = 'spiral',
-  palette,
-  coverUrl,
-}: {
-  variant?: string;
-  palette?: SongPalette;
-  coverUrl?: string;
-}) {
-  return <LiveWallpaper variant={variant} palette={palette} coverUrl={coverUrl} />;
+import { ThreeReactiveBackground } from '../components/ThreeReactiveBackground';
+
+export function AudioReactiveWallpaper() {
+  return <ThreeReactiveBackground />;
 }
 
 export function BeatDancingTitle({ text }: { text: string }) {
@@ -229,11 +222,7 @@ export function PublicLayout({
       <div className="filmGrain" aria-hidden="true" />
       <div className="filmScan" aria-hidden="true" />
       <ReducedMotionGate>
-        <AudioReactiveWallpaper
-          variant={wallpaperVariant}
-          palette={theme.palette}
-          coverUrl={theme.cover}
-        />
+        <AudioReactiveWallpaper />
         <ZombieFX />
         <ScrollFX />
       </ReducedMotionGate>
