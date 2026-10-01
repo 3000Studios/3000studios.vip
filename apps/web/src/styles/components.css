@@ -1,35 +1,44 @@
 .btn,
-.navLink {
+.navLink,
+.vipNavLink,
+.vipBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  padding: 0 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(244, 239, 231, 0.14);
-  background: rgba(7, 11, 22, 0.68);
-  color: var(--ink);
+  padding: 0.5rem 1.1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  background: linear-gradient(135deg, #a37a28 0%, #d4af37 35%, #9a9a9c 70%, #dcdcdc 100%);
+  color: #111111;
   cursor: pointer;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background 180ms ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.94rem;
-  line-height: 1;
-  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+  font-size: clamp(0.7rem, 0.85vw, 0.95rem);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4);
 }
 
 .btn:hover,
+.btn:focus,
 .navLink:hover,
+.navLink:focus,
+.vipNavLink:hover,
+.vipNavLink:focus,
+.vipBtn:hover,
+.vipBtn:focus,
 .navButton:hover {
+  background: linear-gradient(135deg, #1f1a14 0%, #111111 100%);
+  color: #ff5f1f !important; /* Electric neon orange */
+  border-color: #ff5f1f;
+  text-shadow: 0 0 8px rgba(255, 95, 31, 0.8), 0 0 16px rgba(255, 95, 31, 0.4);
+  box-shadow: 0 0 14px rgba(255, 95, 31, 0.6), inset 0 0 6px rgba(255, 95, 31, 0.3);
   transform: translateY(-2px);
-  border-color: rgba(111, 244, 255, 0.5);
-  box-shadow:
-    0 0 0 1px rgba(111, 244, 255, 0.18),
-    0 18px 38px rgba(0, 0, 0, 0.32);
 }
 
 .btn.primary {
