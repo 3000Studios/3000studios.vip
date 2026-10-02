@@ -2,7 +2,7 @@
 
 import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
 import './styles/swipe-slider.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -14,11 +14,16 @@ import { YouTubeSubscriberPerk } from './components/YouTubeSubscriberPerk';
 import {
   AboutPage,
   BlogPage,
+  BlogPostPage,
   CommunityPage,
   ContactPage,
   LegalPage,
   RequestsPage,
   SponsorsPage,
+  ThunderDomePage,
+  AppsPage,
+  ProjectsPage,
+  VipPage,
 } from './pages/Home';
 import { HomePage } from './v2/HomePage';
 import { BottomDock } from './components/BottomDock';
@@ -102,12 +107,17 @@ const router = createBrowserRouter([
       { path: '/music', element: <Navigate to="/#music" replace /> },
       { path: '/video', element: <Navigate to="/" replace /> },
       { path: '/live', element: <Navigate to="/#live" replace /> },
+      { path: '/thunder-dome', element: <ThunderDomePage /> },
+      { path: '/apps', element: <AppsPage /> },
+      { path: '/projects', element: <ProjectsPage /> },
+      { path: '/vip', element: <VipPage /> },
       { path: '/shop', element: <ShopPage /> },
       { path: '/go-live', element: <PhoneGoLive /> },
       { path: '/concepts', element: <ConceptBoard /> },
       { path: '/community', element: <CommunityPage /> },
       { path: '/requests', element: <RequestsPage /> },
       { path: '/blog', element: <BlogPage /> },
+      { path: '/blog/:slug', element: <BlogPostPage /> },
       { path: '/sponsors', element: <SponsorsPage /> },
       {
         path: '/song/:slug',

@@ -213,7 +213,7 @@ body {
 }
 
 .vip-hero-hub h1 {
-  font-family: 'Syne', 'Manrope', sans-serif;
+  font-family: 'Playfair Display', serif;
   font-size: clamp(36px, 7vw, 76px);
   font-weight: 800;
   line-height: 1.05;
