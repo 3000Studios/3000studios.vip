@@ -21,6 +21,7 @@ import {
 } from '@phosphor-icons/react';
 import { sendDudeChat, type DudeChatMessage } from '../lib/api';
 import '../styles/agent-command-center.css';
+import '../v2/admin.css';
 
 type AgentMode = 'talk' | 'work' | 'learn';
 type Gate = 'none' | 'spend-code' | 'spend-confirm' | 'email-first' | 'email-second';
@@ -265,7 +266,7 @@ export function AgentCommandCenter() {
   }
 
   return (
-    <main className={`agentCenter ${aborted ? 'isAborted' : ''}`}>
+    <main className={`agentCenter v2-admin ${aborted ? 'isAborted' : ''}`}>
       <header className="agentTopbar">
         <div className="agentBrand">
           <img src="/media/3k.jpg" alt="3000 Studios" />

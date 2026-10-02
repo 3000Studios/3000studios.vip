@@ -1,5 +1,5 @@
-import { PublicLayout } from './Home';
-import '../styles/vip-luxury.css';
+import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
+import { Reveal } from '../v2/Reveal';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -29,34 +29,51 @@ const content = {
 export function LegalPage({ type }: { type: keyof typeof content }) {
   const page = content[type];
   return (
-    <PublicLayout variant="blackhole" compact>
-      <main style={{ minHeight: '100vh', padding: '28px 16px 80px', maxWidth: 840, margin: '0 auto' }}>
-        <section className="vip-glass-card" style={{ padding: '36px 24px', textAlign: 'center', marginBottom: 28 }}>
-          <span className="vip-live-pill" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
-            Official Policy
-          </span>
-          <h1 className="vip-gold-text" style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 6vw, 48px)', margin: '12px 0 8px', fontWeight: 800 }}>
-            {page.title}
-          </h1>
-          <p style={{ color: 'var(--vip-text-muted)', fontSize: 14 }}>
-            Last updated for 3000 Studios VIP
-          </p>
-        </section>
-
-        <section className="vip-glass-card" style={{ padding: '32px 28px' }}>
-          <p style={{ color: '#f8f6f0', fontSize: 16, lineHeight: 1.7, margin: '0 0 24px' }}>
-            {page.text}
-          </p>
-          <div style={{ borderTop: '1px solid rgba(255, 215, 0, 0.2)', paddingTop: 20 }}>
-            <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: 0 }}>
-              Direct questions to:{' '}
-              <a href={`mailto:${OWNER_EMAIL}`} style={{ color: '#ffd700', fontWeight: 700, textDecoration: 'none' }}>
-                {OWNER_EMAIL}
-              </a>
+    <PublicLayoutV2 wallpaper="nebula">
+      <section className="v2-section">
+        <div className="v2-wrap" style={{ maxWidth: 840 }}>
+          <Reveal>
+            <span className="v2-kicker">Official Policy</span>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <h1 className="v2-display">
+              {page.title.split(' ').slice(0, -1).join(' ')}{' '}
+              <span className="v2-grad-text">
+                {page.title.split(' ').slice(-1)}
+              </span>
+            </h1>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <p className="v2-lede" style={{ marginTop: 12, fontSize: 14 }}>
+              Last updated for 3000 Studios VIP
             </p>
-          </div>
-        </section>
-      </main>
-    </PublicLayout>
+          </Reveal>
+
+          <Reveal delay={0.24}>
+            <div
+              className="v2-card"
+              style={{ padding: 'clamp(24px, 5vw, 40px)', marginTop: 28 }}
+            >
+              <p style={{ color: 'var(--v2-text)', fontSize: 16, lineHeight: 1.7, margin: '0 0 24px' }}>
+                {page.text}
+              </p>
+              <div style={{ borderTop: '1px solid var(--v2-neon-line)', paddingTop: 20 }}>
+                <p style={{ color: 'var(--v2-muted)', fontSize: 14, margin: 0 }}>
+                  Direct questions to:{' '}
+                  <a
+                    href={`mailto:${OWNER_EMAIL}`}
+                    style={{ color: 'var(--v2-neon)', fontWeight: 700, textDecoration: 'none' }}
+                  >
+                    {OWNER_EMAIL}
+                  </a>
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <LiveLine />
+    </PublicLayoutV2>
   );
 }

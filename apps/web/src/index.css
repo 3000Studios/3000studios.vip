@@ -40,6 +40,11 @@
 @import './styles/song-drop.css';
 @import './styles/swipe-slider.css';
 @import './styles/gloss-system.css';
+@import './v2/tokens.css';
+@import './v2/wallpaper.css';
+@import './v2/header.css';
+@import './v2/footer.css';
+@import './v2/home.css';
 
 .routeLoader {
   min-height: 100vh;

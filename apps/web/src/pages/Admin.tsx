@@ -12,6 +12,7 @@ import { AdminActivityLog } from '../components/AdminActivityLog';
 import { LiveAccessControl } from '../components/LiveAccessControl';
 import { PublicLayout } from './Home';
 import '../styles/discover.css';
+import '../v2/admin.css';
 
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 const NOTES_KEY = '3000-admin-rundown';
@@ -165,7 +166,7 @@ export function Admin() {
   if (!isAuthenticated) {
     return (
       <PublicLayout variant="blackhole">
-        <div className="adminScrim adminEasyShell adminWithNav">
+        <div className="adminScrim adminEasyShell adminWithNav v2-admin">
           <form className="adminCodeModal" onSubmit={handleUnlock}>
             <span>3000 STUDIOS · OWNER ACCESS</span>
             <h2>Go Live Console</h2>
@@ -216,7 +217,7 @@ export function Admin() {
 
   return (
     <PublicLayout variant="blackhole">
-      <div className="console adminEasyShell adminWithNav" style={{ gridTemplateColumns: '1fr' }}>
+      <div className="console adminEasyShell adminWithNav v2-admin" style={{ gridTemplateColumns: '1fr' }}>
         <div className="cMain">
           <header className="cTopbar">
             <div className="cTitle">
