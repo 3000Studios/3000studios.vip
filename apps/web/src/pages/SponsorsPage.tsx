@@ -1,6 +1,7 @@
-import { PublicLayout } from './Home';
+import { Check, EnvelopeSimple } from '@phosphor-icons/react';
+import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
+import { Reveal, RevealGroup, RevealItem } from '../v2/Reveal';
 import { MERCH_ITEMS } from '../data/merch';
-import '../styles/vip-luxury.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -45,67 +46,104 @@ export function SponsorsPage() {
   const sponsorItem = MERCH_ITEMS.find((item) => item.id === 'sponsor');
 
   return (
-    <PublicLayout variant="chrome" compact>
-      <main style={{ minHeight: '100vh', padding: '28px 16px 80px', maxWidth: 1140, margin: '0 auto' }}>
-        <section className="vip-glass-card" style={{ padding: '36px 24px', textAlign: 'center', marginBottom: 36 }}>
-          <span className="vip-live-pill" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
-            Brand Partnerships
-          </span>
-          <h1 className="vip-gold-text" style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 6vw, 52px)', margin: '12px 0 8px', fontWeight: 800 }}>
-            Sponsor 3000 Studios
-          </h1>
-          <p style={{ color: 'var(--vip-text-muted)', maxWidth: 640, margin: '0 auto 20px', fontSize: 16 }}>
-            Put your brand in front of engaged music fans, independent creators, and live stream audiences worldwide.
-          </p>
-          <a
-            className="vip-btn-gold"
-            href={`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent('3000 Studios Sponsorship Inquiry')}`}
-          >
-            Inquire via Email ✉
-          </a>
-        </section>
+    <PublicLayoutV2 wallpaper="beams">
+      <section className="v2-section">
+        <div className="v2-wrap" style={{ textAlign: 'center' }}>
+          <Reveal>
+            <span className="v2-kicker">Brand Partnerships</span>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <h1 className="v2-display">
+              Sponsor <span className="v2-grad-text">3000 Studios</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <p className="v2-lede" style={{ margin: '16px auto 24px', maxWidth: 640 }}>
+              Put your brand in front of engaged music fans, independent creators, and live
+              stream audiences worldwide.
+            </p>
+          </Reveal>
+          <Reveal delay={0.24}>
+            <a
+              className="v2-btn"
+              href={`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent('3000 Studios Sponsorship Inquiry')}`}
+            >
+              <EnvelopeSimple size={18} weight="fill" />
+              Inquire via Email
+            </a>
+          </Reveal>
+        </div>
+      </section>
 
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: 24,
-          }}
-        >
-          {sponsorPackages.map((pkg) => (
-            <article key={pkg.title} className="vip-glass-card" style={{ padding: '28px 24px', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                {pkg.tag}
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '8px 0 4px' }}>{pkg.title}</h2>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', margin: '12px 0 20px' }}>
-                {pkg.price}
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-                {pkg.features.map((feat) => (
-                  <li key={feat} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, color: 'var(--vip-text-muted)', fontSize: 14 }}>
-                    <span style={{ color: '#ffd700' }}>✓</span>
-                    <span>{feat}</span>
-                  </li>
-                ))}
-              </ul>
-              {pkg.stripeId && sponsorItem ? (
-                <a className="vip-btn-gold" href={sponsorItem.stripe} style={{ width: '100%' }}>
-                  Sponsor with Stripe ($99)
-                </a>
-              ) : (
-                <a
-                  className="vip-btn-obsidian"
-                  href={`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(`Sponsorship: ${pkg.title}`)}`}
-                  style={{ width: '100%' }}
+      <LiveLine />
+
+      <section className="v2-section" style={{ paddingTop: 0 }}>
+        <div className="v2-wrap">
+          <RevealGroup className="v2-grid-3">
+            {sponsorPackages.map((pkg) => (
+              <RevealItem key={pkg.title}>
+                <article
+                  className="v2-card v2-card--lift"
+                  style={{ padding: 'clamp(24px, 4vw, 32px)', display: 'flex', flexDirection: 'column', height: '100%' }}
                 >
-                  Contact Producer
-                </a>
-              )}
-            </article>
-          ))}
-        </section>
-      </main>
-    </PublicLayout>
+                  <span className="v2-chip">{pkg.tag}</span>
+                  <h2 className="v2-display" style={{ fontSize: 24, margin: '14px 0 4px' }}>
+                    {pkg.title}
+                  </h2>
+                  <div
+                    className="v2-display"
+                    style={{ fontSize: 30, color: 'var(--v2-neon)', margin: '12px 0 20px' }}
+                  >
+                    {pkg.price}
+                  </div>
+                  <ul
+                    style={{
+                      listStyle: 'none',
+                      padding: 0,
+                      margin: '0 0 24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 10,
+                      flex: 1,
+                    }}
+                  >
+                    {pkg.features.map((feat) => (
+                      <li
+                        key={feat}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 10,
+                          color: 'var(--v2-muted)',
+                          fontSize: 14,
+                        }}
+                      >
+                        <Check size={16} weight="bold" style={{ color: 'var(--v2-neon)', flexShrink: 0, marginTop: 2 }} />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {pkg.stripeId && sponsorItem ? (
+                    <a className="v2-btn" href={sponsorItem.stripe} style={{ width: '100%' }}>
+                      Sponsor with Stripe ($99)
+                    </a>
+                  ) : (
+                    <a
+                      className="v2-btn v2-btn--ghost"
+                      href={`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(`Sponsorship: ${pkg.title}`)}`}
+                      style={{ width: '100%' }}
+                    >
+                      Contact Producer
+                    </a>
+                  )}
+                </article>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
+
+      <LiveLine />
+    </PublicLayoutV2>
   );
 }

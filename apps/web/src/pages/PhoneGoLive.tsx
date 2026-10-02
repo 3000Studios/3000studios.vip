@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Broadcast, CameraRotate, Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 import { WHIP_URL_STORAGE_KEY, WhipPublisher, validateWhipUrl } from '../lib/webrtcStream';
 import { setHostLiveFlag } from '../lib/streamScene';
-import { PublicLayout } from './PublicLayout';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
+import '../v2/go-live.css';
 
 export function PhoneGoLive() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -66,42 +68,49 @@ export function PhoneGoLive() {
 
   if (!unlocked) {
     return (
-      <PublicLayout variant="blackhole">
-        <div className="phoneGoLive phoneGoLiveLock">
-          <div className="phoneGoLiveCard">
-            <p>3000 Studios</p>
-            <h1>Owner access required</h1>
-            <p>Open the owner Go Live Console first, then return here to use your phone camera.</p>
-            <Link to="/admin">Open Go Live Console</Link>
-            <Link to="/">Back home</Link>
+      <PublicLayoutV2 wallpaper="beams">
+        <div className="v2-card v2-golive-lock">
+          <span className="v2-kicker">3000 Studios</span>
+          <h1>
+            Owner access <span className="v2-grad-text">required</span>
+          </h1>
+          <p>Open the owner Go Live Console first, then return here to use your phone camera.</p>
+          <div className="v2-golive-lock-links">
+            <Link className="v2-btn" to="/admin">
+              Open Go Live Console
+            </Link>
+            <Link className="v2-btn v2-btn--ghost" to="/">
+              Back home
+            </Link>
           </div>
         </div>
-      </PublicLayout>
+      </PublicLayoutV2>
     );
   }
 
   return (
-    <PublicLayout variant="blackhole" compact>
-      <div className="phoneGoLive">
-        <header className="phoneGoLiveBar">
+    <PublicLayoutV2 wallpaper="beams">
+      <div className="v2-golive">
+        <header className="v2-golive-bar">
           <Link to="/">Home</Link>
           <strong>Phone Go Live</strong>
-          <Link to="/live" target="_blank" rel="noreferrer">
+          <Link to="/#live" target="_blank" rel="noreferrer">
             Viewers
           </Link>
         </header>
-        <video ref={videoRef} className="phoneGoLiveVideo" playsInline muted autoPlay />
-        <div className="phoneGoLiveDock">
-          <p className={status === 'live' ? 'is-live' : ''}>
+        <video ref={videoRef} className="v2-golive-video" playsInline muted autoPlay />
+        <div className="v2-golive-dock">
+          <p className={`v2-golive-status ${status === 'live' ? 'is-live' : ''}`}>
             {status === 'live'
               ? `YOU ARE LIVE ${micMuted ? '· 🔇 MIC MUTED' : '· 🎙️ SOUND ON'}`
               : 'Preview · one tap to broadcast'}
           </p>
-          {error ? <p className="phoneGoLiveErr">{error}</p> : null}
+          {error ? <p className="v2-golive-err">{error}</p> : null}
           {!validateWhipUrl(whip).ok ? (
-            <label className="phoneGoLiveWhip">
+            <label className="v2-golive-whip">
               <span>Cloudflare WebRTC publish URL</span>
               <input
+                className="v2-input"
                 type="url"
                 value={whip}
                 onChange={(event) => {
@@ -115,34 +124,51 @@ export function PhoneGoLive() {
               />
             </label>
           ) : null}
-          <div className="phoneGoLiveActions">
+          <div className="v2-golive-actions">
             {status === 'live' ? (
-              <button type="button" className="phoneGoLiveStop" onClick={() => void endLive()}>
+              <button type="button" className="v2-golive-stop" onClick={() => void endLive()}>
                 End live
               </button>
             ) : (
-              <button type="button" className="phoneGoLiveStart" disabled={status === 'busy'} onClick={() => void goLive()}>
+              <button
+                type="button"
+                className="v2-golive-go"
+                disabled={status === 'busy'}
+                onClick={() => void goLive()}
+              >
+                <Broadcast size={20} weight="fill" style={{ verticalAlign: '-4px', marginRight: 8 }} />
                 {status === 'busy' ? 'Connecting…' : 'Go Live'}
               </button>
             )}
             <button
               type="button"
-              className="phoneGoLiveFlip"
+              className="v2-golive-side"
               onClick={() => setFacing((f) => (f === 'user' ? 'environment' : 'user'))}
             >
+              <CameraRotate size={18} weight="fill" style={{ verticalAlign: '-3px', marginRight: 6 }} />
               Flip camera
             </button>
             <button
               type="button"
-              className="phoneGoLiveFlip"
-              style={{ background: micMuted ? 'rgba(239, 68, 68, 0.4)' : undefined }}
+              className="v2-golive-side"
+              style={micMuted ? { borderColor: 'rgba(255, 77, 77, 0.55)', color: '#ff8080' } : undefined}
               onClick={toggleMic}
             >
-              {micMuted ? '🔇 Unmute' : '🎙️ Mic on'}
+              {micMuted ? (
+                <>
+                  <MicrophoneSlash size={18} weight="fill" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+                  Unmute
+                </>
+              ) : (
+                <>
+                  <Microphone size={18} weight="fill" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+                  Mic on
+                </>
+              )}
             </button>
           </div>
         </div>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

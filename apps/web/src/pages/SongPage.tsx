@@ -6,6 +6,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Play, Pause, YoutubeLogo } from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { LazyYouTube } from '../components/LazyYouTube';
 import { rolloutSongs } from '../data/music';
@@ -17,7 +18,8 @@ import {
 import { priorityShorts } from '../data/priorityShorts';
 import { publishedShorts } from '../data/publishedShorts';
 import { getSongBySlug } from '../data/songs';
-import { PublicLayout } from './Home';
+import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
+import '../v2/song-page.css';
 
 const REVEAL_DELAY_MS = 2000;
 
@@ -90,16 +92,18 @@ export function SongPage() {
 
   if (!song) {
     return (
-      <PublicLayout variant="blackhole">
-        <main className="songDetailPage notFound">
-          <div className="songPanel">
-            <h1>Track unavailable</h1>
-            <Link className="bigAction" to="/music">
+      <PublicLayoutV2 wallpaper="eq">
+        <main className="v2-song-page">
+          <div className="v2-card v2-song-notfound">
+            <h1>
+              Track <span className="v2-grad-text">unavailable</span>
+            </h1>
+            <Link className="v2-btn" to="/music">
               Back to music
             </Link>
           </div>
         </main>
-      </PublicLayout>
+      </PublicLayoutV2>
     );
   }
 
@@ -109,21 +113,22 @@ export function SongPage() {
     : '';
 
   return (
-    <PublicLayout variant={song.wallpaper || 'vortex'}>
+    <PublicLayoutV2 wallpaper="eq">
       <main
-        className="songDetailPage cinematicSongPage"
+        className="v2-song-page"
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
       >
-        <div className="songPageTopline">
-          <button className="backBtn" type="button" onClick={() => navigate('/music')}>
-            ← Collection
+        <div className="v2-song-topline">
+          <button className="v2-song-back" type="button" onClick={() => navigate('/music')}>
+            <ArrowLeft size={15} weight="bold" />
+            Collection
           </button>
           <span>Swipe left or right · {rolloutSongs.length} verified releases</span>
         </div>
 
         <section
-          className={`songCinema ${
+          className={`v2-song-cinema ${
             officialVideo &&
             revealedVideoId === officialVideo.videoId &&
             readyVideoId === officialVideo.videoId
@@ -133,27 +138,27 @@ export function SongPage() {
           aria-label={`${song.title} visual experience`}
         >
           <div
-            className="songCinemaGlow"
+            className="v2-song-cinema-glow"
             style={{ backgroundImage: `url(${song.coverImage})` }}
             aria-hidden="true"
           />
           <img
-            className="songCinemaCover"
+            className="v2-song-cinema-cover"
             src={song.coverImage}
             alt={`${song.title} album artwork`}
           />
           {officialVideo ? (
             <iframe
-              className="songCinemaVideo"
+              className="v2-song-cinema-video"
               src={embed}
               title={`${song.title} official video`}
               allow="autoplay; encrypted-media; picture-in-picture"
               onLoad={() => setReadyVideoId(officialVideo.videoId)}
             />
           ) : null}
-          <div className="songCinemaShade" aria-hidden="true" />
-          <div className="songCinemaMeta">
-            <span className="genrePill">
+          <div className="v2-song-cinema-shade" aria-hidden="true" />
+          <div className="v2-song-cinema-meta">
+            <span className="v2-chip">
               {officialVideo ? 'Official video' : 'Official release'}
             </span>
             <h1>{song.title}</h1>
@@ -162,7 +167,7 @@ export function SongPage() {
             </p>
           </div>
           <button
-            className="songSwipe previous"
+            className="v2-song-swipe previous"
             type="button"
             onClick={() => move(-1)}
             aria-label="Previous song"
@@ -170,7 +175,7 @@ export function SongPage() {
             ‹
           </button>
           <button
-            className="songSwipe next"
+            className="v2-song-swipe next"
             type="button"
             onClick={() => move(1)}
             aria-label="Next song"
@@ -179,23 +184,23 @@ export function SongPage() {
           </button>
         </section>
 
-        <section className="playerSection songControlGlass">
+        <section className="v2-card v2-song-player">
           <button
-            className="playBig"
+            className="v2-song-play"
             type="button"
             onClick={music.toggle}
             aria-label={music.isPlaying ? 'Pause' : 'Play'}
           >
-            {music.isPlaying ? '❚❚' : '▶'}
+            {music.isPlaying ? <Pause size={24} weight="fill" /> : <Play size={24} weight="fill" />}
           </button>
-          <div className="songProgressGroup">
+          <div className="v2-song-progress-group">
             <div
-              className="progressBar"
+              className="v2-song-progress"
               role="progressbar"
               aria-label="Playback progress"
               aria-valuenow={Math.round(progress)}
             >
-              <div className="fill" style={{ width: `${progress}%` }} />
+              <div className="v2-song-progress-fill" style={{ width: `${progress}%` }} />
             </div>
             <p>
               {music.isPlaying
@@ -205,24 +210,25 @@ export function SongPage() {
           </div>
           {officialVideo ? (
             <a
-              className="bigAction"
+              className="v2-btn v2-btn--blue v2-btn--sm"
               href={youtubeWatchUrl(officialVideo.videoId)}
               target="_blank"
               rel="noreferrer"
             >
+              <YoutubeLogo size={18} weight="fill" />
               Watch on YouTube
             </a>
           ) : null}
         </section>
 
-        <section className="songDescription">
+        <section className="v2-card v2-song-about">
           <h2>About this release</h2>
           <p>{song.description}</p>
-          <p className="vibe">{song.vibe}</p>
+          <p className="v2-song-vibe">{song.vibe}</p>
         </section>
 
-        <section className="songShorts" aria-labelledby="song-shorts-title">
-          <div className="songShortsHead">
+        <section className="v2-card v2-song-shorts" aria-labelledby="song-shorts-title">
+          <div className="v2-song-shorts-head">
             <div>
               <span>Official channel</span>
               <h2 id="song-shorts-title">Shorts & clips</h2>
@@ -231,11 +237,11 @@ export function SongPage() {
               All Shorts ↗
             </a>
           </div>
-          <div className="songShortsRail">
+          <div className="v2-song-shorts-rail">
             {relatedShorts.map((short) => (
-              <article className="songShortCard" key={short.videoId}>
+              <article className="v2-song-short-card" key={short.videoId}>
                 <LazyYouTube
-                  className="songShortFrame"
+                  className="v2-song-short-frame"
                   videoId={short.videoId}
                   title={short.title}
                   muted
@@ -248,6 +254,9 @@ export function SongPage() {
           </div>
         </section>
       </main>
-    </PublicLayout>
+      <div className="v2-wrap">
+        <LiveLine />
+      </div>
+    </PublicLayoutV2>
   );
 }

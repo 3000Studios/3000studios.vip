@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { DudeAgent } from './DudeAgent';
+import '../v2/admin.css';
 
 const NAV = [
   {
@@ -87,7 +88,7 @@ export function Shell() {
   const { title, sub } = titleFor(pathname);
 
   return (
-    <div className={`console ${navOpen ? 'navOpen' : ''}`}>
+    <div className={`console v2-admin ${navOpen ? 'navOpen' : ''}`}>
       <aside className="cSidebar" onClick={() => setNavOpen(false)}>
         <motion.div
           className="cBrand"

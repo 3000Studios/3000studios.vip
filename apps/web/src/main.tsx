@@ -19,10 +19,8 @@ import {
   LegalPage,
   RequestsPage,
   SponsorsPage,
-  VideoPage,
 } from './pages/Home';
-import { LiveStreamPage } from './pages/LiveStreamPage';
-import { SwipeHome } from './components/SwipeHome';
+import { HomePage } from './v2/HomePage';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
@@ -100,10 +98,10 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: '/', element: <SwipeHome /> },
+      { path: '/', element: <HomePage /> },
       { path: '/music', element: <Navigate to="/#music" replace /> },
-      { path: '/video', element: <VideoPage /> },
-      { path: '/live', element: <LiveStreamPage /> },
+      { path: '/video', element: <Navigate to="/" replace /> },
+      { path: '/live', element: <Navigate to="/#live" replace /> },
       { path: '/shop', element: <ShopPage /> },
       { path: '/go-live', element: <PhoneGoLive /> },
       { path: '/concepts', element: <ConceptBoard /> },

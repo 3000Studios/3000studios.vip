@@ -1,0 +1,200 @@
+/* ConceptBoard — v2 Neon Noir presentation of the ten redesign directions. */
+
+.v2-concept-hero {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .v2-concept-hero {
+    grid-template-columns: 1.2fr 1fr;
+    align-items: center;
+  }
+}
+
+.v2-concept-panel {
+  padding: clamp(22px, 4vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.v2-concept-panel > span:first-child {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--v2-muted);
+}
+
+.v2-concept-panel strong {
+  font-family: var(--v2-font-display);
+  font-size: clamp(22px, 4vw, 30px);
+  color: var(--v2-text);
+}
+
+.v2-concept-panel small {
+  color: var(--v2-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.v2-concept-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.v2-concept-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(147, 165, 188, 0.2);
+  background: rgba(4, 7, 12, 0.5);
+  color: var(--v2-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.v2-concept-checks input[type='checkbox'] {
+  accent-color: var(--v2-neon);
+  width: 15px;
+  height: 15px;
+}
+
+.v2-concept-art {
+  position: relative;
+  min-height: 190px;
+  border-radius: var(--v2-radius-sm);
+  overflow: hidden;
+  background: radial-gradient(120% 120% at 20% 10%, rgba(0, 245, 147, 0.12), transparent 55%),
+    radial-gradient(120% 120% at 85% 90%, rgba(77, 124, 255, 0.16), transparent 55%),
+    rgba(4, 7, 12, 0.7);
+  border-bottom: 1px solid rgba(147, 165, 188, 0.14);
+}
+
+.v2-concept-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(28px);
+  opacity: 0.65;
+}
+
+.v2-concept-orb.one {
+  width: 110px;
+  height: 110px;
+  left: 8%;
+  top: 12%;
+  background: var(--v2-neon);
+}
+
+.v2-concept-orb.two {
+  width: 90px;
+  height: 90px;
+  right: 14%;
+  top: 48%;
+  background: var(--v2-blue);
+}
+
+.v2-concept-orb.three {
+  width: 70px;
+  height: 70px;
+  left: 42%;
+  bottom: 6%;
+  background: var(--v2-neon-soft);
+}
+
+.v2-concept-phone {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%) rotate(-6deg);
+  width: 88px;
+  height: 158px;
+  border-radius: 16px;
+  border: 1px solid rgba(147, 165, 188, 0.28);
+  background: rgba(8, 12, 18, 0.92);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.v2-concept-phone::before {
+  content: '';
+  align-self: center;
+  width: 34px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(147, 165, 188, 0.35);
+}
+
+.v2-concept-mini-stage {
+  height: 46px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0, 245, 147, 0.28), rgba(77, 124, 255, 0.32));
+}
+
+.v2-concept-mini-row {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(147, 165, 188, 0.22);
+}
+
+.v2-concept-copy {
+  padding: clamp(20px, 4vw, 28px);
+}
+
+.v2-concept-number {
+  font-family: var(--v2-font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: var(--v2-neon);
+}
+
+.v2-concept-copy h2 {
+  font-family: var(--v2-font-display);
+  font-size: clamp(20px, 3.4vw, 26px);
+  margin: 8px 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.v2-concept-copy > p {
+  color: var(--v2-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+
+.v2-concept-copy dl {
+  margin: 0 0 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.v2-concept-copy dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--v2-faint);
+}
+
+.v2-concept-copy dd {
+  margin: 2px 0 0;
+  color: var(--v2-text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.v2-concept-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
