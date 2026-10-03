@@ -42,7 +42,7 @@ export function AppsPage() {
             <Link className="vip-btn-gold" to="/thunder-dome">
               🛸 Play Thunder Dome
             </Link>
-            <Link className="vip-btn-obsidian" to="/#music-catalog">
+            <Link className="vip-btn-obsidian" to="/#music">
               ♪ Velvet Audio Engine
             </Link>
             <Link className="vip-btn-obsidian" to="/live">

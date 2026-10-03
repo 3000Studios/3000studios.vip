@@ -38,6 +38,7 @@ import { AuthProvider } from './lib/auth';
 import { initVelvetMachine } from './lib/velvetEngine';
 import { GlobalMusicProvider } from './components/GlobalMusic';
 import { usePageMeta } from './lib/usePageMeta';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 /** Wraps a route element with a per-route title + meta description. */
 function Titled({
@@ -259,6 +260,7 @@ const router = createBrowserRouter([
       { path: '/copyright', element: <LegalPage type="copyright" /> },
       { path: '/cookies', element: <LegalPage type="cookies" /> },
       { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
+      { path: '*', element: <NotFoundPage /> },
       {
         path: '/admin',
         element: (

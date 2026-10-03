@@ -71,7 +71,7 @@ export function ClipReveal() {
         className="v3-clip-img"
         style={{
           clipPath: clip,
-          backgroundImage: "url('https://picsum.photos/seed/studioclip3k/1800/1100')",
+          backgroundImage: "url('/media/covers/not-giving-up-tonight-bg.jpg')",
         }}
         aria-hidden="true"
       />

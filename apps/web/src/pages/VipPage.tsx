@@ -36,7 +36,7 @@ export function VipPage() {
             <a className="vip-btn-obsidian" href={CASH_APP_URL} target="_blank" rel="noreferrer">
               $ Tip $addcashGift
             </a>
-            <Link className="vip-btn-obsidian" to="/#music-catalog">
+            <Link className="vip-btn-obsidian" to="/#music">
               ♪ Free Catalog
             </Link>
           </div>

@@ -88,7 +88,7 @@ export function PulseFooter() {
           <Link to="/shop">Shop</Link>
           <Link to="/blog">Blog</Link>
           <Link to="/contact">Contact</Link>
-          <Link to="/legal">Legal</Link>
+          <Link to="/privacy">Legal</Link>
         </nav>
         <div className="v3-foot-base">3000 STUDIOS · NEON NOIR × CINEMATIC × PULSE</div>
       </div>
