@@ -25,7 +25,7 @@ import {
   ProjectsPage,
   VipPage,
 } from './pages/Home';
-import { HomePage } from './v2/HomePage';
+import { HomePage } from './v3/HomePage';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';

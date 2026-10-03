@@ -44,7 +44,7 @@
 @import './v2/wallpaper.css';
 @import './v2/header.css';
 @import './v2/footer.css';
-@import './v2/home.css';
+@import './v3/v3.css';
 
 .routeLoader {
   min-height: 100vh;
