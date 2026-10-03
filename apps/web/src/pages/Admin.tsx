@@ -109,7 +109,7 @@ export function Admin() {
       setPasscode('');
       setError(null);
     } else {
-      setError('Incorrect access code. Enter 3000 to access.');
+      setError('Incorrect access code. Enter 5555 to access.');
       setPasscode('');
     }
   }
@@ -172,7 +172,7 @@ export function Admin() {
             <h2>Go Live Console</h2>
             <p>Enter access code to unlock live stream studio, camera & owner tools.</p>
             <label className="adminPasscodeLabel">
-              <span>Access Code (Passcode = 3000)</span>
+              <span>Access Code (Passcode = 5555)</span>
               <input
                 type="password"
                 inputMode="numeric"
@@ -184,7 +184,7 @@ export function Admin() {
                   setPasscode(e.target.value);
                   setError(null);
                 }}
-                placeholder="Enter Passcode (3000)"
+                placeholder="Enter Passcode (5555)"
                 maxLength={32}
               />
             </label>
@@ -201,9 +201,9 @@ export function Admin() {
               <button
                 type="button"
                 className="cBtn ghost sm"
-                onClick={() => setPasscode('3000')}
+                onClick={() => setPasscode('5555')}
               >
-                Auto-fill 3000
+                Auto-fill 5555
               </button>
             </div>
             <Link to="/" className="adminBackLink">

@@ -15,6 +15,7 @@ import {
   rolloutSongs,
   type CatalogSong,
 } from '../data/music';
+import { publishAnalyser } from '../lib/audioAnalyserBus';
 
 const MUSIC_ON_KEY = '3000-music-on';
 
@@ -119,6 +120,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
         source.connect(analyser);
         analyser.connect(ctx.destination);
         analyserRef.current = analyser;
+        publishAnalyser(analyser);
       } catch {
         // Already connected or CORS/autoplay policy blocked setup.
         return;

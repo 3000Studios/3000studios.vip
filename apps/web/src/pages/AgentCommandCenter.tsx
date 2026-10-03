@@ -32,7 +32,7 @@ const ABORT_PHRASES = ['abort', 'abort damn it abort', 'abort, damn it, abort'];
 const UNIVERSAL_POLICY = [
   'Use every owner-approved folder, tool, and website needed to complete a request.',
   'Run ordinary requested work automatically and keep an owner-visible audit trail.',
-  'Never spend money until owner code 3000 is entered and the purchase is confirmed.',
+  'Never spend money until owner code 5555 is entered and the purchase is confirmed.',
   'Never send an email until the owner confirms the exact message twice.',
   'Keep long-term memory and encrypted backups in the owner Google Drive.',
   'Monitor, learn, audit, repair, and improve continuously while preserving rollback.',
@@ -232,7 +232,7 @@ export function AgentCommandCenter() {
 
   function advanceGate() {
     if (gate === 'spend-code') {
-      if (ownerCode !== '3000') return;
+      if (ownerCode !== '5555') return;
       setGate('spend-confirm');
       setOwnerCode('');
       return;
@@ -488,7 +488,7 @@ export function AgentCommandCenter() {
                 type="button"
                 className="primaryButton"
                 onClick={advanceGate}
-                disabled={gate === 'spend-code' && ownerCode !== '3000'}
+                disabled={gate === 'spend-code' && ownerCode !== '5555'}
               >
                 {gate === 'spend-code'
                   ? 'Verify code'

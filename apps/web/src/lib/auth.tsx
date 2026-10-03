@@ -36,9 +36,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (passcodeOrEmail: string, passcode = '', secretAnswer = '') => {
     const code = (passcode || passcodeOrEmail).trim();
-    // Fast local access code check: passcode === '3000'
-    if (code === '3000') {
-      const token = 'owner-token-3000-passcode';
+    // Fast local access code check: passcode === '5555'
+    if (code === '5555') {
+      const token = 'owner-token-5555-passcode';
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, email: OWNER_USERNAME }));
       } catch {
