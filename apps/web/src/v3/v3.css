@@ -33,7 +33,7 @@
   font-family: var(--v3-font-display); font-weight: 900; font-size: clamp(64px, 12vw, 110px);
   color: var(--v3-gold); line-height: 1;
 }
-.v3-loader .v3-loader-l { letter-spacing: 6px; font-size: 11px; color: var(--v3-mut); text-transform: uppercase; font-family: var(--v3-font-grot); }
+.v3-loader .v3-loader-l { letter-spacing: 6px; font-size: 12px; color: var(--v3-mut); text-transform: uppercase; font-family: var(--v3-font-grot); }
 .v3-loader .v3-loader-bar { width: min(320px, 60vw); height: 2px; background: #1a1d26; border-radius: 2px; overflow: hidden; }
 .v3-loader .v3-loader-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--v3-gold), var(--v3-cyan)); }
 
@@ -85,7 +85,7 @@
 .v3-btn--ghost { border: 1px solid rgba(111, 244, 255, 0.5); color: var(--v3-cyan); background: rgba(111, 244, 255, 0.04); }
 .v3-btn--ghost:hover { transform: translateY(-3px); box-shadow: 0 0 26px rgba(111, 244, 255, 0.35); }
 @keyframes v3-pulse { 0%, 100% { box-shadow: 0 0 22px rgba(241,183,78,.4); } 50% { box-shadow: 0 0 48px rgba(241,183,78,.75); } }
-.v3-scroll-cue { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 2; color: var(--v3-mut); font-size: 11px; letter-spacing: 4px; text-transform: uppercase; font-family: var(--v3-font-grot); animation: v3-bob 2s ease-in-out infinite; text-decoration: none; }
+.v3-scroll-cue { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 2; color: var(--v3-mut); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-family: var(--v3-font-grot); animation: v3-bob 2s ease-in-out infinite; text-decoration: none; }
 @keyframes v3-bob { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
 
 /* ---------- marquee ---------- */
@@ -126,8 +126,8 @@
 .v3-hcard h3 { font-family: var(--v3-font-display); font-size: clamp(24px, 3vw, 32px); margin: 20px 0 8px; }
 .v3-hcard h3 i { color: var(--v3-gold); font-style: normal; margin-right: 10px; }
 .v3-hcard p { color: var(--v3-mut); line-height: 1.7; font-size: 15px; }
-.v3-hcard .v3-hmeta { margin-top: 12px; font-size: 11px; letter-spacing: 3px; color: var(--v3-cyan); text-transform: uppercase; font-family: var(--v3-font-grot); }
-.v3-hint { color: var(--v3-mut); letter-spacing: 4px; font-size: 11px; text-transform: uppercase; font-family: var(--v3-font-grot); white-space: nowrap; align-self: center; }
+.v3-hcard .v3-hmeta { margin-top: 12px; font-size: 12px; letter-spacing: 3px; color: var(--v3-cyan); text-transform: uppercase; font-family: var(--v3-font-grot); }
+.v3-hint { color: var(--v3-mut); letter-spacing: 4px; font-size: 12px; text-transform: uppercase; font-family: var(--v3-font-grot); white-space: nowrap; align-self: center; }
 
 /* ---------- cards / tilt ---------- */
 .v3-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 54px; }
@@ -140,7 +140,7 @@
 .v3-card .v3-n { font-family: var(--v3-font-display); font-size: 44px; color: var(--v3-gold); }
 .v3-card h3 { margin: 14px 0 10px; font-size: 20px; font-family: var(--v3-font-grot); font-weight: 700; }
 .v3-card p { color: var(--v3-mut); font-size: 14.5px; line-height: 1.65; }
-.v3-tag { display: inline-block; margin-top: 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--v3-cyan); border: 1px solid rgba(111,244,255,.35); padding: 6px 14px; border-radius: 999px; font-family: var(--v3-font-grot); }
+.v3-tag { display: inline-block; margin-top: 16px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--v3-cyan); border: 1px solid rgba(111,244,255,.35); padding: 6px 14px; border-radius: 999px; font-family: var(--v3-font-grot); }
 
 /* ---------- music ---------- */
 .v3-track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 44px; }
@@ -187,7 +187,7 @@
 .v3-foot-links { margin-top: 70px; display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-family: var(--v3-font-grot); }
 .v3-foot-links a { color: var(--v3-mut); text-decoration: none; }
 .v3-foot-links a:hover { color: var(--v3-gold); }
-.v3-foot-base { margin-top: 26px; color: #5b606c; font-size: 11px; letter-spacing: 3px; }
+.v3-foot-base { margin-top: 26px; color: #5b606c; font-size: 12px; letter-spacing: 3px; }
 
 /* beat headline */
 .v3-beat { display: inline-block; will-change: transform; }

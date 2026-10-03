@@ -5,12 +5,14 @@ import { useLocation } from 'react-router-dom';
 // 1. Audio Analyzer Hookup
 let audioContext: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
-let dataArray: any = null;
+let dataArray: Uint8Array<ArrayBuffer> | null = null;
 
 function setupAudioAnalysis(audioElement: HTMLAudioElement) {
   if (audioContext) return;
-  // Note: For cross-browser compatibility, we cast to any for webkitAudioContext
-  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+  // Note: For cross-browser compatibility, we read the legacy webkit prefix.
+  const AudioCtx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   audioContext = new AudioCtx();
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 128;
@@ -88,7 +90,7 @@ export function ThreeReactiveBackground() {
 
       let bassFactor = 0;
       if (analyser && dataArray) {
-        (analyser as any).getByteFrequencyData(dataArray);
+        analyser.getByteFrequencyData(dataArray);
         // Low frequency average for bass response
         bassFactor = (dataArray[1] + dataArray[2] + dataArray[3]) / 3 / 255;
       }

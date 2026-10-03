@@ -37,6 +37,21 @@ import { ConceptBoard } from './pages/ConceptBoard';
 import { AuthProvider } from './lib/auth';
 import { initVelvetMachine } from './lib/velvetEngine';
 import { GlobalMusicProvider } from './components/GlobalMusic';
+import { usePageMeta } from './lib/usePageMeta';
+
+/** Wraps a route element with a per-route title + meta description. */
+function Titled({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  usePageMeta({ title, description });
+  return <>{children}</>;
+}
 
 const Shell = lazy(() =>
   import('./components/Shell').then((module) => ({ default: module.Shell })),
@@ -107,18 +122,128 @@ const router = createBrowserRouter([
       { path: '/music', element: <Navigate to="/#music" replace /> },
       { path: '/video', element: <Navigate to="/" replace /> },
       { path: '/live', element: <Navigate to="/#live" replace /> },
-      { path: '/thunder-dome', element: <ThunderDomePage /> },
-      { path: '/apps', element: <AppsPage /> },
-      { path: '/projects', element: <ProjectsPage /> },
-      { path: '/vip', element: <VipPage /> },
-      { path: '/shop', element: <ShopPage /> },
-      { path: '/go-live', element: <PhoneGoLive /> },
-      { path: '/concepts', element: <ConceptBoard /> },
-      { path: '/community', element: <CommunityPage /> },
-      { path: '/requests', element: <RequestsPage /> },
-      { path: '/blog', element: <BlogPage /> },
+      {
+        path: '/thunder-dome',
+        element: (
+          <Titled
+            title="Thunderdome"
+            description="Thunderdome by 3000 Studios — the top-down arena shooter. Play the build, watch the trailer."
+          >
+            <ThunderDomePage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/apps',
+        element: (
+          <Titled
+            title="Apps"
+            description="Apps and interactive projects from 3000 Studios."
+          >
+            <AppsPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/projects',
+        element: (
+          <Titled
+            title="Projects"
+            description="Studio projects from 3000 Studios — music, video, software, and games."
+          >
+            <ProjectsPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/vip',
+        element: (
+          <Titled
+            title="VIP"
+            description="3000 Studios VIP — early drops, vault tracks, and member perks."
+          >
+            <VipPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/shop',
+        element: (
+          <Titled
+            title="Shop"
+            description="3000 Studios shop — merch, singles, and studio services."
+          >
+            <ShopPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/go-live',
+        element: (
+          <Titled
+            title="Go Live"
+            description="Start a 3000 Studios live broadcast from your phone."
+          >
+            <PhoneGoLive />
+          </Titled>
+        ),
+      },
+      {
+        path: '/concepts',
+        element: (
+          <Titled
+            title="Concepts"
+            description="3000 Studios concept board — ideas in progress, vote on what gets made."
+          >
+            <ConceptBoard />
+          </Titled>
+        ),
+      },
+      {
+        path: '/community',
+        element: (
+          <Titled
+            title="Community"
+            description="The 3000 Studios community — requests, discussions, and fans."
+          >
+            <CommunityPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/requests',
+        element: (
+          <Titled
+            title="Requests"
+            description="Request a song, video, or cover from 3000 Studios."
+          >
+            <RequestsPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/blog',
+        element: (
+          <Titled
+            title="Blog"
+            description="News, stories, and studio notes from 3000 Studios."
+          >
+            <BlogPage />
+          </Titled>
+        ),
+      },
       { path: '/blog/:slug', element: <BlogPostPage /> },
-      { path: '/sponsors', element: <SponsorsPage /> },
+      {
+        path: '/sponsors',
+        element: (
+          <Titled
+            title="Sponsors"
+            description="Sponsor a 3000 Studios homepage slot — 30 days on the front page."
+          >
+            <SponsorsPage />
+          </Titled>
+        ),
+      },
       {
         path: '/song/:slug',
         element: (

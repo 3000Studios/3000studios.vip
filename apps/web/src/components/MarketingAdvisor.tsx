@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { getOwnerToken } from '../lib/auth';
 
 type Msg = { role: 'you' | 'advisor'; text: string };
 
@@ -27,7 +28,10 @@ export function MarketingAdvisor() {
     try {
       const res = await fetch('/api/advisor', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...(getOwnerToken() ? { authorization: `Bearer ${getOwnerToken()}` } : {}),
+        },
         body: JSON.stringify({
           message,
           history: next.map((m) => ({ role: m.role, text: m.text })),

@@ -36,6 +36,7 @@ function buyTrack(slug: string) {
 }
 
 /** If Stripe sends the buyer back with ?paid=1, lock in the pending unlock. */
+// eslint-disable-next-line react-refresh/only-export-components
 export function settlePendingPurchase() {
   try {
     const params = new URLSearchParams(window.location.search);

@@ -2,7 +2,7 @@ import type { PagesEnv } from '../env';
 
 export const onRequestPost: PagesFunction<PagesEnv> = async ({ request }) => {
   const origin = request.headers.get('origin');
-  if (origin !== 'https://3000studios.vip') {
+  if (origin !== 'https://3000studios.vip' && origin !== 'https://www.3000studios.vip') {
     return Response.json({ error: 'origin_not_allowed' }, { status: 403 });
   }
   let upstream: Response;

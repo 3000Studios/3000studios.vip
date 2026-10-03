@@ -95,7 +95,7 @@
 .studioBlockLabel {
   display: block;
   margin-bottom: 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -138,7 +138,7 @@
   background: rgba(0, 0, 0, 0.72);
   border: 1px solid rgba(255, 215, 0, 0.35);
   color: #ffd700;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
   pointer-events: none;
@@ -156,7 +156,7 @@
 }
 
 .studioSlider span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: rgba(226, 232, 240, 0.75);
   letter-spacing: 0.04em;
@@ -606,7 +606,7 @@ button.liveInquiryBtn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -617,7 +617,7 @@ button.liveInquiryBtn {
 }
 
 .studioAudioMeterStatus {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   padding: 2px 8px;
   border-radius: 999px;
@@ -688,7 +688,7 @@ button.liveInquiryBtn {
   z-index: 3;
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.05em;
   backdrop-filter: blur(8px);

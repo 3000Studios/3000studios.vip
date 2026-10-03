@@ -14,6 +14,9 @@ const CACHE_KEY = 'https://3000studios.vip/__live-room-v1';
 const MAX_MESSAGES = 80;
 const VIEWER_TTL_MS = 25_000;
 
+/* Per-isolate chat throttle (ip -> last message timestamp). */
+const CHAT_THROTTLE = new Map<string, number>();
+
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
   'cache-control': 'no-store',
@@ -106,6 +109,20 @@ export async function onRequestPost({ request }: { request: Request }) {
   }
 
   if (body.type === 'chat') {
+    // Per-IP throttle: max 1 message / 3s (per isolate).
+    const ip =
+      request.headers.get('cf-connecting-ip') ||
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      'unknown';
+    const lastHit = CHAT_THROTTLE.get(ip) || 0;
+    if (now - lastHit < 3000) {
+      return new Response(JSON.stringify({ ok: false, error: 'Slow down' }), {
+        status: 429,
+        headers: JSON_HEADERS,
+      });
+    }
+    CHAT_THROTTLE.set(ip, now);
+    if (CHAT_THROTTLE.size > 2000) CHAT_THROTTLE.clear();
     const name = sanitize(body.name || 'Guest', 32) || 'Guest';
     const text = sanitize(body.text || '', 280);
     if (!text) {

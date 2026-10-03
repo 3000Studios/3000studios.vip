@@ -18,6 +18,7 @@ import { usePrefersReducedMotion } from '../lib/mediaQuery';
 
 export type NavItem = { to: string; label: string; icon: React.ReactNode; hash?: string };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Home', icon: <House size={20} weight="duotone" /> },
   { to: '/#music', label: 'Music', icon: <MusicNote size={20} weight="duotone" /> },
@@ -77,6 +78,9 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    // Close the mobile menu on navigation (back/forward/programmatic).
+    // Navigation-driven, not a render loop: React bails out when already closed.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
   }, [location.pathname, location.hash]);
 

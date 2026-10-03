@@ -152,7 +152,7 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .adminEasyShell .adminCodeModal span:first-child {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -353,7 +353,7 @@
   background: rgba(2, 6, 14, 0.6);
 }
 .easyCopyLabel {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -395,7 +395,7 @@
   background: rgba(2, 6, 14, 0.45);
 }
 .easyCheatGrid strong {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #ffd700;

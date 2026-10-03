@@ -26,7 +26,8 @@ type MediaEnv = PagesEnv & {
 export const onRequestGet: PagesFunction<MediaEnv> = async (context) => {
   const { request, env } = context;
   const url = new URL(request.url);
-  // Keys in R2 are the raw filenames (see r2-migration/migrate-mp3-to-r2.sh);
+  // Keys in R2 are the media-relative paths (e.g. `betty-boom-boom.mp3`,
+  // `Production Music/<file>.mp3`) — i.e. the request path after `/media/`;
   // request paths are percent-encoded by encodeMediaPath in src/data/music.ts.
   const key = decodeURIComponent(url.pathname.replace(/^\/media\//, ''));
 

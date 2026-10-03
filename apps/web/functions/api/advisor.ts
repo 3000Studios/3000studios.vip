@@ -7,7 +7,65 @@ Give short, specific campaigns. Never print API keys, tokens, passcodes, or env 
 
 import type { PagesEnv } from '../env';
 
+/**
+ * Owner gate for the paid Gemini proxy.
+ * Accepts the local passcode-session token (see lib/auth.tsx — the same
+ * token the /admin UI mints after the 5555 passcode) or any bearer token
+ * the remote backend verifies. Anonymous callers get 401: no free rides
+ * on the owner's Gemini quota.
+ */
+const LOCAL_OWNER_TOKEN = 'owner-token-5555-passcode';
+
+async function requireOwner(request: Request, env: PagesEnv): Promise<boolean> {
+  const authorization = request.headers.get('authorization');
+  if (!authorization?.toLowerCase().startsWith('bearer ')) return false;
+  const token = authorization.slice(7).trim();
+  if (!token) return false;
+  if (token === LOCAL_OWNER_TOKEN) return true;
+  const apiBase = (
+    env.API_BASE ||
+    env.VITE_API_BASE ||
+    'https://apex-citadel-api.mr-jwswain.workers.dev'
+  ).replace(/\/$/, '');
+  try {
+    const response = await fetch(`${apiBase}/auth/verify`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+/* Per-isolate throttle: 20 advisor calls / 10 min / IP. Defense in depth. */
+const HITS = new Map<string, number[]>();
+function throttled(ip: string): boolean {
+  const now = Date.now();
+  const windowStart = now - 10 * 60 * 1000;
+  const hits = (HITS.get(ip) || []).filter((t) => t > windowStart);
+  hits.push(now);
+  HITS.set(ip, hits);
+  if (HITS.size > 2000) HITS.clear();
+  return hits.length > 20;
+}
+
 export const onRequestPost: PagesFunction<PagesEnv> = async ({ request, env }) => {
+  if (!(await requireOwner(request, env))) {
+    return new Response(JSON.stringify({ ok: false, error: 'owner_only' }), {
+      status: 401,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+  const ip =
+    request.headers.get('cf-connecting-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    'unknown';
+  if (throttled(ip)) {
+    return new Response(JSON.stringify({ ok: false, error: 'rate_limited' }), {
+      status: 429,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
   const key = String(env.GEMINI_API_KEY || env.VITE_GEMINI_API_KEY || '');
   const model = String(env.VITE_GEMINI_MODEL || 'gemini-2.0-flash');
   if (!key) {

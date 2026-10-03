@@ -29,7 +29,7 @@
 }
 .sdEyebrow {
   color: #f2c14e;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.2em;
 }
@@ -291,7 +291,7 @@
   display: flex;
   gap: 14px;
   color: var(--c-muted);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }

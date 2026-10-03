@@ -7,6 +7,7 @@ import { PageFade } from './Reveal';
 import { AdSenseUnit } from '../pages/Home';
 
 /** Per-page wallpaper identities. */
+// eslint-disable-next-line react-refresh/only-export-components
 export const WALLPAPERS: Record<string, WallpaperVariant> = {
   '/': 'aurora',
   '/shop': 'grid',
@@ -21,6 +22,7 @@ export const WALLPAPERS: Record<string, WallpaperVariant> = {
   '/song': 'eq',
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function wallpaperFor(pathname: string): WallpaperVariant {
   if (WALLPAPERS[pathname]) return WALLPAPERS[pathname];
   if (pathname.startsWith('/song/')) return 'eq';

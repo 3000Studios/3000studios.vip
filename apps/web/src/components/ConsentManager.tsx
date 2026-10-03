@@ -162,6 +162,7 @@ export function useConsent() {
  * ads; re-renders the caller when the stored choice changes so units mounted
  * before consent can render their <ins> and push their ad request.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAdConsent(): boolean {
   const [ads, setAds] = useState(() => readConsent()?.ads === true);
   useEffect(() => {

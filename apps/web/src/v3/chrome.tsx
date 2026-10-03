@@ -6,21 +6,21 @@ import { usePrefersReducedMotion } from '../lib/mediaQuery';
 /* ---------------- cinematic preloader (once per session) ---------------- */
 export function Preloader() {
   const [count, setCount] = useState(0);
+  const reduce = usePrefersReducedMotion();
   const [done, setDone] = useState(() => {
+    // Reduced motion: skip the preloader immediately (no setState-in-effect).
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return true;
+    }
     try {
       return sessionStorage.getItem('v3-preloader-seen') === '1';
     } catch {
       return false;
     }
   });
-  const reduce = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (done) return;
-    if (reduce) {
-      setDone(true);
-      return;
-    }
+    if (done || reduce) return;
     let n = 0;
     const iv = window.setInterval(() => {
       n = Math.min(100, n + Math.ceil(Math.random() * 12));

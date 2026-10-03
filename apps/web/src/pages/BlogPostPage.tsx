@@ -2,12 +2,17 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { PublicLayout, AdSenseUnit } from './Home';
 import { BLOG_ARTICLES } from '../data/blogArticles';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
+import { usePageMeta } from '../lib/usePageMeta';
 import '../styles/vip-luxury.css';
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const article = BLOG_ARTICLES.find((a) => a.slug === slug);
 
+  usePageMeta({
+    title: article ? article.title : 'Blog',
+    description: article ? article.summary : 'Stories and studio notes from 3000 Studios.',
+  });
   if (!article) {
     return <Navigate to="/blog" replace />;
   }

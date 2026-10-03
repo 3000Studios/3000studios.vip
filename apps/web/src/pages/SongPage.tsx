@@ -19,6 +19,7 @@ import { priorityShorts } from '../data/priorityShorts';
 import { publishedShorts } from '../data/publishedShorts';
 import { getSongBySlug } from '../data/songs';
 import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
+import { usePageMeta } from '../lib/usePageMeta';
 import '../v2/song-page.css';
 
 const REVEAL_DELAY_MS = 2000;
@@ -36,6 +37,12 @@ export function SongPage() {
   const music = useGlobalMusic();
   const { playIndex } = music;
   const song = getSongBySlug(slug || '');
+  usePageMeta({
+    title: song ? `3000 Studios - ${song.title}` : 'Song',
+    description: song
+      ? `Listen to "${song.title}" by 3000 Studios — official music, video, and streaming links.`
+      : '3000 Studios song page.',
+  });
   const [readyVideoId, setReadyVideoId] = useState('');
   const [revealedVideoId, setRevealedVideoId] = useState('');
   const touchStart = useRef<number | null>(null);

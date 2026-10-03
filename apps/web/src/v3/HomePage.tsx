@@ -15,8 +15,16 @@ import { CoverWall } from './CoverWall';
 import { LiveSection } from './LiveSection';
 import { PulseFooter } from './PulseFooter';
 
+import { usePageMeta } from '../lib/usePageMeta';
+
 export function HomePage() {
   const [live, setLive] = useState(false);
+
+  usePageMeta({
+    title: 'Official Music & Live Stage',
+    description:
+      '3000 Studios — original music, cinematic videos, and live broadcasts from Acworth, Georgia. New singles weekly, on all platforms.',
+  });
 
   useEffect(() => {
     settlePendingPurchase();
