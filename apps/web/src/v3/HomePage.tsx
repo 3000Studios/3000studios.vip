@@ -11,6 +11,7 @@ import { Statement, ClipReveal, StudioGrid, CtaBand, Marquee } from './Sections'
 import { HorizontalReleases } from './HorizontalReleases';
 import { MusicSection, settlePendingPurchase } from './MusicSection';
 import { PromoShorts } from './PromoShorts';
+import { CoverWall } from './CoverWall';
 import { LiveSection } from './LiveSection';
 import { PulseFooter } from './PulseFooter';
 
@@ -42,6 +43,7 @@ export function HomePage() {
           <main>
             <HeroEQ live={live} />
             <LiveSection />
+            <CoverWall />
             <Marquee
               items={[
                 'New singles weekly',

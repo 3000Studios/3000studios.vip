@@ -148,7 +148,7 @@ export function CtaBand() {
     <section className="v3-section">
       <div className="v3-wrap">
         <Reveal>
-          <div className="v3-cta-band">
+          <div className="v3-cta-band v3-cta-band--art">
             <Lightning size={36} weight="duotone" color="#f1b74e" />
             <h2>
               Your turn. <em>Request it.</em>

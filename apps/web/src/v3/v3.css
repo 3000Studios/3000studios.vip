@@ -68,7 +68,7 @@
 @keyframes v3-blink { 50% { opacity: 0.25; } }
 .v3-display {
   font-family: var(--v3-font-display); font-weight: 900;
-  font-size: clamp(52px, 10vw, 128px); line-height: 1.0; letter-spacing: -1px;
+  font-size: clamp(44px, 13vw, 128px); line-height: 1.0; letter-spacing: -1px;
 }
 .v3-display .v3-w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.08em; margin-bottom: -0.08em; }
 .v3-display .v3-w > span { display: inline-block; }
@@ -229,8 +229,59 @@
 .v3-statement { min-height: 88vh; }
 .v3-clip { height: 100svh; }
 
+/* ---------- cover wall: album art everywhere ---------- */
+.v3-coverwall { padding: clamp(56px, 8vw, 96px) 0; position: relative; z-index: 2; overflow: hidden; }
+.v3-coverwall .v3-wrap { padding: 0 6vw; margin-bottom: 30px; }
+.v3-coverwall-row { overflow: hidden; margin-bottom: 12px; }
+.v3-coverwall-row:last-child { margin-bottom: 0; }
+.v3-coverwall-track { display: flex; width: max-content; animation: v3-coverwall 55s linear infinite; }
+.v3-coverwall-track.is-reverse { animation-direction: reverse; }
+.v3-coverwall-track:hover { animation-play-state: paused; }
+.v3-coverwall-tile {
+  flex: 0 0 auto; width: 128px; margin-right: 12px; border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12); display: block;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+  transition: transform .3s, border-color .3s;
+}
+.v3-coverwall-tile:hover { transform: scale(1.05); border-color: rgba(241,183,78,.6); }
+.v3-coverwall-tile img { width: 128px; height: 128px; object-fit: cover; display: block; }
+@keyframes v3-coverwall { to { transform: translateX(-50%); } }
+@media (min-width: 720px) {
+  .v3-coverwall-tile, .v3-coverwall-tile img { width: 184px; }
+  .v3-coverwall-tile img { height: 184px; }
+  .v3-coverwall-track { animation-duration: 75s; }
+}
+
+/* CTA band with faded album-art backdrop */
+.v3-cta-band--art { position: relative; overflow: hidden; }
+.v3-cta-band--art::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    url('/media/covers/so-fresh-so-cosmic.jpg'),
+    url('/media/covers/ride-smooth.jpg'),
+    url('/media/covers/betty-boom-boom.jpg'),
+    url('/media/covers/oooo-weee.jpg');
+  background-size: 200px, 240px, 180px, 220px;
+  background-repeat: no-repeat;
+  background-position: -24px -24px, right -32px top -20px, left 22% bottom -70px, right 18% bottom -60px;
+  opacity: .16; filter: saturate(1.25);
+}
+.v3-cta-band--art > * { position: relative; z-index: 1; }
+
+/* ---------- mobile-first tune-ups ---------- */
+@media (max-width: 480px) {
+  .v3-cta-row { flex-direction: column; align-items: stretch; }
+  .v3-cta-row .v3-btn { justify-content: center; padding: 17px 24px; }
+  .v3-hero-inner { padding-top: 100px; }
+}
+/* keep the fixed bottom dock from covering the footer on phones */
+@media (max-width: 900px) {
+  .v3-foot-base { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .v3-marquee-track, .v3-grain { animation: none; }
   .v3-btn--gold { animation: none; }
   .v3-hero-eq i { animation: none; height: 14px; opacity: .7; }
+  .v3-coverwall-track { animation: none; }
 }
