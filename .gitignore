@@ -29,3 +29,6 @@ apps/web/preview-*.png
 # Shared media is served from the central R2/Worker CDN - never commit local copies
 shared-media/
 **/shared-media/
+
+# Audio masters live in R2 (studios-vip-media) — never commit
+apps/web/public/media/**/*.mp3
