@@ -129,6 +129,23 @@
 .v3-hcard .v3-hmeta { margin-top: 12px; font-size: 12px; letter-spacing: 3px; color: var(--v3-cyan); text-transform: uppercase; font-family: var(--v3-font-grot); }
 .v3-hint { color: var(--v3-mut); letter-spacing: 4px; font-size: 12px; text-transform: uppercase; font-family: var(--v3-font-grot); white-space: nowrap; align-self: center; }
 
+/* ---------- horizontal swipe (touch devices) ---------- */
+.v3-hswipe-wrap { padding: 72px 0 24px; position: relative; overflow: hidden; }
+.v3-hswipe-head { padding: 0 6vw; max-width: 640px; }
+.v3-hswipe {
+  display: flex; gap: 5vw; align-items: center;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 32px 6vw 48px;
+  scrollbar-width: none;
+  cursor: grab;
+}
+.v3-hswipe::-webkit-scrollbar { display: none; }
+.v3-hswipe:active { cursor: grabbing; }
+.v3-hswipe .v3-hcard { scroll-snap-align: center; }
+.v3-hswipe .v3-hcard .v3-hph { height: 38vh; min-height: 240px; }
+
 /* ---------- cards / tilt ---------- */
 .v3-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 54px; }
 .v3-card {

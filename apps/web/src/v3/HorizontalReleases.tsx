@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Play } from '@phosphor-icons/react';
 import { Reveal } from '../v2/Reveal';
@@ -6,10 +6,57 @@ import {
   officialReleaseVideos,
   youtubeArtworkUrl,
   youtubeWatchUrl,
+  type OfficialReleaseVideo,
 } from '../data/officialReleases';
 
-/* Pinned horizontal scroll gallery of official videos */
-export function HorizontalReleases() {
+/* Touch devices get a native swipeable snap carousel instead of the
+   scroll-jacked pinned gallery (which feels broken on phones). */
+function useIsTouch() {
+  const [isTouch, setIsTouch] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window),
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(pointer: coarse)');
+    const update = () => setIsTouch(mq.matches || 'ontouchstart' in window);
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return isTouch;
+}
+
+function VideoCard({ v, i }: { v: OfficialReleaseVideo; i: number }) {
+  return (
+    <a
+      key={v.videoId}
+      className="v3-hcard"
+      href={youtubeWatchUrl(v.videoId)}
+      target="_blank"
+      rel="noreferrer"
+      style={{ textDecoration: 'none', color: 'inherit' }}
+      aria-label={`Watch ${v.title} on YouTube`}
+    >
+      <div
+        className="v3-hph"
+        style={{ backgroundImage: `url('${youtubeArtworkUrl(v.videoId)}')` }}
+      />
+      <h3>
+        <i>{String(i + 1).padStart(2, '0')}</i>
+        {v.title}
+      </h3>
+      <p>
+        {v.release} · {v.duration}
+      </p>
+      <div className="v3-hmeta">
+        <Play size={13} weight="fill" style={{ verticalAlign: -2 }} /> Watch on YouTube
+      </div>
+    </a>
+  );
+}
+
+/* Desktop: pinned scroll-driven horizontal gallery */
+function HorizontalReleasesDesktop() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ['start start', 'end end'] });
@@ -35,30 +82,7 @@ export function HorizontalReleases() {
           </div>
 
           {videos.map((v, i) => (
-            <a
-              key={v.videoId}
-              className="v3-hcard"
-              href={youtubeWatchUrl(v.videoId)}
-              target="_blank"
-              rel="noreferrer"
-              style={{ textDecoration: 'none', color: 'inherit' }}
-              aria-label={`Watch ${v.title} on YouTube`}
-            >
-              <div
-                className="v3-hph"
-                style={{ backgroundImage: `url('${youtubeArtworkUrl(v.videoId)}')` }}
-              />
-              <h3>
-                <i>{String(i + 1).padStart(2, '0')}</i>
-                {v.title}
-              </h3>
-              <p>
-                {v.release} · {v.duration}
-              </p>
-              <div className="v3-hmeta">
-                <Play size={13} weight="fill" style={{ verticalAlign: -2 }} /> Watch on YouTube
-              </div>
-            </a>
+            <VideoCard key={v.videoId} v={v} i={i} />
           ))}
 
           <div className="v3-hint" style={{ paddingRight: '8vw' }}>
@@ -75,4 +99,49 @@ export function HorizontalReleases() {
       </div>
     </section>
   );
+}
+
+/* Touch: native swipeable snap carousel */
+function HorizontalReleasesTouch() {
+  const videos = officialReleaseVideos.slice(0, 8);
+
+  return (
+    <section id="videos" className="v3-hswipe-wrap">
+      <div className="v3-hswipe-head">
+        <Reveal>
+          <div className="v3-eyebrow">Cinema</div>
+          <h2 className="v3-h2">
+            Official <em>videos</em>
+          </h2>
+          <p className="v3-lead">
+            Every release ships with a full visual world. Swipe sideways to browse
+            the filmstrip.
+          </p>
+        </Reveal>
+      </div>
+
+      <div className="v3-hswipe">
+        {videos.map((v, i) => (
+          <VideoCard key={v.videoId} v={v} i={i} />
+        ))}
+        <div className="v3-hint" style={{ alignSelf: 'center', flexShrink: 0 }}>
+          <a
+            href="https://www.youtube.com/@3000Studio/videos"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'inherit', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 10 }}
+          >
+            Browse them all <ArrowRight size={16} />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* Pinned horizontal scroll gallery of official videos on desktop,
+   swipeable snap carousel on touch devices. */
+export function HorizontalReleases() {
+  const isTouch = useIsTouch();
+  return isTouch ? <HorizontalReleasesTouch /> : <HorizontalReleasesDesktop />;
 }
