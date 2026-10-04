@@ -2,11 +2,13 @@ import { Link, useLocation } from 'react-router-dom';
 
 const items = [
   { to: '/', label: 'Home', icon: '⌂' },
+  { to: '/thunder-dome', label: 'Games', icon: '🛸' },
   { to: '/music', label: 'Music', icon: '♪' },
-  { to: '/thunder-dome', label: 'Dome', icon: '🛸' },
-  { to: '/live', label: 'Live', icon: '●' },
+  { to: '/apps', label: 'Apps', icon: '⚡' },
   { to: '/video', label: 'Video', icon: '▶' },
+  { to: '/live', label: 'Live', icon: '●' },
   { to: '/shop', label: 'Shop', icon: '▣' },
+  { to: '/about', label: 'About', icon: '◇' },
 ] as const;
 
 export function BottomDock() {

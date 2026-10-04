@@ -1,89 +1,105 @@
+import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { EnvelopeSimple } from '@phosphor-icons/react';
-import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
-import { Reveal } from '../v2/Reveal';
+import { PublicLayout } from './Home';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
 export function ContactPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [topic, setTopic] = useState('Booking');
+  const [message, setMessage] = useState('');
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    const subject = `3000 Studios contact — ${topic} — ${name || 'website visitor'}`;
+    const body = `Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`;
+    window.location.assign(
+      `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
+  }
+
   return (
-    <PublicLayoutV2 wallpaper="waves">
-      <section className="v2-section">
-        <div className="v2-wrap" style={{ maxWidth: 840 }}>
-          <Reveal>
-            <span className="v2-kicker">Direct Studio Line</span>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <h1 className="v2-display">
-              Contact <span className="v2-grad-text">3000 Studios</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={0.16}>
-            <p className="v2-lede" style={{ marginTop: 16, maxWidth: 560 }}>
-              Reach Jeremy Swain directly for sync licenses, music features, live stream
-              bookings, brand sponsorships, and press inquiries.
-            </p>
-          </Reveal>
+    <PublicLayout variant="pulse" compact={false}>
+      <div className="nn-scope">
+        <section className="nn-hero">
+          <span className="nn-kicker">Direct studio line</span>
+          <h1 className="nn-chrome" style={{ fontSize: 'clamp(34px, 7vw, 72px)', marginTop: 18 }}>
+            BOOK THE STUDIO
+          </h1>
+          <p>
+            Sync licenses, music features, live stream bookings, brand
+            sponsorships, and press — reach Jeremy Swain directly.
+          </p>
+        </section>
 
-          <Reveal delay={0.24}>
-            <div
-              className="v2-card v2-card--lift"
-              style={{ padding: 'clamp(28px, 5vw, 48px)', textAlign: 'center', marginTop: 32 }}
-            >
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 64,
-                  height: 64,
-                  borderRadius: '50%',
-                  background: 'rgba(0, 245, 147, 0.1)',
-                  border: '1px solid var(--v2-neon-line)',
-                  color: 'var(--v2-neon)',
-                  marginBottom: 18,
-                }}
-                aria-hidden="true"
-              >
-                <EnvelopeSimple size={30} weight="duotone" />
+        <section className="nn-wrap" style={{ marginBottom: 48 }}>
+          <div className="nn-glass" style={{ padding: 'clamp(22px, 4vw, 36px)', maxWidth: 640, margin: '0 auto' }}>
+            <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <input
+                  className="nn-input"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  maxLength={80}
+                  required
+                />
+                <input
+                  className="nn-input"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  maxLength={120}
+                  required
+                />
               </div>
-              <h2
-                className="v2-display"
-                style={{ fontSize: 24, margin: '0 0 8px' }}
+              <select
+                className="nn-select"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                style={{ borderRadius: 12 }}
               >
-                Official Studio Email
-              </h2>
-              <a
-                href={`mailto:${OWNER_EMAIL}`}
-                style={{
-                  color: 'var(--v2-neon)',
-                  fontSize: 'clamp(18px, 4vw, 24px)',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  display: 'inline-block',
-                  margin: '8px 0 20px',
-                  wordBreak: 'break-all',
-                }}
-              >
-                {OWNER_EMAIL}
-              </a>
-              <p style={{ color: 'var(--v2-muted)', fontSize: 14, maxWidth: 440, margin: '0 auto 24px' }}>
-                All messages route directly to the producer. We respond to licensing and
-                business inquiries within 24 hours.
+                <option>Booking</option>
+                <option>Sync license</option>
+                <option>Sponsorship</option>
+                <option>Video project</option>
+                <option>Press</option>
+                <option>Other</option>
+              </select>
+              <textarea
+                className="nn-textarea"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Project details, timeline, budget…"
+                maxLength={2000}
+                required
+              />
+              <button type="submit" className="nn-btn nn-btn-gold" style={{ width: '100%' }}>
+                <EnvelopeSimple size={18} /> Send via email
+              </button>
+              <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: 0, textAlign: 'center' }}>
+                Prefer direct?{' '}
+                <a href={`mailto:${OWNER_EMAIL}`} style={{ color: 'var(--nn-cyan)' }}>
+                  {OWNER_EMAIL}
+                </a>
               </p>
-              <a
-                className="v2-btn"
-                href={`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent('3000 Studios Inquiry')}`}
-                style={{ minWidth: 200 }}
-              >
-                <EnvelopeSimple size={18} weight="fill" />
-                Send Email Message
-              </a>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+            </form>
+          </div>
+        </section>
 
-      <LiveLine />
-    </PublicLayoutV2>
+        <footer className="nn-footer">
+          <strong className="nn-chrome-gold">3000 STUDIOS</strong>
+          <nav>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/about">About</Link>
+          </nav>
+          <p>© 2026 3000 Studios · All rights reserved</p>
+        </footer>
+      </div>
+    </PublicLayout>
   );
 }

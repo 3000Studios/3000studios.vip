@@ -13,6 +13,7 @@ import { MusicSection, settlePendingPurchase } from './MusicSection';
 import { PromoShorts } from './PromoShorts';
 import { CoverWall } from './CoverWall';
 import { LiveSection } from './LiveSection';
+import { ThunderdomeFeature } from './ThunderdomeFeature';
 import { PulseFooter } from './PulseFooter';
 
 import { usePageMeta } from '../lib/usePageMeta';
@@ -50,6 +51,7 @@ export function HomePage() {
         <PageFade routeKey="/">
           <main>
             <HeroEQ live={live} />
+            <ThunderdomeFeature />
             <LiveSection />
             <CoverWall />
             <Marquee

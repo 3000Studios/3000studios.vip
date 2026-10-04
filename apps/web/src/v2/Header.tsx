@@ -3,16 +3,18 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   House,
+  GameController,
   MusicNote,
+  SquaresFour,
   PlayCircle,
   Broadcast,
   ShoppingBag,
+  Info,
   ChatsCircle,
   Lightbulb,
   EnvelopeSimple,
   Newspaper,
   Handshake,
-  Info,
 } from '@phosphor-icons/react';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 
@@ -21,16 +23,18 @@ export type NavItem = { to: string; label: string; icon: React.ReactNode; hash?:
 // eslint-disable-next-line react-refresh/only-export-components
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Home', icon: <House size={20} weight="duotone" /> },
-  { to: '/#music', label: 'Music', icon: <MusicNote size={20} weight="duotone" /> },
-  { to: '/#videos', label: 'Videos', icon: <PlayCircle size={20} weight="duotone" /> },
-  { to: '/#live', label: 'Live', icon: <Broadcast size={20} weight="duotone" /> },
+  { to: '/thunder-dome', label: 'Games', icon: <GameController size={20} weight="duotone" /> },
+  { to: '/music', label: 'Music', icon: <MusicNote size={20} weight="duotone" /> },
+  { to: '/apps', label: 'Apps', icon: <SquaresFour size={20} weight="duotone" /> },
+  { to: '/video', label: 'Video', icon: <PlayCircle size={20} weight="duotone" /> },
+  { to: '/live', label: 'Live', icon: <Broadcast size={20} weight="duotone" /> },
   { to: '/shop', label: 'Shop', icon: <ShoppingBag size={20} weight="duotone" /> },
+  { to: '/about', label: 'About', icon: <Info size={20} weight="duotone" /> },
   { to: '/community', label: 'Community', icon: <ChatsCircle size={20} weight="duotone" /> },
   { to: '/concepts', label: 'Concepts', icon: <Lightbulb size={20} weight="duotone" /> },
   { to: '/requests', label: 'Requests', icon: <Lightbulb size={20} weight="duotone" /> },
   { to: '/blog', label: 'Blog', icon: <Newspaper size={20} weight="duotone" /> },
   { to: '/sponsors', label: 'Sponsors', icon: <Handshake size={20} weight="duotone" /> },
-  { to: '/about', label: 'About', icon: <Info size={20} weight="duotone" /> },
   { to: '/contact', label: 'Contact', icon: <EnvelopeSimple size={20} weight="duotone" /> },
 ];
 

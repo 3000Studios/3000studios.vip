@@ -1,220 +1,115 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { PlayCircle, FilmStrip, GameController } from '@phosphor-icons/react';
 import { PublicLayout, AdSenseUnit } from './Home';
-import {
-  officialReleaseVideos,
-  youtubeArtworkUrl,
-  youtubeEmbedUrl,
-  youtubeWatchUrl,
-} from '../data/officialReleases';
+import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
+import { UnlockCard } from '../components/UnlockCard';
+import { readUnlocks } from '../lib/unlockPayments';
 import { ADSENSE_VIDEO_SLOT } from '../lib/adsense';
-import '../styles/vip-luxury.css';
-import '../styles/million-dollar.css';
 
 export function VideoPage() {
-  const [selectedVideo, setSelectedVideo] = useState(officialReleaseVideos[0]);
   const [searchQuery, setSearchQuery] = useState('');
-  const theaterRef = useRef<HTMLDivElement | null>(null);
+  const [tab, setTab] = useState<'music' | 'cinematics'>('music');
 
-  const filteredVideos = officialReleaseVideos.filter((v) =>
-    v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.release.toLowerCase().includes(searchQuery.toLowerCase())
+  const q = searchQuery.toLowerCase();
+  const music = MUSIC_VIDEOS.filter(
+    (v) => v.title.toLowerCase().includes(q) || v.subtitle.toLowerCase().includes(q),
   );
+  const cinematics = CINEMATIC_VIDEOS.filter((v) => v.title.toLowerCase().includes(q));
 
-  const handleSelectVideo = (video: typeof officialReleaseVideos[0]) => {
-    setSelectedVideo(video);
-    theaterRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const items = tab === 'music' ? music : cinematics;
+  const unlockedCount = readUnlocks().length;
 
   return (
-    <PublicLayout variant="electric" compact>
-      <main className="md-scope" style={{ minHeight: '100vh', padding: '24px 16px 80px', maxWidth: 1320, margin: '0 auto' }}>
-        {/* Header Section */}
-        <section className="vip-glass-card" style={{ padding: '32px 24px', textAlign: 'center', marginBottom: 28 }}>
-          <span className="vip-live-pill" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
-            Official Cinema Theater
+    <PublicLayout variant="electric" compact={false}>
+      <div className="nn-scope">
+        <section className="nn-hero">
+          <span className="nn-kicker">
+            <FilmStrip size={14} style={{ verticalAlign: '-2px' }} /> Official cinema theater
           </span>
-          <h1 className="vip-gold-text" style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 6vw, 56px)', margin: '12px 0 8px', fontWeight: 800 }}>
-            Official Music Videos
+          <h1 className="nn-chrome" style={{ fontSize: 'clamp(38px, 8vw, 84px)', marginTop: 18 }}>
+            VIDEO VAULT
           </h1>
-          <p style={{ color: 'var(--vip-text-muted)', maxWidth: 620, margin: '0 auto 20px', fontSize: 16 }}>
-            Browse and stream all 47 official music videos from 3000 Studios. Direct links to YouTube and DistroKid distribution.
+          <p>
+            Every video plays a free preview right here. Unlock the full video
+            plus the full song for $1 — yours forever, download included.
+            {unlockedCount > 0 && (
+              <>
+                {' '}
+                <strong style={{ color: 'var(--nn-gold)' }}>
+                  {unlockedCount} unlocked on this device.
+                </strong>
+              </>
+            )}
           </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="nn-btn-row">
             <a
-              className="vip-btn-gold"
+              className="nn-btn nn-btn-gold"
               href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
               target="_blank"
               rel="noreferrer"
             >
               Subscribe @3000Studio
             </a>
-            <a
-              className="vip-btn-obsidian"
-              href={youtubeWatchUrl(selectedVideo.videoId)}
-              target="_blank"
-              rel="noreferrer"
+            <Link className="nn-btn nn-btn-ghost" to="/music">
+              <PlayCircle size={18} /> Music catalog
+            </Link>
+          </div>
+        </section>
+
+        <section className="nn-wrap" style={{ marginBottom: 28 }}>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
+            <button
+              type="button"
+              className={`nn-chip${tab === 'music' ? ' is-active' : ''}`}
+              onClick={() => setTab('music')}
             >
-              Watch on YouTube
-            </a>
-          </div>
-        </section>
-
-        {/* Featured Video Theater */}
-        <section ref={theaterRef} className="vip-glass-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 32 }}>
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#000' }}>
-            <iframe
-              key={selectedVideo.videoId}
-              src={`${youtubeEmbedUrl(selectedVideo.videoId)}&autoplay=1&rel=0`}
-              title={`${selectedVideo.title} official video`}
-              style={{ width: '100%', height: '100%', border: 'none' }}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
-          </div>
-          <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
-            <div>
-              <span style={{ color: '#ffd700', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>
-                Now Screening
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 'clamp(20px, 3.5vw, 28px)', margin: '4px 0 2px' }}>
-                {selectedVideo.title}
-              </h2>
-              <span style={{ color: 'var(--vip-text-muted)', fontSize: 14 }}>
-                3000 Studios · {selectedVideo.release} · {selectedVideo.duration}
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <a
-                className="vip-btn-gold"
-                href="https://distrokid.com/hyperfollow/3000studios"
-                target="_blank"
-                rel="noreferrer"
-                style={{ padding: '10px 18px', fontSize: 13 }}
-              >
-                HyperFollow
-              </a>
-              <a
-                className="vip-btn-obsidian"
-                href={youtubeWatchUrl(selectedVideo.videoId)}
-                target="_blank"
-                rel="noreferrer"
-                style={{ padding: '10px 18px', fontSize: 13 }}
-              >
-                Open in YouTube ↗
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* Video Catalog Browser */}
-        <section>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
-            <div>
-              <h2 className="vip-gold-text" style={{ fontSize: 24, margin: 0 }}>
-                Full Catalog ({officialReleaseVideos.length} Releases)
-              </h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '4px 0 0' }}>
-                Select any video to play directly in the theater above
-              </p>
-            </div>
+              <FilmStrip size={14} style={{ verticalAlign: '-2px' }} /> Music videos ({MUSIC_VIDEOS.length})
+            </button>
+            <button
+              type="button"
+              className={`nn-chip${tab === 'cinematics' ? ' is-active' : ''}`}
+              onClick={() => setTab('cinematics')}
+            >
+              <GameController size={14} style={{ verticalAlign: '-2px' }} /> Thunderdome cinematics ({CINEMATIC_VIDEOS.length})
+            </button>
             <input
               type="text"
               placeholder="Search videos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                background: 'rgba(10, 13, 22, 0.8)',
-                border: '1px solid rgba(255, 215, 0, 0.25)',
-                color: '#fff',
-                padding: '10px 18px',
-                borderRadius: 999,
-                fontSize: 14,
-                outline: 'none',
-                minWidth: 220,
-              }}
+              className="nn-input"
+              style={{ minWidth: 220 }}
             />
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: 20,
-            }}
-          >
-            {filteredVideos.map((video) => {
-              const isCurrent = video.videoId === selectedVideo.videoId;
-              return (
-                <article
-                  key={video.videoId}
-                  className="vip-glass-card"
-                  onClick={() => handleSelectVideo(video)}
-                  style={{
-                    cursor: 'pointer',
-                    borderColor: isCurrent ? 'rgba(255, 215, 0, 0.8)' : undefined,
-                    boxShadow: isCurrent ? '0 0 25px rgba(255, 215, 0, 0.35)' : undefined,
-                  }}
-                >
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden' }}>
-                    <img
-                      src={youtubeArtworkUrl(video.videoId)}
-                      alt={video.title}
-                      loading="lazy"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                    {isCurrent && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: 8,
-                          left: 8,
-                          background: 'rgba(255, 215, 0, 0.9)',
-                          color: '#05060a',
-                          padding: '3px 8px',
-                          borderRadius: 4,
-                          fontSize: 10,
-                          fontWeight: 800,
-                          letterSpacing: '0.05em',
-                        }}
-                      >
-                        PLAYING
-                      </div>
-                    )}
-                    <span
-                      style={{
-                        position: 'absolute',
-                        bottom: 8,
-                        right: 8,
-                        background: 'rgba(0, 0, 0, 0.8)',
-                        color: '#fff',
-                        padding: '2px 6px',
-                        borderRadius: 4,
-                        fontSize: 11,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {video.duration}
-                    </span>
-                  </div>
-                  <div style={{ padding: '14px 16px' }}>
-                    <h3 style={{ color: '#fff', fontSize: 16, margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {video.title}
-                    </h3>
-                    <span style={{ color: 'var(--vip-text-muted)', fontSize: 13 }}>
-                      {video.release} · 3000 Studios
-                    </span>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          {items.length === 0 ? (
+            <p style={{ textAlign: 'center', color: 'var(--nn-muted)' }}>
+              No videos match “{searchQuery}”.
+            </p>
+          ) : (
+            <div className="nn-grid">
+              {items.map((item) => (
+                <UnlockCard key={item.id} item={item} />
+              ))}
+            </div>
+          )}
         </section>
 
-        {/* AdSense Unit */}
-        <section style={{ margin: '40px auto 0' }}>
+        <section className="nn-wrap">
           <AdSenseUnit slot={ADSENSE_VIDEO_SLOT} />
         </section>
-      </main>
+
+        <footer className="nn-footer">
+          <strong className="nn-chrome-gold">3000 STUDIOS</strong>
+          <nav>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/contact">Contact</Link>
+          </nav>
+          <p>© 2026 3000 Studios · All rights reserved</p>
+        </footer>
+      </div>
     </PublicLayout>
   );
 }

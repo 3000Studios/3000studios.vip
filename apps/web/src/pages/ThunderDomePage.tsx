@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PublicLayout, AdSenseUnit } from './Home';
 import { THUNDER_BOSSES, THUNDER_SHIPS, THUNDER_WEAPONS } from '../data/thunderDome';
+import { CINEMATIC_CDN } from '../data/videoCatalog';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import '../styles/vip-luxury.css';
 
@@ -59,15 +60,59 @@ export function ThunderDomePage() {
             >
               ▶ Inspect 24 Bosses
             </a>
+            <a
+              className="vip-btn-gold"
+              href="https://play.google.com/store/search?q=Thunderdome%20AeroStrike&c=apps"
+              target="_blank"
+              rel="noreferrer"
+              title="Thunderdome: AeroStrike on Google Play (internal test in progress)"
+            >
+              ▣ Get it on Google Play
+            </a>
+            <a className="vip-btn-obsidian" href="#dome-trailer">
+              🎬 Watch Trailer
+            </a>
             <a className="vip-btn-obsidian" href="#ship-hangar">
               🛸 Ship Hangar
             </a>
             <a className="vip-btn-obsidian" href="#weapon-armory">
               ⚔ Weapon Armory
             </a>
-            <Link className="vip-btn-obsidian" to="/shop">
-              ▣ VIP Thunder Pass
+            <Link className="vip-btn-obsidian" to="/thunder-dome/privacy">
+              🔒 Privacy Policy
             </Link>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            TRAILER SLOT: cinematic embed
+            ========================================================================= */}
+        <section id="dome-trailer" style={{ maxWidth: 1100, margin: '0 auto 48px', padding: '0 16px' }}>
+          <div className="vip-glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(0,240,255,0.15)' }}>
+              <span className="md-kicker" style={{ color: '#00f0ff', borderColor: 'rgba(0, 240, 255, 0.4)' }}>
+                🎬 Official trailer slot
+              </span>
+            </div>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#000' }}>
+              <video
+                src={`${CINEMATIC_CDN}/game-intro-v1.mp4`}
+                controls
+                playsInline
+                preload="metadata"
+                poster="/media/official-3000-studios-profile.png"
+                style={{ width: '100%', height: '100%' }}
+              />
+            </div>
+            <div style={{ padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+              <span style={{ color: 'var(--vip-text-muted)', fontSize: 13 }}>
+                Thunderdome: AeroStrike — game intro cinematic. Full archive on the{' '}
+                <Link to="/video" style={{ color: '#00f0ff' }}>Video Vault</Link>.
+              </span>
+              <Link className="vip-btn-obsidian" to="/video" style={{ fontSize: 12, padding: '8px 16px' }}>
+                All 30 cinematics
+              </Link>
+            </div>
           </div>
         </section>
 

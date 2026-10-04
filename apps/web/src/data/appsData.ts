@@ -74,7 +74,7 @@ export const STUDIO_APPS: StudioApp[] = [
     ],
     techStack: ['TypeScript', 'WebGL', 'Web Audio API', 'Vite'],
     actionLabel: 'Experience Velvet',
-    actionUrl: '/#music-catalog',
+    actionUrl: '/music',
     icon: '✦',
     badgeColor: '#a855f7',
   },

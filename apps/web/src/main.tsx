@@ -2,9 +2,10 @@
 
 import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
 import './styles/swipe-slider.css';
+import './styles/neon-noir.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminFab } from './components/AdminFab';
@@ -25,7 +26,11 @@ import {
   AppsPage,
   ProjectsPage,
   VipPage,
+  MusicPage,
+  VideoPage,
 } from './pages/Home';
+import { LiveBroadcastPage } from './pages/LiveBroadcastPage';
+import { CommandDeckPage } from './pages/CommandDeckPage';
 import { HomePage } from './v3/HomePage';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
@@ -121,9 +126,50 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/music', element: <Navigate to="/#music" replace /> },
-      { path: '/video', element: <Navigate to="/" replace /> },
-      { path: '/live', element: <Navigate to="/#live" replace /> },
+      {
+        path: '/music',
+        element: (
+          <Titled
+            title="Music Vault"
+            description="The full 3000 Studios DistroKid catalog — stream every official release free."
+          >
+            <MusicPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/video',
+        element: (
+          <Titled
+            title="Video Vault"
+            description="Official 3000 Studios music videos and Thunderdome cinematics — free previews, $1 full unlocks."
+          >
+            <VideoPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/live',
+        element: (
+          <Titled
+            title="Live Command"
+            description="Watch 3000 Studios live — broadcast deck, schedule, and chat."
+          >
+            <LiveBroadcastPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/command-deck',
+        element: (
+          <Titled
+            title="Command Deck"
+            description="Owner dashboard — content stats and unlock payment controls."
+          >
+            <CommandDeckPage />
+          </Titled>
+        ),
+      },
       {
         path: '/thunder-dome/privacy',
         element: (

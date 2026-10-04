@@ -26,4 +26,3 @@ export { ThunderDomePrivacyPage } from './ThunderDomePrivacyPage';
 export { AppsPage } from './AppsPage';
 export { ProjectsPage } from './ProjectsPage';
 export { VipPage } from './VipPage';
-export { MusicShowcase, LivePage } from './LegacyPages';

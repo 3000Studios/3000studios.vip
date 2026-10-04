@@ -61,7 +61,7 @@ export const STUDIO_PROJECTS: StudioProject[] = [
       { label: 'Lighthouse Target', value: '100% Mobile Ready' },
     ],
     actionLabel: 'View Music Catalog',
-    actionUrl: '/#music-catalog',
+    actionUrl: '/music',
     image: '/media/official-3000-studios-profile.png',
   },
 ];

@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { MagnifyingGlass, PlayCircle } from '@phosphor-icons/react';
 import { PublicLayout, AdSenseUnit } from './Home';
 import { publishedSongs } from '../data/publishedSongs';
 import { SongCarousel } from '../components/SongCarousel';
 import { OFFICIAL_PLATFORM_LINKS } from '../data/platforms';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
-import '../styles/vip-luxury.css';
 
 export function MusicPage() {
   const [search, setSearch] = useState('');
@@ -36,55 +36,57 @@ export function MusicPage() {
 
   return (
     <PublicLayout variant="spiral" compact={false}>
-      <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
-        
-        {/* =========================================================================
-            MUSIC HERO: 47 TRACKS & UNIVERSAL DISTRIBUTION
-            ========================================================================= */}
-        <section className="vip-hero-hub">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="md-kicker">✦ OFFICIAL DISCOGRAPHY</span>
-            <span className="md-kicker" style={{ color: '#ffd700' }}>47 MASTER RELEASES</span>
+      <div className="nn-scope">
+        <section className="nn-hero">
+          <div className="nn-btn-row" style={{ marginBottom: 18 }}>
+            <span className="nn-kicker">✦ Official discography</span>
+            <span className="nn-kicker nn-kicker--gold">{publishedSongs.length} master releases</span>
           </div>
-
-          <h1 style={{ display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="vip-gold-text">3000 STUDIOS MUSIC</span>
+          <h1 className="nn-chrome" style={{ fontSize: 'clamp(38px, 8vw, 84px)' }}>
+            MUSIC VAULT
           </h1>
-
-          <p style={{ maxWidth: 660, margin: '0 auto 24px' }}>
-            Original high-energy electronic, bass, hip-hop, and cybernetic compositions produced by Jeremy Swain. All 47 official releases stream free in full.
+          <p>
+            Original high-energy electronic, bass, hip-hop, and cybernetic
+            compositions produced by Jeremy Swain. Every official DistroKid
+            release streams free in full.
           </p>
-
-          <div className="vip-badge-row">
-            <a className="vip-btn-gold" href="https://distrokid.com/hyperfollow/3000studios" target="_blank" rel="noreferrer">
-              ✦ DistroKid HyperFollow Hub
+          <div className="nn-btn-row">
+            <a
+              className="nn-btn nn-btn-gold"
+              href="https://distrokid.com/hyperfollow/3000studios"
+              target="_blank"
+              rel="noreferrer"
+            >
+              ✦ HyperFollow hub
             </a>
-            <a className="vip-btn-obsidian" href="https://www.youtube.com/@3000Studio?sub_confirmation=1" target="_blank" rel="noreferrer">
-              ▶ YouTube Channel
+            <a
+              className="nn-btn nn-btn-ghost"
+              href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
+              target="_blank"
+              rel="noreferrer"
+            >
+              ▶ YouTube channel
             </a>
-            <Link className="vip-btn-obsidian" to="/video">
-              ▣ 47 Music Videos
+            <Link className="nn-btn nn-btn-ghost" to="/video">
+              ▣ Music videos
             </Link>
           </div>
         </section>
 
-        {/* =========================================================================
-            PLATFORM ICON STRIP
-            ========================================================================= */}
-        <section style={{ maxWidth: 1280, margin: '0 auto 40px', padding: '0 16px' }}>
-          <div className="vip-glass-card" style={{ padding: '20px' }}>
-            <div style={{ textAlign: 'center', marginBottom: 14, fontSize: 13, color: 'var(--vip-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              Stream 3000 Studios Across Verified Platforms:
+        <section className="nn-wrap" style={{ marginBottom: 40 }}>
+          <div className="nn-glass" style={{ padding: 20 }}>
+            <div style={{ textAlign: 'center', marginBottom: 14, fontSize: 12, color: 'var(--nn-muted)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>
+              Stream 3000 Studios across verified platforms
             </div>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div className="nn-btn-row">
               {OFFICIAL_PLATFORM_LINKS.map((p) => (
                 <a
                   key={p.name}
                   href={p.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="vip-btn-obsidian"
-                  style={{ fontSize: 13, padding: '8px 16px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                  className="nn-btn nn-btn-ghost"
+                  style={{ fontSize: 13, padding: '8px 16px' }}
                 >
                   <span style={{ color: p.color }}>{p.icon}</span>
                   <span>{p.name}</span>
@@ -94,54 +96,39 @@ export function MusicPage() {
           </div>
         </section>
 
-        {/* =========================================================================
-            47-SONG CATALOG WITH FILTERS & INSTANT PREVIEW
-            ========================================================================= */}
-        <section style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
+        <section className="nn-wrap" style={{ marginBottom: 56 }}>
+          <div className="nn-sec-head">
             <div>
-              <h2 className="vip-gold-text" style={{ fontSize: 'clamp(24px, 4.5vw, 36px)', margin: 0, fontWeight: 800 }}>
+              <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4.5vw, 36px)' }}>
                 Official Music Vault ({filteredSongs.length} Tracks)
               </h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '4px 0 0' }}>
-                Click play on any song to stream instantly or open the high-res detail page.
-              </p>
+              <p>Click play on any song to stream instantly or open the high-res detail page.</p>
             </div>
-
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
               {(['ALL', 'ORIGINALS', 'SINGLES'] as const).map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setFilter(cat)}
-                  className="vip-btn-obsidian"
-                  style={{
-                    fontSize: 12,
-                    padding: '8px 14px',
-                    borderColor: filter === cat ? '#ffd700' : undefined,
-                    background: filter === cat ? 'rgba(255, 215, 0, 0.15)' : undefined,
-                    color: filter === cat ? '#ffd700' : undefined,
-                  }}
+                  className={`nn-chip${filter === cat ? ' is-active' : ''}`}
                 >
                   {cat}
                 </button>
               ))}
-              <input
-                type="text"
-                placeholder="Search catalog..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{
-                  background: 'rgba(10, 13, 22, 0.8)',
-                  border: '1px solid rgba(255, 215, 0, 0.3)',
-                  color: '#fff',
-                  padding: '10px 18px',
-                  borderRadius: 999,
-                  fontSize: 14,
-                  outline: 'none',
-                  minWidth: 180,
-                }}
-              />
+              <span style={{ position: 'relative' }}>
+                <MagnifyingGlass
+                  size={16}
+                  style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--nn-muted)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search catalog..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="nn-input"
+                  style={{ paddingLeft: 38, minWidth: 180 }}
+                />
+              </span>
             </div>
           </div>
 
@@ -151,15 +138,27 @@ export function MusicPage() {
             activeTitle={music.activeSong.title}
             isPlaying={music.isPlaying}
           />
+
+          <div style={{ textAlign: 'center', marginTop: 28 }}>
+            <Link className="nn-btn nn-btn-cyan" to="/video">
+              <PlayCircle size={18} /> Unlock full videos + downloads — $1
+            </Link>
+          </div>
         </section>
 
-        {/* =========================================================================
-            ADSENSE PLACEMENT
-            ========================================================================= */}
-        <section style={{ maxWidth: 1200, margin: '0 auto 48px', padding: '0 16px' }}>
+        <section className="nn-wrap">
           <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
         </section>
 
+        <footer className="nn-footer">
+          <strong className="nn-chrome-gold">3000 STUDIOS</strong>
+          <nav>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/contact">Contact</Link>
+          </nav>
+          <p>© 2026 3000 Studios · All rights reserved</p>
+        </footer>
       </div>
     </PublicLayout>
   );
