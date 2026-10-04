@@ -22,6 +22,7 @@ export { SponsorsPage } from './SponsorsPage';
 export { VideoPage } from './VideoPage';
 export { MusicPage } from './MusicPage';
 export { ThunderDomePage } from './ThunderDomePage';
+export { ThunderDomePrivacyPage } from './ThunderDomePrivacyPage';
 export { AppsPage } from './AppsPage';
 export { ProjectsPage } from './ProjectsPage';
 export { VipPage } from './VipPage';

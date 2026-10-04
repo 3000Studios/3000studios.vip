@@ -21,6 +21,7 @@ import {
   RequestsPage,
   SponsorsPage,
   ThunderDomePage,
+  ThunderDomePrivacyPage,
   AppsPage,
   ProjectsPage,
   VipPage,
@@ -123,6 +124,17 @@ const router = createBrowserRouter([
       { path: '/music', element: <Navigate to="/#music" replace /> },
       { path: '/video', element: <Navigate to="/" replace /> },
       { path: '/live', element: <Navigate to="/#live" replace /> },
+      {
+        path: '/thunder-dome/privacy',
+        element: (
+          <Titled
+            title="Thunderdome: AeroStrike Privacy Policy"
+            description="Privacy Policy for Thunderdome: AeroStrike by 3000 Studios."
+          >
+            <ThunderDomePrivacyPage />
+          </Titled>
+        ),
+      },
       {
         path: '/thunder-dome',
         element: (
