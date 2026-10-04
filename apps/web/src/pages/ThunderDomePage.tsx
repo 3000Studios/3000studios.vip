@@ -5,6 +5,20 @@ import { THUNDER_BOSSES, THUNDER_SHIPS, THUNDER_WEAPONS } from '../data/thunderD
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import '../styles/vip-luxury.css';
 
+const THREAT_COLORS: Record<string, string> = {
+  ALPHA: '#00f0ff',
+  OMEGA: '#ffd700',
+  TITAN: '#a855f7',
+  NEXUS: '#ff3366',
+};
+
+const THREAT_LABELS: Record<string, string> = {
+  ALPHA: 'Standard Combat Threat',
+  OMEGA: 'Elite Combat Threat',
+  TITAN: 'Titan-Class Annihilator',
+  NEXUS: 'Nexus-Class Extinction Event',
+};
+
 export function ThunderDomePage() {
   const [selectedBoss, setSelectedBoss] = useState(THUNDER_BOSSES[0]);
   const [selectedShip, setSelectedShip] = useState(THUNDER_SHIPS[0]);
@@ -103,30 +117,78 @@ export function ThunderDomePage() {
                 </div>
               </div>
 
+              {/* Campaign Progression Strip — all 24 levels */}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ color: 'var(--vip-text-muted)', fontSize: 12, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                    Campaign Progression
+                  </span>
+                  <span style={{ color: 'var(--vip-text-muted)', fontSize: 11 }}>
+                    ALPHA <span style={{ color: THREAT_COLORS.ALPHA }}>■</span> · OMEGA <span style={{ color: THREAT_COLORS.OMEGA }}>■</span> · TITAN <span style={{ color: THREAT_COLORS.TITAN }}>■</span> · NEXUS <span style={{ color: THREAT_COLORS.NEXUS }}>■</span>
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 8 }}>
+                  {THUNDER_BOSSES.map((boss) => {
+                    const color = THREAT_COLORS[boss.threatLevel];
+                    const isSelected = selectedBoss.id === boss.id;
+                    return (
+                      <button
+                        key={boss.id}
+                        type="button"
+                        onClick={() => setSelectedBoss(boss)}
+                        title={`${boss.name} — ${boss.threatLevel}`}
+                        style={{
+                          flex: '0 0 auto',
+                          width: 44,
+                          height: 44,
+                          borderRadius: '50%',
+                          border: `2px solid ${isSelected ? '#fff' : color}`,
+                          background: isSelected
+                            ? `radial-gradient(circle at 35% 35%, ${color}, rgba(0,0,0,0.9) 75%)`
+                            : 'rgba(8, 12, 20, 0.9)',
+                          color: isSelected ? '#05060a' : color,
+                          fontWeight: 800,
+                          fontSize: 13,
+                          cursor: 'pointer',
+                          boxShadow: isSelected ? `0 0 14px ${color}` : `0 0 6px ${color}55`,
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        {boss.level}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Boss Selector Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 28 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10, marginBottom: 28 }}>
                 {THUNDER_BOSSES.map((boss) => {
                   const isSelected = selectedBoss.id === boss.id;
+                  const color = THREAT_COLORS[boss.threatLevel];
                   return (
                     <button
                       key={boss.id}
                       type="button"
                       onClick={() => setSelectedBoss(boss)}
                       style={{
-                        background: isSelected ? 'rgba(0, 240, 255, 0.18)' : 'rgba(10, 13, 22, 0.8)',
-                        border: isSelected ? '1px solid #00f0ff' : '1px solid rgba(255, 215, 0, 0.2)',
+                        background: isSelected ? 'rgba(10, 14, 24, 0.95)' : 'rgba(10, 13, 22, 0.8)',
+                        border: isSelected ? `1px solid ${color}` : '1px solid rgba(255, 255, 255, 0.08)',
+                        borderTop: `3px solid ${color}`,
                         borderRadius: 8,
-                        padding: '12px',
+                        padding: '10px',
                         textAlign: 'left',
                         cursor: 'pointer',
                         color: '#fff',
                         transition: 'all 0.2s ease',
+                        boxShadow: isSelected ? `0 0 12px ${color}44` : undefined,
+                        transform: isSelected ? 'translateY(-2px)' : undefined,
                       }}
                     >
-                      <div style={{ fontSize: 11, color: isSelected ? '#00f0ff' : 'var(--vip-text-muted)', fontWeight: 800 }}>
-                        LEVEL {String(boss.level).padStart(2, '0')} · {boss.threatLevel}
+                      <div style={{ fontSize: 11, color, fontWeight: 800 }}>
+                        LV {String(boss.level).padStart(2, '0')} · {boss.threatLevel}
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 700, margin: '4px 0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {boss.name}
                       </div>
                       <div style={{ fontSize: 11, color: '#ffd700' }}>
@@ -139,41 +201,78 @@ export function ThunderDomePage() {
 
               {/* Active Boss Detail HUD */}
               <div
+                key={selectedBoss.id}
                 style={{
+                  position: 'relative',
+                  overflow: 'hidden',
                   background: 'linear-gradient(145deg, rgba(8, 12, 20, 0.95), rgba(4, 6, 12, 0.98))',
-                  border: '1px solid rgba(0, 240, 255, 0.35)',
+                  border: `1px solid ${THREAT_COLORS[selectedBoss.threatLevel]}`,
                   borderRadius: 12,
                   padding: '24px',
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                   gap: 24,
+                  boxShadow: `0 0 28px ${THREAT_COLORS[selectedBoss.threatLevel]}33, inset 0 0 60px rgba(0,0,0,0.5)`,
                 }}
               >
-                <div>
-                  <span style={{ color: '#00f0ff', fontSize: 12, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    {selectedBoss.threatLevel} CLASS TARGET PROFILE
+                {/* scanline sweep */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    background: `linear-gradient(transparent 0%, ${THREAT_COLORS[selectedBoss.threatLevel]}14 48%, ${THREAT_COLORS[selectedBoss.threatLevel]}33 50%, ${THREAT_COLORS[selectedBoss.threatLevel]}14 52%, transparent 100%)`,
+                    backgroundSize: '100% 220%',
+                    animation: 'td-scan 4.5s linear infinite',
+                  }}
+                />
+                <style>{`@keyframes td-scan { 0% { background-position: 0 -120%; } 100% { background-position: 0 220%; } }`}</style>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ color: THREAT_COLORS[selectedBoss.threatLevel], fontSize: 12, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    {selectedBoss.threatLevel} CLASS · {THREAT_LABELS[selectedBoss.threatLevel]}
                   </span>
                   <h3 style={{ fontSize: 26, margin: '6px 0 2px', color: '#fff', fontWeight: 800 }}>
                     {selectedBoss.name}
                   </h3>
-                  <div style={{ color: '#ffd700', fontSize: 14, marginBottom: 16 }}>
+                  <div style={{ color: '#ffd700', fontSize: 14, marginBottom: 12 }}>
                     Sector: {selectedBoss.environment} · Codename: {selectedBoss.codename}
+                  </div>
+                  {/* threat meter */}
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--vip-text-muted)', marginBottom: 4 }}>
+                      <span>THREAT INDEX</span>
+                      <span style={{ color: THREAT_COLORS[selectedBoss.threatLevel], fontWeight: 800 }}>
+                        {selectedBoss.level}/24
+                      </span>
+                    </div>
+                    <div style={{ width: '100%', height: 8, background: 'rgba(255,255,255,0.08)', borderRadius: 4, overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${(selectedBoss.level / 24) * 100}%`,
+                          height: '100%',
+                          borderRadius: 4,
+                          background: `linear-gradient(90deg, ${THREAT_COLORS[selectedBoss.threatLevel]}88, ${THREAT_COLORS[selectedBoss.threatLevel]})`,
+                          boxShadow: `0 0 10px ${THREAT_COLORS[selectedBoss.threatLevel]}`,
+                          transition: 'width 0.4s ease',
+                        }}
+                      />
+                    </div>
                   </div>
                   <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, lineHeight: 1.6, margin: '0 0 18px' }}>
                     {selectedBoss.description}
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, justifyContent: 'center' }}>
-                  <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255, 215, 0, 0.2)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, justifyContent: 'center', position: 'relative' }}>
+                  <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '10px 14px', borderRadius: 8, border: `1px solid ${THREAT_COLORS[selectedBoss.threatLevel]}55` }}>
                     <span style={{ color: 'var(--vip-text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Target Weakness:</span>
                     <div style={{ color: '#ff3366', fontWeight: 700, fontSize: 14 }}>{selectedBoss.weakness}</div>
                   </div>
-                  <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255, 215, 0, 0.2)' }}>
+                  <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '10px 14px', borderRadius: 8, border: `1px solid ${THREAT_COLORS[selectedBoss.threatLevel]}55` }}>
                     <span style={{ color: 'var(--vip-text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Signature Attack:</span>
-                    <div style={{ color: '#00f0ff', fontWeight: 700, fontSize: 14 }}>{selectedBoss.signatureAttack}</div>
+                    <div style={{ color: THREAT_COLORS[selectedBoss.threatLevel], fontWeight: 700, fontSize: 14 }}>{selectedBoss.signatureAttack}</div>
                   </div>
-                  <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255, 215, 0, 0.2)' }}>
+                  <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '10px 14px', borderRadius: 8, border: `1px solid ${THREAT_COLORS[selectedBoss.threatLevel]}55` }}>
                     <span style={{ color: 'var(--vip-text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Armor Rating & Score:</span>
                     <div style={{ color: '#ffd700', fontWeight: 700, fontSize: 14 }}>
                       {selectedBoss.armorRating} · +{selectedBoss.scoreValue.toLocaleString()} PTS
