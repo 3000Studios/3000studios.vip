@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { PublicLayout, AdSenseUnit } from './Home';
 import { publishedSongs } from '../data/publishedSongs';
+import { SongCarousel } from '../components/SongCarousel';
 import { OFFICIAL_PLATFORM_LINKS } from '../data/platforms';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
@@ -144,121 +145,12 @@ export function MusicPage() {
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-              gap: 20,
-            }}
-          >
-            {filteredSongs.map((s, idx) => {
-              const isCurrentPlaying = music.activeSong.title === s.title && music.isPlaying;
-              return (
-                <article
-                  key={s.slug || s.title}
-                  className="vip-glass-card"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderColor: isCurrentPlaying ? 'rgba(255, 215, 0, 0.8)' : undefined,
-                    boxShadow: isCurrentPlaying ? '0 0 25px rgba(255, 215, 0, 0.35)' : undefined,
-                  }}
-                >
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', overflow: 'hidden' }}>
-                    <img
-                      src={s.cover || `/media/covers/${s.slug}.jpg`}
-                      alt={s.title}
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/media/official-3000-studios-profile.png';
-                      }}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handlePlaySong(s)}
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'rgba(0, 0, 0, 0.4)',
-                        border: 'none',
-                        color: '#fff',
-                        fontSize: 36,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        opacity: isCurrentPlaying ? 1 : 0.85,
-                        transition: 'all 0.2s ease',
-                      }}
-                      aria-label={`Play ${s.title}`}
-                    >
-                      <span
-                        style={{
-                          width: 54,
-                          height: 54,
-                          borderRadius: '50%',
-                          background: 'rgba(255, 215, 0, 0.95)',
-                          color: '#05060a',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 22,
-                          paddingLeft: isCurrentPlaying ? 0 : 3,
-                          boxShadow: '0 0 20px rgba(255, 215, 0, 0.6)',
-                        }}
-                      >
-                        {isCurrentPlaying ? '❚❚' : '▶'}
-                      </span>
-                    </button>
-                    <span
-                      style={{
-                        position: 'absolute',
-                        top: 10,
-                        left: 10,
-                        background: 'rgba(5, 6, 10, 0.8)',
-                        color: '#ffd700',
-                        fontSize: 11,
-                        fontWeight: 800,
-                        padding: '3px 8px',
-                        borderRadius: 4,
-                      }}
-                    >
-                      #{String(idx + 1).padStart(2, '0')}
-                    </span>
-                  </div>
-
-                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <h3 style={{ color: '#fff', fontSize: 16, margin: '0 0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {s.title}
-                    </h3>
-                    <span style={{ color: 'var(--vip-text-muted)', fontSize: 13, marginBottom: 12 }}>
-                      3000 Studios · Official Drop
-                    </span>
-
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
-                      <Link
-                        to={`/song/${s.slug}`}
-                        className="vip-btn-obsidian"
-                        style={{ padding: '6px 12px', fontSize: 12, flex: 1, textAlign: 'center' }}
-                      >
-                        Details
-                      </Link>
-                      <a
-                        href={s.buy || 'https://distrokid.com/hyperfollow/3000studios'}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="vip-btn-gold"
-                        style={{ padding: '6px 12px', fontSize: 12 }}
-                      >
-                        Stream / Own
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <SongCarousel
+            songs={filteredSongs}
+            onPlay={handlePlaySong}
+            activeTitle={music.activeSong.title}
+            isPlaying={music.isPlaying}
+          />
         </section>
 
         {/* =========================================================================
