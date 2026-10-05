@@ -49,7 +49,13 @@ export function LiveSection() {
           {live ? (
             <div
               className="v3-card"
-              style={{ padding: 0, overflow: 'hidden', marginTop: 40 }}
+              style={{
+                padding: 0,
+                overflow: 'hidden',
+                marginTop: 40,
+                borderColor: 'rgba(255,47,179,.5)',
+                boxShadow: '0 0 80px rgba(255,47,179,.25), 0 30px 80px rgba(0,0,0,.6)',
+              }}
             >
               <iframe
                 src={`${STREAM_PLAYER_EMBED_SRC}?autoplay=true&muted=true`}

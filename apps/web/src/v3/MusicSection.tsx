@@ -88,6 +88,15 @@ export function MusicSection() {
               aria-label="Search tracks"
             />
           </label>
+          <div style={{ marginTop: 18 }}>
+            <Link
+              to="/beats"
+              className="v3-btn v3-btn--ghost"
+              style={{ padding: '12px 28px', fontSize: 12 }}
+            >
+              Making your own record? License an instrumental
+            </Link>
+          </div>
         </Reveal>
 
         <div className="v3-track-grid">
