@@ -14,7 +14,7 @@ import { PromoShorts } from './PromoShorts';
 import { CoverWall } from './CoverWall';
 import { LiveSection } from './LiveSection';
 import { ThunderdomeFeature } from './ThunderdomeFeature';
-import { PulseFooter } from './PulseFooter';
+import { Footer } from '../v2/Footer';
 
 import { usePageMeta } from '../lib/usePageMeta';
 
@@ -75,7 +75,7 @@ export function HomePage() {
             <CtaBand />
           </main>
         </PageFade>
-        <PulseFooter />
+        <Footer />
       </div>
     </>
   );
