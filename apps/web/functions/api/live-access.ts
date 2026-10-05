@@ -4,7 +4,7 @@ import { getLiveAccessState, updateLiveAccessState } from '../lib/live-access-st
 
 const NO_STORE = { 'cache-control': 'no-store, private' };
 
-async function requireOwner(request: Request, env: PagesEnv): Promise<boolean> {
+export async function requireOwner(request: Request, env: PagesEnv): Promise<boolean> {
   const authorization = request.headers.get('authorization');
   if (!authorization?.toLowerCase().startsWith('bearer ')) return false;
   const apiBase = (env.API_BASE || env.VITE_API_BASE || 'https://api.3000studios.vip').replace(
