@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Broadcast, CameraRotate, Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 import { WHIP_URL_STORAGE_KEY, WhipPublisher, validateWhipUrl } from '../lib/webrtcStream';
 import { setHostLiveFlag } from '../lib/streamScene';
+import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import '../v2/go-live.css';
 
@@ -19,8 +20,19 @@ export function PhoneGoLive() {
     return () => {
       void pubRef.current?.stop();
       setHostLiveFlag(false);
+      void publishServerLiveFlag(false);
     };
   }, []);
+
+  // Server heartbeat while live so any viewer device sees the flag.
+  useEffect(() => {
+    if (status !== 'live') return undefined;
+    void publishServerLiveFlag(true);
+    const id = window.setInterval(() => {
+      void publishServerLiveFlag(true);
+    }, 15_000);
+    return () => window.clearInterval(id);
+  }, [status]);
 
   async function goLive() {
     const el = videoRef.current;
@@ -39,11 +51,13 @@ export function PhoneGoLive() {
       await pub.start(el, facing);
       setStatus('live');
       setHostLiveFlag(true);
+      void publishServerLiveFlag(true);
       window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: true } }));
     } catch (err) {
       setStatus('idle');
       setError(err instanceof Error ? err.message : 'Could not go live');
       setHostLiveFlag(false);
+      void publishServerLiveFlag(false);
     }
   }
 
@@ -63,6 +77,7 @@ export function PhoneGoLive() {
     pubRef.current = null;
     setStatus('idle');
     setHostLiveFlag(false);
+    void publishServerLiveFlag(false);
     window.dispatchEvent(new CustomEvent('3000-host-live', { detail: { live: false } }));
   }
 

@@ -6,6 +6,8 @@
   <url><loc>https://3000studios.vip/projects</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
   <url><loc>https://3000studios.vip/vip</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
   <url><loc>https://3000studios.vip/shop</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://3000studios.vip/podcast</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://3000studios.vip/beats</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
   <url><loc>https://3000studios.vip/community</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/requests</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://3000studios.vip/blog</loc><changefreq>daily</changefreq><priority>0.85</priority></url>
