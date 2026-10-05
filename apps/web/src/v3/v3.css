@@ -116,10 +116,42 @@
 .v3-clip-cap h2 { font-family: var(--v3-font-display); font-size: clamp(32px, 5vw, 64px); margin-top: 8px; text-shadow: 0 4px 30px rgba(0,0,0,.7); }
 .v3-clip-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,6,10,.75), transparent 45%); }
 
-/* ---------- horizontal ---------- */
-.v3-hwrap { position: relative; }
-.v3-hsticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; align-items: center; }
-.v3-htrack { display: flex; gap: 4vw; padding: 0 8vw; width: max-content; will-change: transform; align-items: center; }
+/* ---------- videos carousel (auto-rotating, no scroll animation) ---------- */
+.v3-vidwrap { padding: 96px 0 72px; position: relative; overflow: hidden; }
+.v3-vidhead { padding: 0 6vw; max-width: 720px; margin-bottom: 40px; }
+.v3-vidviewport { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.v3-vidtrack { display: flex; will-change: transform; }
+.v3-vidtrack.is-anim { transition: transform 0.55s cubic-bezier(0.22, 0.8, 0.3, 1); }
+.v3-vidslide { flex: 0 0 100%; padding: 0 6vw; box-sizing: border-box; }
+@media (min-width: 640px) { .v3-vidslide { flex-basis: 50%; padding: 0 3vw; } }
+@media (min-width: 1024px) { .v3-vidslide { flex-basis: 33.3333%; padding: 0 2vw; } }
+.v3-vidslide .v3-hcard { display: block; width: 100%; }
+.v3-vidslide .v3-hcard .v3-hph { height: auto; min-height: 0; aspect-ratio: 16 / 10; }
+
+.v3-vidbtn {
+  position: absolute; top: 32%; transform: translateY(-50%);
+  width: 48px; height: 48px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  background: rgba(5, 6, 10, 0.72); color: var(--v3-gold);
+  border: 1px solid var(--v3-line); backdrop-filter: blur(6px);
+  z-index: 2; padding: 0;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  touch-action: manipulation;
+}
+.v3-vidbtn:hover { background: rgba(241, 183, 78, 0.18); color: var(--v3-ink); }
+.v3-vidbtn:active { transform: translateY(-50%) scale(0.94); }
+.v3-vidbtn:focus-visible { outline: 2px solid var(--v3-cyan); outline-offset: 2px; }
+.v3-vidbtn-prev { left: max(12px, 2vw); }
+.v3-vidbtn-next { right: max(12px, 2vw); }
+
+.v3-viddots { display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 32px; flex-wrap: wrap; padding: 0 6vw; }
+.v3-viddot { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; cursor: pointer; padding: 0; touch-action: manipulation; }
+.v3-viddot span { display: block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.22); transition: background 0.25s, transform 0.25s; }
+.v3-viddot[aria-current="true"] span { background: var(--v3-gold); transform: scale(1.35); box-shadow: 0 0 12px rgba(241, 183, 78, 0.6); }
+.v3-viddot:focus-visible { outline: 2px solid var(--v3-cyan); outline-offset: -8px; border-radius: 8px; }
+.v3-vidmore { display: flex; justify-content: center; margin-top: 12px; }
+
+/* ---------- video cards (shared) ---------- */
 .v3-hcard { width: min(74vw, 460px); flex-shrink: 0; }
 .v3-hcard .v3-hph { height: 46vh; min-height: 300px; border-radius: 18px; background-size: cover; background-position: center; box-shadow: 0 30px 80px rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.1); position: relative; overflow: hidden; }
 .v3-hcard .v3-hph::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,6,10,.55), transparent 50%); }
@@ -129,22 +161,6 @@
 .v3-hcard .v3-hmeta { margin-top: 12px; font-size: 12px; letter-spacing: 3px; color: var(--v3-cyan); text-transform: uppercase; font-family: var(--v3-font-grot); }
 .v3-hint { color: var(--v3-mut); letter-spacing: 4px; font-size: 12px; text-transform: uppercase; font-family: var(--v3-font-grot); white-space: nowrap; align-self: center; }
 
-/* ---------- horizontal swipe (touch devices) ---------- */
-.v3-hswipe-wrap { padding: 72px 0 24px; position: relative; overflow: hidden; }
-.v3-hswipe-head { padding: 0 6vw; max-width: 640px; }
-.v3-hswipe {
-  display: flex; gap: 5vw; align-items: center;
-  overflow-x: auto; overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding: 32px 6vw 48px;
-  scrollbar-width: none;
-  cursor: grab;
-}
-.v3-hswipe::-webkit-scrollbar { display: none; }
-.v3-hswipe:active { cursor: grabbing; }
-.v3-hswipe .v3-hcard { scroll-snap-align: center; }
-.v3-hswipe .v3-hcard .v3-hph { height: 38vh; min-height: 240px; }
 
 /* ---------- cards / tilt ---------- */
 .v3-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 54px; }
