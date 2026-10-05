@@ -5,6 +5,7 @@ import { MagneticButton } from '../components/MagneticButton';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { publishedSongs } from '../data/publishedSongs';
+import { CircularEQ } from './CircularEQ';
 
 function Word({ children, index, gold }: { children: string; index: number; gold?: boolean }) {
   return (
@@ -20,15 +21,9 @@ function Word({ children, index, gold }: { children: string; index: number; gold
   );
 }
 
-/* Mini EQ marks — pure CSS, dance forever at the brand tempo. */
-function MiniEQ() {
-  return (
-    <span className="v3-hero-eq" aria-hidden="true">
-      {Array.from({ length: 5 }, (_, i) => (
-        <i key={i} />
-      ))}
-    </span>
-  );
+/* Premium circular equalizer — canvas radial visualizer, dances to real audio. */
+function HeroVisualizer() {
+  return <CircularEQ size={210} />;
 }
 
 /* Featured drop — the newest release, playable straight from the hero. */
@@ -114,12 +109,12 @@ export function HeroEQ({ live }: { live: boolean }) {
         </motion.h1>
 
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.9 }}
-          style={{ display: 'flex', justifyContent: 'center', marginTop: 18 }}
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.1, delay: 0.9 }}
+          style={{ display: 'flex', justifyContent: 'center', marginTop: 26 }}
         >
-          <MiniEQ />
+          <HeroVisualizer />
         </motion.div>
 
         <motion.p

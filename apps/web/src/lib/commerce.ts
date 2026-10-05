@@ -5,6 +5,10 @@ export const YEARLY_PRICE_CENTS = 1999;
 
 export const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
+/** Primary buy destinations — every song/track links to a purchase path. */
+export const SHOPIFY_STORE_URL = 'https://boughtitonline.com';
+export const HYPERFOLLOW_URL = 'https://distrokid.com/hyperfollow/3000studios';
+
 export const PLATFORMS = [
   { id: 'youtube', label: 'YouTube', url: 'https://www.youtube.com/@3000Studio' },
   { id: 'ytmusic', label: 'YouTube Music', url: 'https://music.youtube.com/channel/UCnQTLksEH7Paj4teEEBU8qQ' },
