@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Broadcast, CalendarBlank, ChatCircleDots, YoutubeLogo } from '@phosphor-icons/react';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { LIVE_STREAM_CONFIG } from '../data/liveStream';
 import { detectIsLive } from '../lib/streamLiveDetect';
 import { STREAM_CUSTOMER_CODE, STREAM_LIVE_INPUT_ID } from '../lib/streamConfig';
@@ -45,7 +45,7 @@ export function LiveBroadcastPage() {
   const useWhepPlayer = isLive && CAN_USE_WHEP;
 
   return (
-    <PublicLayout variant="blackhole" compact={false}>
+    <PublicLayoutV2 wallpaper="nebula">
       <div className="nn-scope">
         <section className="nn-hero">
           <span className={`nn-live-badge ${isLive ? 'is-live' : 'is-off'}`}>
@@ -192,6 +192,6 @@ export function LiveBroadcastPage() {
           <p>© 2026 3000 Studios · All rights reserved</p>
         </footer>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { STUDIO_APPS } from '../data/appsData';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import '../styles/vip-luxury.css';
@@ -14,7 +14,7 @@ export function AppsPage() {
     : STUDIO_APPS.filter((a) => a.category === filter);
 
   return (
-    <PublicLayout variant="spiral" compact={false}>
+    <PublicLayoutV2 wallpaper="aurora">
       <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
         
         {/* =========================================================================
@@ -154,6 +154,6 @@ export function AppsPage() {
         </section>
 
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

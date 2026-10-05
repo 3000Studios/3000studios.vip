@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { STUDIO_PROJECTS } from '../data/projectsData';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import '../styles/vip-luxury.css';
 
 export function ProjectsPage() {
   return (
-    <PublicLayout variant="spiral" compact={false}>
+    <PublicLayoutV2 wallpaper="aurora">
       <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
         
         {/* =========================================================================
@@ -105,6 +105,6 @@ export function ProjectsPage() {
         </section>
 
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

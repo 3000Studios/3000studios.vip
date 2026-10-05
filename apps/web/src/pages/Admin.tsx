@@ -10,7 +10,7 @@ import { AdminObservability } from '../components/AdminObservability';
 import { MarketingAdvisor } from '../components/MarketingAdvisor';
 import { AdminActivityLog } from '../components/AdminActivityLog';
 import { LiveAccessControl } from '../components/LiveAccessControl';
-import { PublicLayout } from './Home';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import '../styles/discover.css';
 import '../v2/admin.css';
 
@@ -165,7 +165,7 @@ export function Admin() {
 
   if (!isAuthenticated) {
     return (
-      <PublicLayout variant="blackhole">
+      <PublicLayoutV2>
         <div className="adminScrim adminEasyShell adminWithNav v2-admin">
           <form className="adminCodeModal" onSubmit={handleUnlock}>
             <span>3000 STUDIOS · OWNER ACCESS</span>
@@ -202,12 +202,12 @@ export function Admin() {
             </Link>
           </form>
         </div>
-      </PublicLayout>
+      </PublicLayoutV2>
     );
   }
 
   return (
-    <PublicLayout variant="blackhole">
+    <PublicLayoutV2>
       <div className="console adminEasyShell adminWithNav v2-admin" style={{ gridTemplateColumns: '1fr' }}>
         <div className="cMain">
           <header className="cTopbar">
@@ -441,6 +441,6 @@ export function Admin() {
           </main>
         </div>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

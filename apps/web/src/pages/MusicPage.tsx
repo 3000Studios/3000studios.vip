@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { MagnifyingGlass, PlayCircle } from '@phosphor-icons/react';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { publishedSongs } from '../data/publishedSongs';
 import { SongCarousel } from '../components/SongCarousel';
 import { OFFICIAL_PLATFORM_LINKS } from '../data/platforms';
@@ -35,7 +35,7 @@ export function MusicPage() {
   };
 
   return (
-    <PublicLayout variant="spiral" compact={false}>
+    <PublicLayoutV2 wallpaper="aurora">
       <div className="nn-scope">
         <section className="nn-hero">
           <div className="nn-btn-row" style={{ marginBottom: 18 }}>
@@ -160,6 +160,6 @@ export function MusicPage() {
           <p>© 2026 3000 Studios · All rights reserved</p>
         </footer>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

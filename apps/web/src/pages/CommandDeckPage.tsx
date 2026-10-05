@@ -7,7 +7,7 @@ import {
   Trash,
   ArrowLeft,
 } from '@phosphor-icons/react';
-import { PublicLayout } from './Home';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import { publishedSongs } from '../data/publishedSongs';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
 import { THUNDER_BOSSES } from '../data/thunderDome';
@@ -197,12 +197,12 @@ export function CommandDeckPage() {
   );
 
   return (
-    <PublicLayout variant="blackhole" compact>
+    <PublicLayoutV2 wallpaper="nebula">
       <div className="nn-scope">
         <section className="nn-wrap" style={{ paddingTop: 56 }}>
           {open ? <Dashboard /> : <PinGate onUnlock={() => setOpen(true)} />}
         </section>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

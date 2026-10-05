@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayCircle, FilmStrip, GameController } from '@phosphor-icons/react';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
 import { UnlockCard } from '../components/UnlockCard';
 import { readUnlocks } from '../lib/unlockPayments';
@@ -21,7 +21,7 @@ export function VideoPage() {
   const unlockedCount = readUnlocks().length;
 
   return (
-    <PublicLayout variant="electric" compact={false}>
+    <PublicLayoutV2 wallpaper="beams">
       <div className="nn-scope">
         <section className="nn-hero">
           <span className="nn-kicker">
@@ -110,6 +110,6 @@ export function VideoPage() {
           <p>© 2026 3000 Studios · All rights reserved</p>
         </footer>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

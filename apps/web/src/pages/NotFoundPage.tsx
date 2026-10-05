@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { usePageMeta } from '../lib/usePageMeta';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 
 export function NotFoundPage() {
   usePageMeta({
@@ -7,7 +8,8 @@ export function NotFoundPage() {
     description: 'The page you are looking for does not exist. Head back to the 3000 Studios stage.',
   });
   return (
-    <main
+    <PublicLayoutV2>
+      <main
       style={{
         minHeight: '100vh',
         display: 'flex',
@@ -40,6 +42,7 @@ export function NotFoundPage() {
       >
         Back to the stage
       </Link>
-    </main>
+      </main>
+    </PublicLayoutV2>
   );
 }
