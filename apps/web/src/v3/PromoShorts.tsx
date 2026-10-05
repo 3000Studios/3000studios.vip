@@ -31,7 +31,7 @@ export function PromoShorts() {
           scrollbarWidth: 'none',
         }}
       >
-        {publishedShorts.map((s) => (
+        {publishedShorts.map((s, i) => (
           <a
             key={s.videoId}
             href={shortUrl(s.videoId)}
@@ -63,6 +63,21 @@ export function PromoShorts() {
                 loading="lazy"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
+              <span
+                style={{
+                  position: 'absolute',
+                  top: 10,
+                  left: 10,
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: 2,
+                  color: '#f1b74e',
+                  textShadow: '0 2px 10px rgba(0,0,0,.8)',
+                }}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
               <span
                 style={{
                   position: 'absolute',
