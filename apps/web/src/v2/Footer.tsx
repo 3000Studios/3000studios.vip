@@ -21,6 +21,8 @@ const EXPLORE = [
   { to: '/#music', label: 'Music catalog' },
   { to: '/#videos', label: 'Official videos' },
   { to: '/#live', label: 'Live stage' },
+  { to: '/podcast', label: 'Podcast' },
+  { to: '/beats', label: 'Beats & instrumentals' },
   { to: '/shop', label: 'Shop merch' },
   { to: '/community', label: 'Community' },
   { to: '/concepts', label: 'Concept board' },
