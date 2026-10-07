@@ -4,30 +4,45 @@ import { Broadcast, CalendarBlank, ChatCircleDots, YoutubeLogo } from '@phosphor
 import { PublicLayout, AdSenseUnit } from './Home';
 import { LIVE_STREAM_CONFIG } from '../data/liveStream';
 import { detectIsLive } from '../lib/streamLiveDetect';
+import { STREAM_CUSTOMER_CODE, STREAM_LIVE_INPUT_ID } from '../lib/streamConfig';
+import { WhepStreamPlayer } from '../components/WhepStreamPlayer';
 import { ADSENSE_LIVE_SLOT } from '../lib/adsense';
+
+/** Cloudflare WHEP playback is available when the Stream env config is set. */
+const CAN_USE_WHEP = Boolean(STREAM_CUSTOMER_CODE && STREAM_LIVE_INPUT_ID);
 
 export function LiveBroadcastPage() {
   const [live, setLive] = useState<boolean | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    void detectIsLive()
-      .then((s) => {
-        if (!cancelled) setLive(s.live);
-      })
-      .catch(() => {
-        if (!cancelled) setLive(LIVE_STREAM_CONFIG.defaultLive);
-      });
+    const check = () => {
+      detectIsLive()
+        .then((s) => {
+          if (!cancelled) setLive(s.live);
+        })
+        .catch(() => {
+          if (!cancelled) setLive(LIVE_STREAM_CONFIG.defaultLive);
+        });
+    };
+    check();
+    // Re-check periodically so the feed takes over automatically when the
+    // studio goes live while this page is open (any viewer device).
+    const poll = window.setInterval(check, 20_000);
     const t = window.setTimeout(() => {
       if (!cancelled) setLive((v) => (v === null ? LIVE_STREAM_CONFIG.defaultLive : v));
     }, 4000);
     return () => {
       cancelled = true;
+      window.clearInterval(poll);
       window.clearTimeout(t);
     };
   }, []);
 
   const isLive = live === true;
+  // WHEP player when live and Stream is configured; YouTube embed is the
+  // fallback only when Stream config is absent.
+  const useWhepPlayer = isLive && CAN_USE_WHEP;
 
   return (
     <PublicLayout variant="blackhole" compact={false}>
@@ -71,7 +86,13 @@ export function LiveBroadcastPage() {
               </strong>
             </div>
             <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#000' }}>
-              {isLive ? (
+              {useWhepPlayer ? (
+                <WhepStreamPlayer
+                  title="3000 Studios live stream"
+                  muted={false}
+                  autoplay
+                />
+              ) : isLive ? (
                 <iframe
                   src={LIVE_STREAM_CONFIG.streamEmbedUrl}
                   title="3000 Studios live stream"
@@ -134,7 +155,7 @@ export function LiveBroadcastPage() {
           </div>
         </section>
 
-        {LIVE_STREAM_CONFIG.chatEmbedUrl && (
+        {LIVE_STREAM_CONFIG.chatEmbedUrl && !useWhepPlayer && (
           <section className="nn-wrap" style={{ marginBottom: 40 }}>
             <div className="nn-sec-head">
               <div>

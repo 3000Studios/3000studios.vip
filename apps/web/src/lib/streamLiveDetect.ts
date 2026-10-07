@@ -1,5 +1,6 @@
 import { STREAM_CUSTOMER_CODE, STREAM_LIVE_INPUT_ID, STREAM_PLAYER_UID } from './streamConfig';
 import { readHostLiveFlag, STREAM_LIVE_FLAG_KEY, STREAM_SCENE_CHANNEL } from './streamScene';
+import { getOwnerToken } from './auth';
 
 export type LiveDetectState = {
   live: boolean;
@@ -7,12 +8,38 @@ export type LiveDetectState = {
   raw?: unknown;
 };
 
+/** Server-side live flag (D1-backed, heartbeat TTL). Cross-device: any viewer sees it. */
 export async function fetchServerLiveFlag(): Promise<boolean | null> {
-  return null;
+  try {
+    const res = await fetch('/api/live-flag', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { ok?: boolean; live?: unknown };
+    if (data?.ok !== true) return null;
+    return data.live === true;
+  } catch {
+    return null;
+  }
 }
 
+/**
+ * Assert/clear the server-side live flag. Fire-and-forget: a failing flag
+ * endpoint must never break the broadcast itself.
+ */
 export async function publishServerLiveFlag(live: boolean): Promise<void> {
-  void live;
+  try {
+    const token = getOwnerToken();
+    await fetch('/api/live-flag', {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'content-type': 'application/json',
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ live }),
+    });
+  } catch {
+    /* non-fatal */
+  }
 }
 
 export async function fetchStreamLifecycle(
