@@ -5,12 +5,14 @@ import { WHIP_URL_STORAGE_KEY, WhipPublisher, validateWhipUrl } from '../lib/web
 import { setHostLiveFlag } from '../lib/streamScene';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
 import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
+import { useAuth } from '../lib/auth';
 import '../v2/go-live.css';
 
 export function PhoneGoLive() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const pubRef = useRef<WhipPublisher | null>(null);
-  const [unlocked] = useState(() => sessionStorage.getItem('3000-admin-auth-v1') === '1');
+  const { isAuthenticated } = useAuth();
+  const unlocked = isAuthenticated;
   const [facing, setFacing] = useState<'user' | 'environment'>('user');
   const [status, setStatus] = useState<'idle' | 'live' | 'busy'>('idle');
   const [error, setError] = useState<string | null>(null);

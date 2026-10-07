@@ -109,7 +109,7 @@ export function Admin() {
       setPasscode('');
       setError(null);
     } else {
-      setError('Incorrect access code. Enter 5555 to access.');
+      setError('Incorrect access code.');
       setPasscode('');
     }
   }
@@ -172,7 +172,7 @@ export function Admin() {
             <h2>Go Live Console</h2>
             <p>Enter access code to unlock live stream studio, camera & owner tools.</p>
             <label className="adminPasscodeLabel">
-              <span>Access Code (Passcode = 5555)</span>
+              <span>Access Code</span>
               <input
                 type="password"
                 inputMode="numeric"
@@ -184,7 +184,7 @@ export function Admin() {
                   setPasscode(e.target.value);
                   setError(null);
                 }}
-                placeholder="Enter Passcode (5555)"
+                placeholder="Enter access code"
                 maxLength={32}
               />
             </label>
@@ -197,15 +197,6 @@ export function Admin() {
             >
               {busy ? 'Unlocking…' : 'Unlock Admin Console'}
             </button>
-            <div className="adminQuickPinRow" style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-              <button
-                type="button"
-                className="cBtn ghost sm"
-                onClick={() => setPasscode('5555')}
-              >
-                Auto-fill 5555
-              </button>
-            </div>
             <Link to="/" className="adminBackLink">
               ← Back to public site
             </Link>
