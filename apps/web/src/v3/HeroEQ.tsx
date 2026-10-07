@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, ArrowRight } from '@phosphor-icons/react';
+import { Play, Pause, ArrowRight } from '@phosphor-icons/react';
 import { MagneticButton } from '../components/MagneticButton';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
+import { useGlobalMusic } from '../components/GlobalMusic';
+import { publishedSongs } from '../data/publishedSongs';
 
 function Word({ children, index, gold }: { children: string; index: number; gold?: boolean }) {
   return (
@@ -26,6 +28,41 @@ function MiniEQ() {
         <i key={i} />
       ))}
     </span>
+  );
+}
+
+/* Featured drop — the newest release, playable straight from the hero. */
+function LatestDrop() {
+  const music = useGlobalMusic();
+  const song = publishedSongs[0];
+  if (!song) return null;
+  const isActive =
+    music.activeSong?.slug === song.slug ||
+    music.activeTitle.toLowerCase() === song.title.toLowerCase();
+  const playing = isActive && music.isPlaying;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.9, delay: 1.45 }}
+      style={{ display: 'flex', justifyContent: 'center', marginTop: 30 }}
+    >
+      <button
+        type="button"
+        className="v3-drop-pill"
+        onClick={() => (playing ? music.pause() : music.playTrack(song.src, song.title))}
+        aria-label={playing ? `Pause ${song.title}` : `Play the latest drop: ${song.title}`}
+      >
+        <img src={song.cover} alt="" aria-hidden="true" />
+        <span className="v3-drop-meta">
+          <i>Latest drop</i>
+          <b>{song.title}</b>
+        </span>
+        <span className="v3-drop-play" aria-hidden="true">
+          {playing ? <Pause size={16} weight="fill" /> : <Play size={16} weight="fill" />}
+        </span>
+      </button>
+    </motion.div>
   );
 }
 
@@ -108,6 +145,8 @@ export function HeroEQ({ live }: { live: boolean }) {
             Watch videos <ArrowRight size={16} />
           </MagneticButton>
         </motion.div>
+
+        <LatestDrop />
 
         <motion.p
           className="v3-hero-hint"
