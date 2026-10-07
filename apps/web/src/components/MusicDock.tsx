@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGlobalMusic } from './GlobalMusic';
+import { HYPERFOLLOW_URL } from '../lib/commerce';
 import { playbackKind } from '../data/music';
 
 function fmt(value: number) {
@@ -64,6 +65,16 @@ export function MusicDock() {
       <button type="button" className="musicDockPlay" onClick={music.toggle} aria-label={music.isPlaying ? 'Pause' : 'Play'}>
         {music.isPlaying ? '❚❚' : '▶'}
       </button>
+      <a
+        className="musicDockBuy"
+        href={HYPERFOLLOW_URL}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`Buy ${music.activeSong.title}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        Buy
+      </a>
     </div>
   );
 }

@@ -7,7 +7,7 @@ img, video, iframe { max-width: 100%; }
   bottom: calc(68px + env(safe-area-inset-bottom));
   z-index: var(--z-dock, 300);
   display: grid;
-  grid-template-columns: 44px 1fr auto;
+  grid-template-columns: 44px 1fr auto auto;
   gap: 10px;
   align-items: center;
   padding: 8px 12px;
@@ -32,6 +32,22 @@ img, video, iframe { max-width: 100%; }
   font-weight: 800;
   cursor: pointer;
 }
+.musicDockBuy {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f6d876 0%, #d4af37 60%, #b8860b 100%);
+  color: #16120a;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+}
+.musicDockBuy:hover { filter: brightness(1.08); }
 .musicVideoWall {
   position: fixed;
   inset: 0;

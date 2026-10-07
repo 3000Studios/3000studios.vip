@@ -178,6 +178,16 @@
   box-shadow: 0 8px 28px rgba(77, 124, 255, 0.32);
 }
 
+.v2-btn--gold {
+  --btn-bg: linear-gradient(135deg, #f6d876 0%, #d4af37 55%, #b8860b 100%);
+  --btn-fg: #1a1408;
+  box-shadow: 0 8px 28px rgba(212, 175, 55, 0.35);
+}
+
+.v2-btn--gold:hover {
+  box-shadow: 0 12px 36px rgba(212, 175, 55, 0.5);
+}
+
 .v2-btn--sm {
   min-height: 40px;
   padding: 9px 18px;

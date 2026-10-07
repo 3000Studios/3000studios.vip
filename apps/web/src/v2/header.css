@@ -121,6 +121,30 @@
   background: rgba(0, 245, 147, 0.08);
 }
 
+.v2-nav-link::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--v2-neon), var(--v2-blue));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.32s var(--v2-ease);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.v2-nav-link:hover::before {
+  transform: scaleX(1);
+}
+
+.v2-nav-link.is-active::before {
+  display: none;
+}
+
 .v2-nav-link.is-active {
   color: var(--v2-neon-soft);
 }

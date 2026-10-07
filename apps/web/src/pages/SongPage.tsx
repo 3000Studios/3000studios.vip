@@ -6,10 +6,12 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, YoutubeLogo } from '@phosphor-icons/react';
+import { ArrowLeft, Play, Pause, ShoppingBag, YoutubeLogo } from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { LazyYouTube } from '../components/LazyYouTube';
 import { rolloutSongs } from '../data/music';
+import { publishedSongs } from '../data/publishedSongs';
+import { HYPERFOLLOW_URL } from '../lib/commerce';
 import {
   getOfficialVideoForTitle,
   youtubeEmbedUrl,
@@ -118,6 +120,8 @@ export function SongPage() {
   const embed = officialVideo
     ? `${youtubeEmbedUrl(officialVideo.videoId)}&autoplay=1&mute=1&controls=0&loop=1&playlist=${officialVideo.videoId}&playsinline=1`
     : '';
+  const buyUrl =
+    publishedSongs.find((s) => s.slug === song.slug)?.buy ?? HYPERFOLLOW_URL;
 
   return (
     <PublicLayoutV2 wallpaper="eq">
@@ -226,6 +230,20 @@ export function SongPage() {
               Watch on YouTube
             </a>
           ) : null}
+          <div className="v2-song-buy-row">
+            <a
+              className="v2-btn v2-btn--gold v2-btn--sm"
+              href={buyUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ShoppingBag size={16} weight="fill" />
+              Buy this track
+            </a>
+            <Link className="v2-btn v2-btn--ghost v2-btn--sm" to="/beats">
+              Beats & instrumentals
+            </Link>
+          </div>
         </section>
 
         <section className="v2-card v2-song-about">

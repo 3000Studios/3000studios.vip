@@ -7,6 +7,7 @@ import { publishedSongs } from '../data/publishedSongs';
 import { youtubeWatchUrl } from '../data/officialReleases';
 import {
   TRACK_PRICE_CENTS,
+  HYPERFOLLOW_URL,
   formatMoney,
   grantTrack,
   readEntitlement,
@@ -132,6 +133,14 @@ export function MusicSection() {
                       <Link to={`/song/${song.slug}`}>{song.title}</Link>
                     </h3>
                     <div className="v3-track-links">
+                      <a
+                        className="v3-track-buy"
+                        href={song.buy ?? HYPERFOLLOW_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Buy
+                      </a>
                       {song.youtubeId && (
                         <a href={youtubeWatchUrl(song.youtubeId)} target="_blank" rel="noreferrer">
                           Video
