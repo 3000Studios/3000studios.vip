@@ -38,6 +38,17 @@ export function MusicPage() {
     <PublicLayoutV2 wallpaper="aurora">
       <div className="nn-scope">
         <section className="nn-hero">
+          <video
+            className="nn-hero-video-bg"
+            src="https://cdn.3000studios.vip/cinematics/game-intro-v1.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+          />
+          <div className="nn-hero-shade" aria-hidden="true" />
           <div className="nn-btn-row" style={{ marginBottom: 18 }}>
             <span className="nn-kicker">✦ Official discography</span>
             <span className="nn-kicker nn-kicker--gold">{publishedSongs.length} master releases</span>
