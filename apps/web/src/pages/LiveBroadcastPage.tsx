@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Broadcast, CalendarBlank, ChatCircleDots, YoutubeLogo } from '@phosphor-icons/react';
+import { Broadcast, CalendarBlank, ChatCircleDots, Heart, Users, YoutubeLogo } from '@phosphor-icons/react';
 import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { LIVE_STREAM_CONFIG } from '../data/liveStream';
 import { detectIsLive } from '../lib/streamLiveDetect';
@@ -152,6 +152,65 @@ export function LiveBroadcastPage() {
                 <p style={{ color: 'var(--nn-muted)', fontSize: 14, margin: 0 }}>{s.note}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        {/* ---- Support the stream: tips, donations, memberships ---- */}
+        <section className="nn-wrap" style={{ marginBottom: 40 }}>
+          <div className="nn-sec-head">
+            <div>
+              <span className="nn-kicker nn-kicker--gold">
+                <Heart size={14} style={{ verticalAlign: '-2px' }} /> Fuel the broadcast
+              </span>
+              <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4vw, 40px)' }}>
+                Tips &amp; Support
+              </h2>
+              <p style={{ color: 'var(--nn-muted)', maxWidth: 640, margin: '10px 0 0' }}>
+                Every tip goes straight back into the studio — new gear, better mixes, bigger
+                shows. During the Saturday 7 PM ET live, Super Chats and Super Stickers are open
+                right in the YouTube chat.
+              </p>
+            </div>
+          </div>
+          <div className="nn-grid">
+            <article className="nn-card" style={{ padding: 22 }}>
+              <span className="nn-kicker">YouTube</span>
+              <h3 style={{ color: '#fff', margin: '12px 0 6px' }}>Super Chat &amp; Stickers</h3>
+              <p style={{ color: 'var(--nn-muted)', fontSize: 14, margin: '0 0 16px' }}>
+                Drop a paid highlight in the live chat during any broadcast — your message pins
+                to the top of the deck.
+              </p>
+              <a
+                className="nn-btn nn-btn-gold"
+                href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <YoutubeLogo size={18} weight="fill" /> Open the channel
+              </a>
+            </article>
+            <article className="nn-card" style={{ padding: 22 }}>
+              <span className="nn-kicker">Direct</span>
+              <h3 style={{ color: '#fff', margin: '12px 0 6px' }}>Tip the studio</h3>
+              <p style={{ color: 'var(--nn-muted)', fontSize: 14, margin: '0 0 16px' }}>
+                Send a one-time tip anytime — no account needed. 100% goes to 3000 Studios
+                productions.
+              </p>
+              <a className="nn-btn nn-btn-cyan" href={LIVE_STREAM_CONFIG.channelUrl} target="_blank" rel="noreferrer">
+                <Heart size={18} weight="fill" /> Tip via YouTube
+              </a>
+            </article>
+            <article className="nn-card" style={{ padding: 22 }}>
+              <span className="nn-kicker">Ongoing</span>
+              <h3 style={{ color: '#fff', margin: '12px 0 6px' }}>Memberships</h3>
+              <p style={{ color: 'var(--nn-muted)', fontSize: 14, margin: '0 0 16px' }}>
+                Channel memberships unlock badges, emotes, and member-only streams as the
+                community grows.
+              </p>
+              <Link className="nn-btn nn-btn-ghost" to="/vip">
+                <Users size={18} weight="duotone" /> VIP perks
+              </Link>
+            </article>
           </div>
         </section>
 

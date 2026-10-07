@@ -6,35 +6,38 @@ import {
   AppleLogo,
   InstagramLogo,
   TiktokLogo,
+  FacebookLogo,
   PaperPlaneTilt,
 } from '@phosphor-icons/react';
 
+const SHOP_URL = 'https://boughtitonline.com';
+
 const SOCIALS = [
   { label: 'YouTube', href: 'https://www.youtube.com/@3000Studio', icon: <YoutubeLogo size={22} weight="duotone" /> },
-  { label: 'Spotify', href: 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik', icon: <SpotifyLogo size={22} weight="duotone" /> },
-  { label: 'Apple Music', href: 'https://music.apple.com/us/artist/3000-studios/6802721597', icon: <AppleLogo size={22} weight="duotone" /> },
   { label: 'Instagram', href: 'https://www.instagram.com/3000studios.vip', icon: <InstagramLogo size={22} weight="duotone" /> },
   { label: 'TikTok', href: 'https://www.tiktok.com/@3000studios.vip', icon: <TiktokLogo size={22} weight="duotone" /> },
+  { label: 'Facebook', href: 'https://www.facebook.com/3000Studios.vip', icon: <FacebookLogo size={22} weight="duotone" /> },
+  { label: 'Spotify', href: 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik', icon: <SpotifyLogo size={22} weight="duotone" /> },
+  { label: 'Apple Music', href: 'https://music.apple.com/us/artist/3000-studios/6802721597', icon: <AppleLogo size={22} weight="duotone" /> },
 ];
 
 const EXPLORE = [
-  { to: '/#music', label: 'Music catalog' },
-  { to: '/#videos', label: 'Official videos' },
-  { to: '/#live', label: 'Live stage' },
+  { to: '/music', label: 'Music' },
+  { to: '/video', label: 'Videos' },
+  { to: '/#promos', label: 'Music Promo' },
+  { to: '/beats', label: 'Music For Sale' },
   { to: '/podcast', label: 'Podcast' },
-  { to: '/beats', label: 'Beats & instrumentals' },
-  { to: '/shop', label: 'Shop merch' },
-  { to: '/community', label: 'Community' },
-  { to: '/concepts', label: 'Concept board' },
+  { to: '/thunder-dome', label: 'Thunderdome' },
+  { to: '/live', label: 'Live Stream' },
 ];
 
 const STUDIO = [
   { to: '/about', label: 'About the studio' },
-  { to: '/requests', label: 'Request a song' },
-  { to: '/sponsors', label: 'Sponsors' },
   { to: '/blog', label: 'Blog' },
+  { to: '/community', label: 'Community' },
+  { to: '/requests', label: 'Request a song' },
   { to: '/contact', label: 'Contact / booking' },
-  { to: '/go-live', label: 'Go live' },
+  { to: SHOP_URL, label: 'Shop — boughtitonline.com', external: true },
 ];
 
 const LEGAL = [
@@ -109,7 +112,13 @@ export function Footer() {
           <ul>
             {STUDIO.map((l) => (
               <li key={l.label}>
-                <Link to={l.to}>{l.label}</Link>
+                {'external' in l && l.external ? (
+                  <a href={l.to} target="_blank" rel="noreferrer">
+                    {l.label}
+                  </a>
+                ) : (
+                  <Link to={l.to}>{l.label}</Link>
+                )}
               </li>
             ))}
           </ul>

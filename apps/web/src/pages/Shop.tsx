@@ -20,7 +20,7 @@ import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 /* wired, checkout opens the Shopify store where the same catalog     */
 /* is mirrored via the Printify integration.                          */
 /* ------------------------------------------------------------------ */
-const SHOPIFY_STOREFRONT_URL = 'https://ath0bu-tg.myshopify.com';
+const SHOPIFY_STOREFRONT_URL = 'https://boughtitonline.com';
 const SHOPIFY_STORE_NAME = '3000 Studios';
 
 function CartDrawer({

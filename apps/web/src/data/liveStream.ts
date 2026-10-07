@@ -36,6 +36,11 @@ export const LIVE_STREAM_CONFIG: {
   defaultLive: false,
   schedule: [
     {
+      title: 'Saturday Night Listening Party — LIVE',
+      when: 'Saturdays · 7 PM ET',
+      note: 'Weekly live session: new drops, track breakdowns, and Q&A with the studio. Tips and Super Chats open.',
+    },
+    {
       title: 'Studio Session Live',
       when: 'Fridays · 8 PM ET',
       note: 'Beat-making, mix feedback, and track premieres.',

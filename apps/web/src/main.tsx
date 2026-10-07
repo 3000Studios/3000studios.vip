@@ -167,7 +167,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="Podcast"
-            description="The 3000 Studios Podcast — stream every episode with Snore Malone and Snoozy Suzy."
+            description="The 3000 Studios Podcast — stream every episode with Follow and Subscribe."
           >
             <PodcastPage />
           </Titled>

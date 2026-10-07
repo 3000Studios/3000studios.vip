@@ -2,36 +2,86 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  House,
   MusicNote,
-  MusicNotes,
   Microphone,
-  Broadcast,
   ShoppingBag,
+  GameController,
+  Broadcast,
   EnvelopeSimple,
+  CaretDown,
 } from '@phosphor-icons/react';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 
-export type NavItem = { to: string; label: string; icon: React.ReactNode; hash?: string };
+export type NavChild = { to: string; label: string; external?: boolean };
+export type NavItem = {
+  to?: string;
+  label: string;
+  icon: React.ReactNode;
+  external?: boolean;
+  children?: NavChild[];
+};
+
+export const SHOP_URL = 'https://boughtitonline.com';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/', label: 'Home', icon: <House size={20} weight="duotone" /> },
-  { to: '/music', label: 'Music', icon: <MusicNote size={20} weight="duotone" /> },
-  { to: '/podcast', label: 'Podcast', icon: <Microphone size={20} weight="duotone" /> },
-  { to: '/beats', label: 'Beats', icon: <MusicNotes size={20} weight="duotone" /> },
-  { to: '/shop', label: 'Shop', icon: <ShoppingBag size={20} weight="duotone" /> },
-  { to: '/live', label: 'Live', icon: <Broadcast size={20} weight="duotone" /> },
-  { to: '/contact', label: 'Contact', icon: <EnvelopeSimple size={20} weight="duotone" /> },
+  {
+    to: '/music',
+    label: 'Music',
+    icon: <MusicNote size={20} weight="duotone" />,
+    children: [
+      { to: '/video', label: 'Videos' },
+      { to: '/#promos', label: 'Music Promo' },
+      { to: '/beats', label: 'Music For Sale' },
+    ],
+  },
+  {
+    to: '/podcast',
+    label: 'Podcast',
+    icon: <Microphone size={20} weight="duotone" />,
+    children: [
+      { to: '/podcast#episodes', label: 'All Episodes' },
+      { to: '/podcast#episode-1', label: 'Episode One' },
+      { to: '/podcast#episode-2', label: 'Episode Two' },
+    ],
+  },
+  {
+    to: SHOP_URL,
+    label: 'Shop',
+    icon: <ShoppingBag size={20} weight="duotone" />,
+    external: true,
+  },
+  {
+    to: '/thunder-dome',
+    label: 'Thunderdome',
+    icon: <GameController size={20} weight="duotone" />,
+  },
+  {
+    to: '/live',
+    label: 'Live Stream',
+    icon: <Broadcast size={20} weight="duotone" />,
+  },
+  {
+    to: '/contact',
+    label: 'Contact',
+    icon: <EnvelopeSimple size={20} weight="duotone" />,
+  },
 ];
-
-const DESKTOP_ITEMS = NAV_ITEMS;
 
 function isActive(pathname: string, hash: string, to: string) {
   if (to.startsWith('/#')) {
     return pathname === '/' && hash === to.slice(1);
   }
+  if (to.includes('#')) {
+    const [p, h] = to.split('#');
+    return pathname === p && hash === h;
+  }
   return pathname === to || (to !== '/' && pathname.startsWith(`${to}/`));
+}
+
+function itemActive(pathname: string, hash: string, item: NavItem): boolean {
+  if (item.to && !item.external && isActive(pathname, hash, item.to)) return true;
+  return !!item.children?.some((c) => isActive(pathname, hash, c.to));
 }
 
 /** Hamburger button: idle pulse, morphs into an X on tap. */
@@ -55,9 +105,45 @@ function Burger({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   );
 }
 
+function DesktopDrop({ item }: { item: NavItem }) {
+  const location = useLocation();
+  const active = itemActive(location.pathname, location.hash, item);
+  return (
+    <div className={`v2-nav-drop${active ? ' is-active' : ''}`}>
+      <NavLink
+        to={item.to!}
+        className={`v2-nav-link${active ? ' is-active' : ''}`}
+        aria-haspopup="true"
+      >
+        {item.label}
+        <CaretDown size={13} weight="bold" className="v2-drop-caret" aria-hidden="true" />
+      </NavLink>
+      <div className="v2-drop-menu" role="menu">
+        {item.children!.map((c) => (
+          <NavLink
+            key={c.label}
+            to={c.to}
+            role="menuitem"
+            className={({ isActive: rrActive }) =>
+              `v2-drop-link${
+                isActive(location.pathname, location.hash, c.to) || rrActive
+                  ? ' is-active'
+                  : ''
+              }`
+            }
+          >
+            {c.label}
+          </NavLink>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const location = useLocation();
   const reduce = usePrefersReducedMotion();
 
@@ -73,6 +159,7 @@ export function Header() {
     // Navigation-driven, not a render loop: React bails out when already closed.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
+    setExpanded(null);
   }, [location.pathname, location.hash]);
 
   useEffect(() => {
@@ -99,17 +186,33 @@ export function Header() {
           </Link>
 
           <nav className="v2-nav-desktop" aria-label="Primary">
-            {DESKTOP_ITEMS.map((item) => (
-              <NavLink
-                key={item.label}
-                to={item.to}
-                className={({ isActive: rrActive }) =>
-                  `v2-nav-link${isActive(location.pathname, hash, item.to) || rrActive ? ' is-active' : ''}`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {NAV_ITEMS.map((item) =>
+              item.external ? (
+                <a
+                  key={item.label}
+                  href={item.to}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="v2-nav-link"
+                >
+                  {item.label}
+                </a>
+              ) : item.children ? (
+                <DesktopDrop key={item.label} item={item} />
+              ) : (
+                <NavLink
+                  key={item.label}
+                  to={item.to!}
+                  className={({ isActive: rrActive }) =>
+                    `v2-nav-link${
+                      itemActive(location.pathname, hash, item) || rrActive ? ' is-active' : ''
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ),
+            )}
           </nav>
 
           <div className="v2-header-actions">
@@ -153,32 +256,99 @@ export function Header() {
             </motion.button>
             <nav aria-label="Mobile">
               <ul className="v2-menu-list">
-                {NAV_ITEMS.map((item, i) => (
-                  <motion.li
-                    key={item.label}
-                    initial={reduce ? { opacity: 0 } : { opacity: 0, x: -26 }}
-                    animate={reduce ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                    transition={
-                      reduce
-                        ? { duration: 0.12 }
-                        : { delay: 0.05 + i * 0.045, type: 'spring', stiffness: 320, damping: 26 }
-                    }
-                  >
-                    <NavLink
-                      to={item.to}
-                      className={`v2-menu-link${
-                        isActive(location.pathname, hash, item.to) ? ' is-active' : ''
-                      }`}
-                      onClick={() => setOpen(false)}
+                {NAV_ITEMS.map((item, i) => {
+                  const isOpen = expanded === item.label;
+                  const active = itemActive(location.pathname, hash, item);
+                  return (
+                    <motion.li
+                      key={item.label}
+                      initial={reduce ? { opacity: 0 } : { opacity: 0, x: -26 }}
+                      animate={reduce ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                      transition={
+                        reduce
+                          ? { duration: 0.12 }
+                          : { delay: 0.05 + i * 0.045, type: 'spring', stiffness: 320, damping: 26 }
+                      }
                     >
-                      <span className="v2-menu-icon">{item.icon}</span>
-                      <span>{item.label}</span>
-                      <span className="v2-menu-arrow" aria-hidden="true">
-                        →
-                      </span>
-                    </NavLink>
-                  </motion.li>
-                ))}
+                      {item.external ? (
+                        <a
+                          href={item.to}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="v2-menu-link"
+                          onClick={() => setOpen(false)}
+                        >
+                          <span className="v2-menu-icon">{item.icon}</span>
+                          <span>{item.label}</span>
+                          <span className="v2-menu-arrow" aria-hidden="true">
+                            ↗
+                          </span>
+                        </a>
+                      ) : item.children ? (
+                        <>
+                          <div className={`v2-menu-parent${active ? ' is-active' : ''}`}>
+                            <NavLink
+                              to={item.to!}
+                              className="v2-menu-link"
+                              onClick={() => setOpen(false)}
+                            >
+                              <span className="v2-menu-icon">{item.icon}</span>
+                              <span>{item.label}</span>
+                            </NavLink>
+                            <button
+                              type="button"
+                              className={`v2-menu-expand${isOpen ? ' is-open' : ''}`}
+                              aria-expanded={isOpen}
+                              aria-label={`Expand ${item.label} submenu`}
+                              onClick={() => setExpanded(isOpen ? null : item.label)}
+                            >
+                              <CaretDown size={18} weight="bold" aria-hidden="true" />
+                            </button>
+                          </div>
+                          <AnimatePresence initial={false}>
+                            {isOpen && (
+                              <motion.ul
+                                className="v2-menu-sub"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.22 }}
+                              >
+                                {item.children.map((c) => (
+                                  <li key={c.label}>
+                                    <NavLink
+                                      to={c.to}
+                                      className={`v2-menu-sublink${
+                                        isActive(location.pathname, hash, c.to)
+                                          ? ' is-active'
+                                          : ''
+                                      }`}
+                                      onClick={() => setOpen(false)}
+                                    >
+                                      {c.label}
+                                    </NavLink>
+                                  </li>
+                                ))}
+                              </motion.ul>
+                            )}
+                          </AnimatePresence>
+                        </>
+                      ) : (
+                        <NavLink
+                          to={item.to!}
+                          className={`v2-menu-link${active ? ' is-active' : ''}`}
+                          onClick={() => setOpen(false)}
+                        >
+                          <span className="v2-menu-icon">{item.icon}</span>
+                          <span>{item.label}</span>
+                          <span className="v2-menu-arrow" aria-hidden="true">
+                            →
+                          </span>
+                        </NavLink>
+                      )}
+                    </motion.li>
+                  );
+                })}
               </ul>
             </nav>
             <motion.div

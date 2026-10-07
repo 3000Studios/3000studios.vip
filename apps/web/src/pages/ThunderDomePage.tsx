@@ -432,6 +432,50 @@ export function ThunderDomePage() {
         )}
 
         {/* =========================================================================
+            MERCH TEASER: Thunderdome gear
+            ========================================================================= */}
+        <section style={{ maxWidth: 1240, margin: '0 auto 56px', padding: '0 16px' }}>
+          <div
+            className="vip-glass-card"
+            style={{
+              padding: '36px 28px',
+              textAlign: 'center',
+              borderColor: 'rgba(255, 215, 0, 0.35)',
+              background:
+                'linear-gradient(145deg, rgba(20, 16, 6, 0.9), rgba(8, 10, 16, 0.95))',
+            }}
+          >
+            <span className="md-kicker" style={{ color: '#ffd700' }}>
+              🛒 Thunderdome Supply Drop
+            </span>
+            <h2
+              className="vip-gold-text"
+              style={{ fontSize: 'clamp(24px, 4.5vw, 38px)', margin: '10px 0 12px', fontWeight: 800 }}
+            >
+              Wear the Dome
+            </h2>
+            <p style={{ color: 'var(--vip-text-muted)', fontSize: 15, maxWidth: 620, margin: '0 auto 22px', lineHeight: 1.6 }}>
+              Official Thunderdome: AeroStrike merch is loading into the armory — tees, hoodies,
+              and pilot gear forged in the neon-noir foundry. First drops land in the 3000 Studios
+              store.
+            </p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <a
+                className="vip-btn-gold"
+                href="https://boughtitonline.com"
+                target="_blank"
+                rel="noreferrer"
+              >
+                🛒 Shop the Store
+              </a>
+              <Link className="vip-btn-obsidian" to="/live">
+                ▶ Catch the Dev Stream
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
             SECTION 4: GOOGLE ADSENSE PLACEMENT
             ========================================================================= */}
         <section style={{ maxWidth: 1200, margin: '0 auto 48px', padding: '0 16px' }}>
