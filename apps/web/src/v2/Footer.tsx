@@ -37,7 +37,6 @@ const STUDIO = [
 
 const LEGAL = [
   { to: '/privacy', label: 'Privacy' },
-  { to: '/privacy-policy', label: 'Privacy Policy' },
   { to: '/terms', label: 'Terms' },
   { to: '/copyright', label: 'Copyright' },
   { to: '/cookies', label: 'Cookies' },

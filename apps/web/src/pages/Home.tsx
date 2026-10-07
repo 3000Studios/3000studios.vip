@@ -17,7 +17,6 @@ export { BlogPostPage } from './BlogPostPage';
 export { CommunityPage } from './CommunityPage';
 export { ContactPage } from './ContactPage';
 export { LegalPage } from './LegalPage';
-export { PrivacyPolicyPage } from './PrivacyPolicyPage';
 export { RequestsPage } from './RequestsPage';
 export { SponsorsPage } from './SponsorsPage';
 export { VideoPage } from './VideoPage';

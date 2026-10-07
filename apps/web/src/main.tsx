@@ -19,7 +19,6 @@ import {
   CommunityPage,
   ContactPage,
   LegalPage,
-  PrivacyPolicyPage,
   RequestsPage,
   SponsorsPage,
   ThunderDomePage,
@@ -315,17 +314,6 @@ const router = createBrowserRouter([
       { path: '/about', element: <AboutPage /> },
       { path: '/contact', element: <ContactPage /> },
       { path: '/privacy', element: <LegalPage type="privacy" /> },
-      {
-        path: '/privacy-policy',
-        element: (
-          <Titled
-            title="Privacy Policy"
-            description="Privacy Policy for 3000studios.vip — how 3000 Studios collects, uses, and protects your information."
-          >
-            <PrivacyPolicyPage />
-          </Titled>
-        ),
-      },
       { path: '/terms', element: <LegalPage type="terms" /> },
       { path: '/copyright', element: <LegalPage type="copyright" /> },
       { path: '/cookies', element: <LegalPage type="cookies" /> },
