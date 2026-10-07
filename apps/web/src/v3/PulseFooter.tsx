@@ -84,6 +84,8 @@ export function PulseFooter() {
         </Reveal>
         <nav className="v3-foot-links" aria-label="Footer">
           <Link to="/music">Music</Link>
+          <Link to="/podcast">Podcast</Link>
+          <Link to="/beats">Beats</Link>
           <Link to="/about">Studio</Link>
           <Link to="/shop">Shop</Link>
           <Link to="/blog">Blog</Link>

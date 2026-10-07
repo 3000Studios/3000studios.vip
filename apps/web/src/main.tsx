@@ -30,6 +30,8 @@ import {
   VideoPage,
 } from './pages/Home';
 import { LiveBroadcastPage } from './pages/LiveBroadcastPage';
+import { PodcastPage } from './pages/PodcastPage';
+import { BeatsPage } from './pages/BeatsPage';
 import { CommandDeckPage } from './pages/CommandDeckPage';
 import { HomePage } from './v3/HomePage';
 import { BottomDock } from './components/BottomDock';
@@ -156,6 +158,28 @@ const router = createBrowserRouter([
             description="Watch 3000 Studios live — broadcast deck, schedule, and chat."
           >
             <LiveBroadcastPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/podcast',
+        element: (
+          <Titled
+            title="Podcast"
+            description="The 3000 Studios Podcast — stream every episode with Snore Malone and Snoozy Suzy."
+          >
+            <PodcastPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/beats',
+        element: (
+          <Titled
+            title="Beat Packs"
+            description="License 3000 Studios beat packs — instrumentals and bundles with instant delivery."
+          >
+            <BeatsPage />
           </Titled>
         ),
       },

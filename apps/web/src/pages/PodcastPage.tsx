@@ -173,7 +173,8 @@ export function PodcastPage() {
               Fresh <span className="v2-grad-text">off the mic</span>
             </h2>
           </Reveal>
-          <RevealGroup className="v2-grid" style={{ marginTop: 26, gap: 18 }} stagger={0.12}>
+          <div style={{ marginTop: 26, gap: 18 }}>
+          <RevealGroup className="v2-grid" stagger={0.12}>
             {EPISODES.map((ep) => (
               <RevealItem key={ep.n}>
                 <article className="pod-ep">
@@ -222,6 +223,7 @@ export function PodcastPage() {
               </RevealItem>
             ))}
           </RevealGroup>
+          </div>
 
           <Reveal delay={0.1}>
             <div
