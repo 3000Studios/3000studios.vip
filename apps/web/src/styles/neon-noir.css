@@ -180,6 +180,33 @@ body {
   text-align: center;
   padding: 72px 16px 48px;
   position: relative;
+  overflow: hidden;
+}
+
+/* Looping cinematic backdrop for hero sections — content stays above it. */
+.nn-hero-video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.38;
+  pointer-events: none;
+}
+.nn-hero-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 7, 10, 0.66) 0%,
+    rgba(5, 7, 10, 0.5) 45%,
+    var(--nn-bg) 100%
+  );
+}
+.nn-hero > *:not(.nn-hero-video-bg):not(.nn-hero-shade) {
+  position: relative;
+  z-index: 1;
 }
 
 .nn-hero p {
