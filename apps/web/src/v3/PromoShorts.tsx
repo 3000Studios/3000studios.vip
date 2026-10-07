@@ -8,7 +8,7 @@ const shortUrl = (id: string) => `https://www.youtube.com/shorts/${id}`;
 /* Every published promo short — native horizontal snap strip */
 export function PromoShorts() {
   return (
-    <section className="v3-section" style={{ paddingLeft: 0, paddingRight: 0 }}>
+    <section id="promos" className="v3-section" style={{ paddingLeft: 0, paddingRight: 0 }}>
       <div className="v3-wrap" style={{ padding: '0 6vw' }}>
         <Reveal>
           <div className="v3-eyebrow">Promo cuts</div>

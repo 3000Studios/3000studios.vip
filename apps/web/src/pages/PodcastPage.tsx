@@ -13,7 +13,7 @@ const EPISODES = [
     title: 'The Rebuild: New Website, Dollar Unlocks, and Beat Packs',
     duration: '6:38',
     blurb:
-      'Snore Malone and Snoozy Suzy walk through the full 3000studios.vip rebuild, the $1 video unlocks, and the new beat pack drops hitting the store.',
+      'Follow and Subscribe walk through the full 3000studios.vip rebuild, the $1 video unlocks, and the new beat pack drops hitting the store.',
   },
   {
     n: '02',
@@ -103,7 +103,7 @@ export function PodcastPage() {
               <div style={{ marginTop: 22 }}>
                 <span className="pod-host-pill">
                   <Microphone size={16} weight="bold" />
-                  Hosted by Snore Malone &amp; Snoozy Suzy
+                  Hosted by Follow &amp; Subscribe
                 </span>
               </div>
             </Reveal>
@@ -175,9 +175,9 @@ export function PodcastPage() {
           </Reveal>
           <div style={{ marginTop: 26, gap: 18 }}>
           <RevealGroup className="v2-grid" stagger={0.12}>
-            {EPISODES.map((ep) => (
+            {EPISODES.map((ep, i) => (
               <RevealItem key={ep.n}>
-                <article className="pod-ep">
+                <article className="pod-ep" id={`episode-${i + 1}`}>
                   <div className="pod-ep-num">{ep.n}</div>
                   <div>
                     <h3
