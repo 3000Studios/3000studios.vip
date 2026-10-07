@@ -7,7 +7,7 @@ import {
   XLogo,
   EnvelopeSimple,
 } from '@phosphor-icons/react';
-import { PublicLayout } from './Home';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import { publishedSongs } from '../data/publishedSongs';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
 import { THUNDER_BOSSES } from '../data/thunderDome';
@@ -29,7 +29,7 @@ export function AboutPage() {
   ];
 
   return (
-    <PublicLayout variant="electric" compact={false}>
+    <PublicLayoutV2>
       <div className="nn-scope">
         <section className="nn-hero">
           <span className="nn-kicker">The story</span>
@@ -110,6 +110,6 @@ export function AboutPage() {
           <p>© 2026 3000 Studios · All rights reserved</p>
         </footer>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

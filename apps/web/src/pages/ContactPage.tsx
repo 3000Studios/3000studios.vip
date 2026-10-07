@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { EnvelopeSimple } from '@phosphor-icons/react';
-import { PublicLayout } from './Home';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -21,7 +21,7 @@ export function ContactPage() {
   }
 
   return (
-    <PublicLayout variant="pulse" compact={false}>
+    <PublicLayoutV2>
       <div className="nn-scope">
         <section className="nn-hero">
           <span className="nn-kicker">Direct studio line</span>
@@ -100,6 +100,6 @@ export function ContactPage() {
           <p>© 2026 3000 Studios · All rights reserved</p>
         </footer>
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

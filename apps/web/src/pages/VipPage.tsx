@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { MERCH_ITEMS } from '../data/merch';
 import { CASH_APP_URL } from '../lib/liveRoom';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
@@ -9,7 +9,7 @@ const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
 export function VipPage() {
   return (
-    <PublicLayout variant="spiral" compact={false}>
+    <PublicLayoutV2 wallpaper="aurora">
       <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
         
         {/* =========================================================================
@@ -157,6 +157,6 @@ export function VipPage() {
         </section>
 
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

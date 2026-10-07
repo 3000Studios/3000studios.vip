@@ -1,5 +1,5 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { BLOG_ARTICLES } from '../data/blogArticles';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import { usePageMeta } from '../lib/usePageMeta';
@@ -20,7 +20,7 @@ export function BlogPostPage() {
   const related = BLOG_ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 2);
 
   return (
-    <PublicLayout variant="spiral" compact={false}>
+    <PublicLayoutV2 wallpaper="particles">
       <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
         
         {/* =========================================================================
@@ -108,6 +108,6 @@ export function BlogPostPage() {
         </section>
 
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

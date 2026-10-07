@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { THUNDER_BOSSES, THUNDER_SHIPS, THUNDER_WEAPONS } from '../data/thunderDome';
 import { CINEMATIC_CDN } from '../data/videoCatalog';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
@@ -26,7 +26,7 @@ export function ThunderDomePage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'bosses' | 'ships' | 'weapons'>('overview');
 
   return (
-    <PublicLayout variant="spiral" compact={false}>
+    <PublicLayoutV2 wallpaper="aurora">
       <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
         
         {/* =========================================================================
@@ -439,6 +439,6 @@ export function ThunderDomePage() {
         </section>
 
       </div>
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }

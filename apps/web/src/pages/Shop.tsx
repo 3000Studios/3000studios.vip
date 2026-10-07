@@ -9,7 +9,7 @@ import {
   ArrowRight,
   Lock,
 } from '@phosphor-icons/react';
-import { PublicLayout, AdSenseUnit } from './Home';
+import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { MERCH_ITEMS, paypalBuyUrl, type MerchItem } from '../data/merch';
 import { formatMoney, grantPlan, grantTrack } from '../lib/commerce';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
@@ -191,7 +191,7 @@ export function ShopPage() {
   };
 
   return (
-    <PublicLayout variant="spiral" compact={false}>
+    <PublicLayoutV2>
       <div className="nn-scope">
         <section className="nn-hero">
           <span className="nn-kicker nn-kicker--gold">
@@ -332,6 +332,6 @@ export function ShopPage() {
         setQty={setQty}
         clear={() => setCart({})}
       />
-    </PublicLayout>
+    </PublicLayoutV2>
   );
 }
