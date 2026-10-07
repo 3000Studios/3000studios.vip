@@ -95,7 +95,7 @@ export function AdminFab() {
                     autoFocus
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="owner@example.com"
+                    placeholder="Email address"
                   />
                 </label>
                 <label>
