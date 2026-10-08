@@ -41,7 +41,6 @@ const STUDIO = [
 ];
 
 const LEGAL = [
-  { to: '/privacy', label: 'Privacy' },
   { to: '/privacy-policy', label: 'Privacy Policy' },
   { to: '/terms', label: 'Terms' },
   { to: '/copyright', label: 'Copyright' },
@@ -149,7 +148,7 @@ export function Footer() {
       </div>
 
       <div className="v2-wrap v2-footer-bottom">
-        <p>© {new Date().getFullYear()} 3000 Studios · Acworth, Georgia. All rights reserved.</p>
+        <p>© {new Date().getFullYear()}{' '}3000 Studios · Acworth, Georgia. All rights reserved.</p>
         <nav aria-label="Legal">
           {LEGAL.map((l, i) => (
             <span key={l.to}>
