@@ -24,6 +24,14 @@ const content = {
     title: 'Legal Disclaimer',
     text: 'The site provides music, media, entertainment, community, and business information. It is not legal, financial, medical, or professional advice. Sponsorships and offers require separate written approval.',
   },
+  shipping: {
+    title: 'Shipping Policy',
+    text: 'Physical merch (apparel and goods) ships via standard carriers, typically within 2–5 business days of order confirmation. U.S. delivery usually takes 5–10 business days after dispatch. Shipping costs are calculated at checkout in our Shopify store.\n\nDigital products — instrumentals, sound packs, construction kits, and custom beats — are delivered electronically. Download links are sent to the email used at checkout, usually within 24 hours; custom beats are delivered on the timeline agreed during the order.\n\nGift cards and exclusive-rights purchases are fulfilled electronically to the buyer\'s email. If a tracking number or download link has not arrived within the stated window, contact us and we will make it right.',
+  },
+  returns: {
+    title: 'Returns & Refunds',
+    text: 'Physical merch: 30-day returns. Unworn, unwashed apparel in original condition may be returned within 30 days of delivery for a refund to the original payment method. Buyer covers return shipping unless the item arrived damaged or incorrect — in that case we cover it and replace or refund.\n\nDigital products: final sale once delivered. Because instrumentals, packs, and kits are downloadable files, we cannot accept returns after the download link has been sent. If a file is corrupted or the wrong product was delivered, we will replace it or refund — your call.\n\nCustom beats and exclusive rights: final sale once work has begun or the rights transfer is issued. If we have not started, a full refund is available.\n\nTo start a return, contact us with your order number within 30 days of delivery. Refunds are issued to the original payment method within 5–10 business days of approval.',
+  },
 };
 
 export function LegalPage({ type }: { type: keyof typeof content }) {
@@ -54,9 +62,11 @@ export function LegalPage({ type }: { type: keyof typeof content }) {
               className="v2-card"
               style={{ padding: 'clamp(24px, 5vw, 40px)', marginTop: 28 }}
             >
-              <p style={{ color: 'var(--v2-text)', fontSize: 16, lineHeight: 1.7, margin: '0 0 24px' }}>
-                {page.text}
-              </p>
+              {page.text.split('\n\n').map((para, i) => (
+                <p key={i} style={{ color: 'var(--v2-text)', fontSize: 16, lineHeight: 1.7, margin: '0 0 24px' }}>
+                  {para}
+                </p>
+              ))}
               <div style={{ borderTop: '1px solid var(--v2-neon-line)', paddingTop: 20 }}>
                 <p style={{ color: 'var(--v2-muted)', fontSize: 14, margin: 0 }}>
                   Direct questions to:{' '}

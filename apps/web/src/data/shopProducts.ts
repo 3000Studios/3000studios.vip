@@ -1,20 +1,41 @@
 /**
  * Real 3000 Studios storefront catalog, sourced from the live Shopify
  * store (boughtitonline.com). Generated from /tmp/shopify-products.json
- * on 2026-10-08. Every title, price, image, and URL below is real.
+ * on 2026-10-08. Every title, price, image, URL, description, and
+ * variant below is real. Descriptions are the store's own body_html
+ * with HTML stripped.
+ *
+ * MARGIN GATE (Boss Man J standing rule: minimum 5% profit on every
+ * product): each product carries `cost` (null until cost data flows
+ * in from Shopify/Printify) and `meetsMarginRule()` below enforces
+ * price >= cost * 1.05 once costs are known. Products with unknown
+ * cost are flagged "margin unverified" via console warning at build/
+ * dev time — never shown to shoppers.
  */
 
 export type ShopCategory = 'apparel' | 'music' | 'services';
 
+export interface ShopVariant {
+  id: string;    // Shopify variant id, for cart permalinks
+  title: string; // e.g. "$25.00"
+  price: number;
+}
+
 export interface ShopProduct {
-  id: string;           // Shopify product handle
+  id: string;
   title: string;
-  price: number;        // first variant price, USD
+  price: number;
   compareAt: number | null;
-  image: string | null; // first product image, or null
-  productUrl: string;   // boughtitonline.com product page
-  variantId: string;    // first variant id, for cart permalinks
+  image: string | null;
+  productUrl: string;
+  variantId: string; // default (first) variant
   category: ShopCategory;
+  description: string;     // short (~2 sentences) for cards
+  descriptionFull: string; // full store description for quick view
+  variants: ShopVariant[];
+  sku: string | null;
+  vendor: string;
+  cost: number | null; // unit cost when known; null = unverified
 }
 
 export const SHOP_PRODUCTS: ShopProduct[] = [
@@ -27,6 +48,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/3000-studios-gift-card',
     variantId: '67626701029455',
     category: 'services',
+    description: 'Give studio credit. The 3000 Studios Gift Card is redeemable on merch, music, and studio services at boughtitonline.com.',
+    descriptionFull: 'Give studio credit. The 3000 Studios Gift Card is redeemable on merch, music, and studio services at boughtitonline.com.',
+    variants: [{ id: '67626701029455', title: '$25.00', price: 25.0 }, { id: '67626701062223', title: '$50.00', price: 50.0 }, { id: '67626701094991', title: '$100.00', price: 100.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'exclusive-rights-own-it-forever',
@@ -37,6 +64,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/exclusive-rights-own-it-forever',
     variantId: '67626698440783',
     category: 'services',
+    description: 'Take any instrumental in the catalog off the market — forever. Full exclusive ownership: the beat is pulled from the store, you get every file we have, and nobody else can ever license it.',
+    descriptionFull: 'Take any instrumental in the catalog off the market — forever. Full exclusive ownership: the beat is pulled from the store, you get every file we have, and nobody else can ever license it. Includes: MP3 + WAV files, exclusive ownership agreement, beat removed from sale. How it works: 1) Purchase. 2) Tell us which beat you want via email. 3) We send your files and ownership agreement, and the beat comes down. One buyer. One owner. You.',
+    variants: [{ id: '67626698440783', title: 'Default Title', price: 499.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'custom-beat-made-for-you',
@@ -47,6 +80,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/custom-beat-made-for-you',
     variantId: '67626693984335',
     category: 'services',
+    description: 'A beat built from scratch around YOUR vision. Tell us the vibe, tempo, and references — we produce an original instrumental made only for you.',
+    descriptionFull: 'A beat built from scratch around YOUR vision. Tell us the vibe, tempo, and references — we produce an original instrumental made only for you. Includes: 1 custom instrumental (MP3 320kbps + WAV), 2 rounds of revisions, full single-artist license to monetize your release. How it works: 1) Purchase this service. 2) We email you within 24 hours to discuss your vision. 3) Your custom beat delivered within 7 days. Serious inquiries only — let\'s make your record.',
+    variants: [{ id: '67626693984335', title: 'Default Title', price: 299.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: '3000-studios-construction-kit',
@@ -57,6 +96,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/3000-studios-construction-kit',
     variantId: '67626580738127',
     category: 'services',
+    description: 'The full 3000 Studios construction kit — 16 loops spanning drums, melodies, and 808s, designed to work together. Build complete beats in minutes.',
+    descriptionFull: 'The full 3000 Studios construction kit — 16 loops spanning drums, melodies, and 808s, designed to work together. Build complete beats in minutes. Includes: WAV (44.1kHz/16-bit) + MP3 (320kbps) of every loop. Instant download. Royalty-free: use in commercial releases, keep 100% of your royalties.',
+    variants: [{ id: '67626580738127', title: 'Default Title', price: 29.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'bass-weight-808s',
@@ -67,6 +112,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/bass-weight-808s',
     variantId: '67626563633231',
     category: 'music',
+    description: '16 earth-shaking 808 and bass loops. Deep, distorted, trunk-ready low end engineered to move air.',
+    descriptionFull: '16 earth-shaking 808 and bass loops. Deep, distorted, trunk-ready low end engineered to move air. Includes: WAV (44.1kHz/16-bit) + MP3 (320kbps) of every loop. Instant download. Royalty-free: use in commercial releases, keep 100% of your royalties.',
+    variants: [{ id: '67626563633231', title: 'Default Title', price: 19.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'after-hours-melodies',
@@ -77,6 +128,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/after-hours-melodies',
     variantId: '67626546102351',
     category: 'music',
+    description: '16 royalty-free melody loops — moody keys, dark pads, late-night textures. The starting point for your next record.',
+    descriptionFull: '16 royalty-free melody loops — moody keys, dark pads, late-night textures. The starting point for your next record. Includes: WAV (44.1kHz/16-bit) + MP3 (320kbps) of every loop. Instant download. Royalty-free: use in commercial releases, keep 100% of your royalties.',
+    variants: [{ id: '67626546102351', title: 'Default Title', price: 19.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'neon-noir-drum-loops',
@@ -87,6 +144,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/neon-noir-drum-loops',
     variantId: '67626524278863',
     category: 'music',
+    description: '16 royalty-free drum loops from the 3000 Studios vault. Punchy kicks, snapping snares, rolling hats — ready to drop into any beat.',
+    descriptionFull: '16 royalty-free drum loops from the 3000 Studios vault. Punchy kicks, snapping snares, rolling hats — ready to drop into any beat. Includes: WAV (44.1kHz/16-bit) + MP3 (320kbps) of every loop. Instant download. Royalty-free: use in commercial releases, keep 100% of your royalties.',
+    variants: [{ id: '67626524278863', title: 'Default Title', price: 19.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'cinematic-pack',
@@ -97,6 +160,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/cinematic-pack',
     variantId: '67626496327759',
     category: 'music',
+    description: 'Five beats that play like scenes from a film. Tension, atmosphere, big emotional swings — for storytellers and vocalists.',
+    descriptionFull: 'Five beats that play like scenes from a film. Tension, atmosphere, big emotional swings — for storytellers and vocalists. Tracks: Motel Television, Room Goes Cold, Am I, Entertain Us, Not Giving Up Tonight. Includes: 5 MP3s (320kbps), instant download, no tags, full single-beat license on every track.',
+    variants: [{ id: '67626496327759', title: 'Default Title', price: 19.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'bass-heavy-pack',
@@ -107,6 +176,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/bass-heavy-pack',
     variantId: '67626469326927',
     category: 'music',
+    description: 'Five beats engineered to move air. All low-end pressure — trunk-rattling, chest-caving, system-testing bass.',
+    descriptionFull: 'Five beats engineered to move air. All low-end pressure — trunk-rattling, chest-caving, system-testing bass. Tracks: More Mass, Burn Up the Bass, Midnight Haunt Drum and Bass, Die in a Fire, Amazon. Includes: 5 MP3s (320kbps), instant download, no tags, full single-beat license on every track.',
+    variants: [{ id: '67626469326927', title: 'Default Title', price: 19.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'late-night-drive-pack',
@@ -117,6 +192,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/late-night-drive-pack',
     variantId: '67626449305679',
     category: 'music',
+    description: 'Five records built for the empty highway. Windows down, dashboard glowing — the soundtrack to 2AM going exactly right.',
+    descriptionFull: 'Five records built for the empty highway. Windows down, dashboard glowing — the soundtrack to 2AM going exactly right. Smooth, moody, cinematic. Tracks: Keep Ridin, After Hours Heaven, Motel Television, Midnight Haunt, Room Goes Cold. Includes: 5 MP3s (320kbps), instant download, no tags, full single-beat license on every track.',
+    variants: [{ id: '67626449305679', title: 'Default Title', price: 19.0 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: '3000-studios-complete-instrumental-bundle-16-tracks',
@@ -127,6 +208,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/3000-studios-complete-instrumental-bundle-16-tracks',
     variantId: '67623419117647',
     category: 'music',
+    description: 'All 16 official 3000 Studios instrumentals in one pack — every backing track from the catalog, vocals removed from the finished masters, 320kbps MP3. Save ~56% vs buying singles.',
+    descriptionFull: 'All 16 official 3000 Studios instrumentals in one pack — every backing track from the catalog, vocals removed from the finished masters, 320kbps MP3. Save ~56% vs buying singles. Instant download. Basic lease: use in your own non-commercial and monetized content with credit "Instrumental by 3000 Studios". Contact 3000studios.vip for exclusive rights.',
+    variants: [{ id: '67623419117647', title: 'Default Title', price: 49.0 }],
+    sku: 'BEAT-BUNDLE-16',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'room-goes-cold-instrumental',
@@ -137,6 +224,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/room-goes-cold-instrumental',
     variantId: '67623418527823',
     category: 'music',
+    description: 'Room Goes Cold (Instrumental) The temperature drops the second this one hits. Icy keys over a heavyweight low end — built for records that walk into the room and take it over.',
+    descriptionFull: 'Room Goes Cold (Instrumental) The temperature drops the second this one hits. Icy keys over a heavyweight low end — built for records that walk into the room and take it over. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623418527823', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-room_goes_cold',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'not-giving-up-tonight-instrumental',
@@ -147,6 +240,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/not-giving-up-tonight-instrumental',
     variantId: '67623418495055',
     category: 'music',
+    description: 'Not Giving Up Tonight (Instrumental) An anthem for the ones still standing at 3AM. Big drums, bigger energy — this is the sound of refusing to lose.',
+    descriptionFull: 'Not Giving Up Tonight (Instrumental) An anthem for the ones still standing at 3AM. Big drums, bigger energy — this is the sound of refusing to lose. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623418495055', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-not_giving_up_tonight',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'motel-television-instrumental',
@@ -157,6 +256,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/motel-television-instrumental',
     variantId: '67623417872463',
     category: 'music',
+    description: 'Motel Television (Instrumental) Gritty, noir, and buzzing with late-night static. A slow-burn backdrop for stories told in neon and bad decisions.',
+    descriptionFull: 'Motel Television (Instrumental) Gritty, noir, and buzzing with late-night static. A slow-burn backdrop for stories told in neon and bad decisions. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623417872463', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-motel_television',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'more-mass-instrumental',
@@ -167,6 +272,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/more-mass-instrumental',
     variantId: '67623417249871',
     category: 'music',
+    description: 'More Mass (Instrumental) Pure weight. The kind of low end that rearranges furniture — engineered to hit stupid hard on any system, from earbuds to the trunk.',
+    descriptionFull: 'More Mass (Instrumental) Pure weight. The kind of low end that rearranges furniture — engineered to hit stupid hard on any system, from earbuds to the trunk. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623417249871', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-more_mass',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'midnight-haunt-drum-and-bass-instrumental',
@@ -177,6 +288,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/midnight-haunt-drum-and-bass-instrumental',
     variantId: '67623416660047',
     category: 'music',
+    description: 'Midnight Haunt Drum and Bass (Instrumental) 174 BPM of controlled chaos. Dark, driving DnB that doesn\'t let up — built for the dancefloor at its most unhinged.',
+    descriptionFull: 'Midnight Haunt Drum and Bass (Instrumental) 174 BPM of controlled chaos. Dark, driving DnB that doesn\'t let up — built for the dancefloor at its most unhinged. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623416660047', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-midnight_haunt_dnb',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'midnight-haunt-instrumental',
@@ -187,6 +304,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/midnight-haunt-instrumental',
     variantId: '67623416070223',
     category: 'music',
+    description: 'Midnight Haunt (Instrumental) Something\'s moving in the dark on this one. Eerie melodies over knocking drums — cinematic tension you can rap or sing over.',
+    descriptionFull: 'Midnight Haunt (Instrumental) Something\'s moving in the dark on this one. Eerie melodies over knocking drums — cinematic tension you can rap or sing over. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623416070223', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-midnight_haunt',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'keep-ridin-instrumental',
@@ -197,6 +320,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/keep-ridin-instrumental',
     variantId: '67623415480399',
     category: 'music',
+    description: 'Keep Ridin (Instrumental) Windows down, system up. Smooth, confident, and built for motion — the definitive cruise record.',
+    descriptionFull: 'Keep Ridin (Instrumental) Windows down, system up. Smooth, confident, and built for motion — the definitive cruise record. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623415480399', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-keep_ridin',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'if-you-dont-play-instrumental',
@@ -207,6 +336,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/if-you-dont-play-instrumental',
     variantId: '67623415382095',
     category: 'music',
+    description: 'If You Don\'t Play (Instrumental) A warning shot. Bold brass stabs and drums that dare somebody to step up — made for competitive records and loud statements.',
+    descriptionFull: 'If You Don\'t Play (Instrumental) A warning shot. Bold brass stabs and drums that dare somebody to step up — made for competitive records and loud statements. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623415382095', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-if_you_dont_play',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'entertain-us-instrumental',
@@ -217,6 +352,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/entertain-us-instrumental',
     variantId: '67623414759503',
     category: 'music',
+    description: 'Entertain Us (Instrumental) The crowd\'s already on their feet. High-voltage hype energy with a drop that does exactly what the title says.',
+    descriptionFull: 'Entertain Us (Instrumental) The crowd\'s already on their feet. High-voltage hype energy with a drop that does exactly what the title says. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623414759503', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-entertain_us',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'dont-tell-me-what-that-is-instrumental',
@@ -227,6 +368,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/dont-tell-me-what-that-is-instrumental',
     variantId: '67623414169679',
     category: 'music',
+    description: 'Don\'t Tell Me What That Is (Instrumental) Defiant from the first bar. Left-field and unbothered — for artists who never asked for permission anyway.',
+    descriptionFull: 'Don\'t Tell Me What That Is (Instrumental) Defiant from the first bar. Left-field and unbothered — for artists who never asked for permission anyway. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623414169679', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-dont_tell_me_what_that_is',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'die-in-a-fire-instrumental',
@@ -237,6 +384,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/die-in-a-fire-instrumental',
     variantId: '67623414136911',
     category: 'music',
+    description: 'Die in a Fire (Instrumental) Aggressive, raw, and completely unfiltered. This one doesn\'t do subtle — it\'s scorched-earth energy for your hardest record.',
+    descriptionFull: 'Die in a Fire (Instrumental) Aggressive, raw, and completely unfiltered. This one doesn\'t do subtle — it\'s scorched-earth energy for your hardest record. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623414136911', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-die_in_a_fire',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'crabs-n-aidas-instrumental',
@@ -247,6 +400,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/crabs-n-aidas-instrumental',
     variantId: '67623413547087',
     category: 'music',
+    description: 'Crabs N Aidas (Instrumental) Bouncy, left-field, and funny in the way only real swagger is. A curveball beat for artists with actual personality.',
+    descriptionFull: 'Crabs N Aidas (Instrumental) Bouncy, left-field, and funny in the way only real swagger is. A curveball beat for artists with actual personality. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623413547087', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-crabs_n_aidas',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'burn-up-the-bass-instrumental',
@@ -257,6 +416,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/burn-up-the-bass-instrumental',
     variantId: '67623413514319',
     category: 'music',
+    description: 'Burn Up the Bass (Instrumental) A club weapon, plain and simple. Relentless bassline pressure designed to set the room on fire — DJ-tested energy.',
+    descriptionFull: 'Burn Up the Bass (Instrumental) A club weapon, plain and simple. Relentless bassline pressure designed to set the room on fire — DJ-tested energy. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623413514319', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-burn_up_the_bass',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'amazon-instrumental',
@@ -267,6 +432,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/amazon-instrumental',
     variantId: '67623413481551',
     category: 'music',
+    description: 'Amazon (Instrumental) Wild and untamed. Exotic percussion and jungle-sized drums — an expedition in beat form.',
+    descriptionFull: 'Amazon (Instrumental) Wild and untamed. Exotic percussion and jungle-sized drums — an expedition in beat form. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623413481551', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-amazon',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'am-i-instrumental',
@@ -277,6 +448,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/am-i-instrumental',
     variantId: '67623412891727',
     category: 'music',
+    description: 'Am I (Instrumental) The late-night question nobody answers. Moody, introspective, and honest — space to say what you actually mean.',
+    descriptionFull: 'Am I (Instrumental) The late-night question nobody answers. Moody, introspective, and honest — space to say what you actually mean. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623412891727', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-am_i',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: 'after-hours-heaven-instrumental',
@@ -287,6 +464,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/after-hours-heaven-instrumental',
     variantId: '67623412793423',
     category: 'music',
+    description: 'After Hours Heaven (Instrumental) When the night finally gets good. Smooth, euphoric, and glowing — the sound of 2AM going exactly right.',
+    descriptionFull: 'After Hours Heaven (Instrumental) When the night finally gets good. Smooth, euphoric, and glowing — the sound of 2AM going exactly right. What\'s included: - High-quality MP3 (320kbps) — instant download after checkout - Full instrumental, no tags, no watermarks - Yours to keep forever License summary: Use it in your songs, videos, podcasts, and streams. Monetize your release. One rule: don\'t resell or redistribute the raw beat as-is. Full terms at checkout. Made by 3000 Studios. Real production, no filler.',
+    variants: [{ id: '67623412793423', title: 'Default Title', price: 7.0 }],
+    sku: 'BEAT-after_hours_heaven',
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: '3000-studios-waveform-tee',
@@ -297,6 +480,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/3000-studios-waveform-tee',
     variantId: '67619919757391',
     category: 'apparel',
+    description: 'Official 3000 Studios Waveform Tee — studio merch from the official store. See the product page for sizing and details.',
+    descriptionFull: 'Official 3000 Studios Waveform Tee — studio merch from the official store. See the product page for sizing and details.',
+    variants: [{ id: '67619919757391', title: 'Default Title', price: 29.99 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: '3000-studios-gold-crest-tee',
@@ -307,6 +496,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/3000-studios-gold-crest-tee',
     variantId: '67619912843343',
     category: 'apparel',
+    description: 'Official 3000 Studios Gold Crest Tee — studio merch from the official store. See the product page for sizing and details.',
+    descriptionFull: 'Official 3000 Studios Gold Crest Tee — studio merch from the official store. See the product page for sizing and details.',
+    variants: [{ id: '67619912843343', title: 'Default Title', price: 29.99 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: '3000-studios-neon-noir-hoodie',
@@ -317,6 +512,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/3000-studios-neon-noir-hoodie',
     variantId: '67619908780111',
     category: 'apparel',
+    description: 'Official 3000 Studios Neon Noir Hoodie — studio merch from the official store. See the product page for sizing and details.',
+    descriptionFull: 'Official 3000 Studios Neon Noir Hoodie — studio merch from the official store. See the product page for sizing and details.',
+    variants: [{ id: '67619908780111', title: 'Default Title', price: 59.99 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
   {
     id: '3000-studios-chrome-logo-tee',
@@ -327,18 +528,50 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     productUrl: 'https://boughtitonline.com/products/3000-studios-chrome-logo-tee',
     variantId: '67619903471695',
     category: 'apparel',
+    description: 'Official 3000 Studios Chrome Logo Tee — studio merch from the official store. See the product page for sizing and details.',
+    descriptionFull: 'Official 3000 Studios Chrome Logo Tee — studio merch from the official store. See the product page for sizing and details.',
+    variants: [{ id: '67619903471695', title: 'Default Title', price: 29.99 }],
+    sku: null,
+    vendor: '3000 Studios',
+    cost: null,
   },
 ];
 
 export const SHOP_STORE_URL = 'https://boughtitonline.com';
 
-/** Real Shopify cart permalink: /cart/{variantId}:{qty},... */
+/** Boss Man J standing rule: every product must clear a minimum 5%
+ *  profit margin — price >= cost * 1.05. Costs live in Shopify /
+ *  Printify, not in the storefront JSON, so `cost` starts null and
+ *  these products are "margin unverified" until cost data flows in.
+ *  Never surface margin state to shoppers. */
+export function meetsMarginRule(p: ShopProduct): boolean {
+  if (p.cost == null) return true; // unverifiable — flagged below, not blocked
+  return p.price >= p.cost * 1.05;
+}
+
+export function marginStatus(p: ShopProduct): 'ok' | 'unverified' | 'below-minimum' {
+  if (p.cost == null) return 'unverified';
+  return p.price >= p.cost * 1.05 ? 'ok' : 'below-minimum';
+}
+
+// Build/dev-time audit: flag every product whose margin cannot yet be
+// verified. Runs once on module load in non-production; silent for shoppers.
+if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+  for (const p of SHOP_PRODUCTS) {
+    const s = marginStatus(p);
+    if (s === 'unverified') console.warn(`[margin] unverified: ${p.id} — cost unknown, 5% rule cannot be checked yet`);
+    else if (s === 'below-minimum') console.warn(`[margin] BELOW MINIMUM: ${p.id} — price $${p.price} < cost*1.05`);
+  }
+}
+
+/** Cart permalink keyed by variant id -> qty. */
 export function cartPermalink(cart: Record<string, number>): string {
   const parts = Object.entries(cart)
-    .map(([id, qty]) => {
-      const p = SHOP_PRODUCTS.find((x) => x.id === id);
-      return p && qty > 0 ? `${p.variantId}:${qty}` : null;
-    })
-    .filter(Boolean);
+    .filter(([, q]) => q > 0)
+    .map(([variantId, q]) => `${variantId}:${q}`);
   return `${SHOP_STORE_URL}/cart/${parts.join(',')}`;
+}
+
+export function productByVariant(variantId: string): ShopProduct | undefined {
+  return SHOP_PRODUCTS.find((p) => p.variants.some((v) => v.id === variantId));
 }

@@ -354,6 +354,8 @@ const router = createBrowserRouter([
       { path: '/copyright', element: <LegalPage type="copyright" /> },
       { path: '/cookies', element: <LegalPage type="cookies" /> },
       { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
+      { path: '/shipping', element: <LegalPage type="shipping" /> },
+      { path: '/returns', element: <LegalPage type="returns" /> },
       { path: '*', element: <NotFoundPage /> },
       {
         path: '/admin',

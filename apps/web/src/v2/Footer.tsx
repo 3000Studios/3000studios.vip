@@ -46,6 +46,8 @@ const LEGAL = [
   { to: '/copyright', label: 'Copyright' },
   { to: '/cookies', label: 'Cookies' },
   { to: '/disclaimer', label: 'Disclaimer' },
+  { to: '/shipping', label: 'Shipping' },
+  { to: '/returns', label: 'Returns' },
 ];
 
 export function Footer() {
