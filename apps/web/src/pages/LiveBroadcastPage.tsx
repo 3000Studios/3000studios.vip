@@ -214,7 +214,7 @@ export function LiveBroadcastPage() {
           </div>
         </section>
 
-        {LIVE_STREAM_CONFIG.chatEmbedUrl && !useWhepPlayer && (
+        {LIVE_STREAM_CONFIG.chatEmbedUrl && !useWhepPlayer && isLive && (
           <section className="nn-wrap" style={{ marginBottom: 40 }}>
             <div className="nn-sec-head">
               <div>

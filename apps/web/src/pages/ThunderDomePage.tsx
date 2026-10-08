@@ -60,15 +60,13 @@ export function ThunderDomePage() {
             >
               ▶ Inspect 24 Bosses
             </a>
-            <a
+            <span
               className="vip-btn-gold"
-              href="https://play.google.com/store/search?q=Thunderdome%20AeroStrike&c=apps"
-              target="_blank"
-              rel="noreferrer"
-              title="Thunderdome: AeroStrike on Google Play (internal test in progress)"
+              title="Thunderdome: AeroStrike is in development — Google Play release coming soon"
+              style={{ opacity: 0.85, cursor: 'default' }}
             >
-              ▣ Get it on Google Play
-            </a>
+              ▣ Coming soon to Google Play
+            </span>
             <a className="vip-btn-obsidian" href="#dome-trailer">
               🎬 Watch Trailer
             </a>
