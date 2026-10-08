@@ -5,24 +5,35 @@ import {
   Plus,
   Minus,
   X,
-  Tag,
   ArrowRight,
   Lock,
+  Storefront,
+  Tag,
 } from '@phosphor-icons/react';
 import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
-import { MERCH_ITEMS, paypalBuyUrl, type MerchItem } from '../data/merch';
-import { formatMoney, grantPlan, grantTrack } from '../lib/commerce';
+import {
+  SHOP_PRODUCTS,
+  SHOP_STORE_URL,
+  cartPermalink,
+  type ShopProduct,
+  type ShopCategory,
+} from '../data/shopProducts';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 
-/* ------------------------------------------------------------------ */
-/* Shopify handoff. Cart checkout deep-links to the 3000 Studios       */
-/* Shopify storefront. Until the Storefront API cart-permalink is      */
-/* wired, checkout opens the Shopify store where the same catalog     */
-/* is mirrored via the Printify integration.                          */
-/* ------------------------------------------------------------------ */
-const SHOPIFY_STOREFRONT_URL = 'https://boughtitonline.com';
-const SHOPIFY_STORE_NAME = '3000 Studios';
+const money = (n: number) => `$${n.toFixed(2)}`;
 
+const CATEGORY_LABEL: Record<ShopCategory, string> = {
+  apparel: 'Apparel',
+  music: 'Music',
+  services: 'Services',
+};
+
+const CATEGORIES: Array<'all' | ShopCategory> = ['all', 'apparel', 'music', 'services'];
+
+/* ------------------------------------------------------------------ */
+/* Real Shopify cart. Checkout builds a cart permalink on               */
+/* boughtitonline.com and opens it in a new tab.                       */
+/* ------------------------------------------------------------------ */
 function CartDrawer({
   open,
   onClose,
@@ -36,30 +47,18 @@ function CartDrawer({
   setQty: (id: string, qty: number) => void;
   clear: () => void;
 }) {
-  const [promo, setPromo] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
-
   const lines = useMemo(
     () =>
       Object.entries(cart)
-        .map(([id, qty]) => ({ item: MERCH_ITEMS.find((m) => m.id === id)!, qty }))
+        .map(([id, qty]) => ({ item: SHOP_PRODUCTS.find((p) => p.id === id)!, qty }))
         .filter((l) => l.item && l.qty > 0),
     [cart],
   );
 
-  const subtotal = lines.reduce((s, l) => s + l.item.priceCents * l.qty, 0);
-  const discount = promoApplied ? Math.round(subtotal * 0.1) : 0;
-  const total = subtotal - discount;
-
-  const applyPromo = () => {
-    if (promo.trim().toUpperCase() === 'WELCOME10') setPromoApplied(true);
-  };
+  const subtotal = lines.reduce((s, l) => s + l.item.price * l.qty, 0);
 
   const checkoutShopify = () => {
-    const names = lines.map((l) => `${l.qty}x ${l.item.title}`).join(', ');
-    const url = new URL(SHOPIFY_STOREFRONT_URL);
-    url.searchParams.set('note', `3000studios.vip cart: ${names}`);
-    window.open(url.toString(), '_blank', 'noreferrer');
+    window.open(cartPermalink(cart), '_blank', 'noreferrer');
   };
 
   return (
@@ -85,16 +84,38 @@ function CartDrawer({
         <div className="nn-cart-items">
           {lines.length === 0 && (
             <p style={{ color: 'var(--nn-muted)' }}>
-              Your cart is empty. Add some merch from the grid.
+              Your cart is empty. Add something from the grid.
             </p>
           )}
           {lines.map(({ item, qty }) => (
             <div key={item.id} className="nn-cart-item">
-              <img src={item.image} alt="" loading="lazy" />
+              {item.image ? (
+                <img src={item.image} alt="" loading="lazy" />
+              ) : (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    width: 56,
+                    height: 56,
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 24,
+                    fontWeight: 900,
+                    color: '#fff',
+                    background: 'linear-gradient(135deg, #0a0f1e 0%, #1a2340 50%, #0d1b2a 100%)',
+                    border: '1px solid rgba(255,215,0,0.25)',
+                    borderRadius: 8,
+                  }}
+                >
+                  {item.title.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div style={{ flex: 1 }}>
                 <strong style={{ fontSize: 14 }}>{item.title}</strong>
                 <div style={{ color: 'var(--nn-gold)', fontWeight: 800, fontSize: 14 }}>
-                  {formatMoney(item.priceCents)}
+                  {money(item.price)}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -121,38 +142,16 @@ function CartDrawer({
         </div>
         {lines.length > 0 && (
           <div className="nn-cart-foot">
-            <div className="nn-promo-row">
-              <input
-                className="nn-input"
-                placeholder="Promo code (try WELCOME10)"
-                value={promo}
-                onChange={(e) => setPromo(e.target.value)}
-                disabled={promoApplied}
-              />
-              <button type="button" className="nn-btn nn-btn-ghost" onClick={applyPromo} disabled={promoApplied} style={{ padding: '11px 16px' }}>
-                <Tag size={16} /> {promoApplied ? 'Applied' : 'Apply'}
-              </button>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--nn-muted)', marginBottom: 6 }}>
-              <span>Subtotal</span>
-              <span>{formatMoney(subtotal)}</span>
-            </div>
-            {promoApplied && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--nn-gold)', marginBottom: 6 }}>
-                <span>WELCOME10 (−10%)</span>
-                <span>−{formatMoney(discount)}</span>
-              </div>
-            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900, margin: '8px 0 14px' }}>
-              <span>Total</span>
-              <span style={{ color: 'var(--nn-gold)' }}>{formatMoney(total)}</span>
+              <span>Subtotal</span>
+              <span style={{ color: 'var(--nn-gold)' }}>{money(subtotal)}</span>
             </div>
             <button type="button" className="nn-btn nn-btn-gold" onClick={checkoutShopify} style={{ width: '100%' }}>
-              Checkout at {SHOPIFY_STORE_NAME} <ArrowRight size={16} />
+              Checkout at 3000 Studios <ArrowRight size={16} />
             </button>
             <p style={{ color: 'var(--nn-muted)', fontSize: 12, margin: '10px 0 0', textAlign: 'center' }}>
               <Lock size={12} style={{ verticalAlign: '-1px' }} /> Secure checkout opens at our
-              Shopify store. Full Storefront API cart sync coming soon.
+              Shopify store with your cart pre-loaded.
             </p>
             <button
               type="button"
@@ -169,9 +168,50 @@ function CartDrawer({
   );
 }
 
+function ProductImage({ item }: { item: ShopProduct }) {
+  if (item.image) {
+    return (
+      <div style={{ aspectRatio: '1/1', overflow: 'hidden', background: '#000' }}>
+        <img
+          src={item.image}
+          alt={item.title}
+          loading="lazy"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      </div>
+    );
+  }
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        aspectRatio: '1/1',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0a0f1e 0%, #1a2340 55%, #0d1b2a 100%)',
+        borderBottom: '1px solid rgba(255,215,0,0.2)',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 84,
+          fontWeight: 900,
+          color: 'rgba(255,215,0,0.85)',
+          textShadow: '0 0 32px rgba(255,215,0,0.35)',
+          lineHeight: 1,
+        }}
+      >
+        {item.title.charAt(0).toUpperCase()}
+      </span>
+    </div>
+  );
+}
+
 export function ShopPage() {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [filter, setFilter] = useState<'all' | ShopCategory>('all');
 
   const setQty = (id: string, qty: number) =>
     setCart((c) => {
@@ -182,10 +222,13 @@ export function ShopPage() {
     });
 
   const cartCount = Object.values(cart).reduce((s, q) => s + q, 0);
-  const merch = MERCH_ITEMS.filter((m) => m.kind === 'merch');
-  const digital = MERCH_ITEMS.filter((m) => m.kind !== 'merch');
 
-  const addToCart = (item: MerchItem) => {
+  const visible = useMemo(
+    () => (filter === 'all' ? SHOP_PRODUCTS : SHOP_PRODUCTS.filter((p) => p.category === filter)),
+    [filter],
+  );
+
+  const addToCart = (item: ShopProduct) => {
     setQty(item.id, (cart[item.id] || 0) + 1);
     setDrawerOpen(true);
   };
@@ -195,107 +238,95 @@ export function ShopPage() {
       <div className="nn-scope">
         <section className="nn-hero">
           <span className="nn-kicker nn-kicker--gold">
-            <Tag size={14} style={{ verticalAlign: '-2px' }} /> WELCOME10 — 10% off your first order
+            <Storefront size={14} style={{ verticalAlign: '-2px' }} /> Official store · powered by Shopify
           </span>
           <h1 className="nn-chrome" style={{ fontSize: 'clamp(38px, 8vw, 84px)', marginTop: 18 }}>
             SUPPLY DEPOT
           </h1>
           <p>
-            Official 3000 Studios merch, music ownership, and VIP passes. Merch
-            checks out through our Shopify store; music and VIP stay on instant
-            checkout below.
+            Official 3000 Studios merch, instrumentals, sound packs, and studio
+            services — live from our Shopify store. Add to cart here and check
+            out there, or visit the full store.
           </p>
+          <a
+            className="nn-btn nn-btn-ghost"
+            href={SHOP_STORE_URL}
+            target="_blank"
+            rel="noreferrer"
+            style={{ marginTop: 14, display: 'inline-flex' }}
+          >
+            Visit full store <ArrowRight size={16} />
+          </a>
         </section>
 
         <section className="nn-wrap" style={{ marginBottom: 56 }}>
           <div className="nn-sec-head">
             <div>
-              <span className="nn-kicker">Merch drops</span>
+              <span className="nn-kicker">The catalog</span>
               <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4vw, 38px)' }}>
-                Wear the Studio
+                Shop 3000 Studios
               </h2>
-              <p>Limited runs. When it sells out, it is gone.</p>
+              <p>{SHOP_PRODUCTS.length} products · real stock from boughtitonline.com</p>
             </div>
           </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 24 }}>
+            {CATEGORIES.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className="nn-chip"
+                onClick={() => setFilter(c)}
+                aria-pressed={filter === c}
+                style={{
+                  padding: '10px 18px',
+                  fontWeight: 800,
+                  ...(filter === c
+                    ? { background: 'var(--nn-gold)', color: '#05060a', borderColor: 'var(--nn-gold)' }
+                    : {}),
+                }}
+              >
+                <Tag size={14} style={{ verticalAlign: '-2px', marginRight: 6 }} />
+                {c === 'all' ? 'All' : CATEGORY_LABEL[c]}
+              </button>
+            ))}
+          </div>
           <div className="nn-grid">
-            {merch.map((item) => (
+            {visible.map((item) => (
               <article key={item.id} className="nn-card">
-                <div style={{ aspectRatio: '1/1', overflow: 'hidden', background: '#000' }}>
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    loading="lazy"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
+                <ProductImage item={item} />
                 <div style={{ padding: 18 }}>
-                  <h3 style={{ color: '#fff', margin: '0 0 4px', fontSize: 17 }}>{item.title}</h3>
-                  <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: '0 0 10px' }}>
-                    {item.blurb}
-                  </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="nn-kicker" style={{ fontSize: 10 }}>
+                    {CATEGORY_LABEL[item.category]}
+                  </span>
+                  <h3 style={{ color: '#fff', margin: '8px 0 4px', fontSize: 17 }}>{item.title}</h3>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, margin: '0 0 12px' }}>
                     <strong style={{ color: 'var(--nn-gold)', fontSize: 20 }}>
-                      {formatMoney(item.priceCents)}
+                      {money(item.price)}
                     </strong>
+                    {item.compareAt != null && item.compareAt > item.price && (
+                      <s style={{ color: 'var(--nn-muted)', fontSize: 14 }}>{money(item.compareAt)}</s>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
                     <button
                       type="button"
                       className="nn-btn nn-btn-cyan"
                       onClick={() => addToCart(item)}
-                      style={{ padding: '10px 18px', fontSize: 13 }}
+                      style={{ padding: '10px 18px', fontSize: 13, flex: 1 }}
                     >
                       <Plus size={14} weight="bold" /> Add
                     </button>
+                    <a
+                      className="nn-btn nn-btn-gold"
+                      href={item.productUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ padding: '10px 18px', fontSize: 13, flex: 1, textAlign: 'center' }}
+                    >
+                      Buy <ArrowRight size={14} />
+                    </a>
                   </div>
                 </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="nn-wrap" style={{ marginBottom: 56 }}>
-          <div className="nn-sec-head">
-            <div>
-              <span className="nn-kicker">Music · VIP · Sponsors</span>
-              <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4vw, 38px)' }}>
-                Own the Music
-              </h2>
-              <p>High-res downloads, VIP passes, and sponsor inventory — instant checkout.</p>
-            </div>
-          </div>
-          <div className="nn-grid">
-            {digital.map((item) => (
-              <article key={item.id} className="nn-card" style={{ padding: 20 }}>
-                <span className="nn-kicker" style={{ fontSize: 10 }}>{item.kind}</span>
-                <h3 style={{ color: '#fff', margin: '12px 0 6px', fontSize: 18 }}>{item.title}</h3>
-                <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: '0 0 12px' }}>
-                  {item.blurb}
-                </p>
-                <p style={{ color: 'var(--nn-gold)', fontWeight: 900, fontSize: 22, margin: '0 0 14px' }}>
-                  {formatMoney(item.priceCents)}
-                </p>
-                <a
-                  className="nn-btn nn-btn-gold"
-                  href={item.stripe}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => {
-                    if (item.id === 'monthly') grantPlan('monthly');
-                    if (item.id === 'yearly') grantPlan('yearly');
-                    if (item.id === 'track') grantTrack('not-giving-up-tonight');
-                  }}
-                  style={{ width: '100%', marginBottom: 8 }}
-                >
-                  Buy now · {formatMoney(item.priceCents)}
-                </a>
-                <a
-                  className="nn-btn nn-btn-ghost"
-                  href={paypalBuyUrl(item)}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ width: '100%' }}
-                >
-                  PayPal instead
-                </a>
               </article>
             ))}
           </div>

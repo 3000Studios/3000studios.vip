@@ -21,8 +21,6 @@ export type NavItem = {
   children?: NavChild[];
 };
 
-export const SHOP_URL = 'https://boughtitonline.com';
-
 // eslint-disable-next-line react-refresh/only-export-components
 export const NAV_ITEMS: NavItem[] = [
   {
@@ -46,10 +44,9 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
-    to: SHOP_URL,
+    to: '/shop',
     label: 'Shop',
     icon: <ShoppingBag size={20} weight="duotone" />,
-    external: true,
   },
   {
     to: '/thunder-dome',
