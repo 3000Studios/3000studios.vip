@@ -45,7 +45,10 @@ export function youtubeWatch(videoId: string): string {
 
 /* ---------------- music videos (DistroKid catalog) ---------------- */
 
-const musicVideos: VideoCatalogItem[] = officialReleaseVideos.map((v) => ({
+const musicVideos: VideoCatalogItem[] = officialReleaseVideos
+  // Guard (2026-10-11 bug fix): never catalog a video whose ID would build a dead player/link.
+  .filter((v) => /^[\w-]{11}$/.test(v.videoId))
+  .map((v) => ({
   id: `mv-${v.videoId}`,
   kind: 'music',
   title: v.title,

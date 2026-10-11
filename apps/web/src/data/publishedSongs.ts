@@ -31,6 +31,16 @@ function youtubeFor(title: string) {
   return hit?.videoId;
 }
 
+/**
+ * Guard (2026-10-11 bug fix): a song with an empty/missing/invalid YouTube ID
+ * must never reach a player or a "Watch on YouTube" link — embed/watch URLs
+ * built from an empty ID are dead. Only a real 11-char YouTube ID survives;
+ * anything else becomes `undefined`, and renderers already gate on truthiness.
+ */
+export function validYoutubeId(id: string | undefined | null): string | undefined {
+  return typeof id === 'string' && /^[\w-]{11}$/.test(id.trim()) ? id.trim() : undefined;
+}
+
 function localSrc(title: string, slug: string) {
   if (MEDIA_MAP[slug]) return encodeMediaPath(MEDIA_MAP[slug]);
   const fromRollout = rolloutSongs.find((s) => s.slug === slug || norm(s.title) === norm(title));
@@ -40,7 +50,7 @@ function localSrc(title: string, slug: string) {
 export const publishedSongs: PublishedSong[] = (generated as PublishedSong[]).map((row) => ({
   ...row,
   src: localSrc(row.title, row.slug) || row.preview || row.src,
-  youtubeId: youtubeFor(row.title) || row.youtubeId,
+  youtubeId: validYoutubeId(youtubeFor(row.title)) || validYoutubeId(row.youtubeId),
 }));
 
 export function publishedToCatalog(song: PublishedSong): CatalogSong {

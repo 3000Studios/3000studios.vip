@@ -99,10 +99,13 @@ function norm(s: string) {
 function buildUnifiedReleases(): OfficialReleaseVideo[] {
   const seenIds = new Set<string>();
   const list: OfficialReleaseVideo[] = [];
+  // Guard (2026-10-11 bug fix): an entry with an empty/invalid videoId would
+  // build dead youtube-nocookie embed + watch URLs. It never enters the list.
+  const isValidId = (id: string) => typeof id === 'string' && /^[\w-]{11}$/.test(id.trim());
 
   // Add all curated releases first
   for (const c of curatedReleaseVideos) {
-    if (!seenIds.has(c.videoId)) {
+    if (isValidId(c.videoId) && !seenIds.has(c.videoId)) {
       seenIds.add(c.videoId);
       list.push(c);
     }
@@ -110,7 +113,7 @@ function buildUnifiedReleases(): OfficialReleaseVideo[] {
 
   // Add generated releases with curated override fallback
   for (const g of generated as OfficialReleaseVideo[]) {
-    if (!seenIds.has(g.videoId)) {
+    if (isValidId(g.videoId) && !seenIds.has(g.videoId)) {
       const match = curatedReleaseVideos.find((c) => norm(c.title) === norm(g.title));
       if (match) continue;
       seenIds.add(g.videoId);

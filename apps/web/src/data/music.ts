@@ -176,7 +176,8 @@ export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, inde
       description: 'Verified DistroKid release · 3000 Studios',
       src: resolvePlaybackSrc(release, existing),
       cover: release.cover || existing.cover,
-      youtubeId: release.youtubeId || existing.youtubeId,
+      // Never propagate an empty-string ID: it builds dead embed/watch URLs.
+      youtubeId: release.youtubeId || existing.youtubeId || undefined,
     };
   }
   return {
@@ -189,7 +190,7 @@ export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, inde
     cover: release.cover,
     palette: { a: '#171c2b', b: '#d4af37', c: '#ffffff', gold: '#d4af37' },
     wallpaper: 'spiral',
-    youtubeId: release.youtubeId,
+    youtubeId: release.youtubeId || undefined,
   };
 });
 
