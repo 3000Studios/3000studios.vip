@@ -15,6 +15,13 @@ global.env
 apps/web/preview-*.png
 .playwright-mcp/
 
+# Committed junk removed 2026-10-11 (dead-code cleanup) — do not re-commit
+.codex-agent-preview.*.log
+_worker.bundle
+apps/android-agent/device-*.png
+apps/android-agent/installed-*.png
+apps/web/design-implementation-*.png
+
 # Android build artifacts
 **/app/build/
 **/.gradle/
