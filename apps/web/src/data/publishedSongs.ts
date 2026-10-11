@@ -1,6 +1,5 @@
 import generated from './publishedSongs.generated.json';
 import mediaPathMap from './mediaPathMap.generated.json';
-import { officialReleaseVideos } from './officialReleases';
 import { rolloutSongs, type CatalogSong } from './music';
 
 const MEDIA_MAP = mediaPathMap as Record<string, string>;
@@ -25,17 +24,19 @@ function norm(s: string) {
   return s.toLowerCase().replace(/['\u2019]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
-function youtubeFor(title: string) {
-  const n = norm(title);
-  const hit = officialReleaseVideos.find((v) => norm(v.title) === n || n.includes(norm(v.title)) || norm(v.title).includes(n));
-  return hit?.videoId;
-}
-
 /**
  * Guard (2026-10-11 bug fix): a song with an empty/missing/invalid YouTube ID
  * must never reach a player or a "Watch on YouTube" link — embed/watch URLs
  * built from an empty ID are dead. Only a real 11-char YouTube ID survives;
  * anything else becomes `undefined`, and renderers already gate on truthiness.
+ *
+ * The generated JSON is the single source of truth for IDs: its values are
+ * the VERIFIED title->ID mapping (full channel catalog + oembed-checked,
+ * 2026-10-11). The old fuzzy title fallback against officialReleaseVideos
+ * was removed deliberately — it overrode verified IDs and resurrected IDs
+ * for titles that have no upload on the channel (the 8 unmatched songs
+ * must stay ID-less so they are excluded from the video UI only; their
+ * audio playback is independent and unaffected).
  */
 export function validYoutubeId(id: string | undefined | null): string | undefined {
   return typeof id === 'string' && /^[\w-]{11}$/.test(id.trim()) ? id.trim() : undefined;
@@ -50,7 +51,7 @@ function localSrc(title: string, slug: string) {
 export const publishedSongs: PublishedSong[] = (generated as PublishedSong[]).map((row) => ({
   ...row,
   src: localSrc(row.title, row.slug) || row.preview || row.src,
-  youtubeId: validYoutubeId(youtubeFor(row.title)) || validYoutubeId(row.youtubeId),
+  youtubeId: validYoutubeId(row.youtubeId),
 }));
 
 export function publishedToCatalog(song: PublishedSong): CatalogSong {
