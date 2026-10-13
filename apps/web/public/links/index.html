@@ -15,6 +15,20 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://3000studios.vip/links" />
+    <meta
+      property="og:image"
+      content="https://3000studios.vip/media/official-3000-studios-profile.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="3000 Studios — All Links" />
+    <meta
+      name="twitter:description"
+      content="Listen, watch, follow, and shop 3000 Studios — every platform, one page."
+    />
+    <meta
+      name="twitter:image"
+      content="https://3000studios.vip/media/official-3000-studios-profile.png"
+    />
     <link rel="icon" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -163,6 +177,20 @@
         background: rgba(224, 38, 60, 0.14);
         border-color: rgba(224, 38, 60, 0.4);
       }
+      button.row {
+        width: 100%;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        margin-top: 12px;
+      }
+      .share-status {
+        text-align: center;
+        color: var(--md-gold-hi);
+        font-size: 0.92rem;
+        min-height: 1.2em;
+        margin: 10px 0 0;
+      }
       footer {
         text-align: center;
         color: var(--md-muted);
@@ -285,6 +313,42 @@
           <span class="arrow" aria-hidden="true">→</span>
         </a>
       </nav>
+      <button class="row" id="share-links" type="button">
+        <span class="icon" aria-hidden="true">📤</span>
+        <span class="txt">
+          <span class="name">Share this page</span>
+          <span class="hook">Send every 3000 Studios link to a friend</span>
+        </span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+      <p class="share-status" id="share-status" role="status" aria-live="polite"></p>
+      <script>
+        (function () {
+          var btn = document.getElementById('share-links');
+          var status = document.getElementById('share-status');
+          var shareData = {
+            title: '3000 Studios — All Links',
+            text: 'Listen, watch, follow, and shop 3000 Studios — every platform, one page.',
+            url: 'https://3000studios.vip/links',
+          };
+          btn.addEventListener('click', function () {
+            if (navigator.share) {
+              navigator.share(shareData).catch(function () {});
+              return;
+            }
+            var done = function () {
+              status.textContent = 'Link copied — paste it anywhere to share.';
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(shareData.url).then(done, function () {
+                status.textContent = shareData.url;
+              });
+            } else {
+              status.textContent = shareData.url;
+            }
+          });
+        })();
+      </script>
       <footer>
         <p>© 3000 Studios · <a href="https://3000studios.vip">3000studios.vip</a></p>
       </footer>
