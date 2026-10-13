@@ -6,6 +6,7 @@ export function NotFoundPage() {
   usePageMeta({
     title: 'Page not found',
     description: 'The page you are looking for does not exist. Head back to the 3000 Studios stage.',
+    noCanonical: true,
   });
   return (
     <PublicLayoutV2>

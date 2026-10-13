@@ -336,9 +336,39 @@ const router = createBrowserRouter([
           </RouteLoader>
         ),
       },
-      { path: '/about', element: <AboutPage /> },
-      { path: '/contact', element: <ContactPage /> },
-      { path: '/privacy', element: <LegalPage type="privacy" /> },
+      {
+        path: '/about',
+        element: (
+          <Titled
+            title="About"
+            description="About 3000 Studios — an independent music production label and creator media brand founded in Acworth, Georgia."
+          >
+            <AboutPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/contact',
+        element: (
+          <Titled
+            title="Contact"
+            description="Contact 3000 Studios — sync licenses, music features, live stream bookings, and brand inquiries."
+          >
+            <ContactPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/privacy',
+        element: (
+          <Titled
+            title="Privacy Policy"
+            description="How 3000 Studios VIP handles personal data — contact requests, site operations, analytics, and advertising measurement."
+          >
+            <LegalPage type="privacy" />
+          </Titled>
+        ),
+      },
       {
         path: '/privacy-policy',
         element: (
@@ -350,12 +380,72 @@ const router = createBrowserRouter([
           </Titled>
         ),
       },
-      { path: '/terms', element: <LegalPage type="terms" /> },
-      { path: '/copyright', element: <LegalPage type="copyright" /> },
-      { path: '/cookies', element: <LegalPage type="cookies" /> },
-      { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
-      { path: '/shipping', element: <LegalPage type="shipping" /> },
-      { path: '/returns', element: <LegalPage type="returns" /> },
+      {
+        path: '/terms',
+        element: (
+          <Titled
+            title="Terms of Use"
+            description="Terms of use for 3000studios.vip — lawful use, respectful community behavior, and content ownership."
+          >
+            <LegalPage type="terms" />
+          </Titled>
+        ),
+      },
+      {
+        path: '/copyright',
+        element: (
+          <Titled
+            title="Copyright & DMCA"
+            description="Copyright ownership and DMCA takedown or licensing requests for 3000 Studios music, video, and visuals."
+          >
+            <LegalPage type="copyright" />
+          </Titled>
+        ),
+      },
+      {
+        path: '/cookies',
+        element: (
+          <Titled
+            title="Cookie Notice"
+            description="How 3000studios.vip uses cookies and local storage — preferences, playback settings, analytics, and AdSense advertising."
+          >
+            <LegalPage type="cookies" />
+          </Titled>
+        ),
+      },
+      {
+        path: '/disclaimer',
+        element: (
+          <Titled
+            title="Legal Disclaimer"
+            description="Legal disclaimer for 3000studios.vip — music, media, and business information; not legal, financial, medical, or professional advice."
+          >
+            <LegalPage type="disclaimer" />
+          </Titled>
+        ),
+      },
+      {
+        path: '/shipping',
+        element: (
+          <Titled
+            title="Shipping Policy"
+            description="Shipping policy for 3000 Studios merch and digital products — dispatch times, U.S. delivery windows, and electronic fulfillment."
+          >
+            <LegalPage type="shipping" />
+          </Titled>
+        ),
+      },
+      {
+        path: '/returns',
+        element: (
+          <Titled
+            title="Returns & Refunds"
+            description="Returns and refunds for 3000 Studios merch, digital products, custom beats, and exclusive-rights purchases."
+          >
+            <LegalPage type="returns" />
+          </Titled>
+        ),
+      },
       { path: '*', element: <NotFoundPage /> },
       {
         path: '/admin',
