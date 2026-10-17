@@ -251,14 +251,13 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   const seek = seekTo;
 
-  // Start the site soundtrack on each fresh load. Browsers that disallow audible
-  // autoplay leave the visible music control available for the required tap.
+  // Playback starts from a user gesture (the visible music control). An
+  // autoplay attempt on fresh load is blocked by every modern browser and
+  // only leaves a failed-playback state on screen, so it is not attempted.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
-    localStorage.setItem(MUSIC_ON_KEY, '1');
-    playIndex(startIndex, { autoplay: true });
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       try {
@@ -390,7 +389,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   return (
     <MusicContext.Provider value={api}>
-      <audio ref={audioRef} autoPlay preload="metadata" playsInline crossOrigin="anonymous" />
+      <audio ref={audioRef} preload="metadata" playsInline crossOrigin="anonymous" />
       {children}
     </MusicContext.Provider>
   );

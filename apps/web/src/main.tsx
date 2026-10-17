@@ -4,7 +4,6 @@ import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
-import './styles/swipe-slider.css';
 import './styles/neon-noir.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -12,42 +11,74 @@ import { AdminFab } from './components/AdminFab';
 import { SparkClickFX } from './components/SparkClickFX';
 import { StageFX } from './components/StageFX';
 import { YouTubeSubscriberPerk } from './components/YouTubeSubscriberPerk';
-import {
-  AboutPage,
-  BlogPage,
-  BlogPostPage,
-  CommunityPage,
-  ContactPage,
-  LegalPage,
-  PrivacyPolicyPage,
-  RequestsPage,
-  SponsorsPage,
-  ThunderDomePage,
-  ThunderDomePrivacyPage,
-  AppsPage,
-  ProjectsPage,
-  VipPage,
-  MusicPage,
-  VideoPage,
-} from './pages/Home';
-import { LiveBroadcastPage } from './pages/LiveBroadcastPage';
-import { PodcastPage } from './pages/PodcastPage';
-import { BeatsPage } from './pages/BeatsPage';
-import { CommandDeckPage } from './pages/CommandDeckPage';
+/* Route pages are lazy-loaded so the entry bundle only carries the homepage;
+   every other page ships as its own chunk and loads on navigation. */
+const AboutPage = lazy(() =>
+  import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })),
+);
+const BlogPage = lazy(() => import('./pages/BlogPage').then((m) => ({ default: m.BlogPage })));
+const BlogPostPage = lazy(() =>
+  import('./pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })),
+);
+const CommunityPage = lazy(() =>
+  import('./pages/CommunityPage').then((m) => ({ default: m.CommunityPage })),
+);
+const ContactPage = lazy(() =>
+  import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })),
+);
+const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })));
+const PrivacyPolicyPage = lazy(() =>
+  import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
+);
+const RequestsPage = lazy(() =>
+  import('./pages/RequestsPage').then((m) => ({ default: m.RequestsPage })),
+);
+const SponsorsPage = lazy(() =>
+  import('./pages/SponsorsPage').then((m) => ({ default: m.SponsorsPage })),
+);
+const ThunderDomePage = lazy(() =>
+  import('./pages/ThunderDomePage').then((m) => ({ default: m.ThunderDomePage })),
+);
+const ThunderDomePrivacyPage = lazy(() =>
+  import('./pages/ThunderDomePrivacyPage').then((m) => ({ default: m.ThunderDomePrivacyPage })),
+);
+const AppsPage = lazy(() => import('./pages/AppsPage').then((m) => ({ default: m.AppsPage })));
+const ProjectsPage = lazy(() =>
+  import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })),
+);
+const VipPage = lazy(() => import('./pages/VipPage').then((m) => ({ default: m.VipPage })));
+const MusicPage = lazy(() => import('./pages/MusicPage').then((m) => ({ default: m.MusicPage })));
+const VideoPage = lazy(() => import('./pages/VideoPage').then((m) => ({ default: m.VideoPage })));
+const LiveBroadcastPage = lazy(() =>
+  import('./pages/LiveBroadcastPage').then((m) => ({ default: m.LiveBroadcastPage })),
+);
+const PodcastPage = lazy(() =>
+  import('./pages/PodcastPage').then((m) => ({ default: m.PodcastPage })),
+);
+const BeatsPage = lazy(() => import('./pages/BeatsPage').then((m) => ({ default: m.BeatsPage })));
+const CommandDeckPage = lazy(() =>
+  import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })),
+);
+const PhoneGoLive = lazy(() =>
+  import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })),
+);
+const ShopPage = lazy(() => import('./pages/Shop').then((m) => ({ default: m.ShopPage })));
+const ConceptBoard = lazy(() =>
+  import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })),
+);
+const NotFoundPage = lazy(() =>
+  import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
+);
 import { HomePage } from './v3/HomePage';
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
 import { ConsentManager } from './components/ConsentManager';
 import { usePrefersReducedMotion } from './lib/mediaQuery';
-import { PhoneGoLive } from './pages/PhoneGoLive';
-import { ShopPage } from './pages/Shop';
-import { ConceptBoard } from './pages/ConceptBoard';
 import { AuthProvider } from './lib/auth';
 import { initVelvetMachine } from './lib/velvetEngine';
 import { GlobalMusicProvider } from './components/GlobalMusic';
 import { usePageMeta } from './lib/usePageMeta';
-import { NotFoundPage } from './pages/NotFoundPage';
 
 /** Wraps a route element with a per-route title + meta description. */
 function Titled({
@@ -115,7 +146,9 @@ function RootLayout() {
       </FxGate>
       <YouTubeSubscriberPerk />
       <SampleGate />
-      <Outlet />
+      <RouteLoader>
+        <Outlet />
+      </RouteLoader>
       <MusicDock />
       <BottomDock />
       <AdminFab />

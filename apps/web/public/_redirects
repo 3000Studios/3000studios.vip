@@ -25,6 +25,9 @@
 /releases/  /music  302
 /releases/*  /music  302
 
+# Canonical privacy page is the static /privacy; dedupe the SPA duplicate.
+/privacy-policy  /privacy  301
+
 # Pages Functions under /api must not fall through to the SPA.
 # Prefer Functions (or Worker route) over this rewrite; keep as pass-through guard.
 /api/*  /api/:splat  200
