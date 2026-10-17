@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Broadcast } from '@phosphor-icons/react';
 import { Reveal } from '../v2/Reveal';
 import { MagneticLink } from './chrome';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
-import { STREAM_PLAYER_EMBED_SRC } from '../lib/streamConfig';
 
-/* Live stream — kept front and center */
+/**
+ * Live stream — front and center.
+ *
+ * The player is the YouTube channel live embed: it always resolves to
+ * whatever broadcast is currently live on the 3000 Studios channel
+ * (24/7 stream), with no per-broadcast video ID to maintain. It never
+ * autoplays — the visitor presses play.
+ */
+const YOUTUBE_CHANNEL_ID = 'UCTQnEFZUIutrFuDlxGj9cDA';
+const YOUTUBE_LIVE_EMBED_SRC = `https://www.youtube.com/embed/live_stream?channel=${YOUTUBE_CHANNEL_ID}`;
+const YOUTUBE_LIVE_URL = 'https://www.youtube.com/@3000Studio/live';
+
 export function LiveSection() {
   const [live, setLive] = useState<boolean | null>(null);
 
@@ -46,49 +55,69 @@ export function LiveSection() {
           </p>
         </Reveal>
         <Reveal delay={0.1}>
-          {live ? (
+          <div
+            className="v3-card"
+            style={{
+              padding: 0,
+              overflow: 'hidden',
+              marginTop: 40,
+              borderColor: 'rgba(255,47,179,.5)',
+              boxShadow: '0 0 80px rgba(255,47,179,.25), 0 30px 80px rgba(0,0,0,.6)',
+            }}
+          >
             <div
-              className="v3-card"
               style={{
-                padding: 0,
-                overflow: 'hidden',
-                marginTop: 40,
-                borderColor: 'rgba(255,47,179,.5)',
-                boxShadow: '0 0 80px rgba(255,47,179,.25), 0 30px 80px rgba(0,0,0,.6)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                padding: '14px 18px',
+                flexWrap: 'wrap',
               }}
             >
-              <iframe
-                src={`${STREAM_PLAYER_EMBED_SRC}?autoplay=true&muted=true`}
-                title="3000 Studios live stream"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowFullScreen
-                loading="lazy"
-                style={{ width: '100%', aspectRatio: '16 / 9', border: 0, display: 'block' }}
-              />
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontWeight: 700,
+                }}
+              >
+                <span className="v3-live-dot" aria-hidden="true" />
+                Watch Live — 3000 Studios 24/7
+              </span>
+              <a
+                href={YOUTUBE_LIVE_URL}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: '#f1b74e', fontWeight: 600 }}
+              >
+                Open in YouTube
+              </a>
             </div>
-          ) : (
-            <div className="v3-card" style={{ marginTop: 40, textAlign: 'center' }}>
-              <Broadcast size={40} weight="duotone" color="#f1b74e" />
-              <h3 style={{ margin: '14px 0 10px', fontSize: 22 }}>The stage is dark right now</h3>
-              <p style={{ color: '#9aa0ae', maxWidth: '52ch', margin: '0 auto 24px', lineHeight: 1.7 }}>
-                When the lights come up, it happens here first. Follow the channel so you
-                never miss a broadcast.
-              </p>
-              <div className="v3-cta-row" style={{ marginTop: 0 }}>
-                <a
-                  className="v3-btn v3-btn--gold"
-                  href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Get notified
-                </a>
-                <MagneticLink to="/go-live" className="v3-btn v3-btn--ghost">
-                  Owner? Go live
-                </MagneticLink>
-              </div>
-            </div>
-          )}
+            <iframe
+              src={YOUTUBE_LIVE_EMBED_SRC}
+              title="Watch Live — 3000 Studios 24/7"
+              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+              style={{ width: '100%', aspectRatio: '16 / 9', border: 0, display: 'block' }}
+            />
+          </div>
+          <div className="v3-cta-row">
+            <a
+              className="v3-btn v3-btn--gold"
+              href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Get notified
+            </a>
+            <MagneticLink to="/go-live" className="v3-btn v3-btn--ghost">
+              Owner? Go live
+            </MagneticLink>
+          </div>
         </Reveal>
       </div>
     </section>
