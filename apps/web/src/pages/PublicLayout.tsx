@@ -360,6 +360,10 @@ export function PublicLayout({
                 <li><Link to="/requests" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>♬ Pitch Song Ideas</Link></li>
                 <li><Link to="/blog" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>◈ Engineering Blog</Link></li>
                 <li><Link to="/sponsors" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>◆ Brand Partnerships</Link></li>
+                <li><a href="https://boughtitonline.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🛒 Store — Bought It Online</a></li>
+                <li><a href="https://paypal.me/3000Studios" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>♥ Tip the Studio (PayPal)</a></li>
+                <li><a href="https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎙 3000 Studios Podcast (Spotify)</a></li>
+                <li><a href="https://thunderdome.store" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎮 Thunderdome: AeroStrike Beta</a></li>
               </ul>
             </div>
 
