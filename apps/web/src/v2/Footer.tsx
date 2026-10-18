@@ -38,6 +38,9 @@ const STUDIO = [
   { to: '/requests', label: 'Request a song' },
   { to: '/contact', label: 'Contact / booking' },
   { to: SHOP_URL, label: 'Shop — boughtitonline.com', external: true },
+  { to: 'https://paypal.me/3000Studios', label: 'Tip the studio — PayPal', external: true },
+  { to: 'https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI', label: 'Podcast — Spotify', external: true },
+  { to: 'https://thunderdome.store', label: 'Thunderdome — AeroStrike beta', external: true },
 ];
 
 const LEGAL = [
