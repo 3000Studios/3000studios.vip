@@ -383,6 +383,28 @@ export function PublicLayout({
             </div>
           </div>
 
+          {/* 3000 Studios family — Site Standard footer law */}
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <p style={{ color: 'var(--vip-text-muted)', fontSize: 13, lineHeight: 1.6, margin: '0 0 12px' }}>
+              🚀 <strong style={{ color: 'var(--vip-cream)' }}>Thunderdome</strong> — the new arena game from 3000 Studios — launches{' '}
+              <strong style={{ color: 'var(--vip-cream)' }}>November 2, 2026</strong>.{' '}
+              <a href="https://thunderdome.store" target="_blank" rel="noopener noreferrer" style={{ color: '#ffd700', fontWeight: 700, textDecoration: 'underline' }}>
+                Join the beta →
+              </a>
+            </p>
+            <nav aria-label="3000 Studios family" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 20px', fontSize: 12 }}>
+              <a href="https://www.youtube.com/@3000Studio" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>YouTube — @3000Studio</a>
+              <a href="https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Spotify — 3000 Studios</a>
+              <a href="https://thunderdome.store" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Thunderdome</a>
+              <a href="https://voicetowebsite.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>VoiceToWebsite</a>
+              <a href="https://getnexa.space" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Nexa</a>
+              <a href="https://swain.pro" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Swain.pro</a>
+              <a href="https://jerica.pro" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Jerica</a>
+              <a href="https://jadon.pro" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Jadon</a>
+              <a href="https://boughtitonline.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Shop</a>
+            </nav>
+          </div>
+
           <div style={{ borderTop: '1px solid rgba(255, 215, 0, 0.15)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, fontSize: 12, color: 'var(--vip-text-muted)' }}>
             <div>
               © {new Date().getFullYear()} 3000 Studios. All Rights Reserved. Production by Jeremy Swain.
