@@ -2,7 +2,7 @@
 
 import { lazy, StrictMode, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
 import './styles/swipe-slider.css';
 import './styles/neon-noir.css';
@@ -338,9 +338,8 @@ const router = createBrowserRouter([
       },
       { path: '/about', element: <AboutPage /> },
       { path: '/contact', element: <ContactPage /> },
-      { path: '/privacy', element: <LegalPage type="privacy" /> },
       {
-        path: '/privacy-policy',
+        path: '/privacy',
         element: (
           <Titled
             title="Privacy Policy"
@@ -350,6 +349,8 @@ const router = createBrowserRouter([
           </Titled>
         ),
       },
+      // Canonical privacy URL is /privacy — keep the old path as an alias only.
+      { path: '/privacy-policy', element: <Navigate to="/privacy" replace /> },
       { path: '/terms', element: <LegalPage type="terms" /> },
       { path: '/copyright', element: <LegalPage type="copyright" /> },
       { path: '/cookies', element: <LegalPage type="cookies" /> },

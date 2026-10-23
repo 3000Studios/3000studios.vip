@@ -4,10 +4,6 @@ import { Reveal } from '../v2/Reveal';
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
 const content = {
-  privacy: {
-    title: 'Privacy Policy',
-    text: '3000 Studios VIP limits personal data collection to contact requests, site operations, security, analytics, advertising measurement, legal compliance, and optional community submissions. Google AdSense may use cookies or similar technologies to serve and measure ads when ad serving is active. Do not submit sensitive personal information in public forms.',
-  },
   terms: {
     title: 'Terms Of Use',
     text: 'By using this site you agree to lawful use, respectful community behavior, no scraping or abuse, and no unauthorized copying of music, videos, visuals, source code, private streams, or protected admin content.',

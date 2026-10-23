@@ -90,6 +90,42 @@ export function ContactPage() {
           </div>
         </section>
 
+        <section className="nn-wrap" style={{ marginBottom: 48 }}>
+          <div style={{ maxWidth: 640, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <h2 className="nn-chrome" style={{ fontSize: 'clamp(22px, 4vw, 32px)', margin: 0 }}>
+              MORE WAYS TO REACH THE STUDIO
+            </h2>
+            <p style={{ color: 'var(--nn-muted)', margin: 0, lineHeight: 1.6 }}>
+              3000 Studios is an independent music and media label run by Jeremy Swain out of
+              Acworth, Georgia. Every message from this page lands in the studio inbox — pick the
+              route that fits and include your timeline so the reply can be specific.
+            </p>
+            <div className="nn-glass" style={{ padding: '18px 22px' }}>
+              <strong>Booking, sync &amp; press</strong>
+              <p style={{ color: 'var(--nn-muted)', margin: '6px 0 0', lineHeight: 1.6 }}>
+                Use the form above, or email{' '}
+                <a href={`mailto:${OWNER_EMAIL}`} style={{ color: 'var(--nn-cyan)' }}>
+                  {OWNER_EMAIL}
+                </a>{' '}
+                directly. For team and VIP list matters, write to{' '}
+                <a href="mailto:Team@3000studios.vip" style={{ color: 'var(--nn-cyan)' }}>
+                  Team@3000studios.vip
+                </a>
+                .
+              </p>
+            </div>
+            <div className="nn-glass" style={{ padding: '18px 22px' }}>
+              <strong>Looking for something specific?</strong>
+              <p style={{ color: 'var(--nn-muted)', margin: '6px 0 0', lineHeight: 1.6 }}>
+                Song and video requests go through <Link to="/requests" style={{ color: 'var(--nn-cyan)' }}>Requests</Link>;
+                homepage sponsorship slots are on <Link to="/sponsors" style={{ color: 'var(--nn-cyan)' }}>Sponsors</Link>;
+                beat packs and licensing live on <Link to="/beats" style={{ color: 'var(--nn-cyan)' }}>Beat Packs</Link>;
+                and merch is in the <Link to="/shop" style={{ color: 'var(--nn-cyan)' }}>Shop</Link>.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <footer className="nn-footer">
           <strong className="nn-chrome-gold">3000 STUDIOS</strong>
           <nav>

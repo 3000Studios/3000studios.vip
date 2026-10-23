@@ -14,6 +14,10 @@
 # Do not 200-rewrite /privacy or /terms to *.html. Pages pretty-URLs already
 # serve privacy.html at /privacy; rewriting to .html 308-loops (AdSense reject).
 
+# Privacy canonicalization — /privacy is the one canonical policy URL
+/privacy-policy  /privacy  301
+/privacy-policy/  /privacy  301
+
 # Blueprint aliases — only expose working surfaces (no empty SPA shells)
 /videos  /video  302
 /videos/  /video  302
