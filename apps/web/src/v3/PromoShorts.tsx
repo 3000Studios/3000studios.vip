@@ -1,11 +1,13 @@
-import { Play } from '@phosphor-icons/react';
 import { Reveal } from '../v2/Reveal';
 import { publishedShorts } from '../data/publishedShorts';
+import { RotorGallery } from './RotorGallery';
 
 const thumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 const shortUrl = (id: string) => `https://www.youtube.com/shorts/${id}`;
 
-/* Every published promo short — native horizontal snap strip */
+/* Every published promo short — on the Rotor: a 3D rotating gallery
+   (native port of the Framer Rotor module). All cards carry their real
+   YouTube thumbnail and link out to the short. */
 export function PromoShorts() {
   return (
     <section id="promos" className="v3-section" style={{ paddingLeft: 0, paddingRight: 0 }}>
@@ -16,109 +18,25 @@ export function PromoShorts() {
             All <em>{publishedShorts.length}</em> promo videos
           </h2>
           <p className="v3-lead">
-            Every short-form cut, in one filmstrip. Swipe sideways — tap any of them to
-            watch it on YouTube.
+            Every short-form cut, riding the rotor. It spins on its own — drag to
+            take it for a spin, tap any card to watch it on YouTube.
           </p>
         </Reveal>
       </div>
-      <div
-        style={{
-          display: 'flex',
-          gap: 18,
-          overflowX: 'auto',
-          padding: '40px 6vw 10px',
-          scrollSnapType: 'x mandatory',
-          scrollbarWidth: 'none',
-        }}
-      >
-        {publishedShorts.map((s, i) => (
-          <a
-            key={s.videoId}
-            href={shortUrl(s.videoId)}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              flex: '0 0 auto',
-              width: 190,
-              scrollSnapAlign: 'start',
-              textDecoration: 'none',
-              color: 'inherit',
-            }}
-            aria-label={`Watch ${s.title}`}
-          >
-            <span
-              style={{
-                display: 'block',
-                position: 'relative',
-                aspectRatio: '9 / 16',
-                borderRadius: 16,
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,.12)',
-                background: '#0b0d14',
-              }}
-            >
-              <img
-                src={thumb(s.videoId)}
-                alt=""
-                loading="lazy"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              />
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 10,
-                  left: 10,
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: 12,
-                  fontWeight: 800,
-                  letterSpacing: 2,
-                  color: '#f1b74e',
-                  textShadow: '0 2px 10px rgba(0,0,0,.8)',
-                }}
-              >
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <span
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(5,6,10,.35)',
-                }}
-              >
-                <span
-                  style={{
-                    width: 46,
-                    height: 46,
-                    borderRadius: '50%',
-                    background: 'rgba(241,183,78,.92)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#0a0800',
-                  }}
-                >
-                  <Play size={20} weight="fill" />
-                </span>
-              </span>
-            </span>
-            <span
-              style={{
-                display: 'block',
-                marginTop: 10,
-                fontSize: 13,
-                fontWeight: 600,
-                lineHeight: 1.4,
-                color: '#f4f1ea',
-              }}
-            >
-              {s.title}
-            </span>
-          </a>
-        ))}
-      </div>
+      <RotorGallery
+        ariaLabel={`All ${publishedShorts.length} promo videos on a rotating gallery`}
+        items={publishedShorts.map((s) => ({
+          image: thumb(s.videoId),
+          link: shortUrl(s.videoId),
+          title: s.title,
+        }))}
+        cardWidth={190}
+        cardHeight={300}
+        speedSec={35}
+        slowOnHover
+        enableDrag
+        openInNewTab
+      />
     </section>
   );
 }
