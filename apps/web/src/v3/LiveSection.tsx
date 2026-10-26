@@ -95,14 +95,47 @@ export function LiveSection() {
                 Open in YouTube
               </a>
             </div>
-            <iframe
-              src={YOUTUBE_LIVE_EMBED_SRC}
-              title="Watch Live — 3000 Studios 24/7"
-              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-              loading="lazy"
-              referrerPolicy="strict-origin-when-cross-origin"
-              style={{ width: '100%', aspectRatio: '16 / 9', border: 0, display: 'block' }}
-            />
+            {live ? (
+              <iframe
+                src={YOUTUBE_LIVE_EMBED_SRC}
+                title="Watch Live — 3000 Studios 24/7"
+                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+                style={{ width: '100%', aspectRatio: '16 / 9', border: 0, display: 'block' }}
+              />
+            ) : (
+              /* Offline/checking slate: never mount the YouTube live embed
+                 while off air — it renders YouTube's "This video is
+                 unavailable" error inside our card, which reads as a
+                 broken site. The embed mounts only once detectIsLive()
+                 confirms a broadcast. */
+              <div
+                style={{
+                  width: '100%',
+                  aspectRatio: '16 / 9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  padding: 24,
+                  background:
+                    'radial-gradient(120% 140% at 50% 0%, rgba(255,47,179,.14), rgba(3,4,8,.9) 60%)',
+                  color: '#9aa0ae',
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 700, color: '#f4f1ea', fontSize: 20, marginBottom: 8 }}>
+                    {live === null ? 'Checking the stage…' : 'Off air right now'}
+                  </div>
+                  <div style={{ fontSize: 14, lineHeight: 1.55, maxWidth: 460, margin: '0 auto' }}>
+                    {live === null
+                      ? 'One moment while we check the broadcast.'
+                      : 'The stage is between broadcasts. Tap Get Notified below and YouTube will ping you the moment the next show starts.'}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           <div className="v3-cta-row">
             <a

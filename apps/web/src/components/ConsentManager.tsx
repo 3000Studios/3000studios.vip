@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { adsenseClientId } from '../lib/adsense';
 import { adsAllowedOnRoute } from './explicitAdsGate';
 
@@ -119,7 +119,10 @@ export function ConsentManager() {
   // so the floating Subscribe FAB, the bottom dock/nav and the music dock
   // can lift clear of it (rules at the end of src/index.css), and hero CTAs
   // get bottom padding instead of hiding under the banner.
-  useEffect(() => {
+  // Layout effect (not passive): the class + height var must land before
+  // first paint, or the floaters render under the banner for one frame
+  // and visibly jump when the passive effect catches up.
+  useLayoutEffect(() => {
     if (!bannerOpen) return;
     const el = bannerRef.current;
     document.body.classList.add('consent-open');

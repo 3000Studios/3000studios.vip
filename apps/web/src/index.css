@@ -253,6 +253,21 @@ body.consent-open .musicDock {
   }
 }
 
+/* Admin FAB: same lift while the banner is open. premium-shell.css pins
+   .adminFab at 72px with !important — square inside the banner's band —
+   so this rule needs !important as well (post-deploy browser check,
+   VIP-1000X follow-up: the FAB sat on the banner's right edge). */
+body.consent-open .adminFab {
+  bottom: calc(
+    58px + env(safe-area-inset-bottom, 0px) + var(--consent-banner-h, 180px) + 14px
+  ) !important;
+}
+@media (min-width: 980px) {
+  body.consent-open .adminFab {
+    bottom: calc(var(--consent-banner-h, 140px) + 14px) !important;
+  }
+}
+
 /* Hero CTAs: give bottom-anchored hero copy room equal to the banner
    so the CTA row is never hidden behind it on desktop or mobile. */
 body.consent-open .v3-hero-inner {
