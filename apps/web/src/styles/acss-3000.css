@@ -1,0 +1,362 @@
+/* ============================================================================
+   ACSS-3000 — 3000 Studios advanced-CSS layer for 3000studios.vip
+   ----------------------------------------------------------------------------
+   Zero-JS, dependency-free modern CSS, imported LAST in src/index.css so it
+   upgrades the existing design system (neon-noir .nn-*, v3.*) in place:
+
+     · Cards auto-grid layouts (auto-fit + fluid min track, container-aware)
+     · Scroll-driven reveal animations (animation-timeline: view())
+     · Text scroll / flow animations (animated gradient text)
+     · Hover lift + click (press) micro-animations — transform/opacity only
+     · 3D depth: layered shadows, gradient borders, oklch color textures
+     · Fluid auto-sizing type + spacing tokens (clamp + container units)
+
+   Rules of the layer:
+     - Animate transform / opacity / background-position only (compositor).
+     - Every motion effect is disabled under prefers-reduced-motion.
+     - Scroll-driven effects live behind @supports so older engines simply
+       render the final state — content is never hidden waiting for JS.
+     - No markup changes required: this file enhances the classes the site
+       already renders (.nn-grid, .nn-card, .v3-track-grid, .v3-track, …).
+   ========================================================================== */
+
+/* Animatable gradient angle for card borders (progressive enhancement). */
+@property --acss-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+:root {
+  /* oklch color textures — wide-gamut where supported, hex fallback first */
+  --acss-gold: #f1b74e;
+  --acss-gold: oklch(0.82 0.14 85);
+  --acss-cyan: #00f0ff;
+  --acss-cyan: oklch(0.87 0.15 200);
+  --acss-violet: #8b7bff;
+  --acss-violet: oklch(0.68 0.17 285);
+  --acss-ink: #05060a;
+  --acss-ink: oklch(0.16 0.02 260);
+
+  /* Fluid auto-sizing type scale (auto-sizers: clamp + viewport units) */
+  --acss-step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --acss-step-0: clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+  --acss-step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
+  --acss-step-2: clamp(1.55rem, 1.35rem + 1vw, 2.1rem);
+  --acss-step-3: clamp(2.1rem, 1.7rem + 2vw, 3.2rem);
+
+  /* Fluid spacing */
+  --acss-gap: clamp(14px, 1.2vw + 10px, 24px);
+  --acss-section-pad: clamp(56px, 9vw, 120px);
+
+  /* Layered 3D shadow system (contact + ambient + rim) */
+  --acss-shadow-1:
+    0 1px 2px rgb(0 0 0 / 0.45),
+    0 6px 18px rgb(0 0 0 / 0.35);
+  --acss-shadow-2:
+    0 2px 4px rgb(0 0 0 / 0.5),
+    0 14px 34px rgb(0 0 0 / 0.48),
+    0 0 0 1px rgb(255 255 255 / 0.04) inset;
+  --acss-shadow-3:
+    0 4px 8px rgb(0 0 0 / 0.55),
+    0 26px 60px rgb(0 0 0 / 0.6),
+    0 0 44px rgb(0 240 255 / 0.1),
+    0 0 0 1px rgb(255 255 255 / 0.06) inset;
+  --acss-shadow-gold:
+    0 4px 8px rgb(0 0 0 / 0.55),
+    0 26px 60px rgb(0 0 0 / 0.6),
+    0 0 44px rgb(241 183 78 / 0.16),
+    0 0 0 1px rgb(255 255 255 / 0.06) inset;
+
+  --acss-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --acss-ease-spring: cubic-bezier(0.34, 1.4, 0.4, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Cards auto-grid — one layout primitive for every card collection.   */
+/* auto-fit collapses empty tracks (no ragged last rows); the min()    */
+/* guard keeps a single column truly full-width on small phones.       */
+/* ------------------------------------------------------------------ */
+
+.acss-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--acss-card-min, 270px)), 1fr));
+  gap: var(--acss-gap);
+  container-type: inline-size;
+  container-name: acss-grid;
+}
+
+.nn-grid,
+.v3-track-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap: var(--acss-gap);
+}
+
+.v3-track-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+}
+
+.nn-admin-grid {
+  gap: var(--acss-gap);
+}
+
+/* ------------------------------------------------------------------ */
+/* Card depth system — layered shadows + gradient texture + 3D lift.   */
+/* Applied over the existing .nn-card / .v3-track look; backgrounds    */
+/* layer a subtle oklch sheen on top of each theme's own surface.      */
+/* ------------------------------------------------------------------ */
+
+.acss-card,
+.nn-card,
+.v3-track {
+  box-shadow: var(--acss-shadow-2);
+  transform: perspective(1100px) translateZ(0);
+  transition:
+    transform 0.45s var(--acss-ease-out),
+    box-shadow 0.45s var(--acss-ease-out),
+    border-color 0.35s ease;
+  will-change: transform;
+}
+
+.acss-card {
+  position: relative;
+  border: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(155deg, oklch(0.99 0 0 / 0.06), transparent 42%),
+    linear-gradient(160deg, rgb(20 27 40 / 0.92), rgb(8 11 17 / 0.94));
+}
+
+/* Gradient border ring that slowly orbits on hover (via @property). */
+.acss-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--acss-angle),
+    transparent 0deg,
+    var(--acss-gold) 70deg,
+    transparent 150deg,
+    var(--acss-cyan) 230deg,
+    transparent 310deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .acss-card:hover,
+  .nn-card:hover,
+  .v3-track:hover {
+    transform: perspective(1100px) translateY(-7px) rotateX(1.6deg);
+    box-shadow: var(--acss-shadow-3);
+  }
+
+  .nn-unlock-card:hover {
+    box-shadow: var(--acss-shadow-gold);
+  }
+
+  .acss-card:hover::before {
+    opacity: 1;
+    animation: acss-spin-angle 3.2s linear infinite;
+  }
+}
+
+/* Click (press) animation — physical dip on activation. */
+.acss-card:active,
+.nn-card:active,
+.v3-track:active {
+  transform: perspective(1100px) translateY(-2px) scale(0.985);
+  transition-duration: 0.12s;
+}
+
+.nn-btn:active,
+.v3-btn:active,
+.nn-chip:active {
+  transform: scale(0.96);
+}
+
+.nn-btn,
+.v3-btn {
+  transition:
+    transform 0.25s var(--acss-ease-spring),
+    box-shadow 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease,
+    filter 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nn-btn:hover,
+  .v3-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgb(0 0 0 / 0.5), 0 0 26px rgb(241 183 78 / 0.14);
+  }
+}
+
+/* Keyboard focus stays unmistakable on every interactive card control. */
+.nn-card :is(a, button):focus-visible,
+.v3-track :is(a, button):focus-visible,
+.acss-card :is(a, button):focus-visible {
+  outline: 2px solid var(--acss-cyan);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Scroll-driven reveal — pure CSS, runs on the compositor timeline.  */
+/* Cards rise + settle as they enter the viewport; where scroll       */
+/* timelines are unsupported the cards simply render in final state.   */
+/* ------------------------------------------------------------------ */
+
+@keyframes acss-rise {
+  from {
+    opacity: 0;
+    transform: perspective(1100px) translateY(34px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1100px) translateY(0) scale(1);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .nn-grid > .nn-card,
+  .v3-track-grid .v3-track,
+  .acss-reveal {
+    animation: acss-rise 0.9s var(--acss-ease-out) both;
+    animation-timeline: view();
+    animation-range: entry 2% entry 42%;
+  }
+}
+
+/* Explicit utility for any block that wants the reveal without a grid. */
+.acss-reveal-manual {
+  animation: acss-rise 0.9s var(--acss-ease-out) both;
+}
+
+/* ------------------------------------------------------------------ */
+/* Text scroll animations — gradient text that flows as you read,      */
+/* plus a true marquee primitive for ticker strips.                    */
+/* ------------------------------------------------------------------ */
+
+@keyframes acss-text-pan {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+.nn-chrome-gold,
+.v3-h2 em {
+  background-size: 200% auto;
+  animation: acss-text-pan 7s linear infinite alternate;
+}
+
+.acss-marquee {
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.acss-marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  animation: acss-marquee-x 30s linear infinite;
+}
+
+.acss-marquee:hover .acss-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes acss-marquee-x {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes acss-spin-angle {
+  to {
+    --acss-angle: 360deg;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Fluid auto-sizing — balanced headings, container-aware card type.   */
+/* ------------------------------------------------------------------ */
+
+.nn-scope h1,
+.nn-scope h2,
+.v3-h2 {
+  text-wrap: balance;
+}
+
+.nn-unlock-meta h3 {
+  font-size: var(--acss-step-0);
+}
+
+@container acss-grid (max-width: 340px) {
+  .acss-card {
+    border-radius: 14px;
+  }
+}
+
+/* Section rhythm picks up the fluid spacing token. */
+.nn-wrap {
+  padding-left: max(20px, 4vw);
+  padding-right: max(20px, 4vw);
+}
+
+/* Selection + scrollbar pick up the palette (cheap brand texture). */
+::selection {
+  background: var(--acss-gold);
+  color: #171204;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion — every ACSS motion effect off, content static.      */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .nn-grid > .nn-card,
+  .v3-track-grid .v3-track,
+  .acss-reveal,
+  .acss-reveal-manual,
+  .acss-marquee-track,
+  .nn-chrome-gold,
+  .v3-h2 em,
+  .acss-card:hover::before {
+    animation: none !important;
+  }
+
+  .acss-card,
+  .nn-card,
+  .v3-track,
+  .nn-btn,
+  .v3-btn {
+    transition: none !important;
+  }
+
+  .acss-card:hover,
+  .nn-card:hover,
+  .v3-track:hover,
+  .acss-card:active,
+  .nn-card:active,
+  .v3-track:active {
+    transform: none !important;
+  }
+}
