@@ -14,9 +14,24 @@
  * Live input id is used for WHIP publish and WHEP browser playback.
  */
 
+/**
+ * Public playback identifiers (NOT secrets): the customer subdomain code
+ * and the "3000 Studios" live-input UID appear in every public embed URL
+ * and are already committed elsewhere in this repo (StreamSceneEditor).
+ * They are fallbacks ONLY: the VITE_STREAM_* env vars win whenever the
+ * build actually receives them. The fallbacks exist because the Pages
+ * production env never reached the Vite build in practice (the env sync
+ * populated Preview only; two production builds on 2026-10-26 shipped
+ * with empty values despite the vars being set — VIP-1000X). The WHIP
+ * publish URL remains a true secret and is never defaulted here.
+ */
+const PUBLIC_STREAM_CUSTOMER_CODE = 'wx8j23tjjjpkb37k';
+const PUBLIC_STREAM_LIVE_INPUT_UID = '3e4ea5b57e0ce5cc54fd519ba2b7ae7d';
+
 /** customer-*.cloudflarestream.com subdomain code */
 export const STREAM_CUSTOMER_CODE =
-  import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() || '';
+  import.meta.env.VITE_STREAM_CUSTOMER_CODE?.toString().trim() ||
+  PUBLIC_STREAM_CUSTOMER_CODE;
 
 /**
  * Hosted Stream Player video / asset UID (from Stream dashboard → Embed).
@@ -25,11 +40,12 @@ export const STREAM_CUSTOMER_CODE =
 export const STREAM_PLAYER_UID =
   import.meta.env.VITE_STREAM_PLAYER_UID?.toString().trim() ||
   import.meta.env.VITE_STREAM_VIDEO_UID?.toString().trim() ||
-  '';
+  PUBLIC_STREAM_LIVE_INPUT_UID;
 
 /** Live input for WHIP/RTMPS publish and WHEP playback (phone + admin). */
 export const STREAM_LIVE_INPUT_ID =
-  import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() || '';
+  import.meta.env.VITE_STREAM_LIVE_INPUT_ID?.toString().trim() ||
+  PUBLIC_STREAM_LIVE_INPUT_UID;
 
 /**
  * Browser ultra-low latency **publish** (WHIP) is intentionally not exported
