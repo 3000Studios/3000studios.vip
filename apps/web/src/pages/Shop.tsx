@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShoppingCart,
@@ -22,6 +22,38 @@ import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 /* ------------------------------------------------------------------ */
 const SHOPIFY_STOREFRONT_URL = 'https://boughtitonline.com';
 const SHOPIFY_STORE_NAME = '3000 Studios';
+
+/* FAIL-CLOSED digital checkout (fixed 2026-10-25): Buy buttons used to grant
+   the plan/track entitlement in their onClick — before any payment happened
+   (and even if the buyer abandoned Stripe). Now a click only remembers the
+   pending item; the entitlement is granted by settleShopPurchase() when the
+   buyer returns from Stripe/PayPal with ?paid=1. */
+const PENDING_SHOP_KEY = '3000-pending-shop-item';
+
+function rememberPendingShopItem(id: string) {
+  try {
+    localStorage.setItem(PENDING_SHOP_KEY, id);
+  } catch {
+    /* private mode */
+  }
+}
+
+function settleShopPurchase() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('paid') !== '1') return;
+    const id = localStorage.getItem(PENDING_SHOP_KEY);
+    if (id === 'monthly') grantPlan('monthly');
+    if (id === 'yearly') grantPlan('yearly');
+    if (id === 'track') grantTrack('not-giving-up-tonight');
+    localStorage.removeItem(PENDING_SHOP_KEY);
+    params.delete('paid');
+    const clean = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
+    window.history.replaceState(null, '', clean);
+  } catch {
+    /* ignore */
+  }
+}
 
 function CartDrawer({
   open,
@@ -170,6 +202,10 @@ function CartDrawer({
 }
 
 export function ShopPage() {
+  useEffect(() => {
+    settleShopPurchase();
+  }, []);
+
   const [cart, setCart] = useState<Record<string, number>>({});
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -278,11 +314,7 @@ export function ShopPage() {
                   href={item.stripe}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => {
-                    if (item.id === 'monthly') grantPlan('monthly');
-                    if (item.id === 'yearly') grantPlan('yearly');
-                    if (item.id === 'track') grantTrack('not-giving-up-tonight');
-                  }}
+                  onClick={() => rememberPendingShopItem(item.id)}
                   style={{ width: '100%', marginBottom: 8 }}
                 >
                   Buy now · {formatMoney(item.priceCents)}
@@ -292,6 +324,7 @@ export function ShopPage() {
                   href={paypalBuyUrl(item)}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => rememberPendingShopItem(item.id)}
                   style={{ width: '100%' }}
                 >
                   PayPal instead

@@ -9,9 +9,9 @@ import {
   activeProvider,
   formatMoney,
   grantUnlock,
+  isLivePayments,
   isUnlocked,
   onUnlocksChanged,
-  readUnlockSettings,
 } from '../lib/unlockPayments';
 
 interface BurstParticle {
@@ -78,7 +78,9 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
 
   useEffect(() => onUnlocksChanged(() => setUnlocked(isUnlocked(item.id))), [item.id]);
 
-  const demoMode = readUnlockSettings().demoMode;
+  // Fail-closed: with no live $1 payment link configured, checkout is
+  // disabled and locked content stays locked (see lib/unlockPayments).
+  const livePayments = isLivePayments();
 
   const previewSrc =
     item.preview.type === 'youtube'
@@ -113,7 +115,7 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
       } else {
         setCheckoutError(
           result.reason === 'not-configured'
-            ? 'Live payments are not connected yet. Switch on demo mode in the Command Deck.'
+            ? 'Paid unlocks are not available yet — no charge was made. Previews stay free.'
             : 'Checkout did not complete. No charge was made.',
         );
       }
@@ -185,15 +187,29 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
 
         <div className="nn-unlock-actions">
           {!unlocked ? (
-            <button
-              type="button"
-              className="nn-btn nn-btn-gold"
-              onClick={() => setShowCheckout((v) => !v)}
-              style={{ flex: 1 }}
-            >
-              <Lock size={16} weight="fill" />
-              Unlock Full — {formatMoney(item.priceCents)}
-            </button>
+            livePayments ? (
+              <button
+                type="button"
+                className="nn-btn nn-btn-gold"
+                onClick={() => setShowCheckout((v) => !v)}
+                style={{ flex: 1 }}
+              >
+                <Lock size={16} weight="fill" />
+                Unlock Full — {formatMoney(item.priceCents)}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="nn-btn nn-btn-gold"
+                disabled
+                aria-disabled="true"
+                title="Paid unlocks are not available yet"
+                style={{ flex: 1, opacity: 0.55, cursor: 'not-allowed' }}
+              >
+                <Lock size={16} weight="fill" />
+                Unlock Full — coming soon
+              </button>
+            )
           ) : (
             <>
               {!playingFull && (
@@ -228,16 +244,12 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
           )}
         </div>
 
-        {showCheckout && !unlocked && (
+        {showCheckout && !unlocked && livePayments && (
           <div className="nn-checkout">
-            <h4>
-              Unlock “{item.title}”{demoMode && <span className="nn-demo-flag">DEMO</span>}
-            </h4>
+            <h4>Unlock “{item.title}”</h4>
             <p>
               One-time {formatMoney(item.priceCents)} · full video + full song, yours forever.
-              {demoMode
-                ? ' Demo checkout — no card is charged.'
-                : ' Secure checkout via Stripe.'}
+              Secure checkout via Stripe.
             </p>
             {checkoutError && (
               <p style={{ color: '#ff4d5e' }}>{checkoutError}</p>
@@ -255,7 +267,7 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
                     <Spinner size={16} className="nn-spin" /> Processing…
                   </>
                 ) : (
-                  <>Pay {formatMoney(item.priceCents)}{demoMode ? ' (demo)' : ''}</>
+                  <>Pay {formatMoney(item.priceCents)}</>
                 )}
               </button>
               <button
@@ -267,6 +279,13 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
               </button>
             </div>
           </div>
+        )}
+        {!unlocked && !livePayments && (
+          <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: '10px 0 0' }}>
+            Paid unlocks are being connected — the full video unlocks here for{' '}
+            {formatMoney(item.priceCents)} as soon as checkout is live. The preview above
+            is always free.
+          </p>
         )}
       </div>
     </article>

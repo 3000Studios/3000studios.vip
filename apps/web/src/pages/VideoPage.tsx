@@ -1,13 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayCircle, FilmStrip, GameController } from '@phosphor-icons/react';
 import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
 import { UnlockCard } from '../components/UnlockCard';
-import { readUnlocks } from '../lib/unlockPayments';
+import {
+  grantUnlock,
+  isLivePayments,
+  readUnlocks,
+  settleUnlockReturn,
+} from '../lib/unlockPayments';
 import { ADSENSE_VIDEO_SLOT } from '../lib/adsense';
 
 export function VideoPage() {
+  // Post-payment settle: Stripe returns buyers to /video?unlocked=1&item=<id>.
+  // Grant ONLY here, ONLY for a real catalog id, ONLY when live payments are
+  // configured — never before or during checkout (fail-closed).
+  useEffect(() => {
+    if (!isLivePayments()) return;
+    const itemId = settleUnlockReturn();
+    if (!itemId) return;
+    const known = [...MUSIC_VIDEOS, ...CINEMATIC_VIDEOS].some((v) => v.id === itemId);
+    if (known) grantUnlock(itemId);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [tab, setTab] = useState<'music' | 'cinematics'>('music');
 
@@ -31,8 +47,9 @@ export function VideoPage() {
             VIDEO VAULT
           </h1>
           <p>
-            Every video plays a free preview right here. Unlock the full video
-            plus the full song for $1 — yours forever, download included.
+            Every video plays a free preview right here. Full-video unlocks
+            ($1, yours forever, download included) open as soon as paid
+            checkout is connected — previews stay free either way.
             {unlockedCount > 0 && (
               <>
                 {' '}

@@ -69,8 +69,9 @@ export function AboutPage() {
               <p style={{ margin: 0 }}>
                 The catalog is distributed globally across Spotify, Apple Music,
                 YouTube, and all major platforms via DistroKid. Every song is
-                paired with a cinematic official video — and now, every video can
-                be unlocked in full right here for $1.
+                paired with a cinematic official video — free previews play
+                right here, with $1 full-video unlocks opening as soon as paid
+                checkout is connected.
               </p>
               <p style={{ margin: 0 }}>
                 Beyond music: <strong style={{ color: 'var(--nn-gold)' }}>Thunderdome:

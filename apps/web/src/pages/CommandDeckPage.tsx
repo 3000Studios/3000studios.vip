@@ -152,11 +152,9 @@ function Dashboard() {
           unlock payments
         </h2>
         <p style={{ color: 'var(--nn-muted)', fontSize: 14, margin: '0 0 16px' }}>
-          {demoMode
-            ? 'DEMO MODE is on — checkouts are simulated and no card is charged.'
-            : isLivePayments()
-              ? 'LIVE MODE — Stripe Payment Link is configured and taking real $1 charges.'
-              : 'Live requested but no payment link is configured — checkouts fall back to demo.'}
+          {isLivePayments()
+            ? 'LIVE MODE — Stripe Payment Link is configured and taking real $1 charges.'
+            : 'NOT CONFIGURED — no $1 payment link is set, so video checkout is disabled and locked videos stay locked. Demo mode was removed on 2026-10-25: it granted unlocks for free.'}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <button
@@ -167,14 +165,16 @@ function Dashboard() {
             className={`nn-toggle${demoMode ? ' is-on' : ''}`}
             onClick={toggleDemo}
           />
-          <strong style={{ color: demoMode ? 'var(--nn-gold)' : 'var(--nn-cyan)' }}>
-            {demoMode ? 'Demo mode ON' : 'Demo mode OFF'}
+          <strong style={{ color: 'var(--nn-muted)' }}>
+            Legacy demo flag — inert (kept only so old settings parse)
           </strong>
         </div>
         <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: '14px 0 0' }}>
-          Real charges stay blocked until Stripe identity/tax verification is
-          complete and a $1 payment link is set. See the build log for the
-          exact flip steps.
+          To take real $1 charges: complete Stripe identity/tax verification,
+          create a $1 Payment Link for video unlocks, and set
+          VITE_UNLOCK_PAYMENT_LINK (or STRIPE_UNLOCK_LINK in
+          lib/unlockPayments.ts), then redeploy. Until then nothing unlocks
+          without payment — that is deliberate.
         </p>
       </div>
 

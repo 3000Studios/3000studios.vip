@@ -25,14 +25,17 @@ function useOwnedTracks(): string[] {
   return tracks;
 }
 
-/** $0.99 — yours to keep + download. Not a license, just the song. */
+/** $0.99 — yours to keep + download. Not a license, just the song.
+ *  FAIL-CLOSED (fixed 2026-10-25): this used to grantTrack() BEFORE sending
+ *  the buyer to Stripe, so every "Own it" click unlocked the download for
+ *  free. Now the slug is only remembered as pending; the entitlement is
+ *  granted by settlePendingPurchase() after Stripe returns with ?paid=1. */
 function buyTrack(slug: string) {
   try {
     localStorage.setItem(PENDING_KEY, slug);
   } catch {
     /* private mode */
   }
-  grantTrack(slug);
   window.location.assign('/api/pay?sku=track');
 }
 
