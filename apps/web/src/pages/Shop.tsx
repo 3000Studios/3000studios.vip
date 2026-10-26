@@ -122,7 +122,7 @@ function CartDrawer({
           )}
           {lines.map(({ item, qty }) => (
             <div key={item.id} className="nn-cart-item">
-              <img src={item.image} alt="" loading="lazy" />
+              <img src={item.image} alt={item.title} loading="lazy" />
               <div style={{ flex: 1 }}>
                 <strong style={{ fontSize: 14 }}>{item.title}</strong>
                 <div style={{ color: 'var(--nn-gold)', fontWeight: 800, fontSize: 14 }}>

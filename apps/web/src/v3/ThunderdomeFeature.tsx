@@ -14,7 +14,7 @@ export function ThunderdomeFeature() {
   const preview = THUNDER_BOSSES.slice(0, 6);
 
   return (
-    <section className="v3-section" style={{ paddingTop: 0 }} aria-label="Thunderdome feature">
+    <section className="v3-section" style={{ paddingTop: 0 }} aria-label="Thunder Dome feature">
       <div className="v3-wrap">
         <Reveal>
           <div

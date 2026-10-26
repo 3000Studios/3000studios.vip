@@ -4,9 +4,15 @@ export function StageFX() {
   useEffect(() => {
     const bolt = document.createElement('div');
     bolt.className = 'boltCursor';
+    // VIP-1000X fix #6: the bolt previously sat at its untransformed
+    // (0,0) position — clipped in the top-left corner, jammed against
+    // the logo — until the first pointermove. Keep it invisible until
+    // the pointer actually moves, then reveal it at the pointer.
+    bolt.style.opacity = '0';
     document.body.appendChild(bolt);
 
     const onMove = (x: number, y: number) => {
+      bolt.style.opacity = '';
       bolt.style.transform = `translate(${x - 10}px, ${y - 18}px)`;
       document.documentElement.style.setProperty('--ptr-x', `${x}px`);
       document.documentElement.style.setProperty('--ptr-y', `${y}px`);

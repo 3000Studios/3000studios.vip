@@ -40,7 +40,9 @@ export function SongPage() {
   const { playIndex } = music;
   const song = getSongBySlug(slug || '');
   usePageMeta({
-    title: song ? `3000 Studios - ${song.title}` : 'Song',
+    // usePageMeta appends "— 3000 Studios VIP" itself; passing the brand
+    // here too produced "3000 Studios - CODE RED — 3000 Studios VIP".
+    title: song ? song.title : 'Song',
     description: song
       ? `Listen to "${song.title}" by 3000 Studios — official music, video, and streaming links.`
       : '3000 Studios song page.',
@@ -68,7 +70,10 @@ export function SongPage() {
   useEffect(() => {
     if (!song) return;
     const index = rolloutSongs.findIndex((track) => track.slug === song.slug);
-    if (index >= 0) playIndex(index, { autoplay: true });
+    // Cue only (VIP-1000X fix #1): no autoplay, no AudioContext and no
+    // audio fetch before the visitor's first gesture. Pressing play on
+    // this page starts the cued track.
+    if (index >= 0) playIndex(index);
   }, [song, playIndex]);
 
   useEffect(() => {

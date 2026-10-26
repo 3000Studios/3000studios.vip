@@ -65,7 +65,7 @@ export function ThunderDomePage() {
               href="https://play.google.com/store/search?q=Thunderdome%20AeroStrike&c=apps"
               target="_blank"
               rel="noreferrer"
-              title="Thunderdome: AeroStrike on Google Play (internal test in progress)"
+              title="Thunder Dome: AeroStrike on Google Play (internal test in progress)"
             >
               ▣ Get it on Google Play
             </a>
@@ -106,7 +106,7 @@ export function ThunderDomePage() {
             </div>
             <div style={{ padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
               <span style={{ color: 'var(--vip-text-muted)', fontSize: 13 }}>
-                Thunderdome: AeroStrike — game intro cinematic. Full archive on the{' '}
+                Thunder Dome: AeroStrike — game intro cinematic. Full archive on the{' '}
                 <Link to="/video" style={{ color: '#00f0ff' }}>Video Vault</Link>.
               </span>
               <Link className="vip-btn-obsidian" to="/video" style={{ fontSize: 12, padding: '8px 16px' }}>
@@ -432,7 +432,7 @@ export function ThunderDomePage() {
         )}
 
         {/* =========================================================================
-            MERCH TEASER: Thunderdome gear
+            MERCH TEASER: Thunder Dome gear
             ========================================================================= */}
         <section style={{ maxWidth: 1240, margin: '0 auto 56px', padding: '0 16px' }}>
           <div
@@ -446,7 +446,7 @@ export function ThunderDomePage() {
             }}
           >
             <span className="md-kicker" style={{ color: '#ffd700' }}>
-              🛒 Thunderdome Supply Drop
+              🛒 Thunder Dome Supply Drop
             </span>
             <h2
               className="vip-gold-text"
@@ -455,7 +455,7 @@ export function ThunderDomePage() {
               Wear the Dome
             </h2>
             <p style={{ color: 'var(--vip-text-muted)', fontSize: 15, maxWidth: 620, margin: '0 auto 22px', lineHeight: 1.6 }}>
-              Official Thunderdome: AeroStrike merch is loading into the armory — tees, hoodies,
+              Official Thunder Dome: AeroStrike merch is loading into the armory — tees, hoodies,
               and pilot gear forged in the neon-noir foundry. First drops land in the 3000 Studios
               store.
             </p>

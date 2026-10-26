@@ -88,7 +88,7 @@ export function VideoPage() {
               className={`nn-chip${tab === 'cinematics' ? ' is-active' : ''}`}
               onClick={() => setTab('cinematics')}
             >
-              <GameController size={14} style={{ verticalAlign: '-2px' }} /> Thunderdome cinematics ({CINEMATIC_VIDEOS.length})
+              <GameController size={14} style={{ verticalAlign: '-2px' }} /> Thunder Dome cinematics ({CINEMATIC_VIDEOS.length})
             </button>
             <input
               type="text"

@@ -4,6 +4,8 @@ export type PriorityShort = {
   title: string;
   kind: 'short';
   priority: boolean;
+  /** Explicit title — surfaces showing this short must gate ad scripts (AdSense risk). */
+  explicit?: boolean;
 };
 
 /** Hello / YouTube Growth PLAN priority Shorts (Studio IDs). */
@@ -37,7 +39,8 @@ export const priorityShorts: PriorityShort[] = [
     "videoId": "ezzhPOFDT4A",
     "title": "Fuhk U | 3000 Studios",
     "kind": "short",
-    "priority": true
+    "priority": true,
+    "explicit": true
   },
   {
     "videoId": "sGdAIxIi1IM",

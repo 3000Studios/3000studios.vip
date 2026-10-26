@@ -11,7 +11,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminFab } from './components/AdminFab';
 import { SparkClickFX } from './components/SparkClickFX';
 import { StageFX } from './components/StageFX';
-import { YouTubeSubscriberPerk } from './components/YouTubeSubscriberPerk';
 import {
   AboutPage,
   BlogPage,
@@ -113,7 +112,10 @@ function RootLayout() {
         <SparkClickFX />
         <StageFX />
       </FxGate>
-      <YouTubeSubscriberPerk />
+      {/* VIP-1000X fix #5: YouTubeSubscriberPerk's floating red Subscribe
+          FAB is unmounted — exactly one subscribe CTA remains, the header
+          nav Subscribe button (v2/Header). The component file is kept for
+          reference but renders nowhere. */}
       <SampleGate />
       <Outlet />
       <MusicDock />
@@ -145,7 +147,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="Video Vault"
-            description="Official 3000 Studios music videos and Thunderdome cinematics — free previews, $1 full unlocks."
+            description="Official 3000 Studios music videos and Thunder Dome cinematics — free previews, $1 full unlocks."
           >
             <VideoPage />
           </Titled>
@@ -199,8 +201,8 @@ const router = createBrowserRouter([
         path: '/thunder-dome/privacy',
         element: (
           <Titled
-            title="Thunderdome: AeroStrike Privacy Policy"
-            description="Privacy Policy for Thunderdome: AeroStrike by 3000 Studios."
+            title="Thunder Dome: AeroStrike Privacy Policy"
+            description="Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios."
           >
             <ThunderDomePrivacyPage />
           </Titled>
@@ -210,8 +212,8 @@ const router = createBrowserRouter([
         path: '/thunder-dome',
         element: (
           <Titled
-            title="Thunderdome"
-            description="Thunderdome by 3000 Studios — the top-down arena shooter. Play the build, watch the trailer."
+            title="Thunder Dome"
+            description="Thunder Dome by 3000 Studios — the top-down arena shooter. Play the build, watch the trailer."
           >
             <ThunderDomePage />
           </Titled>

@@ -31,10 +31,13 @@ export function WhepStreamPlayer({
   const [status, setStatus] = useState<'connecting' | 'live' | 'error' | 'idle'>('connecting');
 
   const endpoint = whepUrl || buildStreamWhepUrl(uid);
+  // Empty-config guard (VIP-1000X fix #3): no customer code / live input
+  // id → no WHEP connection attempt at all.
+  const configured = Boolean(endpoint);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !configured) return;
     let cancelled = false;
 
     const run = async () => {
@@ -82,7 +85,15 @@ export function WhepStreamPlayer({
       void playerRef.current?.stop();
       playerRef.current = null;
     };
-  }, [endpoint, muted, autoplay, onStatus]);
+  }, [endpoint, muted, autoplay, onStatus, configured]);
+
+  if (!configured) {
+    return (
+      <div className={`cfManifestPlayer cfWhepPlayer cfStreamOffline ${className}`.trim()} role="status">
+        <p className="cfManifestError">Offline — live playback is not configured yet.</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`cfManifestPlayer cfWhepPlayer ${className}`.trim()}>

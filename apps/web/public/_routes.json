@@ -1,8 +1,1 @@
-{
-  "version": 1,
-  "include": [
-    "/api/*",
-    "/media/*"
-  ],
-  "exclude": []
-}
+{"exclude":["/assets/*","/favicon.svg","/favicon.ico","/apple-touch-icon.png","/manifest.webmanifest","/icons.svg","/robots.txt","/sitemap.xml","/llms.txt","/ads.txt","/blog-daily.stamp","/muse-campaigns.json","/muse-promos.json","/muse-promos.txt","/listen.html","/privacy.html","/terms.html","/thunderdome-privacy.html","/tiktok/*","/tiktok-games/*","/js/*"],"include":["/*"],"version":1}

@@ -39,10 +39,21 @@ export const STREAM_LIVE_INPUT_ID =
 
 // ─── URL builders ─────────────────────────────
 
+/**
+ * Empty-config guard (VIP-1000X fix #3): when the customer code or the
+ * asset/live-input UID is missing, every builder returns '' instead of a
+ * malformed `https://customer-.cloudflarestream.com//…` URL, so callers
+ * can (and must) render an offline state and fire ZERO stream requests.
+ */
+export function streamConfigMissing(uid: string, customer: string): boolean {
+  return !customer.trim() || !uid.trim();
+}
+
 export function buildStreamPlayerUrl(
   uid = STREAM_PLAYER_UID,
   customer = STREAM_CUSTOMER_CODE,
 ): string {
+  if (streamConfigMissing(uid, customer)) return '';
   return `https://customer-${customer}.cloudflarestream.com/${uid}/iframe`;
 }
 
@@ -50,6 +61,7 @@ export function buildStreamWatchUrl(
   uid = STREAM_PLAYER_UID,
   customer = STREAM_CUSTOMER_CODE,
 ): string {
+  if (streamConfigMissing(uid, customer)) return '';
   return `https://customer-${customer}.cloudflarestream.com/${uid}/watch`;
 }
 
@@ -58,6 +70,7 @@ export function buildStreamManifestHls(
   uid = STREAM_PLAYER_UID,
   customer = STREAM_CUSTOMER_CODE,
 ): string {
+  if (streamConfigMissing(uid, customer)) return '';
   return `https://customer-${customer}.cloudflarestream.com/${uid}/manifest/video.m3u8`;
 }
 
@@ -66,6 +79,7 @@ export function buildStreamManifestDash(
   uid = STREAM_PLAYER_UID,
   customer = STREAM_CUSTOMER_CODE,
 ): string {
+  if (streamConfigMissing(uid, customer)) return '';
   return `https://customer-${customer}.cloudflarestream.com/${uid}/manifest/video.mpd`;
 }
 
@@ -77,6 +91,7 @@ export function buildStreamWhepUrl(
   liveInputId = STREAM_LIVE_INPUT_ID,
   customer = STREAM_CUSTOMER_CODE,
 ): string {
+  if (streamConfigMissing(liveInputId, customer)) return '';
   return `https://customer-${customer}.cloudflarestream.com/${liveInputId}/webRTC/play`;
 }
 
@@ -115,6 +130,7 @@ export function streamPlayerIframeSrc(opts?: {
   primaryColor?: string;
 }): string {
   const base = buildStreamPlayerUrl(opts?.uid);
+  if (!base) return '';
   const params = new URLSearchParams();
   if (opts?.autoplay) params.set('autoplay', 'true');
   if (opts?.muted) params.set('muted', 'true');

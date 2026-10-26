@@ -119,7 +119,7 @@ export function MusicSection() {
                     onClick={() => (playing ? music.pause() : music.playTrack(song.src, song.title))}
                     aria-label={playing ? `Pause ${song.title}` : `Play ${song.title}`}
                   >
-                    <img src={song.cover} alt="" loading="lazy" />
+                    <img src={song.cover} alt={`${song.title} album artwork`} loading="lazy" />
                     <span className="v3-track-play" aria-hidden="true">
                       <span>{playing ? <Pause size={22} weight="fill" /> : <Play size={22} weight="fill" />}</span>
                     </span>

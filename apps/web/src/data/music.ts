@@ -20,6 +20,8 @@ export type CatalogSong = {
   palette: SongPalette;
   wallpaper: string;
   youtubeId?: string;
+  /** Explicit title/content — drives ads-off gating + sitemap/noindex (see explicit-routes.json). */
+  explicit?: boolean;
 };
 
 /** slug → real /media/*.mp3 path (remap-only; filled by repair-catalog-paths). */
@@ -67,6 +69,7 @@ function enrich(
   title: string,
   description: string,
   src: string,
+  explicit = false,
 ): CatalogSong {
   const meta = (coverMap as Record<string, { cover: string; palette: SongPalette; wallpaper: string }>)[slug] ?? {
     cover: `/media/covers/${slug}.svg`,
@@ -84,12 +87,14 @@ function enrich(
     palette: meta.palette,
     wallpaper: meta.wallpaper,
     youtubeId: YOUTUBE_BY_SLUG[slug],
+    explicit,
   };
 }
 
 /** Feature of the week — dual version (Jazz default + Remix morph) */
 export const featureSong = {
   title: 'Lick My Balls, and Die in a Fire',
+  explicit: true,
   artist: '3000 Studios',
   weekLabel: 'Feature Song of the Week',
   src: '/media/lick-my-balls-jazz.mp3',
@@ -119,8 +124,8 @@ export const distrokidSongs: CatalogSong[] = [
 
 const vaultSongs: CatalogSong[] = [
   enrich(0, 'not-giving-up-tonight', 'Not Giving Up Tonight', 'DistroKid live · Official music video on YouTube @3000Studio.', '/media/not-giving-up-tonight.mp3'),
-  enrich(1, 'lick-my-balls-jazz', 'Lick My Balls, and Die in a Fire — Jazz Edition', 'Feature song of the week · Jazz edition · 3000 Studios original.', '/media/lick-my-balls-jazz.mp3'),
-  enrich(2, 'lick-my-balls-remix', 'Lick My Balls, and Die in a Fire — Remix', 'Feature song remix · Devil DJ cut · 3000 Studios original.', '/media/lick-my-balls-remix.mp3'),
+  enrich(1, 'lick-my-balls-jazz', 'Lick My Balls, and Die in a Fire — Jazz Edition', 'Feature song of the week · Jazz edition · 3000 Studios original.', '/media/lick-my-balls-jazz.mp3', true),
+  enrich(2, 'lick-my-balls-remix', 'Lick My Balls, and Die in a Fire — Remix', 'Feature song remix · Devil DJ cut · 3000 Studios original.', '/media/lick-my-balls-remix.mp3', true),
   enrich(3, 'always-late', 'Always Late', '3000 Studios original from the VIP music vault.', '/media/always-late.mp3'),
   enrich(4, 'am-i-wrong-good', 'Am I Wrong Good', '3000 Studios original from the VIP music vault.', '/media/am-i-wrong-good.mp3'),
   enrich(5, 'am-i-wrong-stp', 'Am I Wrong STP', '3000 Studios original from the VIP music vault.', '/media/am-i-wrong-stp.mp3'),
@@ -129,11 +134,11 @@ const vaultSongs: CatalogSong[] = [
   enrich(8, 'clogged-up-toilet-blues', 'Clogged Up (Toilet Blues)', '3000 Studios original from the VIP music vault.', '/media/clogged-up-toilet-blues.mp3'),
   enrich(9, 'code-red', 'CODE RED', 'High-energy original ready for the red carpet stage.', '/media/code-red.mp3'),
   enrich(10, 'dad', 'DAD', '3000 Studios original from the VIP music vault.', '/media/dad.mp3'),
-  enrich(11, 'do-ya-think-my-shits-messy', "Do Ya Think My Shit's Messy", '3000 Studios original from the VIP music vault.', '/media/do-ya-think-my-shits-messy.mp3'),
+  enrich(11, 'do-ya-think-my-shits-messy', "Do Ya Think My Shit's Messy", '3000 Studios original from the VIP music vault.', '/media/do-ya-think-my-shits-messy.mp3', true),
   enrich(12, 'everlong-pretender', 'Everlong Pretender', '3000 Studios original from the VIP music vault.', '/media/everlong-pretender.mp3'),
   enrich(13, 'figgity-fa-kit', 'FIGGITY FA KIT', '3000 Studios original from the VIP music vault.', '/media/figgity-fa-kit.mp3'),
   enrich(14, 'fix-your-lane', 'FIx Your Lane', '3000 Studios original from the VIP music vault.', '/media/fix-your-lane.mp3'),
-  enrich(15, 'fuck-redlights', 'Fuck Redlights', '3000 Studios original from the VIP music vault.', '/media/fuck-redlights.mp3'),
+  enrich(15, 'fuck-redlights', 'Fuck Redlights', '3000 Studios original from the VIP music vault.', '/media/fuck-redlights.mp3', true),
   enrich(16, 'go-the-other-way-player', 'Go the Other Way, Player', 'Abstract bars and outcast energy from the 3000 vault.', '/media/go-the-other-way-player.mp3'),
   enrich(17, 'i-always-feel-like-someones', "I Always Feel Like Someone's", '3000 Studios original from the VIP music vault.', '/media/i-always-feel-like-someones.mp3'),
   enrich(18, 'i-always-feel-like', 'I Always Feel Like', 'Signature cinematic energy for the VIP rollout.', '/media/i-always-feel-like.mp3'),
@@ -149,9 +154,9 @@ const vaultSongs: CatalogSong[] = [
   enrich(28, 'oooo-weee', 'OOoo Weee', '3000 Studios original from the VIP music vault.', '/media/oooo-weee.mp3'),
   enrich(29, 'outkast-3000-studios-style', 'OUTKAST 3000 Studios Style', '3000 Studios reinterpretation with Atlanta heat.', '/media/outkast-3000-studios-style.mp3'),
   enrich(30, 'ride-smooth', 'Ride Smooth', 'Laid-back glide for the velvet rope after-party.', '/media/ride-smooth.mp3'),
-  enrich(31, 'simp-bitch', 'Simp Bitch', '3000 Studios original from the VIP music vault.', '/media/simp-bitch.mp3'),
+  enrich(31, 'simp-bitch', 'Simp Bitch', '3000 Studios original from the VIP music vault.', '/media/simp-bitch.mp3', true),
   enrich(32, 'so-fresh-so-cosmic', 'So Fresh, So Cosmic', 'Cosmic bounce built for creators who move different.', '/media/so-fresh-so-cosmic.mp3'),
-  enrich(33, 'squash-that-mother', 'Squash That Mother', '3000 Studios original from the VIP music vault.', '/media/squash-that-mother.mp3'),
+  enrich(33, 'squash-that-mother', 'Squash That Mother', '3000 Studios original from the VIP music vault.', '/media/squash-that-mother.mp3', true),
   enrich(34, 'subwoofer-pressure-2', 'SUBWOOFER PRESSURE 2', '3000 Studios original from the VIP music vault.', '/media/subwoofer-pressure-2.mp3'),
   enrich(35, 'subwoofer-pressure', 'SUBWOOFER PRESSURE', '3000 Studios original from the VIP music vault.', '/media/subwoofer-pressure.mp3'),
   enrich(36, 'sunset-and-bliss-jnp', 'Sunset and Bliss (JnP)', 'Smooth JnP vibes for late-night VIP lounges.', '/media/sunset-and-bliss-jnp.mp3'),
@@ -166,6 +171,7 @@ const normalizedTitle = (value: string) =>
 
 /** Public playback is restricted to titles verified live through DistroKid/Apple. */
 export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, index) => {
+  const rel = release as typeof release & { explicit?: boolean };
   const existing = vaultSongs.find(
     (song) => song.slug === release.slug || normalizedTitle(song.title) === normalizedTitle(release.title),
   );
@@ -177,6 +183,7 @@ export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, inde
       src: resolvePlaybackSrc(release, existing),
       cover: release.cover || existing.cover,
       youtubeId: release.youtubeId || existing.youtubeId,
+      explicit: rel.explicit ?? existing.explicit,
     };
   }
   return {
@@ -190,6 +197,7 @@ export const rolloutSongs: CatalogSong[] = publishedGenerated.map((release, inde
     palette: { a: '#171c2b', b: '#d4af37', c: '#ffffff', gold: '#d4af37' },
     wallpaper: 'spiral',
     youtubeId: release.youtubeId,
+    explicit: rel.explicit,
   };
 });
 

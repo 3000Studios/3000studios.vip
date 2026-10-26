@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { adsenseClientId } from '../lib/adsense';
+import { adsAllowedOnRoute } from './explicitAdsGate';
 
 const CONSENT_KEY = '3000-consent-v1';
 
@@ -82,6 +83,8 @@ function loadAnalytics() {
 }
 
 function loadAdsense() {
+  // Ads-off gate: never load the AdSense library on explicit song routes.
+  if (typeof window !== 'undefined' && !adsAllowedOnRoute(window.location.pathname)) return;
   const clientId = adsenseClientId();
   if (!clientId) return;
   loadScript('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js', {
@@ -99,6 +102,7 @@ function applyConsent(consent: Consent) {
 export function ConsentManager() {
   const [consent, setConsent] = useState<Consent | null>(readConsent);
   const [bannerOpen, setBannerOpen] = useState(false);
+  const bannerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (consent) {
@@ -109,6 +113,36 @@ export function ConsentManager() {
     const id = window.setTimeout(() => setBannerOpen(true), 600);
     return () => window.clearTimeout(id);
   }, [consent]);
+
+  // Collision fix (VIP-1000X #4): while the banner is open, publish its
+  // measured height as --consent-banner-h and tag <body class="consent-open">
+  // so the floating Subscribe FAB, the bottom dock/nav and the music dock
+  // can lift clear of it (rules at the end of src/index.css), and hero CTAs
+  // get bottom padding instead of hiding under the banner.
+  useEffect(() => {
+    if (!bannerOpen) return;
+    const el = bannerRef.current;
+    document.body.classList.add('consent-open');
+    const publish = () => {
+      if (el) {
+        document.documentElement.style.setProperty(
+          '--consent-banner-h',
+          `${Math.ceil(el.getBoundingClientRect().height)}px`,
+        );
+      }
+    };
+    publish();
+    const ro =
+      typeof ResizeObserver !== 'undefined' && el ? new ResizeObserver(publish) : null;
+    if (ro && el) ro.observe(el);
+    window.addEventListener('resize', publish);
+    return () => {
+      document.body.classList.remove('consent-open');
+      document.documentElement.style.removeProperty('--consent-banner-h');
+      window.removeEventListener('resize', publish);
+      ro?.disconnect();
+    };
+  }, [bannerOpen]);
 
   const choose = (analytics: boolean, ads: boolean) => {
     const next: Consent = { analytics, ads, timestamp: Date.now() };
@@ -125,6 +159,7 @@ export function ConsentManager() {
 
   return createPortal(
     <div
+      ref={bannerRef}
       className="consentBanner"
       role="dialog"
       aria-modal="true"

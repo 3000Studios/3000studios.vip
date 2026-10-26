@@ -409,5 +409,15 @@
       "gold": "#ffd700"
     },
     "wallpaper": "goldwave"
+  },
+  "always-feel-like": {
+    "cover": "/media/covers/i-always-feel-like.jpg",
+    "palette": {
+      "a": "hsl(19 80% 55%)",
+      "b": "hsl(331 75% 48%)",
+      "c": "hsl(290 70% 42%)",
+      "gold": "#ffd700"
+    },
+    "wallpaper": "chrome"
   }
 }

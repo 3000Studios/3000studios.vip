@@ -71,7 +71,6 @@ export function LazyYouTube({
           aria-hidden={decorative || undefined}
           tabIndex={decorative ? -1 : undefined}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
           loading="lazy"
           style={{ width: '100%', height: '100%', border: 0 }}
         />

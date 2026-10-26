@@ -1,0 +1,35 @@
+# 3000 Studios VIP
+
+> 3000 Studios is an independent, AI-driven music and media studio based in
+> Acworth, Georgia, run by Jeremy Swain. The studio releases original music
+> (new singles weekly, streaming on every platform), produces cinematic music
+> videos, broadcasts live shows, and develops Thunder Dome: AeroStrike, a
+> top-down arena shooter game. Every song on the site streams free in full;
+> official downloads are $0.99.
+
+## Key pages
+
+- [Home — Official Music & Live Stage](https://3000studios.vip/): The full catalog, live stage, official videos, and VIP visuals.
+- [Music Vault](https://3000studios.vip/music): Stream every official 3000 Studios release free.
+- [Video Vault](https://3000studios.vip/video): Official music videos and Thunder Dome cinematics.
+- [Live Stage](https://3000studios.vip/live): Watch 3000 Studios live broadcasts.
+- [Podcast](https://3000studios.vip/podcast): The 3000 Studios Podcast — every episode.
+- [Beat Packs](https://3000studios.vip/beats): License 3000 Studios instrumentals and bundles.
+- [Thunder Dome](https://3000studios.vip/thunder-dome): Thunder Dome: AeroStrike — the top-down arena shooter with 24 bosses.
+- [Shop](https://3000studios.vip/shop): Merch, singles, and studio services.
+- [Blog](https://3000studios.vip/blog): News, stories, and studio notes.
+- [Community Requests](https://3000studios.vip/requests): Request a song, video, or cover.
+- [About](https://3000studios.vip/about): The studio story.
+- [Contact](https://3000studios.vip/contact): Booking, sync licensing, sponsorships, and press.
+
+## Catalog
+
+- 52 published songs, each with its own page under https://3000studios.vip/song/<slug>
+  (for example [Code Red](https://3000studios.vip/song/code-red)).
+- Full index of indexable pages: https://3000studios.vip/sitemap.xml
+
+## Contact
+
+- Email: mr.jwswain@gmail.com
+- YouTube: https://www.youtube.com/@3000Studio
+- Spotify: https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik

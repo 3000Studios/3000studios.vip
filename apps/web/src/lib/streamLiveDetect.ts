@@ -46,6 +46,10 @@ export async function fetchStreamLifecycle(
   uid: string,
   customer = STREAM_CUSTOMER_CODE,
 ): Promise<{ live: boolean | null; raw?: unknown }> {
+  // Empty-config guard (VIP-1000X fix #3): never fire a lifecycle request
+  // against `customer-.cloudflarestream.com//lifecycle` — with no customer
+  // code or UID there is nothing to probe, and the answer is "unknown".
+  if (!customer.trim() || !uid.trim()) return { live: null };
   try {
     const res = await fetch(`https://customer-${customer}.cloudflarestream.com/${uid}/lifecycle`, {
       cache: 'no-store',

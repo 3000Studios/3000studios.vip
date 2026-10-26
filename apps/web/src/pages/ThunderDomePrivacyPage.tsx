@@ -48,7 +48,7 @@ export function ThunderDomePrivacyPage() {
           </Reveal>
           <Reveal delay={0.08}>
             <h1 className="v2-display">
-              Thunderdome: AeroStrike{' '}
+              Thunder Dome: AeroStrike{' '}
               <span className="v2-grad-text">Privacy Policy</span>
             </h1>
           </Reveal>
@@ -71,7 +71,7 @@ export function ThunderDomePrivacyPage() {
                   margin: '0 0 24px',
                 }}
               >
-                This Privacy Policy explains how Thunderdome: AeroStrike
+                This Privacy Policy explains how Thunder Dome: AeroStrike
                 (&ldquo;the Game,&rdquo; &ldquo;we&rdquo;) collects, uses, and
                 protects your information.
               </p>

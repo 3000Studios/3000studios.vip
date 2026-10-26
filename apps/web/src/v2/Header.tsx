@@ -53,7 +53,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     to: '/thunder-dome',
-    label: 'Thunderdome',
+    label: 'Thunder Dome',
     icon: <GameController size={20} weight="duotone" />,
   },
   {
@@ -176,7 +176,7 @@ export function Header() {
       <header className={`v2-header${scrolled ? ' is-scrolled' : ''}`}>
         <div className="v2-header-inner">
           <Link to="/" className="v2-brand" aria-label="3000 Studios home">
-            <img src="/media/official-3000-studios-profile.png" alt="" className="v2-brand-logo" />
+            <img src="/media/official-3000-studios-profile.png" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
             <span className="v2-brand-word">
               <strong>
                 3000<span className="v2-grad-text">Studios</span>
@@ -351,21 +351,9 @@ export function Header() {
                 })}
               </ul>
             </nav>
-            <motion.div
-              className="v2-menu-foot"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.55 }}
-            >
-              <a
-                href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
-                target="_blank"
-                rel="noreferrer"
-                className="v2-btn v2-btn--sm"
-              >
-                Subscribe on YouTube
-              </a>
-            </motion.div>
+            {/* VIP-1000X fix #5: the hamburger menu's Subscribe button was
+                removed — the header nav Subscribe CTA is the single
+                subscribe pattern site-wide. */}
           </motion.div>
         )}
       </AnimatePresence>

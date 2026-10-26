@@ -6,6 +6,8 @@ export type PublishedShort = {
   kind: 'short';
   sourceStatus: string;
   fromUrl: boolean;
+  /** Explicit title — surfaces showing this short must gate ad scripts (AdSense risk). */
+  explicit?: boolean;
 };
 
 /** Real YouTube Shorts IDs from ALL_PUBLISHED (URL id preferred over legacy id field). */

@@ -31,6 +31,8 @@ export interface VideoCatalogItem {
   /** Optional full-song links bundled with the $1 unlock. */
   songLinks?: { hyperfollow?: string; spotify?: string };
   priceCents: number;
+  /** Explicit title/content — surfaces showing this item must gate ad scripts (AdSense risk). */
+  explicit?: boolean;
 }
 
 export const UNLOCK_PRICE_CENTS = 100;
@@ -55,6 +57,7 @@ const musicVideos: VideoCatalogItem[] = officialReleaseVideos.map((v) => ({
   full: { type: 'youtube', videoId: v.videoId },
   songLinks: { hyperfollow: 'https://distrokid.com/hyperfollow/3000studios' },
   priceCents: UNLOCK_PRICE_CENTS,
+  explicit: v.explicit,
 }));
 
 /* ---------------- Thunderdome cinematics (30 clips) ---------------- */

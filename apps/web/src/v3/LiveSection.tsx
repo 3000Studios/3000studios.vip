@@ -98,8 +98,7 @@ export function LiveSection() {
             <iframe
               src={YOUTUBE_LIVE_EMBED_SRC}
               title="Watch Live — 3000 Studios 24/7"
-              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-              allowFullScreen
+              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               loading="lazy"
               referrerPolicy="strict-origin-when-cross-origin"
               style={{ width: '100%', aspectRatio: '16 / 9', border: 0, display: 'block' }}

@@ -204,3 +204,60 @@ svg {
   color: #fff;
   font-size: 1.25rem;
 }
+
+/* ================================================================
+   VIP-1000X — consent-banner collision fix (Crew C, fix #4)
+   The banner is position:fixed, so without help it overlays the
+   bottom dock, the floating Subscribe FAB, the music dock and the
+   hero CTAs. ConsentManager adds body.consent-open and publishes
+   the banner's measured height as --consent-banner-h while open.
+   ================================================================ */
+
+/* The banner itself always sits ABOVE the fixed bottom dock
+   (58px + safe area, matching .bottomDock's min-height) instead of
+   covering it, on every viewport. */
+.consentBanner {
+  bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 980px) {
+  /* .bottomDock is display:none at this width — banner to the edge.
+     !important needed to override the legacy `body .consentBanner`
+     offset in million-dollar.css. */
+  .consentBanner {
+    bottom: 0 !important;
+  }
+}
+
+/* Floating Subscribe FAB: lift fully clear of the open banner. */
+body.consent-open .ytSubFab {
+  bottom: calc(
+    58px + env(safe-area-inset-bottom, 0px) + var(--consent-banner-h, 180px) + 14px
+  );
+}
+@media (min-width: 980px) {
+  body.consent-open .ytSubFab {
+    bottom: calc(var(--consent-banner-h, 140px) + 14px);
+  }
+}
+
+/* Music dock: same lift while the banner is open (it auto-hides after
+   4s, but must never sit underneath the banner while visible). */
+body.consent-open .musicDock {
+  bottom: calc(
+    68px + env(safe-area-inset-bottom, 0px) + var(--consent-banner-h, 180px) + 8px
+  );
+}
+@media (min-width: 980px) {
+  body.consent-open .musicDock {
+    bottom: calc(var(--consent-banner-h, 140px) + 16px);
+  }
+}
+
+/* Hero CTAs: give bottom-anchored hero copy room equal to the banner
+   so the CTA row is never hidden behind it on desktop or mobile. */
+body.consent-open .v3-hero-inner {
+  padding-bottom: calc(80px + var(--consent-banner-h, 180px));
+}
+body.consent-open .md-hero-copy {
+  padding-bottom: var(--consent-banner-h, 180px);
+}

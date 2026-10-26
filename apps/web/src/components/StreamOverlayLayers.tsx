@@ -25,7 +25,7 @@ export function StreamOverlayLayers({ layers }: { layers: StreamOverlayLayer[] }
             <div key={layer.id} className="streamOverlayLayer" style={box}>
               <img
                 src={layer.content}
-                alt=""
+                alt={layer.name || 'Stream overlay image'}
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             </div>

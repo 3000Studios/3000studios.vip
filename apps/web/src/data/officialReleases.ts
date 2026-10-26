@@ -8,6 +8,8 @@ export interface OfficialReleaseVideo {
   videoId: string;
   release: '3000 Studios Originals' | 'Single';
   duration: string;
+  /** Explicit title/content — drives ads-off gating + sitemap/noindex (see explicit-routes.json). */
+  explicit?: boolean;
 }
 
 /**
@@ -61,7 +63,7 @@ const curatedReleaseVideos: OfficialReleaseVideo[] = [
     release: '3000 Studios Originals',
     duration: '1:45',
   },
-  { title: 'Fuhk U', videoId: 't-ZIQhzZ09A', release: '3000 Studios Originals', duration: '3:54' },
+  { title: 'Fuhk U', videoId: 't-ZIQhzZ09A', release: '3000 Studios Originals', duration: '3:54', explicit: true },
   {
     title: "Taqueesha Can't Never Get",
     videoId: 'VR9_WIjY9wg',

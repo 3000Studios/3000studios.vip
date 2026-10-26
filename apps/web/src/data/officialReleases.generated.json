@@ -75,7 +75,8 @@
     "title": "Fuhk U",
     "videoId": "ezzhPOFDT4A",
     "release": "Single",
-    "duration": "1:45"
+    "duration": "1:45",
+    "explicit": true
   },
   {
     "title": "Built Like a Fart x Black Hole Thumb (Mashup)",
@@ -135,7 +136,8 @@
     "title": "Cum on My Face",
     "videoId": "F3QEEXiVHRY",
     "release": "Single",
-    "duration": "5:01"
+    "duration": "5:01",
+    "explicit": true
   },
   {
     "title": "3000 Studios Podcast",
@@ -240,7 +242,7 @@
     "duration": "3:37"
   },
   {
-    "title": "DON\u2019T TELL ME WHAT THAT IS",
+    "title": "DON’T TELL ME WHAT THAT IS",
     "videoId": "qxq6gBUoEgc",
     "release": "Single",
     "duration": "3:21"

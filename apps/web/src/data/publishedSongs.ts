@@ -19,6 +19,8 @@ export type PublishedSong = {
   youtubeId?: string;
   buy?: string;
   apple?: string;
+  /** Explicit title/content — drives ads-off gating + sitemap/noindex (see explicit-routes.json). */
+  explicit?: boolean;
 };
 
 function norm(s: string) {
@@ -57,5 +59,6 @@ export function publishedToCatalog(song: PublishedSong): CatalogSong {
     palette: { a: '#2d3042', b: '#efefef', c: '#ffffff', gold: '#d4af37' },
     wallpaper: 'spiral',
     youtubeId: song.youtubeId,
+    explicit: song.explicit,
   };
 }

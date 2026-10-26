@@ -112,7 +112,7 @@ function Dashboard() {
     { num: String(publishedSongs.length), label: 'Catalog tracks' },
     { num: String(MUSIC_VIDEOS.length), label: 'Music videos' },
     { num: String(CINEMATIC_VIDEOS.length), label: 'Game cinematics' },
-    { num: String(THUNDER_BOSSES.length), label: 'Thunderdome bosses' },
+    { num: String(THUNDER_BOSSES.length), label: 'Thunder Dome bosses' },
     { num: String(unlockCount), label: 'Unlocks granted (this device)' },
   ];
 

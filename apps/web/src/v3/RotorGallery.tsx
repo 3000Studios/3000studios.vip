@@ -264,7 +264,7 @@ export function RotorGallery({
                 >
                   <img
                     src={item.image}
-                    alt=""
+                    alt={item.title ? `${item.title} — YouTube video thumbnail` : ''}
                     loading="lazy"
                     decoding="async"
                     draggable={false}

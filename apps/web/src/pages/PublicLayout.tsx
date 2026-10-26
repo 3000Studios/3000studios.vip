@@ -9,6 +9,7 @@ import { ChromeWallpaper } from '../components/ChromeWallpaper';
 import { type SongPalette } from '../data/music';
 import { adsenseClientId } from '../lib/adsense';
 import { useAdConsent } from '../components/ConsentManager';
+import { adsAllowedOnRoute } from '../components/explicitAdsGate';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { fadeUp } from './PageMotion';
 
@@ -137,9 +138,13 @@ export function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; 
   // Reactive: re-renders when the visitor accepts ads after this unit already
   // mounted, so the push below fires in the session consent was granted.
   const adConsent = useAdConsent();
+  // Ads-off gate (VIP-1000X fix #13): explicit song routes never render or
+  // push ad units — see components/explicitAdsGate.ts (Crew B route list).
+  const { pathname } = useLocation();
+  const adsAllowed = adsAllowedOnRoute(pathname);
   const pushedRef = useRef(false);
   useEffect(() => {
-    if (!slot || !clientId || !adConsent || pushedRef.current) return;
+    if (!slot || !clientId || !adConsent || !adsAllowed || pushedRef.current) return;
     try {
       const target = window as unknown as { adsbygoogle?: unknown[] };
       target.adsbygoogle = target.adsbygoogle ?? [];
@@ -148,8 +153,8 @@ export function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; 
     } catch {
       /* Ad blockers or pending AdSense approval can block the client script. */
     }
-  }, [slot, clientId, adConsent]);
-  if (!slot || !clientId || !adConsent) return null;
+  }, [slot, clientId, adConsent, adsAllowed]);
+  if (!slot || !clientId || !adConsent || !adsAllowed) return null;
   return (
     <aside className="adsenseSlot" aria-label={label}>
       <span>{label}</span>
@@ -237,7 +242,7 @@ export function PublicLayout({
           <img
             className="officialProfileLogo"
             src="/media/official-3000-studios-profile.png"
-            alt=""
+            alt="3000 Studios — official artist profile"
           />
           <span className="logoStack">
             <strong className="logoWordmark">3000 Studios</strong>
@@ -386,7 +391,7 @@ export function PublicLayout({
           {/* 3000 Studios family — Site Standard footer law */}
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <p style={{ color: 'var(--vip-text-muted)', fontSize: 13, lineHeight: 1.6, margin: '0 0 12px' }}>
-              🚀 <strong style={{ color: 'var(--vip-cream)' }}>Thunderdome</strong> — the new arena game from 3000 Studios — launches{' '}
+              🚀 <strong style={{ color: 'var(--vip-cream)' }}>Thunder Dome</strong> — the new arena game from 3000 Studios — launches{' '}
               <strong style={{ color: 'var(--vip-cream)' }}>November 2, 2026</strong>.{' '}
               <a href="https://thunderdome.store" target="_blank" rel="noopener noreferrer" style={{ color: '#ffd700', fontWeight: 700, textDecoration: 'underline' }}>
                 Join the beta →

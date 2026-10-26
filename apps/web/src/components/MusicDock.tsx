@@ -54,7 +54,7 @@ export function MusicDock() {
       onFocus={resetVisibility}
       onClick={resetVisibility}
     >
-      <img src={music.activeSong.cover} alt="" />
+      <img src={music.activeSong.cover} alt={`${music.activeSong.title} album artwork`} />
       <div className="musicDockMeta">
         <strong>{music.activeSong.title}</strong>
         <span>

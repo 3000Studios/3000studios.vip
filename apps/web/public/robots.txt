@@ -2,5 +2,7 @@ User-agent: *
 Disallow: /vault
 Disallow: /admin
 Disallow: /agent
+Disallow: /command-deck
+Disallow: /go-live
 
 Sitemap: https://3000studios.vip/sitemap.xml

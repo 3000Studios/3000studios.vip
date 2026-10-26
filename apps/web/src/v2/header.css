@@ -328,6 +328,15 @@
   }
 }
 
+/* VIP-1000X fix #8: the full desktop nav fits from 940px up (same
+   breakpoint as .v2-nav-desktop) — the hamburger is redundant there
+   and must not render alongside it. Below 940px it is the only menu. */
+@media (min-width: 940px) {
+  .v2-burger {
+    display: none;
+  }
+}
+
 /* burger — idle pulse, morphs to X */
 
 .v2-burger {

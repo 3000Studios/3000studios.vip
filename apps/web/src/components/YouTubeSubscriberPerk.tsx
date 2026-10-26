@@ -8,7 +8,14 @@ import { useFocusTrap } from '../lib/focusTrap';
 
 const SUBSCRIBE_URL = `https://www.youtube.com/channel/${OFFICIAL_YOUTUBE_CHANNEL_ID}?sub_confirmation=1`;
 
-/** No auto-open modal. No top banner. Corner button only. */
+/**
+ * No auto-open modal. No top banner. Corner button only.
+ *
+ * NOT MOUNTED (VIP-1000X fix #5): this floating Subscribe FAB was the
+ * second of three competing Subscribe CTAs and overlapped the consent
+ * banner's "Reject all" on mobile. The header nav Subscribe button is
+ * the one remaining subscribe pattern. Kept in-tree for reference only.
+ */
 export function YouTubeSubscriberPerk() {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);

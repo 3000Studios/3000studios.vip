@@ -18,6 +18,9 @@ export function MouseFX() {
     const ring = root.querySelector<HTMLElement>('.mouseFxRing');
     if (!cursor || !ring) return;
 
+    // Hidden until the first pointermove (same centre-on-load defect as
+    // the v3 cursor, VIP-1000X fix #7).
+    root.style.opacity = '0';
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
     let rx = x;
@@ -25,6 +28,7 @@ export function MouseFX() {
     let raf = 0;
 
     const onMove = (e: PointerEvent) => {
+      root.style.opacity = '';
       x = e.clientX;
       y = e.clientY;
       document.documentElement.style.setProperty('--mx', `${(x / window.innerWidth).toFixed(4)}`);

@@ -97,8 +97,7 @@ export function LiveBroadcastPage() {
                   src={LIVE_STREAM_CONFIG.streamEmbedUrl}
                   title="3000 Studios live stream"
                   style={{ width: '100%', height: '100%', border: 'none' }}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 />
               ) : (
                 <div
@@ -246,7 +245,7 @@ export function LiveBroadcastPage() {
             <Link to="/privacy">Privacy</Link>
             <Link to="/terms">Terms</Link>
             <Link to="/contact">Contact</Link>
-            <Link to="/thunder-dome/privacy">Thunderdome Privacy</Link>
+            <Link to="/thunder-dome/privacy">Thunder Dome Privacy</Link>
           </nav>
           <p>© 2026 3000 Studios · All rights reserved</p>
         </footer>

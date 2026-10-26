@@ -13,7 +13,10 @@ function setupAudioAnalysis(audioElement: HTMLAudioElement) {
   const AudioCtx =
     window.AudioContext ||
     (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioCtx) return;
   audioContext = new AudioCtx();
+  // Only ever called from a user-gesture handler — safe to resume here.
+  void audioContext.resume().catch(() => undefined);
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 128;
   const source = audioContext.createMediaElementSource(audioElement);
@@ -31,11 +34,28 @@ export function ThreeReactiveBackground() {
   useEffect(() => {
     if (!mountRef.current) return;
 
+    // GPU fallback guard (VIP-1000X fix #11): mobile browsers without an
+    // available WebGL/WebGPU adapter must fall back cleanly to the page's
+    // CSS background — probe first, and bail silently (no throw, no
+    // console spam) when no context can be created.
+    const probe = document.createElement('canvas');
+    const gl =
+      probe.getContext('webgl2') ??
+      probe.getContext('webgl') ??
+      probe.getContext('experimental-webgl');
+    if (!gl) return;
+
     // 2. Three.js Canvas Setup
     const scene = new THREE.Scene();
     sceneRef.current = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch {
+      // Adapter vanished between probe and renderer creation — fall back.
+      return;
+    }
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.domElement.style.position = 'fixed';
@@ -66,21 +86,21 @@ export function ThreeReactiveBackground() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Try to find the audio element to connect
+    // Find the audio element to connect — ONLY after the first user
+    // gesture (VIP-1000X fix #1). Creating an AudioContext on mount is
+    // blocked by Chrome and logs an autoplay warning, so the previous
+    // immediate attachAudio() call is gone; the click listener is the
+    // single entry point.
     const attachAudio = () => {
       const audioEl = document.querySelector('audio');
       if (audioEl) {
-        // Need user interaction for audio context usually, but we attach if it exists
-        // Might throw if cross-origin isn't set, but we try:
         try {
           setupAudioAnalysis(audioEl as HTMLAudioElement);
-        } catch (e) {
-          console.warn('Audio connection failed:', e);
+        } catch {
+          /* cross-origin / already-connected — visuals keep animating */
         }
       }
     };
-    attachAudio();
-    // Re-check periodically or listen to DOM changes if needed, but a simple interval or click listener works best
     window.addEventListener('click', attachAudio, { once: true });
 
     // 4. Reactive Animation Loop

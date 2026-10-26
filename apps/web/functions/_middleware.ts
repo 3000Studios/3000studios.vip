@@ -4,6 +4,7 @@ const CSP =
   "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self' https://accounts.google.com; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://pagead2.googlesyndication.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; media-src 'self' blob: https:; connect-src 'self' blob: https://apex-citadel-api.mr-jwswain.workers.dev https://*.googleapis.com https://accounts.google.com https://*.firebaseio.com wss://*.firebaseio.com https://www.google-analytics.com https://region1.google-analytics.com https://static.cloudflareinsights.com https://www.youtube.com https://youtube.com https://*.cloudflarestream.com https://live.cloudflare.com; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://accounts.google.com https://*.firebaseapp.com https://*.cloudflarestream.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests";
 
 import type { PagesEnv } from './env';
+import { isFilePath, redirectFor, transformHtmlResponse } from './lib/route-meta';
 import {
   clearLiveSessionCookie,
   createLiveSession,
@@ -82,6 +83,21 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
   const { request, env } = context;
   const url = new URL(request.url);
 
+  // Crew A serving layer: www -> apex 301 (same path + query) and the
+  // Crew B redirects contract. GET/HEAD only — never rewrite a POST.
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    const redirect = redirectFor(url);
+    if (redirect) {
+      return new Response(null, {
+        status: redirect.status,
+        headers: {
+          location: redirect.location,
+          'cache-control': 'public, max-age=3600',
+        },
+      });
+    }
+  }
+
   if (url.pathname === '/live/logout') {
     if (request.method !== 'POST' || !isSameOrigin(request))
       return new Response('Method not allowed', { status: 405 });
@@ -157,6 +173,32 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
     const headers = new Headers(response.headers);
     headers.set('Permissions-Policy', PERMISSIONS);
     headers.set('Content-Security-Policy', CSP);
+
+    // Crew A serving layer: per-route head injection + real 404s.
+    // The SPA fallback serves the same shell for every path; rewrite its
+    // <head> from the generated route->meta map so crawlers and link
+    // previews see the real page. Direct static files (own <head>) and
+    // non-HTML responses pass through untouched.
+    const contentType = headers.get('content-type') || '';
+    if (
+      contentType.includes('text/html') &&
+      (request.method === 'GET' || request.method === 'HEAD') &&
+      !isFilePath(url.pathname)
+    ) {
+      const html = await response.text();
+      if (html) {
+        const out = transformHtmlResponse({ url, status: response.status, html });
+        if (out.noindex) headers.set('x-robots-tag', 'noindex, nofollow');
+        headers.delete('content-length');
+        headers.delete('etag');
+        return new Response(out.html, {
+          status: out.status,
+          statusText: response.statusText,
+          headers,
+        });
+      }
+    }
+
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,

@@ -65,10 +65,13 @@ export function StreamManifestPlayer({
 
   const hlsUrl = buildStreamManifestHls(uid);
   const dashUrl = buildStreamManifestDash(uid);
+  // Empty-config guard (VIP-1000X fix #3): builders return '' when the
+  // customer code or UID is missing — never load a malformed manifest.
+  const configured = Boolean(mode === 'dash' ? dashUrl : hlsUrl);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !configured) return;
 
     let cancelled = false;
     setError(null);
@@ -189,12 +192,22 @@ export function StreamManifestPlayer({
       video.removeEventListener('pause', onPause);
       teardown();
     };
-  }, [mode, hlsUrl, dashUrl, autoplay, onStatus]);
+  }, [mode, hlsUrl, dashUrl, autoplay, onStatus, configured]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (video) video.muted = muted;
   }, [muted]);
+
+  if (!configured) {
+    return (
+      <div className={`cfManifestPlayer cfStreamOffline ${className}`.trim()} role="status">
+        <p className="cfManifestError">
+          Offline — stream playback is not configured yet.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={`cfManifestPlayer ${className}`.trim()}>
@@ -224,6 +237,16 @@ export function StreamManifestPlayer({
 export function ManifestUrlList({ uid = STREAM_PLAYER_UID }: { uid?: string }) {
   const hls = buildStreamManifestHls(uid);
   const dash = buildStreamManifestDash(uid);
+  if (!hls || !dash) {
+    return (
+      <ul className="streamMetaList">
+        <li>
+          <strong>Stream manifests</strong>
+          <code>Not configured — no customer code / video UID set.</code>
+        </li>
+      </ul>
+    );
+  }
   return (
     <ul className="streamMetaList">
       <li>

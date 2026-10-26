@@ -15,6 +15,8 @@ export interface Song {
   unlockType: 'daily' | 'vip' | 'unlocked';
   wallpaper: string;
   palette: CatalogSong['palette'];
+  /** Explicit title/content — drives ads-off gating + sitemap/noindex (see explicit-routes.json). */
+  explicit?: boolean;
 }
 
 function toSong(track: CatalogSong): Song {
@@ -33,6 +35,7 @@ function toSong(track: CatalogSong): Song {
     unlockType: 'unlocked',
     wallpaper: track.wallpaper,
     palette: track.palette,
+    explicit: track.explicit,
   };
 }
 

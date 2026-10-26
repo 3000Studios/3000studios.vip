@@ -153,6 +153,20 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
         setPlaybackError('No local master or Apple preview for this title yet.');
         return;
       }
+      // Gesture gate (VIP-1000X fix #1): without autoplay intent this is a
+      // "cue" — update the selection/theme only. Do NOT assign audio.src
+      // (that fetches the mp3 and Chrome aborts it), do NOT create/resume
+      // an AudioContext, and do NOT call play() before the visitor's first
+      // interaction. play()/playTrack()/toggle() all pass autoplay: true
+      // from real click handlers; 'ended'-advance reuses an already
+      // gesture-authorised context.
+      if (opts?.autoplay !== true) {
+        setActiveIndex(rolloutSongs.findIndex((s) => s.src === song.src));
+        applySongTheme(song);
+        audio.pause();
+        setIsPlaying(false);
+        return;
+      }
       const current = audio.getAttribute('src') || audio.src;
       if (!current.endsWith(nextSrc)) {
         audio.src = nextSrc;
@@ -163,15 +177,10 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       audio.muted = muted;
       connectAnalyzer();
       void ctxRef.current?.resume();
-      if (opts?.autoplay === true) {
-        void audio
-          .play()
-          .then(() => setIsPlaying(true))
-          .catch(() => setIsPlaying(false));
-      } else {
-        audio.pause();
-        setIsPlaying(false);
-      }
+      void audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
     },
     [volume, muted, connectAnalyzer],
   );
@@ -199,13 +208,20 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   const play = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    // First gesture: the audio element intentionally has no src yet
+    // (preload gate) — load the cued track through playIndex, which is
+    // also where the AudioContext is created/resumed.
+    if (!audio.getAttribute('src')) {
+      playIndex(activeIndex, { autoplay: true });
+      return;
+    }
     connectAnalyzer();
     void ctxRef.current?.resume();
     void audio
       .play()
       .then(() => setIsPlaying(true))
       .catch(() => setIsPlaying(false));
-  }, [connectAnalyzer]);
+  }, [connectAnalyzer, playIndex, activeIndex]);
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
@@ -251,14 +267,16 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   const seek = seekTo;
 
-  // Start the site soundtrack on each fresh load. Browsers that disallow audible
-  // autoplay leave the visible music control available for the required tap.
+  // NO autoplay on load (VIP-1000X fix #1): creating an AudioContext or
+  // fetching/playing audio before the visitor's first gesture is blocked
+  // by Chrome and produced the aborted i-always-feel-like.mp3 request.
+  // Cue the opening track only — no src assignment, no context, no fetch.
+  // Playback starts from the visitor's first tap on any play control.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
-    localStorage.setItem(MUSIC_ON_KEY, '1');
-    playIndex(startIndex, { autoplay: true });
+    playIndex(startIndex);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       try {
@@ -390,7 +408,9 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   return (
     <MusicContext.Provider value={api}>
-      <audio ref={audioRef} autoPlay preload="metadata" playsInline crossOrigin="anonymous" />
+      {/* preload="none" + no autoPlay + no src until first gesture:
+          zero audio network requests on page load (VIP-1000X fix #1). */}
+      <audio ref={audioRef} preload="none" playsInline crossOrigin="anonymous" />
       {children}
     </MusicContext.Provider>
   );

@@ -142,8 +142,7 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
             <iframe
               src={`${fullSrc}&autoplay=1&rel=0`}
               title={`${item.title} — full`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             />
           ) : (
             <video src={fullSrc} controls autoPlay playsInline preload="metadata" />
@@ -153,8 +152,7 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
             src={previewSrc}
             title={`${item.title} — free preview`}
             loading="lazy"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           />
         ) : (
           <video src={previewSrc} controls playsInline preload="metadata" />

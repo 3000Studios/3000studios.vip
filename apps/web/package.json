@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node ../../scripts/check-no-placeholders.mjs",
+    "prebuild": "node ../../scripts/check-no-placeholders.mjs && node ../../scripts/generate-site-meta.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
