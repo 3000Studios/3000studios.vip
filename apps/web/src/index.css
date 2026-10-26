@@ -208,7 +208,7 @@ svg {
 /* ================================================================
    VIP-1000X — consent-banner collision fix (Crew C, fix #4)
    The banner is position:fixed, so without help it overlays the
-   bottom dock, the floating Subscribe FAB, the music dock and the
+   bottom dock, the music dock, the Admin FAB and the
    hero CTAs. ConsentManager adds body.consent-open and publishes
    the banner's measured height as --consent-banner-h while open.
    ================================================================ */
@@ -225,18 +225,6 @@ svg {
      offset in million-dollar.css. */
   .consentBanner {
     bottom: 0 !important;
-  }
-}
-
-/* Floating Subscribe FAB: lift fully clear of the open banner. */
-body.consent-open .ytSubFab {
-  bottom: calc(
-    58px + env(safe-area-inset-bottom, 0px) + var(--consent-banner-h, 180px) + 14px
-  );
-}
-@media (min-width: 980px) {
-  body.consent-open .ytSubFab {
-    bottom: calc(var(--consent-banner-h, 140px) + 14px);
   }
 }
 
@@ -266,6 +254,23 @@ body.consent-open .adminFab {
   body.consent-open .adminFab {
     bottom: calc(var(--consent-banner-h, 140px) + 14px) !important;
   }
+}
+
+/* ================================================================
+   Smooth scrolling (Boss order, 2026-10-26)
+   Canonical smooth scrolling for the whole site, declared here in
+   the root stylesheet so it cannot be lost in a legacy sheet, plus
+   scroll padding so anchored sections land below the fixed header
+   instead of sliding underneath it. Reduced-motion users keep
+   instant scrolling (also enforced globally in lock.css).
+   ================================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+html {
+  scroll-padding-top: 88px;
 }
 
 /* Hero CTAs: give bottom-anchored hero copy room equal to the banner

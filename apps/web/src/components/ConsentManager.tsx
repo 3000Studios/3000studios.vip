@@ -116,7 +116,7 @@ export function ConsentManager() {
 
   // Collision fix (VIP-1000X #4): while the banner is open, publish its
   // measured height as --consent-banner-h and tag <body class="consent-open">
-  // so the floating Subscribe FAB, the bottom dock/nav and the music dock
+  // so the bottom dock/nav, the music dock and the Admin FAB
   // can lift clear of it (rules at the end of src/index.css), and hero CTAs
   // get bottom padding instead of hiding under the banner.
   // Layout effect (not passive): the class + height var must land before

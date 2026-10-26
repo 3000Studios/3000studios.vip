@@ -112,10 +112,9 @@ function RootLayout() {
         <SparkClickFX />
         <StageFX />
       </FxGate>
-      {/* VIP-1000X fix #5: YouTubeSubscriberPerk's floating red Subscribe
-          FAB is unmounted — exactly one subscribe CTA remains, the header
-          nav Subscribe button (v2/Header). The component file is kept for
-          reference but renders nowhere. */}
+      {/* Exactly one subscribe CTA on the site: the header nav Subscribe
+          button (v2/Header). The old floating Subscribe FAB component was
+          removed as dead code (Boss order, 2026-10-26). */}
       <SampleGate />
       <Outlet />
       <MusicDock />

@@ -5,7 +5,6 @@ import { AdSenseUnit } from '../pages/PublicLayout';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { Preloader, CursorFX, Grain } from './chrome';
-import { EQWallpaper } from './EQWallpaper';
 import { HeroEQ } from './HeroEQ';
 import { Statement, ClipReveal, StudioGrid, CtaBand, Marquee } from './Sections';
 import { HorizontalReleases } from './HorizontalReleases';
@@ -42,8 +41,7 @@ export function HomePage() {
 
   return (
     <>
-      <EQWallpaper />
-      <div className="v3-root v3-root--eq">
+      <div className="v3-root">
         <Preloader />
         <CursorFX />
         <Grain />

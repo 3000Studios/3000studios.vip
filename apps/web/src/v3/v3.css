@@ -272,15 +272,6 @@
 /* beat headline */
 .v3-beat { display: inline-block; will-change: transform; }
 
-/* ---------- EQ live wallpaper ---------- */
-.v3-eq-wallpaper {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  width: 100vw; height: 100vh; height: 100svh;
-  background: #05060a;
-}
-/* Homepage variant: root goes transparent so the wallpaper shows through. */
-.v3-root--eq { background: transparent; z-index: 1; }
-
 /* Premium circular equalizer — canvas radial visualizer */
 .v3-circular-eq {
   display: inline-block;
