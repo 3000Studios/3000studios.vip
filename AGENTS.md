@@ -1,8 +1,16 @@
 ﻿# AGENTS.md — 3000Studios Project Rules
 
-- Workspace root: `C:\Users\MrJws\OneDrive\Workspaces\3000studios.vip`. Never work from temp directories.
-- Deploy exclusively through Cloudflare Pages auto-deploy. Every change: commit → push → auto-deploy. No manual wrangler deploys, no separate branches, no GitHub Actions.
-- One repo, one branch (`main`), one Cloudflare Pages project. After every change: commit, push, resolve all conflicts, then Cloudflare auto-deploy triggers.
+## Cloud coding agents (Jules and similar) — read this first
+
+- Work from the root of this repository clone. Windows/OneDrive paths elsewhere in this file describe the owner's local machine, not this repo — ignore them in cloud environments.
+- Stack: npm 11 workspaces + Turbo monorepo. Web app = `apps/web` (Vite + React + TypeScript). Install: `npm ci`. Build: `npm run build`. Test: `npm test`. Lint: `npm run lint`. Extra gates that must pass: `npm run check:placeholders` (no placeholder content ever ships) and `npm run smoke:sitemap`.
+- Deployment: Cloudflare Pages project `3000studios-vip`, build root `apps/web`. Deploys are handled by the owner outside the agent workflow — your job ends at a pull request. Never deploy, never run wrangler.
+- Pull requests only: never merge, never push to `main` directly, never create or modify GitHub Actions workflows.
+- Standing rules: the brand is always written "3000 Studios". No placeholder or lorem content. No new paid services, paid dependencies, or subscriptions. Never print, commit, or expose secrets or env values. Keep changes small, tested, and explained in the PR description.
+
+- Workspace root: the root of this repository's working clone (on the owner's Windows machine: its local clone of this repo). Never work from temp directories.
+- Deploy through Cloudflare Pages (project `3000studios-vip`, build root `apps/web`). The owner handles deploys; agents deliver work via pull requests to `main`. No GitHub Actions.
+- One repo, one branch (`main`), one Cloudflare Pages project.
 - Secrets & env vars: `C:\Users\MrJws\Documents\global.env` is the canonical global environment file. Keep it clean, organized, and deduplicated. Use it for required API access and safe secret injection only; never print, commit, screenshot, upload, or expose secret values.
 
 - Start by reading package.json, framework config, Firebase config, Cloudflare config, and env examples.
