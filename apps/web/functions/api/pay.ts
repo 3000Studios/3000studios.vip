@@ -3,7 +3,10 @@ const STRIPE: Record<string, string> = {
   tee: 'https://buy.stripe.com/00w9AT4SF4iG00UbA6bAs0X',
   cap: 'https://buy.stripe.com/5kQ8wP2Kx8yW292fQmbAs0Y',
   sticker: 'https://buy.stripe.com/00w6oHetf5mKfZS9rYbAs0Z',
-  track: 'https://buy.stripe.com/6oUcN52Kx8yW14YcEabAs0T',
+  // 'track' retired 2026-10-27 (music model flip): on-site track sales are
+  // off — songs are previews here, full listens on the streaming platforms.
+  // The Stripe link itself is untouched in the owner's account; this edge
+  // simply no longer routes anyone to it, and no checkout arm is issued.
   monthly: 'https://buy.stripe.com/28EbJ15WJg1oeVO1ZwbAs0U',
   yearly: 'https://buy.stripe.com/28E6oH4SF6qO9Bu6fMbAs0V',
   sponsor: 'https://buy.stripe.com/00w14n70NaH414YeMibAs10',

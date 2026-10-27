@@ -1,5 +1,3 @@
-export const SAMPLE_SECONDS = 30;
-export const TRACK_PRICE_CENTS = 99;
 export const MONTHLY_PRICE_CENTS = 399;
 export const YEARLY_PRICE_CENTS = 1999;
 
@@ -69,19 +67,14 @@ export function hasFullAccess(slug?: string) {
   // Was hard-coded `return true` (business audit P0-2): any gate that asked
   // this question got "yes" for every visitor. Now it answers from the real
   // entitlement — an active plan covers everything; otherwise the specific
-  // track must be owned. NOTE: full-length streaming stays free by design
-  // (see llms.txt / terms); this gates paid extras (downloads, vault perks)
-  // at the call sites that choose to check it.
+  // track must be owned. NOTE (music model, Boss order 2026-10-27): on-site
+  // track sales are retired — songs are heard as 1-minute previews here and
+  // in full on the streaming platforms. This gates plan extras (vault
+  // perks) at the call sites that choose to check it; `tracks` is a legacy
+  // field kept so pre-flip entitlements still parse.
   const ent = readEntitlement();
   if (ent.plan !== 'none') return true;
   return slug ? ent.tracks.includes(slug) : false;
-}
-
-export function grantTrack(slug: string) {
-  const ent = readEntitlement();
-  if (!ent.tracks.includes(slug)) ent.tracks.push(slug);
-  writeEntitlement(ent);
-  logOpsEvent('purchase_track', { slug });
 }
 
 export function grantPlan(plan: 'monthly' | 'yearly' | 'admin') {
@@ -105,7 +98,6 @@ export function grantPlan(plan: 'monthly' | 'yearly' | 'admin') {
 /* pending record older than 24h, settles nothing.                     */
 /* ------------------------------------------------------------------ */
 
-export const TRACK_PENDING_KEY = '3000-pending-track';
 export const SHOP_PENDING_KEY = '3000-pending-shop-item';
 const PENDING_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -132,11 +124,9 @@ export function readPending(key: string): PendingPurchase | null {
       const parsed = JSON.parse(raw) as PendingPurchase;
       return typeof parsed.id === 'string' ? parsed : null;
     }
-    // Legacy pre-2026-10-27 records stored a bare slug/id with no timestamp;
+    // Legacy pre-2026-10-27 records stored a bare id with no timestamp;
     // treat them as just-created so an in-flight checkout is not stranded.
-    return key === TRACK_PENDING_KEY
-      ? { id: 'track', slug: raw, ts: Date.now() }
-      : { id: raw, ts: Date.now() };
+    return { id: raw, ts: Date.now() };
   } catch {
     return null;
   }
@@ -154,12 +144,6 @@ function pendingFresh(pending: PendingPurchase) {
   return Date.now() - pending.ts < PENDING_TTL_MS;
 }
 
-/** Begin the $0.99 track checkout: record intent, hand off to Stripe. */
-export function startTrackCheckout(slug: string) {
-  writePending(TRACK_PENDING_KEY, { id: 'track', slug, via: 'stripe', ts: Date.now() });
-  window.location.assign(`/api/pay?sku=track&slug=${encodeURIComponent(slug)}`);
-}
-
 type PayArmResponse = { ok: boolean; sku?: string; slug?: string; ts?: number };
 
 async function fetchPayArm(): Promise<PayArmResponse | null> {
@@ -175,11 +159,14 @@ async function fetchPayArm(): Promise<PayArmResponse | null> {
 /**
  * Settle any pending purchase on a ?paid=1 return. Grants ONLY when:
  *  - a pending record exists from a real buy click and is < 24h old, AND
- *  - the server validates the signed checkout arm for the same sku/slug.
- * PayPal shop returns have no arm (PayPal never transits /api/pay); those
- * settle on the pending record alone, as before — documented residual.
- * The generic shop "track" item carries no slug, so it never auto-grants a
- * (previously hard-coded, wrong) track; the buyer picks in the catalog.
+ *  - the server validates the signed checkout arm for the same sku.
+ * PayPal returns carry no arm (PayPal never transits /api/pay), so they
+ * NEVER settle client-side (v2 full-check P1-4: the old pending-only
+ * PayPal settle granted plans with no payment proof at all). PayPal plan
+ * orders are fulfilled by the studio after the payment lands — the return
+ * is logged, nothing is granted.
+ * Track purchases no longer exist (music model flip, 2026-10-27): the
+ * track pending key and the track SKU were retired with the $0.99 offers.
  * Returns true when something was granted. Always strips ?paid from the URL.
  */
 export async function settleReturnPurchase(): Promise<boolean> {
@@ -189,32 +176,17 @@ export async function settleReturnPurchase(): Promise<boolean> {
     if (params.get('paid') !== '1') return false;
 
     const arm = await fetchPayArm();
-    const trackPending = readPending(TRACK_PENDING_KEY);
     const shopPending = readPending(SHOP_PENDING_KEY);
-
-    if (
-      trackPending?.id === 'track' &&
-      trackPending.slug &&
-      pendingFresh(trackPending) &&
-      arm?.ok &&
-      arm.sku === 'track' &&
-      arm.slug === trackPending.slug
-    ) {
-      grantTrack(trackPending.slug);
-      granted = true;
-    }
-    if (trackPending) clearPending(TRACK_PENDING_KEY);
 
     if (shopPending && pendingFresh(shopPending)) {
       const plan =
         shopPending.id === 'monthly' ? 'monthly' : shopPending.id === 'yearly' ? 'yearly' : null;
-      const armed =
-        arm?.ok && plan !== null && arm.sku === plan ? true : shopPending.via === 'paypal';
+      const armed = Boolean(arm?.ok && plan !== null && arm.sku === plan);
       if (plan && armed) {
         grantPlan(plan);
         granted = true;
-      } else if (shopPending.id === 'track') {
-        logOpsEvent('shop_track_return_unassigned', {});
+      } else if (plan && shopPending.via === 'paypal') {
+        logOpsEvent('paypal_plan_return_unverified', { id: shopPending.id });
       }
     }
     if (shopPending) clearPending(SHOP_PENDING_KEY);
@@ -227,23 +199,6 @@ export async function settleReturnPurchase(): Promise<boolean> {
     /* ignore — fail closed: no grant */
   }
   return granted;
-}
-
-export function checkoutMailto(kind: 'track' | 'monthly' | 'yearly', title?: string) {
-  const stripe =
-    kind === 'track'
-      ? (import.meta.env.VITE_STRIPE_TRACK_LINK as string | undefined)
-      : kind === 'monthly'
-        ? (import.meta.env.VITE_STRIPE_MONTHLY_LINK as string | undefined)
-        : (import.meta.env.VITE_STRIPE_YEARLY_LINK as string | undefined);
-  if (stripe) return stripe;
-  const subject =
-    kind === 'track'
-      ? `Buy ${title || 'track'} — $0.99`
-      : kind === 'monthly'
-        ? 'Unlock all songs — $3.99/mo'
-        : 'Unlock all songs — $19.99/year';
-  return `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(subject)}`;
 }
 
 export function logOpsEvent(type: string, extra?: Record<string, unknown>) {

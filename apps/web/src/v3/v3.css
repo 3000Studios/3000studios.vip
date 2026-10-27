@@ -354,3 +354,32 @@
   .v3-hero-eq i { animation: none; height: 14px; opacity: .7; }
   .v3-coverwall-track { animation: none; }
 }
+
+/* --- v2 model flip: preview framing + platform links in the catalog --- */
+.v3-track-preview-note {
+  margin: 2px 0 8px;
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.v3-track-links-label {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.8;
+  margin-right: 2px;
+}
+.v3-artist-platforms {
+  margin-top: 34px;
+  padding: 22px 24px;
+  border-radius: 18px;
+}
+.v3-artist-platforms strong {
+  font-size: 17px;
+}
+.v3-artist-platforms p {
+  margin: 6px 0 12px;
+  opacity: 0.8;
+  font-size: 14px;
+  max-width: 62ch;
+}

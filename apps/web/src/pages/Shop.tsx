@@ -220,9 +220,10 @@ export function ShopPage() {
             SUPPLY DEPOT
           </h1>
           <p>
-            Official 3000 Studios merch, music ownership, and VIP passes. Merch
-            checks out through our Shopify store; music and VIP stay on instant
-            checkout below.
+            Official 3000 Studios merch and VIP passes. Merch checks out
+            through our Shopify store; VIP and sponsor slots stay on instant
+            checkout below. (The music itself is free on the streaming
+            platforms — previews play on every song page.)
           </p>
         </section>
 
@@ -274,11 +275,11 @@ export function ShopPage() {
         <section className="nn-wrap" style={{ marginBottom: 56 }}>
           <div className="nn-sec-head">
             <div>
-              <span className="nn-kicker">Music · VIP · Sponsors</span>
+              <span className="nn-kicker">VIP · Sponsors</span>
               <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4vw, 38px)' }}>
-                Own the Music
+                Passes & Sponsor Slots
               </h2>
-              <p>High-res downloads, VIP passes, and sponsor inventory — instant checkout.</p>
+              <p>VIP passes and sponsor inventory — instant checkout. PayPal plan orders are confirmed by email.</p>
             </div>
           </div>
           <div className="nn-grid">

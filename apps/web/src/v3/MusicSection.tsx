@@ -1,51 +1,30 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DownloadSimple, LockKey, MagnifyingGlass, Pause, Play } from '@phosphor-icons/react';
+import { ArrowSquareOut, MagnifyingGlass, Pause, Play } from '@phosphor-icons/react';
 import { Reveal } from '../v2/Reveal';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { publishedSongs } from '../data/publishedSongs';
-import { youtubeWatchUrl } from '../data/officialReleases';
-import {
-  TRACK_PRICE_CENTS,
-  HYPERFOLLOW_URL,
-  formatMoney,
-  readEntitlement,
-  settleReturnPurchase,
-  startTrackCheckout,
-} from '../lib/commerce';
+import { settleReturnPurchase } from '../lib/commerce';
+import { ARTIST_LINKS, getTrackLinks } from '../lib/trackLinks';
+import { hasPreview } from '../lib/previews';
 
-function useOwnedTracks(): string[] {
-  const [tracks, setTracks] = useState<string[]>(() => readEntitlement().tracks);
-  useEffect(() => {
-    const onChange = () => setTracks(readEntitlement().tracks);
-    window.addEventListener('3000-entitlement', onChange);
-    return () => window.removeEventListener('3000-entitlement', onChange);
-  }, []);
-  return tracks;
-}
-
-/** $0.99 — yours to keep + download. Not a license, just the song.
- *  FAIL-CLOSED (fixed 2026-10-25; hardened 2026-10-27, audit P0-1): this
- *  used to grantTrack() BEFORE sending the buyer to Stripe, so every
- *  "Own it" click unlocked the download for free. Now the click only
- *  records a timestamped pending intent (commerce.startTrackCheckout) and
- *  the entitlement settles on the ?paid=1 return ONLY when the server
- *  validates the signed checkout-arm cookie (commerce.settleReturnPurchase).
- *  A bare ?paid=1 URL grants nothing. */
-function buyTrack(slug: string) {
-  startTrackCheckout(slug);
-}
-
-/** Settle any pending purchase when Stripe returns the buyer with ?paid=1. */
+/** Settle any pending VIP plan purchase when Stripe returns with ?paid=1. */
 // eslint-disable-next-line react-refresh/only-export-components
 export function settlePendingPurchase() {
   void settleReturnPurchase();
 }
 
+/* MUSIC MODEL (Boss order 2026-10-27): on-site track sales are retired.
+   Songs are free on the streaming platforms, so this catalog plays a
+   preview of every track (the produced 1-minute preview where one
+   exists, otherwise the label's short clip — lib/previews) and sends
+   listeners out for the full song: per-track verified links only
+   (lib/trackLinks); Spotify/Amazon exist at artist level only and are
+   labeled as such. The old $0.99 "Own it" grant/settle flow is gone,
+   along with owned-track downloads. */
 export function MusicSection() {
   const music = useGlobalMusic();
   const [query, setQuery] = useState('');
-  const owned = useOwnedTracks();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -62,9 +41,10 @@ export function MusicSection() {
             The <em>music</em>
           </h2>
           <p className="v3-lead">
-            Every released track, playable right here. Tap any cover — it keeps going
-            while you browse. Own any song for {formatMoney(TRACK_PRICE_CENTS)}: yours
-            to keep and download, forever. No license, no strings.
+            Every released track, with a preview playing right here — a full
+            1-minute preview where the studio cut exists, the label&apos;s
+            short clip everywhere else. The full song is free on the
+            streaming platforms — pick yours under any track and it counts.
           </p>
           <label className="v3-search">
             <MagnifyingGlass size={17} />
@@ -93,7 +73,7 @@ export function MusicSection() {
               music.activeTitle.toLowerCase() === song.title.toLowerCase() ||
               music.activeSong?.slug === song.slug;
             const playing = isActive && music.isPlaying;
-            const unlocked = owned.includes(song.slug);
+            const links = getTrackLinks(song.slug);
             return (
               <Reveal key={song.slug} delay={Math.min(i * 0.03, 0.3)}>
                 <article className={`v3-track acss-shine${isActive ? ' is-active' : ''}`}>
@@ -101,7 +81,9 @@ export function MusicSection() {
                     type="button"
                     className="v3-track-cover"
                     onClick={() => (playing ? music.pause() : music.playTrack(song.src, song.title))}
-                    aria-label={playing ? `Pause ${song.title}` : `Play ${song.title}`}
+                    aria-label={
+                      playing ? `Pause preview of ${song.title}` : `Play the preview of ${song.title}`
+                    }
                   >
                     <img src={song.cover} alt={`${song.title} album artwork`} loading="lazy" />
                     <span className="v3-track-play" aria-hidden="true">
@@ -119,53 +101,47 @@ export function MusicSection() {
                     <h3>
                       <Link to={`/song/${song.slug}`}>{song.title}</Link>
                     </h3>
-                    <div className="v3-track-links">
-                      <a
-                        className="v3-track-buy acss-press"
-                        href={song.buy ?? HYPERFOLLOW_URL}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Buy
-                      </a>
-                      {song.youtubeId && (
-                        <a href={youtubeWatchUrl(song.youtubeId)} target="_blank" rel="noreferrer">
-                          Video
-                        </a>
-                      )}
-                      {(song.buy ?? song.apple) && (
-                        <a href={song.buy ?? song.apple} target="_blank" rel="noreferrer">
-                          Stream
-                        </a>
-                      )}
-                    </div>
-                    <div style={{ marginTop: 12 }}>
-                      {unlocked ? (
-                        <a
-                          className="v3-btn v3-btn--ghost"
-                          style={{ padding: '10px 22px', fontSize: 12 }}
-                          href={song.src}
-                          download={`${song.title}.mp3`}
-                        >
-                          <DownloadSimple size={15} /> Download
-                        </a>
-                      ) : (
-                        <button
-                          type="button"
-                          className="v3-btn v3-btn--gold"
-                          style={{ padding: '10px 22px', fontSize: 12, border: 0, cursor: 'pointer' }}
-                          onClick={() => buyTrack(song.slug)}
-                        >
-                          <LockKey size={15} /> Own it — {formatMoney(TRACK_PRICE_CENTS)}
-                        </button>
-                      )}
-                    </div>
+                    <p className="v3-track-preview-note">
+                      {hasPreview(song.slug)
+                        ? playing
+                          ? 'Playing the 1-minute preview'
+                          : '1-minute preview'
+                        : 'Preview clip'}
+                    </p>
+                    {links.length > 0 && (
+                      <div className="v3-track-links" aria-label={`Hear the full song: ${song.title}`}>
+                        <span className="v3-track-links-label">Full song:</span>
+                        {links.map((l) => (
+                          <a key={l.id} href={l.url} target="_blank" rel="noreferrer">
+                            {l.label} <ArrowSquareOut size={11} aria-hidden="true" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </article>
               </Reveal>
             );
           })}
         </div>
+
+        <Reveal>
+          <div className="v3-artist-platforms acss-glass">
+            <strong>Every song, on your platform</strong>
+            <p>
+              Per-track Spotify and Amazon links don&apos;t exist in the
+              label&apos;s records, so here are the artist pages instead —
+              every release lives there:
+            </p>
+            <div className="v3-track-links">
+              {ARTIST_LINKS.map((l) => (
+                <a key={l.id} href={l.url} target="_blank" rel="noreferrer">
+                  {l.label} <ArrowSquareOut size={11} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGlobalMusic } from './GlobalMusic';
 import { HYPERFOLLOW_URL } from '../lib/commerce';
+import { getTrackLinks } from '../lib/trackLinks';
 import { playbackKind } from '../data/music';
 
 function fmt(value: number) {
@@ -37,13 +38,16 @@ export function MusicDock() {
   if (!visible) return null;
 
   const kind = playbackKind(music.activeSong.src);
+  // On-site playback is previews only (music model flip, 2026-10-27) —
+  // the dock says so plainly instead of claiming a full stream.
   const streamLabel = music.playbackError
     ? 'Unavailable'
     : kind === 'apple-preview'
       ? 'Apple preview'
       : kind === 'missing'
         ? 'Unavailable'
-        : 'Full stream';
+        : '1-minute preview';
+  const fullSongUrl = getTrackLinks(music.activeSong.slug)[0]?.url ?? HYPERFOLLOW_URL;
 
   return (
     <div
@@ -67,13 +71,13 @@ export function MusicDock() {
       </button>
       <a
         className="musicDockBuy"
-        href={HYPERFOLLOW_URL}
+        href={fullSongUrl}
         target="_blank"
         rel="noreferrer"
-        aria-label={`Buy ${music.activeSong.title}`}
+        aria-label={`Hear the full song: ${music.activeSong.title}`}
         onClick={(e) => e.stopPropagation()}
       >
-        Buy
+        Full song
       </a>
     </div>
   );

@@ -16,6 +16,7 @@ import {
   type CatalogSong,
 } from '../data/music';
 import { publishAnalyser } from '../lib/audioAnalyserBus';
+import { previewSourceForSong } from '../lib/previews';
 
 const MUSIC_ON_KEY = '3000-music-on';
 
@@ -29,6 +30,9 @@ type MusicApi = {
   activeIndex: number;
   activeSong: CatalogSong;
   activeTitle: string;
+  /** True when the loaded source is a preview (the on-site model since
+   *  2026-10-27 — full tracks live on the streaming platforms). */
+  isPreview: boolean;
   playbackError: string | null;
   play: () => void;
   pause: () => void;
@@ -91,6 +95,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
   const startIndex = 0;
   const [activeIndex, setActiveIndex] = useState(startIndex);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [muted, setMutedState] = useState(false);
   const [volume, setVolumeState] = useState(0.42);
@@ -146,11 +151,10 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       if (!song) return;
       const audio = audioRef.current;
       if (!audio) return;
-      const nextSrc = song.src;
       setPlaybackError(null);
-      if (!nextSrc) {
+      if (!song.src) {
         setIsPlaying(false);
-        setPlaybackError('No local master or Apple preview for this title yet.');
+        setPlaybackError('No preview for this title yet.');
         return;
       }
       // Gesture gate (VIP-1000X fix #1): without autoplay intent this is a
@@ -167,6 +171,21 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
         setIsPlaying(false);
         return;
       }
+      // Music model flip (2026-10-27): the player only ever loads a
+      // PREVIEW source — the produced 1-minute preview video's audio or
+      // the label's Apple preview clip. Full-track masters are no longer
+      // public, so a song without a preview fails honestly here instead
+      // of streaming the master.
+      const preview = previewSourceForSong(song);
+      if (!preview) {
+        setIsPlaying(false);
+        setPlaybackError(
+          'Preview coming soon — the full song is free on the streaming platforms.',
+        );
+        return;
+      }
+      const nextSrc = preview.src;
+      setIsPreview(true);
       const current = audio.getAttribute('src') || audio.src;
       if (!current.endsWith(nextSrc)) {
         audio.src = nextSrc;
@@ -195,6 +214,14 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       }
       const audio = audioRef.current;
       if (!audio) return;
+      // Unknown-source fallback: never stream a full-track master path —
+      // on-site playback is previews only (music model flip, 2026-10-27).
+      if (src.includes('/media/') && !src.includes('/media/previews/')) {
+        setPlaybackError(
+          'Full tracks play on the streaming platforms — previews only on this site.',
+        );
+        return;
+      }
       if (!audio.src.endsWith(src)) audio.src = src;
       connectAnalyzer();
       void audio
@@ -369,6 +396,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       activeIndex,
       activeSong,
       activeTitle,
+      isPreview,
       playbackError,
       play,
       pause,
@@ -391,6 +419,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
       activeIndex,
       activeSong,
       activeTitle,
+      isPreview,
       playbackError,
       play,
       pause,

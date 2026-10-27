@@ -50,16 +50,7 @@ export const MERCH_ITEMS: MerchItem[] = [
     image: 'https://pixabay.com/get/g0456505ee1cb4cf2bc4dc4109b6d1bfa0ff4df77cd8e8ccfbb18f04e152a140fab7832f5d39f95f4e380fa269c4582231eda6a859864fbd8aa1d6730fa7cb1fd_1280.jpg',
     stripe: 'https://buy.stripe.com/00w6oHetf5mKfZS9rYbAs0Z',
   },
-  {
-    id: 'track',
-    title: 'Any official track',
-    priceCents: 99,
-    kind: 'music',
-    blurb: 'High-res audio download & official release license.',
-    sku: 'TRK-001',
-    image: 'https://pixabay.com/get/g745a3ab6cbcad934b2f22c73b1395e9c9a3688ff346db9d3a9b37c5fadedfc8a66b74220326bda30a5d03b38ec675aa51d61d186b7923cf021798c0ddb538658_1280.jpg',
-    stripe: 'https://buy.stripe.com/6oUcN52Kx8yW14YcEabAs0T',
-  },
+
   {
     id: 'monthly',
     title: 'Vault monthly',

@@ -6,12 +6,14 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, ShoppingBag, YoutubeLogo } from '@phosphor-icons/react';
+import { ArrowLeft, Play, Pause, YoutubeLogo } from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { LazyYouTube } from '../components/LazyYouTube';
 import { rolloutSongs } from '../data/music';
 import { publishedSongs } from '../data/publishedSongs';
-import { HYPERFOLLOW_URL, startTrackCheckout } from '../lib/commerce';
+import { HYPERFOLLOW_URL } from '../lib/commerce';
+import { ARTIST_LINKS, getTrackLinks } from '../lib/trackLinks';
+import { previewPathFor } from '../lib/previews';
 import {
   getOfficialVideoForTitle,
   youtubeEmbedUrl,
@@ -125,7 +127,9 @@ export function SongPage() {
   const embed = officialVideo
     ? `${youtubeEmbedUrl(officialVideo.videoId)}&autoplay=1&mute=1&controls=0&loop=1&playlist=${officialVideo.videoId}&playsinline=1`
     : '';
-  const buyUrl =
+  const trackLinks = getTrackLinks(song.slug);
+  const previewSrc = previewPathFor(song.slug);
+  const hyperfollow =
     publishedSongs.find((s) => s.slug === song.slug)?.buy ?? HYPERFOLLOW_URL;
 
   return (
@@ -220,8 +224,8 @@ export function SongPage() {
             </div>
             <p>
               {music.isPlaying
-                ? 'Audio-reactive experience live'
-                : 'Press play to activate the visual environment'}
+                ? 'Preview playing — the page moves with the music'
+                : 'Press play for the 1-minute preview'}
             </p>
           </div>
           {officialVideo ? (
@@ -235,45 +239,61 @@ export function SongPage() {
               Watch on YouTube
             </a>
           ) : null}
-          <div className="v2-song-buy-row">
-            <a
-              className="v2-btn v2-btn--gold v2-btn--sm acss-glow-cta acss-press"
-              href={buyUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <ShoppingBag size={16} weight="fill" />
-              Buy this track
-            </a>
-            <Link className="v2-btn v2-btn--ghost v2-btn--sm" to="/beats">
-              Beats & instrumentals
-            </Link>
-          </div>
-
-          {/* Own-it + VIP upsell (audit P1-4): the site's own offers, next to
-              the Apple path — song pages are the SEO landing pages and used
-              to present no direct offer at all. Checkout settles through the
-              same fail-closed /api/pay flow as the catalog. */}
-          <div className="vip-own-block acss-glass">
-            <div className="vip-own-copy">
-              <strong>Own this track — $0.99</strong>
-              <span>
-                Buy direct from the studio and it&apos;s yours to keep — or unlock every
-                track with VIP.
-              </span>
+          {/* MUSIC MODEL (Boss order 2026-10-27): no on-site track sales.
+              The 1-minute preview plays here; the full song is outbound —
+              per-track verified platform links, with the artist pages for
+              Spotify/Amazon (no per-track URLs exist for those two). */}
+          {previewSrc ? (
+            <div className="v2-song-preview">
+              <video
+                src={previewSrc}
+                poster={song.coverImage}
+                controls
+                preload="none"
+                playsInline
+                aria-label={`1-minute preview of ${song.title}`}
+              />
+              <p>1-minute preview — the full song is free on the platforms below.</p>
             </div>
-            <div className="vip-own-actions">
-              <button
-                type="button"
-                className="v2-btn v2-btn--gold v2-btn--sm acss-glow-cta acss-press"
-                onClick={() => startTrackCheckout(song.slug)}
+          ) : null}
+          <div className="v2-song-listen">
+            <span className="v2-song-listen-label">For the full song — listen to more:</span>
+            <div className="v2-song-listen-links">
+              {trackLinks.map((l) => (
+                <a
+                  key={l.id}
+                  className="v2-btn v2-btn--gold v2-btn--sm acss-glow-cta acss-press"
+                  href={l.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {l.label}
+                </a>
+              ))}
+              <a
+                className="v2-btn v2-btn--ghost v2-btn--sm"
+                href={hyperfollow}
+                target="_blank"
+                rel="noreferrer"
               >
-                Own it — $0.99
-              </button>
-              <Link className="v2-btn v2-btn--ghost v2-btn--sm acss-press" to="/vip">
-                VIP — all tracks, $3.99/mo
+                All platforms
+              </a>
+              <Link className="v2-btn v2-btn--ghost v2-btn--sm" to="/beats">
+                Beats & instrumentals
               </Link>
             </div>
+            <p className="v2-song-artist-links">
+              Find 3000 Studios on{' '}
+              {ARTIST_LINKS.map((l, i) => (
+                <span key={l.id}>
+                  {i > 0 ? ' · ' : ''}
+                  <a href={l.url} target="_blank" rel="noreferrer">
+                    {l.id === 'spotify' ? 'Spotify' : 'Amazon Music'}
+                  </a>
+                </span>
+              ))}{' '}
+              (artist pages — every release is there).
+            </p>
           </div>
         </section>
 
