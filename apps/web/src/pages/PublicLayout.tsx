@@ -12,6 +12,7 @@ import { useAdConsent } from '../components/ConsentManager';
 import { adsAllowedOnRoute } from '../components/explicitAdsGate';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { fadeUp } from './PageMotion';
+import { attachNavDance, syncAllNavCurrent } from '../liquid/loader';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
@@ -192,6 +193,14 @@ export function PublicLayout({
     const id = window.setTimeout(() => setOpen(false), 0);
     return () => window.clearTimeout(id);
   }, [location.pathname]);
+  /* Liquid A nav dance (v2, 2026-10-27): the legacy layout's rail nav
+     grooves on the same shared beat hub as the v2 header and the dock. */
+  useEffect(() => {
+    void attachNavDance(document.getElementById('vip-primary-nav'));
+  }, []);
+  useEffect(() => {
+    syncAllNavCurrent();
+  }, [location.pathname]);
   useEffect(() => {
     document.body.classList.toggle('vip-nav-open', open);
     return () => document.body.classList.remove('vip-nav-open');
@@ -241,7 +250,7 @@ export function PublicLayout({
         >
           <img
             className="officialProfileLogo"
-            src="/media/official-3000-studios-profile.png"
+            src="/media/official-3000-studios-profile.webp"
             alt="3000 Studios — official artist profile"
           />
           <span className="logoStack">
@@ -329,7 +338,7 @@ export function PublicLayout({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32, margin: '36px 0 32px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <img src="/media/official-3000-studios-profile.png" alt="3000 Studios" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid #ffd700' }} />
+                <img src="/media/official-3000-studios-profile.webp" alt="3000 Studios" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid #ffd700' }} />
                 <strong style={{ color: '#ffd700', fontSize: 18, fontFamily: 'Syne, sans-serif' }}>3000 STUDIOS</strong>
               </div>
               <p style={{ color: 'var(--vip-text-muted)', fontSize: 13, lineHeight: 1.6, margin: '0 0 16px' }}>

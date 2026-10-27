@@ -1,0 +1,122 @@
+/* ============================================================================
+   LIQUID A — navdance.css  ·  3000 Studios VIP v2
+   The Boss's nav choreography, ACSS-style: links glow-pulse and bounce to the
+   music (navdance.js drives --nd-glow / transform from the shared LiquidBeat
+   hub, staggered per link), while the CURRENT page's link (.is-current, or
+   [aria-current="page"]) stays steadily, brightly illuminated — no bounce,
+   no flicker — so "where am I" is never in doubt.
+
+   Works on: a top bar (.navdance), a phone bottom bar (.navdance--bottom),
+   and a full-screen menu list (.navdance--menu). Pure CSS fallback: with no
+   JS the current link is still lit and the rest sit still.
+   Tokens match vip-redesign.css / acss-fleet.css.
+   ========================================================================== */
+
+.navdance {
+  --nd-beat: 0;                       /* page groove 0..1, set by navdance.js */
+  --nd-ink: var(--acss-ink, oklch(0.95 0.01 95));
+  --nd-gold: var(--acss-brand, oklch(0.82 0.14 85));
+}
+.navdance a,
+.navdance [data-nav-link] {
+  --nd-glow: 0.15;                    /* per-link pulse, set by navdance.js */
+  --nd-hue: oklch(0.87 0.15 200);     /* default glow: VIP cyan */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: color-mix(in oklch, var(--nd-ink) 82%, transparent);
+  text-shadow:
+    0 0 calc(4px + var(--nd-glow) * 16px) var(--nd-hue),
+    0 0 calc(var(--nd-glow) * 30px) var(--nd-hue);
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Staggered glow palette — links cycle the aurora, never flash in unison. */
+.navdance a:nth-of-type(4n+2), .navdance [data-nav-link]:nth-of-type(4n+2) { --nd-hue: oklch(0.66 0.24 350); }
+.navdance a:nth-of-type(4n+3), .navdance [data-nav-link]:nth-of-type(4n+3) { --nd-hue: oklch(0.62 0.20 285); }
+.navdance a:nth-of-type(4n+4), .navdance [data-nav-link]:nth-of-type(4n+4) { --nd-hue: var(--nd-gold); }
+
+/* ---------- THE CURRENT PAGE: steady, bright, dominant. No dance. ------ */
+.navdance a.is-current,
+.navdance a[aria-current="page"],
+.navdance [data-nav-link].is-current {
+  --nd-glow: 1;
+  color: #fff8e7;
+  font-weight: 700;
+  text-shadow:
+    0 0 10px oklch(0.82 0.14 85 / 0.95),
+    0 0 26px oklch(0.82 0.14 85 / 0.65),
+    0 0 52px oklch(0.82 0.14 85 / 0.35);
+  transform: none !important;         /* illumination, never motion */
+}
+.navdance a.is-current::after,
+.navdance a[aria-current="page"]::after,
+.navdance [data-nav-link].is-current::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -0.28em;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--nd-gold), transparent);
+  box-shadow: 0 0 12px oklch(0.82 0.14 85 / 0.8);
+}
+
+/* Bar ambience: the whole bar breathes with the groove (cheap, opacity). */
+.navdance {
+  box-shadow: 0 0 calc(var(--nd-beat) * 26px) oklch(0.62 0.20 285 / calc(var(--nd-beat) * 0.25));
+}
+
+/* ---------- Phone bottom bar: compact icons+labels, smaller stage ------ */
+.navdance--bottom a,
+.navdance--bottom [data-nav-link] {
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+}
+.navdance--bottom a.is-current::after,
+.navdance--bottom [data-nav-link].is-current::after {
+  bottom: auto;
+  top: -0.3rem;
+}
+
+/* ---------- Full-screen menu: big links, the dance can be bigger ------- */
+.navdance--menu a,
+.navdance--menu [data-nav-link] {
+  font-family: var(--acss-font-display, 'Space Grotesk', sans-serif);
+  font-size: clamp(1.7rem, 7.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding: 0.35em 0;
+}
+.navdance--menu a.is-current::after,
+.navdance--menu [data-nav-link].is-current::after {
+  left: 0;
+  right: auto;
+  width: 2.2em;
+  bottom: 0.08em;
+}
+
+/* Hover / focus: a visitor's intent always wins over the groove. */
+.navdance a:hover, .navdance a:focus-visible,
+.navdance [data-nav-link]:hover, .navdance [data-nav-link]:focus-visible {
+  --nd-glow: 0.9;
+  color: var(--nd-ink);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navdance a, .navdance [data-nav-link] {
+    will-change: auto;
+    text-shadow: none;
+  }
+  .navdance a.is-current, .navdance a[aria-current="page"],
+  .navdance [data-nav-link].is-current {
+    /* Illumination is information, not motion — it stays. */
+    text-shadow:
+      0 0 10px oklch(0.82 0.14 85 / 0.9),
+      0 0 24px oklch(0.82 0.14 85 / 0.55);
+  }
+}

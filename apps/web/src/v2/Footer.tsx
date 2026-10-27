@@ -86,7 +86,7 @@ export function Footer() {
       <div className="v2-wrap v2-footer-grid">
         <div className="v2-footer-brand">
           <Link to="/" className="v2-brand" aria-label="3000 Studios home">
-            <img src="/media/official-3000-studios-profile.png" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
+            <img src="/media/official-3000-studios-profile-96.webp" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
             <span className="v2-brand-word">
               <strong>
                 3000<span className="v2-grad-text">Studios</span>

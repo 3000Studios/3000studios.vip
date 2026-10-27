@@ -1,0 +1,123 @@
+/* ============================================================================
+   LIQUID A — carousel.css  ·  3000 Studios VIP v2
+   Floating video panels on the liquid surface. Transform-only motion (the
+   JS writes translate3d/rotate/scale per frame); CSS here owns the panel
+   chrome: glass frame, aurora glow driven by --lq-glow (set from the beat),
+   caption chip, sheen sweep. Tokens match vip-redesign.css.
+   ========================================================================== */
+
+.lq-stage {
+  position: relative;
+  overflow: hidden;
+  perspective: 1100px;
+  touch-action: pan-y;               /* vertical page scroll stays native */
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: grab;
+}
+.lq-stage:active { cursor: grabbing; }
+
+.lq-ring {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;              /* panels opt back in, below */
+}
+
+.lq-panel {
+  --lq-glow: 0.3;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(58%, 340px);
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  border-radius: var(--acss-radius, 1rem);
+  overflow: hidden;
+  pointer-events: auto;
+  background: var(--vip-panel, #101319);
+  box-shadow:
+    0 18px 44px rgb(0 0 0 / 0.55),
+    0 0 calc(18px + var(--lq-glow) * 42px) oklch(0.87 0.15 200 / calc(var(--lq-glow) * 0.5)),
+    inset 0 0 0 1px oklch(0.95 0.01 95 / 0.14);
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+.lq-panel video,
+.lq-panel__ph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Placeholder tile (demo / no preview encode yet): liquid gradient still. */
+.lq-panel__ph {
+  background:
+    radial-gradient(120% 130% at 18% 0%, oklch(0.62 0.20 285 / 0.55), transparent 55%),
+    radial-gradient(110% 120% at 88% 100%, oklch(0.87 0.15 200 / 0.4), transparent 55%),
+    linear-gradient(160deg,
+      oklch(0.30 0.10 var(--ph-hue, 265)),
+      oklch(0.17 0.05 calc(var(--ph-hue, 265) + 40)));
+}
+.lq-panel__ph::after {              /* fake play glyph */
+  content: "▶";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  color: oklch(0.95 0.01 95 / 0.85);
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.6);
+}
+
+.lq-panel__cap {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.55rem;
+  max-width: calc(100% - 1.2rem);
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  font: 600 0.72rem/1.2 var(--acss-font-display, 'Space Grotesk', sans-serif);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--acss-ink, oklch(0.95 0.01 95));
+  background: rgb(5 6 12 / 0.55);
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+/* Sheen: a light sweep that strengthens on the front panel. */
+.lq-panel__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, oklch(0.95 0.01 95 / 0.10) 48%, transparent 62%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.lq-panel.is-front {
+  box-shadow:
+    0 26px 60px rgb(0 0 0 / 0.6),
+    0 0 calc(26px + var(--lq-glow) * 60px) oklch(0.82 0.14 85 / calc(0.25 + var(--lq-glow) * 0.45)),
+    inset 0 0 0 1px oklch(0.82 0.14 85 / 0.45);
+}
+.lq-panel.is-front .lq-panel__sheen { opacity: 0.8; }
+.lq-panel:focus-visible {
+  outline: 2px solid var(--vip-cyan, oklch(0.87 0.15 200));
+  outline-offset: 3px;
+}
+
+/* Phones: panels go portrait-friendly and wider in the stack. */
+@media (max-width: 680px) {
+  .lq-stage { perspective: 800px; }
+  .lq-panel { width: min(72%, 300px); aspect-ratio: 4 / 3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lq-panel { will-change: auto; }
+  .lq-panel__sheen { display: none; }
+}

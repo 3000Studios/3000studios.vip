@@ -11,6 +11,7 @@ import {
   CaretDown,
 } from '@phosphor-icons/react';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
+import { attachNavDance, syncAllNavCurrent } from '../liquid/loader';
 
 export type NavChild = { to: string; label: string; external?: boolean };
 export type NavItem = {
@@ -154,6 +155,19 @@ export function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  /* Liquid A nav dance (v2, 2026-10-27): the specialist's NavDance
+     grooves both nav forms to the shared LiquidBeat hub; the current
+     page's link stays steadily lit (pinned in liquid.css). */
+  useEffect(() => {
+    void attachNavDance(document.querySelector('.v2-nav-desktop'));
+  }, []);
+  useEffect(() => {
+    if (open) void attachNavDance(document.querySelector('.v2-mobile-nav'));
+  }, [ open ]);
+  useEffect(() => {
+    syncAllNavCurrent();
+  }, [location.pathname, location.hash]);
+
   useEffect(() => {
     // Close the mobile menu on navigation (back/forward/programmatic).
     // Navigation-driven, not a render loop: React bails out when already closed.
@@ -176,7 +190,7 @@ export function Header() {
       <header className={`v2-header acss-sticky${scrolled ? ' is-scrolled' : ''}`}>
         <div className="v2-header-inner acss-sticky__bar">
           <Link to="/" className="v2-brand" aria-label="3000 Studios home">
-            <img src="/media/official-3000-studios-profile.png" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
+            <img src="/media/official-3000-studios-profile-96.webp" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
             <span className="v2-brand-word">
               <strong>
                 3000<span className="v2-grad-text">Studios</span>

@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { attachNavDance } from '../liquid/loader';
 
 const items = [
   { to: '/', label: 'Home', icon: '⌂' },
@@ -13,6 +15,13 @@ const items = [
 
 export function BottomDock() {
   const { pathname, hash } = useLocation();
+  const dockRef = useRef<HTMLElement | null>(null);
+
+  /* Liquid A: the bottom thumb bar dances too (small amplitude — the
+     specialist's engine keeps tap targets hittable). */
+  useEffect(() => {
+    void attachNavDance(dockRef.current);
+  }, [pathname]);
   if (
     pathname.startsWith('/admin') ||
     pathname.startsWith('/vault') ||
@@ -31,7 +40,7 @@ export function BottomDock() {
   };
 
   return (
-    <nav className="bottomDock ytPerkSafe" aria-label="Primary mobile navigation">
+    <nav ref={dockRef} className="bottomDock ytPerkSafe" aria-label="Primary mobile navigation">
       {items.map((item) => {
         const active = item.to === '/'
           ? pathname === '/' && (!hash || hash === '')

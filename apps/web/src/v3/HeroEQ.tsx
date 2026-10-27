@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, ArrowRight } from '@phosphor-icons/react';
 import { MagneticButton } from '../components/MagneticButton';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { publishedSongs } from '../data/publishedSongs';
-import { CircularEQ } from './CircularEQ';
+import { LiquidHero, type LiquidPanel } from '../liquid/LiquidHero';
+import { hasPreview, previewPathFor } from '../lib/previews';
 
 function Word({ children, index, gold }: { children: string; index: number; gold?: boolean }) {
   return (
@@ -21,10 +22,22 @@ function Word({ children, index, gold }: { children: string; index: number; gold
   );
 }
 
-/* Premium circular equalizer — canvas radial visualizer, dances to real audio. */
-function HeroVisualizer() {
-  return <CircularEQ size={210} />;
-}
+/**
+ * Hero carousel panels: the produced 1-minute previews, in catalog order,
+ * capped at 8 simultaneous decoders so a mid phone stays smooth (the
+ * VIDEO SPEED LAW). Every panel in the ring plays at once (muted, looped)
+ * per the carousel's own engine; the rest of the previews live on their
+ * song pages and in the catalog below.
+ */
+const HERO_PANELS: LiquidPanel[] = publishedSongs
+  .filter((s) => hasPreview(s.slug))
+  .slice(0, 8)
+  .map((s) => ({
+    slug: s.slug,
+    src: previewPathFor(s.slug) ?? undefined,
+    poster: `/media/previews/${s.slug}-poster.jpg`,
+    label: s.title,
+  }));
 
 /* Featured drop — the newest release, playable straight from the hero. */
 function LatestDrop() {
@@ -63,6 +76,7 @@ function LatestDrop() {
 
 export function HeroEQ({ live }: { live: boolean }) {
   const reduce = usePrefersReducedMotion();
+  const heroRef = useRef<HTMLElement | null>(null);
   const [beat, setBeat] = useState(false);
 
   /* 128 BPM headline pulse — the brand heartbeat. */
@@ -80,7 +94,8 @@ export function HeroEQ({ live }: { live: boolean }) {
   ];
 
   return (
-    <header className="v3-hero">
+    <header className="v3-hero liquid-hero" ref={heroRef}>
+      <LiquidHero panels={HERO_PANELS} heroRef={heroRef} />
       <div className="v3-hero-shade" aria-hidden="true" />
 
       <div className="v3-hero-inner">
@@ -107,15 +122,6 @@ export function HeroEQ({ live }: { live: boolean }) {
             </span>
           ))}
         </motion.h1>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.1, delay: 0.9 }}
-          style={{ display: 'flex', justifyContent: 'center', marginTop: 26 }}
-        >
-          <HeroVisualizer />
-        </motion.div>
 
         <motion.p
           className="v3-lede"
@@ -149,7 +155,9 @@ export function HeroEQ({ live }: { live: boolean }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.6 }}
         >
-          Hit play on any track — the whole page moves with the music.
+          Touch the water — it answers. Every floating panel is a 1-minute
+          preview; tap one to open its song. Hit play on any track and the
+          whole page moves with the music.
         </motion.p>
       </div>
 
