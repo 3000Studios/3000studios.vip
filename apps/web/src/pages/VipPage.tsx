@@ -48,19 +48,18 @@ export function VipPage() {
         <section id="vip-tiers" style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             
-            {/* 99c Single */}
+            {/* Previews + Full Songs */}
             <article className="vip-glass-card acss-lift" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
               <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                99¢ Single
+                Free Previews
               </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Own Any Track</h2>
+              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Previews + Full Songs</h2>
               <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '0 0 16px', flex: 1 }}>
-                Lossless 24-bit studio master audio download + personal license. Yours to keep forever.
+                Every track previews free for a full minute right here on the site. Want the whole song? Full tracks live on Apple Music, Spotify, and Amazon — one tap takes you there.
               </p>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', marginBottom: 16 }}>$0.99</div>
-              <a className="vip-btn-gold acss-press" href={MERCH_ITEMS.find((m) => m.id === 'track')?.stripe ?? '#'}>
-                Buy Track
-              </a>
+              <Link className="vip-btn-gold acss-press" to="/music">
+                ♪ Hear the Previews
+              </Link>
             </article>
 
             {/* Monthly VIP */}

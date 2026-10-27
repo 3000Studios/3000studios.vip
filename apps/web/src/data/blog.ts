@@ -19,7 +19,7 @@ const SITE_UPDATES: Omit<BlogPost, 'date' | 'id'>[] = [
   },
   {
     title: 'Shop, Samples, And Vault Plans Are Live',
-    summary: 'Full tracks stay 100% free to stream. Official downloads $0.99. Vault VIP $3.99/mo or $19.99/year. Merch and sponsor slots check out on Stripe.',
+    summary: 'Every track previews free for 1 minute on-site, and full songs stream free on Apple, Spotify & Amazon. Vault VIP $3.99/mo or $19.99/year. Merch and sponsor slots check out on Stripe.',
     keywords: '3000 Studios shop, music paywall, merch',
     image: '/media/covers/ride-smooth.jpg',
     category: 'update',

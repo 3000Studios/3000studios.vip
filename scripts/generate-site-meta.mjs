@@ -347,8 +347,8 @@ const llmsTxt = `# 3000 Studios VIP
 > Acworth, Georgia, run by Jeremy Swain. The studio releases original music
 > (new singles weekly, streaming on every platform), produces cinematic music
 > videos, broadcasts live shows, and develops Thunder Dome: AeroStrike, a
-> top-down arena shooter game. Every song on the site streams free in full;
-> official downloads are $0.99.
+> top-down arena shooter game. Every song previews free for one minute
+> on the site; full songs stream on Apple Music, Spotify, and Amazon.
 
 ## Key pages
 
