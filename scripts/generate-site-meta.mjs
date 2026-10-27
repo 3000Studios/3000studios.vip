@@ -98,13 +98,23 @@ for (const m of blogTs.matchAll(
 /* ------------------------------ static routes ----------------------------- */
 const mainTs = read(join(WEB, 'src/main.tsx'));
 const titled = new Map();
-for (const m of mainTs.matchAll(
-  /path:\s*'([^']+)'[\s\S]{0,700}?title="([^"]+)"[\s\S]{0,300}?description="([^"]+)"/g,
-)) {
-  // Dynamic segments and the catch-all have no <Titled> of their own; without
-  // this filter the regex would steal the NEXT route's meta for them.
-  if (m[1].includes(':') || m[1].includes('*') || m[1] === '/privacy-policy') continue;
-  titled.set(m[1], { title: m[2], description: m[3] });
+// Segment-scoped extraction: split the router table at each `path:` so a
+// route's <Titled> meta is only ever read from its OWN route block. The old
+// single-regex scan let a route with no <Titled> nearby (or a dynamic route)
+// swallow the NEXT route's meta across the window — which silently dropped
+// /music, /sponsors and /privacy from the served route table (live 404 +
+// noindex on two revenue pages; fixed 2026-10-27, business audit P0-4/P0-3).
+for (const segment of mainTs.split(/(?=path:\s*')/)) {
+  const pm = segment.match(/^path:\s*'([^']+)'/);
+  if (!pm) continue;
+  const path = pm[1];
+  // Only absolute top-level routes belong in the served table; relative
+  // paths are nested children of protected layouts (e.g. the vault's).
+  // Dynamic segments and the catch-all have no <Titled> meta of their own;
+  // '/privacy-policy' is a <Navigate> alias of '/privacy', not a page.
+  if (!path.startsWith('/') || path.includes(':') || path.includes('*') || path === '/privacy-policy') continue;
+  const tm = segment.match(/title="([^"]+)"[\s\S]{0,300}?description="([^"]+)"/);
+  if (tm) titled.set(path, { title: tm[1], description: tm[2] });
 }
 
 const brand = (t) => (t === SITE || t.endsWith(`— ${SITE}`) ? t : `${t} — ${SITE}`);
@@ -244,6 +254,30 @@ for (const path of explicitRoutes) {
   if (song && songMeta[song[1]]) songMeta[song[1]] = { ...songMeta[song[1]], noindex: true, noads: true };
   const blog = path.match(/^\/blog\/(.+)$/);
   if (blog && blogMeta[blog[1]]) blogMeta[blog[1]] = { ...blogMeta[blog[1]], noindex: true, noads: true };
+}
+
+/* ------------------------- completeness gate ------------------------------ */
+// Every public router path MUST land in the served route table. If a route
+// is added to main.tsx without meta (or extraction regresses), fail the
+// build loudly instead of shipping a live 404 + noindex like /music and
+// /sponsors had. Dynamic segments and the /privacy-policy alias are exempt.
+{
+  const routerPaths = [...mainTs.matchAll(/path:\s*'([^']+)'/g)].map((m) => m[1]);
+  const missing = routerPaths.filter(
+    (p) =>
+      p.startsWith('/') &&
+      !p.includes(':') &&
+      !p.includes('*') &&
+      p !== '/privacy-policy' &&
+      !routes[p],
+  );
+  if (missing.length) {
+    console.error(
+      `generate-site-meta: router paths missing from the route table: ${missing.join(', ')}\n` +
+        'Add <Titled> meta in main.tsx or a HAND entry in this generator, then re-run.',
+    );
+    process.exit(1);
+  }
 }
 
 /* --------------------------------- outputs -------------------------------- */

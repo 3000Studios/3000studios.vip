@@ -17,7 +17,9 @@
   <url><loc>https://3000studios.vip/copyright</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/disclaimer</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/live</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/music</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/podcast</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/projects</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/requests</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/shop</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
@@ -71,6 +73,7 @@
   <url><loc>https://3000studios.vip/song/the-peepers</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/song/tropical-bass-land</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/song/why-do-i-not-like-my-songs</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://3000studios.vip/sponsors</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/terms</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/thunder-dome</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/thunder-dome/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>

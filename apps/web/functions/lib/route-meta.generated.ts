@@ -51,6 +51,10 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
     "title": "Legal Disclaimer — 3000 Studios VIP",
     "description": "Legal disclaimer for 3000 Studios — the site provides music, media, and entertainment information, not professional advice."
   },
+  "/music": {
+    "title": "Music Vault — 3000 Studios VIP",
+    "description": "The full 3000 Studios DistroKid catalog — stream every official release free."
+  },
   "/video": {
     "title": "Video Vault — 3000 Studios VIP",
     "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free previews, $1 full unlocks."
@@ -106,6 +110,14 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   "/blog": {
     "title": "Blog — 3000 Studios VIP",
     "description": "News, stories, and studio notes from 3000 Studios."
+  },
+  "/sponsors": {
+    "title": "Sponsors — 3000 Studios VIP",
+    "description": "Sponsor a 3000 Studios homepage slot — 30 days on the front page."
+  },
+  "/privacy": {
+    "title": "Privacy Policy — 3000 Studios VIP",
+    "description": "Privacy Policy for 3000studios.vip — how 3000 Studios collects, uses, and protects your information."
   },
   "/command-deck": {
     "title": "Command Deck — 3000 Studios VIP",
