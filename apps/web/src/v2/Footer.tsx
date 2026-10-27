@@ -57,11 +57,27 @@ export function Footer() {
 
   const subscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    window.location.href = `mailto:Team@3000studios.vip?subject=${encodeURIComponent(
-      'VIP list signup',
-    )}&body=${encodeURIComponent(`Please add ${email.trim()} to the 3000 Studios VIP list.`)}`;
-    setSent(true);
+    const value = email.trim();
+    if (!value) return;
+    // Real capture (audit P1-7): signups POST to the studio inbox in D1.
+    // The old flow opened the visitor's mail client (mailto:) — anyone
+    // without one configured was silently lost. Mailto remains only as a
+    // fallback when the inbox endpoint is unreachable.
+    void fetch('/api/requests', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kind: 'subscribe', email: value }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('inbox unavailable');
+        setSent(true);
+      })
+      .catch(() => {
+        window.location.href = `mailto:Team@3000studios.vip?subject=${encodeURIComponent(
+          'VIP list signup',
+        )}&body=${encodeURIComponent(`Please add ${value} to the 3000 Studios VIP list.`)}`;
+        setSent(true);
+      });
   };
 
   return (
@@ -126,11 +142,11 @@ export function Footer() {
           </ul>
         </nav>
 
-        <div className="v2-footer-col v2-footer-news">
+        <div className="v2-footer-col v2-footer-news" id="vip-list">
           <h3>Join the VIP list</h3>
           <p>Get new drops, live alerts, and exclusives first.</p>
           {sent ? (
-            <p className="v2-news-done">Opening your mail app — hit send and you&apos;re in.</p>
+            <p className="v2-news-done">You&apos;re in — welcome to the VIP list.</p>
           ) : (
             <form onSubmit={subscribe} className="v2-news-form">
               <input

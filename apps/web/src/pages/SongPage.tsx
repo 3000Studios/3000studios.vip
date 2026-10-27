@@ -11,7 +11,7 @@ import { useGlobalMusic } from '../components/GlobalMusic';
 import { LazyYouTube } from '../components/LazyYouTube';
 import { rolloutSongs } from '../data/music';
 import { publishedSongs } from '../data/publishedSongs';
-import { HYPERFOLLOW_URL } from '../lib/commerce';
+import { HYPERFOLLOW_URL, startTrackCheckout } from '../lib/commerce';
 import {
   getOfficialVideoForTitle,
   youtubeEmbedUrl,
@@ -200,7 +200,7 @@ export function SongPage() {
           </button>
         </section>
 
-        <section className="v2-card v2-song-player">
+        <section className="v2-card v2-song-player acss-glass">
           <button
             className="v2-song-play"
             type="button"
@@ -237,7 +237,7 @@ export function SongPage() {
           ) : null}
           <div className="v2-song-buy-row">
             <a
-              className="v2-btn v2-btn--gold v2-btn--sm"
+              className="v2-btn v2-btn--gold v2-btn--sm acss-glow-cta acss-press"
               href={buyUrl}
               target="_blank"
               rel="noreferrer"
@@ -249,9 +249,35 @@ export function SongPage() {
               Beats & instrumentals
             </Link>
           </div>
+
+          {/* Own-it + VIP upsell (audit P1-4): the site's own offers, next to
+              the Apple path — song pages are the SEO landing pages and used
+              to present no direct offer at all. Checkout settles through the
+              same fail-closed /api/pay flow as the catalog. */}
+          <div className="vip-own-block acss-glass">
+            <div className="vip-own-copy">
+              <strong>Own this track — $0.99</strong>
+              <span>
+                Buy direct from the studio and it&apos;s yours to keep — or unlock every
+                track with VIP.
+              </span>
+            </div>
+            <div className="vip-own-actions">
+              <button
+                type="button"
+                className="v2-btn v2-btn--gold v2-btn--sm acss-glow-cta acss-press"
+                onClick={() => startTrackCheckout(song.slug)}
+              >
+                Own it — $0.99
+              </button>
+              <Link className="v2-btn v2-btn--ghost v2-btn--sm acss-press" to="/vip">
+                VIP — all tracks, $3.99/mo
+              </Link>
+            </div>
+          </div>
         </section>
 
-        <section className="v2-card v2-song-about">
+        <section className="v2-card v2-song-about acss-texture">
           <h2>About this release</h2>
           <p>{song.description}</p>
           <p className="v2-song-vibe">{song.vibe}</p>

@@ -27,7 +27,7 @@ export function ThunderDomePage() {
 
   return (
     <PublicLayoutV2 wallpaper="aurora">
-      <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
+      <div className="md-scope vip-arena" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
         
         {/* =========================================================================
             THUNDER DOME HERO: CARBON FIBER & CYBER-HUD COCKPIT
@@ -62,12 +62,10 @@ export function ThunderDomePage() {
             </a>
             <a
               className="vip-btn-gold"
-              href="https://play.google.com/store/search?q=Thunderdome%20AeroStrike&c=apps"
-              target="_blank"
-              rel="noreferrer"
-              title="Thunder Dome: AeroStrike on Google Play (internal test in progress)"
+              href="#vip-list"
+              title="Thunder Dome: AeroStrike is in closed tester tracks — join the VIP list for launch access"
             >
-              ▣ Get it on Google Play
+              ▣ Join the tester track
             </a>
             <a className="vip-btn-obsidian" href="#dome-trailer">
               🎬 Watch Trailer

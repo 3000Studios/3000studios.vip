@@ -22,8 +22,10 @@ export function RequestsPage() {
     }
   });
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [mood, setMood] = useState('cinematic');
   const [idea, setIdea] = useState('');
+  const [sentToStudio, setSentToStudio] = useState(false);
 
   useEffect(() => {
     try {
@@ -36,17 +38,35 @@ export function RequestsPage() {
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!idea.trim()) return;
-    setIdeas((current) => [
-      {
-        id: crypto.randomUUID(),
-        name: name.trim() || 'VIP Producer',
+    const entry = {
+      id: crypto.randomUUID(),
+      name: name.trim() || 'VIP Producer',
+      mood,
+      idea: idea.trim().slice(0, 360),
+      votes: 1,
+      createdAt: new Date().toISOString(),
+    };
+    setIdeas((current) => [entry, ...current]);
+    // Deliver to the studio inbox (audit P0-6): submissions used to live
+    // ONLY in this visitor's localStorage — the studio never saw them.
+    // The local list below remains the visitor's own copy of the board.
+    void fetch('/api/requests', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'request',
+        name: entry.name,
+        email: email.trim(),
         mood,
-        idea: idea.trim().slice(0, 360),
-        votes: 1,
-        createdAt: new Date().toISOString(),
-      },
-      ...current,
-    ]);
+        body: entry.idea,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) setSentToStudio(true);
+      })
+      .catch(() => {
+        /* board copy is kept locally either way */
+      });
     setIdea('');
   }
 
@@ -87,6 +107,17 @@ export function RequestsPage() {
                     maxLength={42}
                     aria-label="Your name or producer tag"
                   />
+                  <input
+                    className="v2-input"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email (optional — so we can reach you)"
+                    maxLength={160}
+                    aria-label="Email (optional)"
+                  />
+                </div>
+                <div className="v2-grid-2">
                   <select
                     className="v2-input"
                     value={mood}
@@ -114,6 +145,11 @@ export function RequestsPage() {
                   <Sparkle size={18} weight="fill" />
                   Submit Concept
                 </button>
+                {sentToStudio ? (
+                  <p style={{ margin: 0, fontSize: 13.5, color: 'var(--v2-neon)' }}>
+                    ✓ Sent to the studio — every request is read. Thanks for the concept.
+                  </p>
+                ) : null}
               </form>
             </div>
           </Reveal>
