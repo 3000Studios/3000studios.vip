@@ -10,14 +10,39 @@ export function ContactPage() {
   const [email, setEmail] = useState('');
   const [topic, setTopic] = useState('Booking');
   const [message, setMessage] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
-    const subject = `3000 Studios contact — ${topic} — ${name || 'website visitor'}`;
-    const body = `Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`;
-    window.location.assign(
-      `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-    );
+    if (status === 'sending') return;
+    setStatus('sending');
+    // Store in the studio inbox (D1, /api/requests) — the old mailto-only
+    // submit silently lost every inquiry from visitors without a mail
+    // client configured (v2 full-check P2-10). Mailto stays as the
+    // fallback if the inbox post fails.
+    try {
+      const res = await fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          kind: 'contact',
+          name,
+          email,
+          mood: topic,
+          body: message.slice(0, 1000),
+        }),
+      });
+      const data = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+      if (!res.ok || !data?.ok) throw new Error('inbox rejected');
+      setStatus('sent');
+    } catch {
+      setStatus('failed');
+      const subject = `3000 Studios contact — ${topic} — ${name || 'website visitor'}`;
+      const body = `Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`;
+      window.location.assign(
+        `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      );
+    }
   }
 
   return (
@@ -77,9 +102,29 @@ export function ContactPage() {
                 maxLength={2000}
                 required
               />
-              <button type="submit" className="nn-btn nn-btn-gold" style={{ width: '100%' }}>
-                <EnvelopeSimple size={18} /> Send via email
+              <button
+                type="submit"
+                className="nn-btn nn-btn-gold"
+                style={{ width: '100%' }}
+                disabled={status === 'sending' || status === 'sent'}
+              >
+                <EnvelopeSimple size={18} />{' '}
+                {status === 'sending'
+                  ? 'Sending…'
+                  : status === 'sent'
+                    ? 'Sent to the studio'
+                    : 'Send to the studio'}
               </button>
+              {status === 'sent' && (
+                <p style={{ color: 'var(--nn-cyan)', fontSize: 13, margin: 0, textAlign: 'center' }} role="status">
+                  Got it — your message is in the studio inbox.
+                </p>
+              )}
+              {status === 'failed' && (
+                <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: 0, textAlign: 'center' }} role="status">
+                  The inbox didn&apos;t answer, so your email app should open with the message ready to send.
+                </p>
+              )}
               <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: 0, textAlign: 'center' }}>
                 Prefer direct?{' '}
                 <a href={`mailto:${OWNER_EMAIL}`} style={{ color: 'var(--nn-cyan)' }}>

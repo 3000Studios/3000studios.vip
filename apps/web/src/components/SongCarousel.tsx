@@ -59,7 +59,7 @@ function SongCard<T extends CarouselSong>({
           alt={song.title}
           loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = '/media/official-3000-studios-profile.png';
+            (e.target as HTMLImageElement).src = '/media/official-3000-studios-profile.webp';
           }}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />

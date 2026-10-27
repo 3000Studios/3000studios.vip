@@ -98,7 +98,7 @@ export function ThunderDomePage() {
                 controls
                 playsInline
                 preload="metadata"
-                poster="/media/official-3000-studios-profile.png"
+                poster="/media/official-3000-studios-profile.webp"
                 style={{ width: '100%', height: '100%' }}
               />
             </div>

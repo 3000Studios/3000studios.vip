@@ -53,11 +53,11 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/music": {
     "title": "Music Vault — 3000 Studios VIP",
-    "description": "The full 3000 Studios DistroKid catalog — stream every official release free."
+    "description": "The full 3000 Studios DistroKid catalog — 1-minute previews of every official release."
   },
   "/video": {
     "title": "Video Vault — 3000 Studios VIP",
-    "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free previews, $1 full unlocks."
+    "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free previews."
   },
   "/live": {
     "title": "Live Command — 3000 Studios VIP",
@@ -93,7 +93,7 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/shop": {
     "title": "Shop — 3000 Studios VIP",
-    "description": "3000 Studios shop — merch, singles, and studio services."
+    "description": "3000 Studios shop — merch, VIP passes, and sponsor slots."
   },
   "/concepts": {
     "title": "Concepts — 3000 Studios VIP",

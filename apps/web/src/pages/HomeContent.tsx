@@ -31,7 +31,7 @@ export function HomeContent() {
             loop
             playsInline
             preload="metadata"
-            poster="/media/official-3000-studios-profile.png"
+            poster="/media/official-3000-studios-profile.webp"
           />
           <div className="carpetDepth" aria-hidden="true" />
           <ReducedMotionGate>

@@ -66,7 +66,8 @@ export const onRequestPost: PagesFunction<PagesEnv> = async ({ request, env }) =
     return json({ ok: false, error: 'invalid_json' }, 400);
   }
 
-  const kind = parsed.kind === 'subscribe' ? 'subscribe' : 'request';
+  const kind =
+    parsed.kind === 'subscribe' ? 'subscribe' : parsed.kind === 'contact' ? 'contact' : 'request';
   const name = clip(parsed.name, 80);
   const email = clip(parsed.email, 160);
   const mood = clip(parsed.mood, 40);

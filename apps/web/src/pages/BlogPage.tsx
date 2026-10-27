@@ -20,7 +20,7 @@ type Card = {
   author?: string;
 };
 
-const FALLBACK_IMG = '/media/official-3000-studios-profile.png';
+const FALLBACK_IMG = '/media/official-3000-studios-profile.webp';
 
 export function BlogPage() {
   const [filter, setFilter] = useState('ALL');

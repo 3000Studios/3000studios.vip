@@ -1,73 +1,70 @@
 import type { PagesEnv } from '../env';
 
-type MediaEnv = PagesEnv & {
-  MEDIA_BUCKET?: R2Bucket;
-};
-
 /**
- * R2-backed MP3 serving for /media/*.mp3.
+ * /media/* guard (music model flip — Boss order 2026-10-27).
  *
- * Migration context: the 85 MP3s (~253MB) that used to be committed under
- * apps/web/public/media/ are moving to the R2 bucket `studios-vip-media`.
- * This function keeps every existing /media/*.mp3 URL working without any
- * src/ changes: it serves the bytes from R2 and falls back to the static
- * asset bundle (env.ASSETS) whenever R2 is not bound or the key is missing,
- * so it is safe to deploy BEFORE, DURING, and AFTER the migration.
+ * Until today this function served the catalog's full-track MP3 masters
+ * from the R2 bucket `studios-vip-media` at predictable public URLs —
+ * anyone could download every song free while the site also tried to
+ * sell them. The model flipped: songs are free on the streaming
+ * platforms, on-site listening is the 1-minute preview, and FULL-TRACK
+ * FILES ARE NO LONGER PUBLICLY SERVED from this domain.
  *
- * Only *.mp3 is served from R2. Covers, images, and mp4 under /media/
- * continue to come from static assets untouched.
+ * What this function does now:
+ *  - Any *.mp3 outside /media/previews/ → 404 JSON. The masters stay in
+ *    R2 (nothing is deleted); they are simply unreachable from the site.
+ *    This also retires the old range-request defect (v2 full-check
+ *    P1-1/P1-2): nothing is function-proxied anymore, so there is no
+ *    broken range handling and no per-play origin fetch — previews are
+ *    static assets, edge-cached, with Cloudflare's correct range support.
+ *  - Everything else (covers, images, the preview MP4s under
+ *    /media/previews/) is served from the static asset bundle — but a
+ *    MISSING media file now answers a real 404 instead of falling
+ *    through to the SPA shell with 200 text/html (full-check P2-6/P2-7).
  *
- * Range requests are forwarded to R2 and answered with 206 + Content-Range
- * so audio seeking keeps working.
- *
- * Requires in _routes.json: "/media/*" in `include`, otherwise this function
- * never fires and /media/* is served statically (which is the safe default).
+ * Requires _routes.json to keep "/media/*" in `include`.
  */
-export const onRequestGet: PagesFunction<MediaEnv> = async (context) => {
+export const onRequestGet: PagesFunction<PagesEnv> = async (context) => {
   const { request, env } = context;
   const url = new URL(request.url);
-  // Keys in R2 are the media-relative paths (e.g. `betty-boom-boom.mp3`,
-  // `Production Music/<file>.mp3`) — i.e. the request path after `/media/`;
-  // request paths are percent-encoded by encodeMediaPath in src/data/music.ts.
   const key = decodeURIComponent(url.pathname.replace(/^\/media\//, ''));
+  const lower = key.toLowerCase();
 
-  const serveStatic = () =>
-    env.ASSETS ? env.ASSETS.fetch(request) : context.next();
-
-  if (!key || !key.toLowerCase().endsWith('.mp3')) return serveStatic();
-
-  const bucket = env.MEDIA_BUCKET;
-  if (!bucket) return serveStatic(); // R2 not bound yet — pre-migration.
-
-  try {
-    const obj = await bucket.get(key, { range: request.headers });
-    if (!obj) return serveStatic(); // not in R2 yet — mid-migration.
-
-    const headers = new Headers();
-    obj.writeHttpMetadata(headers);
-    headers.set('etag', obj.httpEtag);
-    headers.set('accept-ranges', 'bytes');
-    headers.set('cache-control', 'public, max-age=31536000, immutable');
-    if (!headers.has('content-type')) headers.set('content-type', 'audio/mpeg');
-
-    if (obj.range) {
-      // R2Range is a union: {offset,length?} | {length,offset?} | {suffix}.
-      // Narrow defensively so every variant yields a correct Content-Range.
-      const r = obj.range as { offset?: number; length?: number; suffix?: number };
-      let start: number;
-      let end: number;
-      if (r.suffix != null) {
-        start = Math.max(0, obj.size - r.suffix);
-        end = obj.size - 1;
-      } else {
-        start = r.offset ?? 0;
-        end = r.length != null ? start + r.length - 1 : obj.size - 1;
-      }
-      headers.set('content-range', `bytes ${start}-${end}/${obj.size}`);
-      return new Response(obj.body, { status: 206, headers });
-    }
-    return new Response(obj.body, { headers });
-  } catch {
-    return serveStatic();
+  if (lower.endsWith('.mp3') && !lower.startsWith('previews/')) {
+    return new Response(
+      JSON.stringify({
+        ok: false,
+        error: 'full_track_not_public',
+        detail:
+          'Full songs live on the streaming platforms; this site serves 1-minute previews under /media/previews/.',
+      }),
+      {
+        status: 404,
+        headers: {
+          'content-type': 'application/json; charset=utf-8',
+          'cache-control': 'public, max-age=300',
+        },
+      },
+    );
   }
+
+  const res = env.ASSETS ? await env.ASSETS.fetch(request) : await context.next();
+
+  // A missing media file falls through to the SPA shell (200 text/html).
+  // For real media extensions that is a lie — answer a real 404.
+  const type = res.headers.get('content-type') || '';
+  if (
+    res.ok &&
+    type.includes('text/html') &&
+    /\.(mp3|wav|mp4|webm|mov|jpg|jpeg|png|webp|gif|svg|avif)$/.test(lower)
+  ) {
+    return new Response('Not found', {
+      status: 404,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'public, max-age=300',
+      },
+    });
+  }
+  return res;
 };
