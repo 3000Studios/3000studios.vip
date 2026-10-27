@@ -11,7 +11,7 @@ import {
 } from '@phosphor-icons/react';
 import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { MERCH_ITEMS, paypalBuyUrl, type MerchItem } from '../data/merch';
-import { formatMoney, grantPlan, grantTrack } from '../lib/commerce';
+import { formatMoney, settleReturnPurchase, writePending, SHOP_PENDING_KEY } from '../lib/commerce';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 
 /* ------------------------------------------------------------------ */
@@ -23,36 +23,19 @@ import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 const SHOPIFY_STOREFRONT_URL = 'https://boughtitonline.com';
 const SHOPIFY_STORE_NAME = '3000 Studios';
 
-/* FAIL-CLOSED digital checkout (fixed 2026-10-25): Buy buttons used to grant
-   the plan/track entitlement in their onClick — before any payment happened
-   (and even if the buyer abandoned Stripe). Now a click only remembers the
-   pending item; the entitlement is granted by settleShopPurchase() when the
-   buyer returns from Stripe/PayPal with ?paid=1. */
-const PENDING_SHOP_KEY = '3000-pending-shop-item';
-
-function rememberPendingShopItem(id: string) {
-  try {
-    localStorage.setItem(PENDING_SHOP_KEY, id);
-  } catch {
-    /* private mode */
-  }
-}
-
-function settleShopPurchase() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('paid') !== '1') return;
-    const id = localStorage.getItem(PENDING_SHOP_KEY);
-    if (id === 'monthly') grantPlan('monthly');
-    if (id === 'yearly') grantPlan('yearly');
-    if (id === 'track') grantTrack('not-giving-up-tonight');
-    localStorage.removeItem(PENDING_SHOP_KEY);
-    params.delete('paid');
-    const clean = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
-    window.history.replaceState(null, '', clean);
-  } catch {
-    /* ignore */
-  }
+/* FAIL-CLOSED digital checkout (fixed 2026-10-25; hardened 2026-10-27,
+   business audit P0-1): Buy buttons used to grant the plan/track
+   entitlement in their onClick — before any payment happened (and even if
+   the buyer abandoned Stripe). Now a click only records a timestamped
+   pending intent; settlement runs through commerce.settleReturnPurchase(),
+   which grants ONLY on the ?paid=1 return after the server validates the
+   signed checkout-arm cookie /api/pay set on the way to Stripe. Stripe
+   buttons for digital items therefore route through /api/pay (same Stripe
+   links, plus the arm). The old settle also granted a hard-coded track
+   ('not-giving-up-tonight') for the generic track item — removed: that
+   item carries no slug, so it never auto-grants the wrong song. */
+function rememberPendingShopItem(id: string, via: 'stripe' | 'paypal') {
+  writePending(SHOP_PENDING_KEY, { id, via, ts: Date.now() });
 }
 
 function CartDrawer({
@@ -203,7 +186,7 @@ function CartDrawer({
 
 export function ShopPage() {
   useEffect(() => {
-    settleShopPurchase();
+    void settleReturnPurchase();
   }, []);
 
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -228,7 +211,7 @@ export function ShopPage() {
 
   return (
     <PublicLayoutV2>
-      <div className="nn-scope">
+      <div className="nn-scope vip-shop">
         <section className="nn-hero">
           <span className="nn-kicker nn-kicker--gold">
             <Tag size={14} style={{ verticalAlign: '-2px' }} /> WELCOME10 — 10% off your first order
@@ -311,10 +294,10 @@ export function ShopPage() {
                 </p>
                 <a
                   className="nn-btn nn-btn-gold"
-                  href={item.stripe}
+                  href={`/api/pay?sku=${item.id}`}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => rememberPendingShopItem(item.id)}
+                  onClick={() => rememberPendingShopItem(item.id, 'stripe')}
                   style={{ width: '100%', marginBottom: 8 }}
                 >
                   Buy now · {formatMoney(item.priceCents)}
@@ -324,7 +307,7 @@ export function ShopPage() {
                   href={paypalBuyUrl(item)}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => rememberPendingShopItem(item.id)}
+                  onClick={() => rememberPendingShopItem(item.id, 'paypal')}
                   style={{ width: '100%' }}
                 >
                   PayPal instead

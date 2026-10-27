@@ -10,8 +10,9 @@ const STRIPE: Record<string, string> = {
 };
 
 import type { PagesEnv } from '../env';
+import { createPayArmCookie } from '../lib/pay-arm';
 
-export const onRequestGet: PagesFunction<PagesEnv> = async ({ request }) => {
+export const onRequestGet: PagesFunction<PagesEnv> = async ({ request, env }) => {
   const url = new URL(request.url);
   const sku = (url.searchParams.get('sku') || '').toLowerCase();
   if (!sku) {
@@ -32,5 +33,15 @@ export const onRequestGet: PagesFunction<PagesEnv> = async ({ request }) => {
       headers: { 'content-type': 'application/json; charset=utf-8' },
     });
   }
-  return Response.redirect(href, 302);
+  // Arm the purchase return (audit P0-1): a signed, HttpOnly cookie is set
+  // as the buyer leaves for Stripe. The success return (?paid=1) settles
+  // only when /api/pay/session validates this arm server-side against the
+  // pending purchase the buyer started — a bare ?paid=1 link grants nothing.
+  const headers = new Headers({ location: href });
+  const armCookie = await createPayArmCookie(
+    { sku, slug: (url.searchParams.get('slug') || '').toLowerCase(), ts: Date.now() },
+    env,
+  ).catch(() => null);
+  if (armCookie) headers.set('set-cookie', armCookie);
+  return new Response(null, { status: 302, headers });
 };

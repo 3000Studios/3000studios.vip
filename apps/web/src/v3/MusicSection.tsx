@@ -9,11 +9,10 @@ import {
   TRACK_PRICE_CENTS,
   HYPERFOLLOW_URL,
   formatMoney,
-  grantTrack,
   readEntitlement,
+  settleReturnPurchase,
+  startTrackCheckout,
 } from '../lib/commerce';
-
-const PENDING_KEY = '3000-pending-track';
 
 function useOwnedTracks(): string[] {
   const [tracks, setTracks] = useState<string[]>(() => readEntitlement().tracks);
@@ -26,36 +25,21 @@ function useOwnedTracks(): string[] {
 }
 
 /** $0.99 — yours to keep + download. Not a license, just the song.
- *  FAIL-CLOSED (fixed 2026-10-25): this used to grantTrack() BEFORE sending
- *  the buyer to Stripe, so every "Own it" click unlocked the download for
- *  free. Now the slug is only remembered as pending; the entitlement is
- *  granted by settlePendingPurchase() after Stripe returns with ?paid=1. */
+ *  FAIL-CLOSED (fixed 2026-10-25; hardened 2026-10-27, audit P0-1): this
+ *  used to grantTrack() BEFORE sending the buyer to Stripe, so every
+ *  "Own it" click unlocked the download for free. Now the click only
+ *  records a timestamped pending intent (commerce.startTrackCheckout) and
+ *  the entitlement settles on the ?paid=1 return ONLY when the server
+ *  validates the signed checkout-arm cookie (commerce.settleReturnPurchase).
+ *  A bare ?paid=1 URL grants nothing. */
 function buyTrack(slug: string) {
-  try {
-    localStorage.setItem(PENDING_KEY, slug);
-  } catch {
-    /* private mode */
-  }
-  window.location.assign('/api/pay?sku=track');
+  startTrackCheckout(slug);
 }
 
-/** If Stripe sends the buyer back with ?paid=1, lock in the pending unlock. */
+/** Settle any pending purchase when Stripe returns the buyer with ?paid=1. */
 // eslint-disable-next-line react-refresh/only-export-components
 export function settlePendingPurchase() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('paid') !== '1') return;
-    const slug = localStorage.getItem(PENDING_KEY);
-    if (slug) {
-      grantTrack(slug);
-      localStorage.removeItem(PENDING_KEY);
-    }
-    params.delete('paid');
-    const clean = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
-    window.history.replaceState(null, '', clean);
-  } catch {
-    /* ignore */
-  }
+  void settleReturnPurchase();
 }
 
 export function MusicSection() {
@@ -112,7 +96,7 @@ export function MusicSection() {
             const unlocked = owned.includes(song.slug);
             return (
               <Reveal key={song.slug} delay={Math.min(i * 0.03, 0.3)}>
-                <article className={`v3-track${isActive ? ' is-active' : ''}`}>
+                <article className={`v3-track acss-shine${isActive ? ' is-active' : ''}`}>
                   <button
                     type="button"
                     className="v3-track-cover"
@@ -137,7 +121,7 @@ export function MusicSection() {
                     </h3>
                     <div className="v3-track-links">
                       <a
-                        className="v3-track-buy"
+                        className="v3-track-buy acss-press"
                         href={song.buy ?? HYPERFOLLOW_URL}
                         target="_blank"
                         rel="noreferrer"

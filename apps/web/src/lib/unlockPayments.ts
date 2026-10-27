@@ -154,6 +154,18 @@ export function settleUnlockReturn(): string | null {
   try {
     const params = new URLSearchParams(window.location.search);
     if (params.get('unlocked') !== '1') return null;
+    // Fail closed (2026-10-27, audit P0-1/P0-5): with NO live payment link
+    // configured, no legitimate buyer can ever arrive via this URL — it
+    // can only be hand-typed. Scrub the params and grant nothing. When a
+    // real $1 link is wired, returns are honored again (same return-trust
+    // caveat as the track/plan settle — see lib/pay-arm.ts).
+    if (!isLivePayments()) {
+      params.delete('unlocked');
+      params.delete('item');
+      const clean = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
+      window.history.replaceState(null, '', clean);
+      return null;
+    }
     const item = params.get('item');
     params.delete('unlocked');
     params.delete('item');

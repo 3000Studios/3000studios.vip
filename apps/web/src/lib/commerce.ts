@@ -65,9 +65,16 @@ export function writeEntitlement(next: Entitlement) {
   window.dispatchEvent(new CustomEvent('3000-entitlement', { detail: next }));
 }
 
-export function hasFullAccess(_slug?: string) {
-  void _slug;
-  return true;
+export function hasFullAccess(slug?: string) {
+  // Was hard-coded `return true` (business audit P0-2): any gate that asked
+  // this question got "yes" for every visitor. Now it answers from the real
+  // entitlement — an active plan covers everything; otherwise the specific
+  // track must be owned. NOTE: full-length streaming stays free by design
+  // (see llms.txt / terms); this gates paid extras (downloads, vault perks)
+  // at the call sites that choose to check it.
+  const ent = readEntitlement();
+  if (ent.plan !== 'none') return true;
+  return slug ? ent.tracks.includes(slug) : false;
 }
 
 export function grantTrack(slug: string) {
@@ -83,6 +90,143 @@ export function grantPlan(plan: 'monthly' | 'yearly' | 'admin') {
     plan === 'admin' ? now + 1000 * 60 * 60 * 24 * 365 * 10 : plan === 'yearly' ? now + 1000 * 60 * 60 * 24 * 365 : now + 1000 * 60 * 60 * 24 * 31;
   writeEntitlement({ plan, expiresAt, tracks: readEntitlement().tracks });
   logOpsEvent('subscribe', { plan });
+}
+
+/* ------------------------------------------------------------------ */
+/* Purchase returns — FAIL-CLOSED settlement (business audit P0-1).    */
+/*                                                                     */
+/* Nothing is granted when a buy button is clicked. Clicking records   */
+/* a *pending intent* only; the entitlement settles on the Stripe      */
+/* success return (?paid=1) and only when the server validates the     */
+/* signed checkout-arm cookie that /api/pay set as the buyer left for  */
+/* Stripe (see functions/lib/pay-arm.ts for what the arm proves and    */
+/* what it cannot — full Stripe session/webhook verification lands     */
+/* with the owner's Stripe reconnect). A bare ?paid=1 URL, or a        */
+/* pending record older than 24h, settles nothing.                     */
+/* ------------------------------------------------------------------ */
+
+export const TRACK_PENDING_KEY = '3000-pending-track';
+export const SHOP_PENDING_KEY = '3000-pending-shop-item';
+const PENDING_TTL_MS = 24 * 60 * 60 * 1000;
+
+export type PendingPurchase = {
+  id: string; // 'track' (with slug), 'monthly', 'yearly', shop item id
+  slug?: string;
+  via?: 'stripe' | 'paypal';
+  ts: number;
+};
+
+export function writePending(key: string, pending: PendingPurchase) {
+  try {
+    localStorage.setItem(key, JSON.stringify(pending));
+  } catch {
+    /* private mode */
+  }
+}
+
+export function readPending(key: string): PendingPurchase | null {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    if (raw.startsWith('{')) {
+      const parsed = JSON.parse(raw) as PendingPurchase;
+      return typeof parsed.id === 'string' ? parsed : null;
+    }
+    // Legacy pre-2026-10-27 records stored a bare slug/id with no timestamp;
+    // treat them as just-created so an in-flight checkout is not stranded.
+    return key === TRACK_PENDING_KEY
+      ? { id: 'track', slug: raw, ts: Date.now() }
+      : { id: raw, ts: Date.now() };
+  } catch {
+    return null;
+  }
+}
+
+export function clearPending(key: string) {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
+function pendingFresh(pending: PendingPurchase) {
+  return Date.now() - pending.ts < PENDING_TTL_MS;
+}
+
+/** Begin the $0.99 track checkout: record intent, hand off to Stripe. */
+export function startTrackCheckout(slug: string) {
+  writePending(TRACK_PENDING_KEY, { id: 'track', slug, via: 'stripe', ts: Date.now() });
+  window.location.assign(`/api/pay?sku=track&slug=${encodeURIComponent(slug)}`);
+}
+
+type PayArmResponse = { ok: boolean; sku?: string; slug?: string; ts?: number };
+
+async function fetchPayArm(): Promise<PayArmResponse | null> {
+  try {
+    const res = await fetch('/api/pay/session', { headers: { accept: 'application/json' } });
+    if (!res.ok) return null;
+    return (await res.json()) as PayArmResponse;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Settle any pending purchase on a ?paid=1 return. Grants ONLY when:
+ *  - a pending record exists from a real buy click and is < 24h old, AND
+ *  - the server validates the signed checkout arm for the same sku/slug.
+ * PayPal shop returns have no arm (PayPal never transits /api/pay); those
+ * settle on the pending record alone, as before — documented residual.
+ * The generic shop "track" item carries no slug, so it never auto-grants a
+ * (previously hard-coded, wrong) track; the buyer picks in the catalog.
+ * Returns true when something was granted. Always strips ?paid from the URL.
+ */
+export async function settleReturnPurchase(): Promise<boolean> {
+  let granted = false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('paid') !== '1') return false;
+
+    const arm = await fetchPayArm();
+    const trackPending = readPending(TRACK_PENDING_KEY);
+    const shopPending = readPending(SHOP_PENDING_KEY);
+
+    if (
+      trackPending?.id === 'track' &&
+      trackPending.slug &&
+      pendingFresh(trackPending) &&
+      arm?.ok &&
+      arm.sku === 'track' &&
+      arm.slug === trackPending.slug
+    ) {
+      grantTrack(trackPending.slug);
+      granted = true;
+    }
+    if (trackPending) clearPending(TRACK_PENDING_KEY);
+
+    if (shopPending && pendingFresh(shopPending)) {
+      const plan =
+        shopPending.id === 'monthly' ? 'monthly' : shopPending.id === 'yearly' ? 'yearly' : null;
+      const armed =
+        arm?.ok && plan !== null && arm.sku === plan ? true : shopPending.via === 'paypal';
+      if (plan && armed) {
+        grantPlan(plan);
+        granted = true;
+      } else if (shopPending.id === 'track') {
+        logOpsEvent('shop_track_return_unassigned', {});
+      }
+    }
+    if (shopPending) clearPending(SHOP_PENDING_KEY);
+
+    if (!granted) logOpsEvent('purchase_return_unverified', {});
+    params.delete('paid');
+    const clean = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
+    window.history.replaceState(null, '', clean);
+  } catch {
+    /* ignore — fail closed: no grant */
+  }
+  return granted;
 }
 
 export function checkoutMailto(kind: 'track' | 'monthly' | 'yearly', title?: string) {
