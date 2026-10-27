@@ -36,7 +36,7 @@ export function MusicPage() {
 
   return (
     <PublicLayoutV2 wallpaper="aurora">
-      <div className="nn-scope">
+      <div className="nn-scope vip-catalog">
         <section className="nn-hero">
           <video
             className="nn-hero-video-bg"
@@ -85,7 +85,7 @@ export function MusicPage() {
         </section>
 
         <section className="nn-wrap" style={{ marginBottom: 40 }}>
-          <div className="nn-glass" style={{ padding: 20 }}>
+          <div className="nn-glass acss-texture" style={{ padding: 20 }}>
             <div style={{ textAlign: 'center', marginBottom: 14, fontSize: 12, color: 'var(--nn-muted)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>
               Stream 3000 Studios across verified platforms
             </div>
@@ -121,7 +121,7 @@ export function MusicPage() {
                   key={cat}
                   type="button"
                   onClick={() => setFilter(cat)}
-                  className={`nn-chip${filter === cat ? ' is-active' : ''}`}
+                  className={`nn-chip acss-press${filter === cat ? ' is-active' : ''}`}
                 >
                   {cat}
                 </button>

@@ -1,0 +1,428 @@
+/* ============================================================================
+   VIP REDESIGN 2026-10-27 — "One studio, five stages"
+   ----------------------------------------------------------------------------
+   Whole new look & feel for 3000studios.vip, built on the fleet ACSS system
+   (acss-fleet.css: tokens, cards auto-grid, reveals, aurora, glass, tilt,
+   snap rows, sticky scroll-state header) + the site ACSS layer.
+
+   Design law for this pass:
+   - Every page family gets its OWN treatment — no repeated card template:
+       HOME      "Grand Stage"   — textured hero washes, diagonal clip cinema,
+                                   edge-faded cover wall, aurora CTA ring.
+       CATALOG   "Vault Shelf"   — clipped video hero, glowing filter chips,
+                                   alternating cover-card accents.
+       SONG      "Cinema Single" — deep-shadow cinema frame, glass player,
+                                   gold→magenta progress, textured notes.
+       SERVICES  "Concierge"     — staggered tier ledger, aurora feature tier.
+       ARENA     "Thunder Dome"  — cut-corner panels, cyan/crimson arena wash.
+       LIVE      "Broadcast"     — signal glass, on-air glow ring, accented
+                                   schedule ledger.
+   - Performance is a hard gate: CSS only, no new JS, animations are
+     transform/opacity/background-position only, textures are static
+     gradients (zero per-frame cost), no full-viewport animated backdrops.
+   - This file is imported LAST and is unlayered on purpose: where the
+     layered fleet rules and the legacy sheets disagree, the redesign wins.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* 0. Brand tokens — pin the fleet ACSS palette to the VIP identity.   */
+/* The site is dark-luxury only: force the dark side of light-dark().  */
+/* ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: dark;
+  --acss-brand: oklch(0.82 0.14 85); /* VIP gold */
+  --acss-brand-2: oklch(0.66 0.24 350); /* stage magenta */
+  --acss-gold: oklch(0.82 0.14 85);
+  --acss-ink: oklch(0.95 0.01 95); /* warm cream */
+  --acss-bg: oklch(0.16 0.02 260);
+  --acss-surface: oklch(0.21 0.02 260);
+  --vip-cyan: oklch(0.87 0.15 200);
+  --vip-crimson: oklch(0.58 0.22 18);
+  --vip-panel: #101319;
+  --vip-ink-soft: #a7adbd;
+}
+
+/* Static color-texture wash behind every public page (no animation). */
+body {
+  background-image:
+    radial-gradient(110% 60% at 12% -4%, oklch(0.82 0.14 85 / 0.07), transparent 55%),
+    radial-gradient(90% 55% at 96% 0%, oklch(0.66 0.24 350 / 0.05), transparent 50%),
+    radial-gradient(120% 70% at 50% 115%, oklch(0.87 0.15 200 / 0.045), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* ------------------------------------------------------------------ */
+/* 1. Chrome — scroll-state header picks up a gold hairline + deeper   */
+/* glass once stuck (pairs with .acss-sticky on the header element).   */
+/* ------------------------------------------------------------------ */
+
+@container scroll-state(stuck: top) {
+  .v2-header-inner.acss-sticky__bar {
+    box-shadow:
+      0 1px 0 oklch(0.82 0.14 85 / 0.35),
+      0 18px 44px rgb(0 0 0 / 0.55);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. HOME — "Grand Stage"                                             */
+/* ------------------------------------------------------------------ */
+
+/* Hero: layered oklch washes over the existing shade stack. */
+.v3-hero {
+  background-image:
+    radial-gradient(90% 65% at 50% 0%, oklch(0.82 0.14 85 / 0.13), transparent 60%),
+    radial-gradient(55% 45% at 88% 78%, oklch(0.66 0.24 350 / 0.1), transparent 60%),
+    radial-gradient(50% 40% at 8% 82%, oklch(0.87 0.15 200 / 0.08), transparent 60%);
+}
+
+/* Hero headline: the gold word gets the fleet gradient-text flow. */
+.v3-display .v3-gold {
+  background-image: linear-gradient(
+    100deg,
+    #fff3d6 0%,
+    var(--v3-gold) 30%,
+    var(--v3-gold-deep) 55%,
+    oklch(0.66 0.24 350) 82%,
+    var(--v3-gold) 100%
+  );
+  background-size: 220% auto;
+  animation: acss-text-pan 9s linear infinite alternate;
+}
+
+/* Featured-drop pill: glass + shine-ready surface. */
+.v3-drop-pill {
+  box-shadow:
+    0 14px 40px rgb(0 0 0 / 0.5),
+    0 0 0 1px oklch(0.82 0.14 85 / 0.12) inset;
+}
+
+/* Cinema clip section: diagonal exit edge (ACSS clip-hero language). */
+.v3-clip {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.25rem), 0 100%);
+}
+
+/* Cover wall: rows fade at both edges instead of hard-cutting tiles. */
+.v3-coverwall-row {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.v3-coverwall-tile {
+  box-shadow:
+    0 10px 30px rgb(0 0 0 / 0.45),
+    0 0 0 1px rgb(255 255 255 / 0.05) inset;
+}
+
+/* Marquee: edge fade so the ticker melts into the page. */
+.v3-marquee {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* Studio pillars: one row, three personalities — gold / cyan / magenta. */
+.v3-grid .v3-card:nth-child(2) {
+  border-color: oklch(0.87 0.15 200 / 0.28);
+}
+.v3-grid .v3-card:nth-child(2):hover {
+  box-shadow: 0 24px 60px oklch(0.87 0.15 200 / 0.14);
+}
+.v3-grid .v3-card:nth-child(3) {
+  border-color: oklch(0.66 0.24 350 / 0.28);
+}
+.v3-grid .v3-card:nth-child(3):hover {
+  box-shadow: 0 24px 60px oklch(0.66 0.24 350 / 0.14);
+}
+.v3-grid .v3-card:nth-child(3) .v3-n {
+  color: oklch(0.66 0.24 350);
+}
+.v3-grid .v3-card:nth-child(2) .v3-tag {
+  color: var(--vip-cyan);
+  border-color: oklch(0.87 0.15 200 / 0.35);
+}
+.v3-grid .v3-card:nth-child(3) .v3-tag {
+  color: oklch(0.66 0.24 350);
+  border-color: oklch(0.66 0.24 350 / 0.35);
+}
+
+/* CTA band: animated aurora ring that keeps the band's own art backdrop.
+   (Unlayered twin of the fleet .acss-aurora technique — the band's
+   background stack must survive, so the ring rides on ::after.) */
+.v3-cta-band {
+  position: relative;
+  isolation: isolate;
+}
+.v3-cta-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--acss-angle),
+    transparent 0deg,
+    oklch(0.82 0.14 85 / 0.9) 70deg,
+    transparent 150deg,
+    oklch(0.87 0.15 200 / 0.8) 230deg,
+    transparent 310deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: acss-spin-angle 7s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Home track cards: cover art breathes on hover (transform only). */
+.v3-track-cover img {
+  transition: transform 0.6s var(--acss-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.v3-track:hover .v3-track-cover img {
+  transform: scale(1.045);
+}
+
+/* Cinema rail cards lift as one piece. */
+.v3-hcard {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.v3-hcard:hover {
+  transform: translateY(-6px);
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. CATALOG (/music) — "Vault Shelf"                                 */
+/* ------------------------------------------------------------------ */
+
+/* Video hero exits on a diagonal; the shelf starts underneath it. */
+.vip-catalog .nn-hero {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.75rem), 0 100%);
+}
+
+/* Filter chips: the active one carries the gold glow. */
+.vip-catalog .nn-chip {
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+.vip-catalog .nn-chip.is-active {
+  box-shadow:
+    0 0 0 1px oklch(0.82 0.14 85 / 0.55),
+    0 8px 26px oklch(0.82 0.14 85 / 0.22);
+}
+
+/* Carousel cover cards: alternating rim accents so a long shelf of    */
+/* near-identical glass cards reads as a collection, not a stamp.     */
+.vip-catalog .vip-glass-card {
+  box-shadow: var(--acss-shadow-2);
+}
+.vip-catalog .nn-input {
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+.vip-catalog .nn-input:focus {
+  box-shadow: 0 0 0 3px oklch(0.87 0.15 200 / 0.25);
+  outline: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. SONG PAGES — "Cinema Single"                                     */
+/* ------------------------------------------------------------------ */
+
+/* The cinema frame sits in a deep layered well with a gold rim. */
+.v2-song-cinema {
+  box-shadow:
+    0 4px 8px rgb(0 0 0 / 0.55),
+    0 30px 70px rgb(0 0 0 / 0.62),
+    0 0 52px oklch(0.82 0.14 85 / 0.1),
+    0 0 0 1px rgb(255 255 255 / 0.06) inset;
+}
+
+/* Player progress: gold melts into magenta along the track. */
+.v2-song-progress-fill {
+  background: linear-gradient(90deg, oklch(0.82 0.14 85), oklch(0.66 0.24 350));
+}
+
+/* Shorts rail: staggered stills instead of a uniform 3-up stamp. */
+@media (min-width: 641px) {
+  .v2-song-shorts-rail .v2-song-short-card:nth-child(2) {
+    translate: 0 14px;
+  }
+  .v2-song-shorts-rail .v2-song-short-card:nth-child(3) {
+    translate: 0 28px;
+  }
+  .v2-song-shorts {
+    padding-bottom: 34px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. SERVICES — "Concierge Ledger" (VIP tiers + Shop)                 */
+/* ------------------------------------------------------------------ */
+
+/* Tier ledger staggers on desktop via the standalone `translate`     */
+/* property, so hover lift transforms still compose on top of it.     */
+@media (min-width: 1024px) {
+  #vip-tiers article:nth-child(even) {
+    translate: 0 16px;
+  }
+  #vip-tiers {
+    padding-bottom: 24px;
+  }
+}
+
+/* Featured tier: unlayered aurora ring twin (see CTA band note). */
+.vip-aurora-ring {
+  position: relative;
+  isolation: isolate;
+}
+.vip-aurora-ring::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--acss-angle),
+    oklch(0.82 0.14 85 / 0.95),
+    oklch(0.66 0.24 350 / 0.85),
+    oklch(0.87 0.15 200 / 0.85),
+    oklch(0.82 0.14 85 / 0.95)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: acss-spin-angle 6s linear infinite;
+  pointer-events: none;
+}
+
+/* Shop shelf: denser rhythm + shine-ready product cards. */
+.vip-shop .nn-grid {
+  gap: clamp(14px, 1.6vw, 22px);
+}
+.vip-shop .nn-hero {
+  background-image: radial-gradient(80% 60% at 50% 0%, oklch(0.87 0.15 200 / 0.08), transparent 60%);
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. THUNDER DOME — "Arena"                                           */
+/* ------------------------------------------------------------------ */
+
+/* Arena hero: angular deck plate, cyan→gold wash, hard diagonal out. */
+.vip-arena .vip-hero-hub {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3rem), 0 100%);
+  background-image:
+    radial-gradient(70% 60% at 18% 0%, oklch(0.87 0.15 200 / 0.12), transparent 55%),
+    radial-gradient(60% 55% at 88% 12%, oklch(0.58 0.22 18 / 0.12), transparent 55%);
+}
+
+/* Arena panels: cut corners + cyan rim — machined, not rounded-soft. */
+.vip-arena .vip-glass-card {
+  clip-path: polygon(
+    14px 0,
+    100% 0,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    0 100%,
+    0 14px
+  );
+}
+
+/* Home Thunder Dome feature panel: arena washes + cyan rim (no clip —
+   the panel's gold ambient shadow must survive; the machined corner
+   cut lives on the Thunder Dome page itself). */
+.vip-arena-panel {
+  border-color: oklch(0.87 0.15 200 / 0.35);
+  background-image:
+    radial-gradient(70% 90% at 12% 0%, oklch(0.87 0.15 200 / 0.1), transparent 55%),
+    radial-gradient(60% 80% at 92% 100%, oklch(0.58 0.22 18 / 0.12), transparent 55%);
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. LIVE — "Broadcast Deck"                                          */
+/* ------------------------------------------------------------------ */
+
+/* When the badge says LIVE, the stage glass carries an on-air ring. */
+.vip-live:has(.nn-live-badge.is-live) .nn-glass {
+  box-shadow:
+    0 0 0 1px oklch(0.58 0.22 18 / 0.65),
+    0 24px 60px rgb(0 0 0 / 0.55),
+    0 0 44px oklch(0.58 0.22 18 / 0.22);
+}
+
+/* Schedule ledger: alternating gold/cyan time accents. */
+.vip-live .nn-grid > article {
+  border-left: 3px solid oklch(0.82 0.14 85 / 0.55);
+}
+.vip-live .nn-grid > article:nth-child(even) {
+  border-left-color: oklch(0.87 0.15 200 / 0.55);
+}
+
+/* ------------------------------------------------------------------ */
+/* 8. Footer — gradient hairline + texture wash                        */
+/* ------------------------------------------------------------------ */
+
+.v2-footer {
+  background-image:
+    linear-gradient(180deg, oklch(0.82 0.14 85 / 0.16), transparent 1px),
+    radial-gradient(70% 90% at 50% 110%, oklch(0.66 0.24 350 / 0.06), transparent 60%);
+}
+
+/* ------------------------------------------------------------------ */
+/* 8b. SONG PAGES — own-it / VIP offer block (audit P1-4). Sits under    */
+/* the buy row inside the cinema player card: a quiet ledger line, not   */
+/* another stamped card — gold rule on top, actions right.               */
+.vip-own-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border-top: 1px solid color-mix(in oklch, var(--acss-brand) 45%, transparent);
+}
+.vip-own-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: min(320px, 100%);
+  flex: 1;
+}
+.vip-own-copy strong {
+  font-family: var(--acss-font-display, 'Space Grotesk', sans-serif);
+  letter-spacing: 0.02em;
+}
+.vip-own-copy span {
+  opacity: 0.78;
+  font-size: 0.92em;
+  line-height: 1.45;
+}
+.vip-own-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* 9. Reduced motion — the redesign's own loops stop with the fleet's. */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-cta-band::after,
+  .vip-aurora-ring::after,
+  .v3-display .v3-gold {
+    animation: none !important;
+  }
+  .v3-track:hover .v3-track-cover img,
+  .v3-hcard:hover {
+    transform: none !important;
+  }
+}

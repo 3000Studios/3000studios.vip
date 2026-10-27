@@ -49,7 +49,7 @@ export function VipPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             
             {/* 99c Single */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
+            <article className="vip-glass-card acss-lift" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
               <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 99¢ Single
               </span>
@@ -58,13 +58,13 @@ export function VipPage() {
                 Lossless 24-bit studio master audio download + personal license. Yours to keep forever.
               </p>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', marginBottom: 16 }}>$0.99</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'track')?.stripe ?? '#'}>
+              <a className="vip-btn-gold acss-press" href={MERCH_ITEMS.find((m) => m.id === 'track')?.stripe ?? '#'}>
                 Buy Track
               </a>
             </article>
 
             {/* Monthly VIP */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
+            <article className="vip-glass-card acss-lift" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
               <span style={{ color: '#00f0ff', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 VIP Monthly
               </span>
@@ -73,13 +73,13 @@ export function VipPage() {
                 Full vault access, unreleased stems, exclusive drops, and priority live stream badge for 31 days.
               </p>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#00f0ff', marginBottom: 16 }}>$3.99 / mo</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'monthly')?.stripe ?? '#'}>
+              <a className="vip-btn-gold acss-press" href={MERCH_ITEMS.find((m) => m.id === 'monthly')?.stripe ?? '#'}>
                 Go VIP Monthly
               </a>
             </article>
 
             {/* Annual VIP */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column', borderColor: 'rgba(255, 215, 0, 0.7)', boxShadow: '0 0 30px rgba(255, 215, 0, 0.25)' }}>
+            <article className="vip-glass-card acss-lift acss-aurora vip-aurora-ring" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column', borderColor: 'rgba(255, 215, 0, 0.7)', boxShadow: '0 0 30px rgba(255, 215, 0, 0.25)' }}>
               <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 ★ Best Value
               </span>
@@ -88,13 +88,13 @@ export function VipPage() {
                 Full year VIP access with 2 months free. Every stem, high-res catalog archive, and Discord role.
               </p>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', marginBottom: 16 }}>$19.99 / yr</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'yearly')?.stripe ?? '#'}>
+              <a className="vip-btn-gold acss-press" href={MERCH_ITEMS.find((m) => m.id === 'yearly')?.stripe ?? '#'}>
                 Go VIP Yearly
               </a>
             </article>
 
             {/* Sync Licensing */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
+            <article className="vip-glass-card acss-lift" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
               <span style={{ color: '#a855f7', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Sync License
               </span>
@@ -112,7 +112,7 @@ export function VipPage() {
             </article>
 
             {/* Brand Sponsor */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
+            <article className="vip-glass-card acss-lift" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
               <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Sponsor Tier
               </span>
@@ -121,13 +121,13 @@ export function VipPage() {
                 Prominent brand placement on 3000studios.vip and live stream tickers for 30 days.
               </p>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', marginBottom: 16 }}>$99 / mo</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'sponsor')?.stripe ?? '#'}>
+              <a className="vip-btn-gold acss-press" href={MERCH_ITEMS.find((m) => m.id === 'sponsor')?.stripe ?? '#'}>
                 Sponsor Now
               </a>
             </article>
 
             {/* Cash App Direct Boost */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
+            <article className="vip-glass-card acss-lift" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
               <span style={{ color: '#00d632', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Direct Tip
               </span>
@@ -137,7 +137,7 @@ export function VipPage() {
               </p>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#00d632', marginBottom: 16 }}>Any $</div>
               <a
-                className="vip-btn-gold"
+                className="vip-btn-gold acss-press"
                 href={CASH_APP_URL}
                 target="_blank"
                 rel="noreferrer"

@@ -108,6 +108,8 @@ function FxGate({ children }: { children: React.ReactNode }) {
 function RootLayout() {
   return (
     <>
+      {/* VIP redesign 2026-10-27: fleet ACSS scroll progress bar (CSS-only). */}
+      <div className="acss-progress" aria-hidden="true" />
       <FxGate>
         <SparkClickFX />
         <StageFX />

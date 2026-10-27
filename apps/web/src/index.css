@@ -1,3 +1,4 @@
+@import './styles/acss-fleet.css';
 @import './styles/variables.css';
 @import './styles/theme.css';
 @import './styles/vip-luxury.css';
@@ -46,6 +47,7 @@
 @import './v2/footer.css';
 @import './v3/v3.css';
 @import './styles/acss-3000.css';
+@import './styles/vip-redesign.css';
 
 .routeLoader {
   min-height: 100vh;

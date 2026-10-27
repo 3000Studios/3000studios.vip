@@ -18,7 +18,7 @@ export function ThunderdomeFeature() {
       <div className="v3-wrap">
         <Reveal>
           <div
-            className="v3-card"
+            className="v3-card vip-arena-panel"
             style={{
               textAlign: 'center',
               borderColor: 'rgba(241,183,78,.35)',

@@ -46,7 +46,7 @@ export function LiveBroadcastPage() {
 
   return (
     <PublicLayoutV2 wallpaper="nebula">
-      <div className="nn-scope">
+      <div className="nn-scope vip-live">
         <section className="nn-hero">
           <span className={`nn-live-badge ${isLive ? 'is-live' : 'is-off'}`}>
             <span className="nn-dot" />
@@ -60,7 +60,7 @@ export function LiveBroadcastPage() {
             takes over this screen automatically.
           </p>
           <div className="nn-btn-row">
-            <a className="nn-btn nn-btn-gold" href={LIVE_STREAM_CONFIG.channelUrl} target="_blank" rel="noreferrer">
+            <a className="nn-btn nn-btn-gold acss-glow-cta acss-press" href={LIVE_STREAM_CONFIG.channelUrl} target="_blank" rel="noreferrer">
               <YoutubeLogo size={18} weight="fill" /> Open channel
             </a>
             <Link className="nn-btn nn-btn-ghost" to="/video">
@@ -70,7 +70,7 @@ export function LiveBroadcastPage() {
         </section>
 
         <section className="nn-wrap" style={{ marginBottom: 40 }}>
-          <div className="nn-glass" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="nn-glass acss-texture" style={{ padding: 0, overflow: 'hidden' }}>
             <div
               style={{
                 display: 'flex',

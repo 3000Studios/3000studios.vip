@@ -173,8 +173,8 @@ export function Header() {
 
   return (
     <>
-      <header className={`v2-header${scrolled ? ' is-scrolled' : ''}`}>
-        <div className="v2-header-inner">
+      <header className={`v2-header acss-sticky${scrolled ? ' is-scrolled' : ''}`}>
+        <div className="v2-header-inner acss-sticky__bar">
           <Link to="/" className="v2-brand" aria-label="3000 Studios home">
             <img src="/media/official-3000-studios-profile.png" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
             <span className="v2-brand-word">
