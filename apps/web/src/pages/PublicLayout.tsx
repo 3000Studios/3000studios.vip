@@ -9,7 +9,7 @@ import { ChromeWallpaper } from '../components/ChromeWallpaper';
 import { type SongPalette } from '../data/music';
 import { adsenseClientId } from '../lib/adsense';
 import { useAdConsent } from '../components/ConsentManager';
-import { adsAllowedOnRoute } from '../components/explicitAdsGate';
+import { adsAllowedForItems, adsAllowedOnRoute } from '../components/explicitAdsGate';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { fadeUp } from './PageMotion';
 
@@ -133,15 +133,28 @@ export function BeatDancingTitle({ text }: { text: string }) {
   );
 }
 
-export function AdSenseUnit({ slot, label = 'Advertisement' }: { slot?: string; label?: string }) {
+export function AdSenseUnit({
+  slot,
+  label = 'Advertisement',
+  items,
+}: {
+  slot?: string;
+  label?: string;
+  /** Items rendered on this page — if ANY is explicit-flagged, no ad renders (audit §4.3). */
+  items?: readonly unknown[];
+}) {
   const clientId = adsenseClientId();
   // Reactive: re-renders when the visitor accepts ads after this unit already
   // mounted, so the push below fires in the session consent was granted.
   const adConsent = useAdConsent();
-  // Ads-off gate (VIP-1000X fix #13): explicit song routes never render or
-  // push ad units — see components/explicitAdsGate.ts (Crew B route list).
+  // Ads-off gate (VIP-1000X fix #13 + fast-track 2026-10-29): explicit song
+  // routes AND aggregate surfaces that list explicit titles (/, /video,
+  // /music, /vip) never render or push ad units — see
+  // components/explicitAdsGate.ts. A caller-supplied item list is also
+  // content-gated: one explicit entry on the page blocks the unit.
   const { pathname } = useLocation();
-  const adsAllowed = adsAllowedOnRoute(pathname);
+  const adsAllowed =
+    adsAllowedOnRoute(pathname) && (items ? adsAllowedForItems(items) : true);
   const pushedRef = useRef(false);
   useEffect(() => {
     if (!slot || !clientId || !adConsent || !adsAllowed || pushedRef.current) return;

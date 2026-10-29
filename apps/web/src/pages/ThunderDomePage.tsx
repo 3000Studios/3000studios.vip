@@ -40,6 +40,9 @@ export function ThunderDomePage() {
             <span className="md-kicker" style={{ color: '#ffd700' }}>
               60 FPS ARCADE ENGINE
             </span>
+            <span className="md-kicker" style={{ color: '#ff2fb3', borderColor: 'rgba(255, 47, 179, 0.45)', background: 'rgba(255, 47, 179, 0.08)' }}>
+              ● CLOSED TESTING — COMING SOON
+            </span>
           </div>
 
           <h1 style={{ display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -60,15 +63,13 @@ export function ThunderDomePage() {
             >
               ▶ Inspect 24 Bosses
             </a>
-            <a
+            <Link
               className="vip-btn-gold"
-              href="https://play.google.com/store/search?q=Thunderdome%20AeroStrike&c=apps"
-              target="_blank"
-              rel="noreferrer"
-              title="Thunder Dome: AeroStrike on Google Play (internal test in progress)"
+              to="/contact"
+              title="Thunder Dome: AeroStrike is in closed testing — join the launch list"
             >
-              ▣ Get it on Google Play
-            </a>
+              ▣ Closed testing — join the launch list
+            </Link>
             <a className="vip-btn-obsidian" href="#dome-trailer">
               🎬 Watch Trailer
             </a>
@@ -83,6 +84,18 @@ export function ThunderDomePage() {
             </Link>
           </div>
         </section>
+
+        {/* Launch-status truth (fast-track 2026-10-29): closed testing /
+            coming soon — not a live purchasable product. */}
+        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 16px' }}>
+          <div className="td-status">
+            <strong>Launch status — Closed testing</strong>
+            Thunder Dome: AeroStrike is in closed testing on Google Play and
+            is <strong>not yet on public sale</strong>. The boss roster, ship
+            hangar, and armory below are the real launch content — join the
+            launch list and you will be first in when the Dome opens.
+          </div>
+        </div>
 
         {/* =========================================================================
             TRAILER SLOT: cinematic embed

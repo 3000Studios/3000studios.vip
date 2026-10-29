@@ -36,8 +36,9 @@ export function ThunderdomeFeature() {
               Thunder <em>Dome</em>
             </h2>
             <p className="v3-lead" style={{ margin: '0 auto', textAlign: 'center' }}>
-              24 hand-crafted bosses. 4 threat tiers. One dome. Enter the premier
-              3000 Studios arcade flight combat universe.
+              24 hand-crafted bosses. 4 threat tiers. One dome. The premier
+              3000 Studios arcade flight combat universe — now in closed
+              testing, public launch coming soon.
             </p>
 
             <div

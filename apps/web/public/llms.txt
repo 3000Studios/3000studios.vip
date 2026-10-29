@@ -24,7 +24,7 @@
 
 ## Catalog
 
-- 52 published songs, each with its own page under https://3000studios.vip/song/<slug>
+- 51 published songs, each with its own page under https://3000studios.vip/song/<slug>
   (for example [Code Red](https://3000studios.vip/song/code-red)).
 - Full index of indexable pages: https://3000studios.vip/sitemap.xml
 

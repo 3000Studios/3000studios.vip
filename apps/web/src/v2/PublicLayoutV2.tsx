@@ -4,7 +4,11 @@ import { Wallpaper, type WallpaperVariant } from './Wallpaper';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { PageFade } from './Reveal';
-import { AdSenseUnit } from '../pages/Home';
+/* Import AdSenseUnit from its defining module, NOT the pages/Home barrel:
+   the barrel re-exports every page, which statically dragged the whole
+   page set into the initial bundle and defeated route code splitting
+   (fast-track 2026-10-29). */
+import { AdSenseUnit } from '../pages/PublicLayout';
 
 /** Per-page wallpaper identities. */
 // eslint-disable-next-line react-refresh/only-export-components

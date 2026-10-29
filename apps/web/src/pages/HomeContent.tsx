@@ -26,11 +26,10 @@ export function HomeContent() {
         <section className="redCarpetHero">
           <video
             src={INTRO_VIDEO}
-            autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
             poster="/media/official-3000-studios-profile.png"
           />
           <div className="carpetDepth" aria-hidden="true" />
@@ -48,7 +47,8 @@ export function HomeContent() {
             </motion.span>
             <BeatDancingTitle text="3000 Studios" />
             <motion.p variants={fadeUp}>
-              Official music videos and DistroKid releases. Everything streams free. Subscribe so
+              Official music videos and DistroKid releases. Songs play as 1-minute previews here —
+              full tracks live on the streaming platforms. Subscribe so
               YouTube puts the next drop in your feed.
             </motion.p>
             <motion.div className="heroFeature" variants={fadeUp}>
@@ -111,7 +111,7 @@ export function HomeContent() {
           variants={stagger}
         >
           {[
-            ['Music Showcase', 'Original tracks, full streams, and official videos — all free.'],
+            ['Music Showcase', 'Original tracks as 1-minute previews, full tracks on all platforms, and official videos free via YouTube.'],
             [
               'Live Stream',
               'Cloudflare Stream-ready playback plus a protected owner stream console.',

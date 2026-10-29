@@ -219,7 +219,14 @@ export function ShopPage() {
 
   const cartCount = Object.values(cart).reduce((s, q) => s + q, 0);
   const merch = MERCH_ITEMS.filter((m) => m.kind === 'merch');
-  const digital = MERCH_ITEMS.filter((m) => m.kind !== 'merch');
+  // Fast-track 2026-10-29 (SHOP — FULL SONGS ON): the 'music' kind gets its
+  // OWN explicit section below instead of riding a catch-all
+  // `kind !== 'merch'` bucket — a bucket filter is exactly how the $0.99
+  // "Any official track" item could silently vanish from this page.
+  // Every MERCH_ITEMS entry now renders in exactly one named section:
+  // merch → Wear the Studio · music → Full Songs · plan/sponsor → Own the Music.
+  const musicItems = MERCH_ITEMS.filter((m) => m.kind === 'music');
+  const digital = MERCH_ITEMS.filter((m) => m.kind === 'plan' || m.kind === 'sponsor');
 
   const addToCart = (item: MerchItem) => {
     setQty(item.id, (cart[item.id] || 0) + 1);
@@ -288,10 +295,63 @@ export function ShopPage() {
           </div>
         </section>
 
+        {/* FULL SONGS — the 'music' kind, surfaced explicitly (see note at
+            the filters above). Stripe link AND PayPal alternative on every
+            item; both URLs come straight from src/data/merch.ts. */}
+        <section className="nn-wrap" style={{ marginBottom: 56 }} aria-label="Full songs">
+          <div className="nn-sec-head">
+            <div>
+              <span className="nn-kicker nn-kicker--gold">Full songs · Instant download</span>
+              <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4vw, 38px)' }}>
+                Own the Full Track
+              </h2>
+              <p>
+                Previews are free on the Music page — owning the song is $0.99.
+                High-res audio download &amp; official release license, yours
+                to keep.
+              </p>
+            </div>
+          </div>
+          <div className="nn-grid">
+            {musicItems.map((item) => (
+              <article key={item.id} className="nn-card" style={{ padding: 20 }} data-kind={item.kind}>
+                <span className="nn-kicker" style={{ fontSize: 10 }}>{item.kind}</span>
+                <h3 style={{ color: '#fff', margin: '12px 0 6px', fontSize: 18 }}>{item.title}</h3>
+                <p style={{ color: 'var(--nn-muted)', fontSize: 13, margin: '0 0 12px' }}>
+                  {item.blurb}
+                </p>
+                <p style={{ color: 'var(--nn-gold)', fontWeight: 900, fontSize: 22, margin: '0 0 14px' }}>
+                  {formatMoney(item.priceCents)}
+                </p>
+                <a
+                  className="nn-btn nn-btn-gold"
+                  href={item.stripe}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => rememberPendingShopItem(item.id)}
+                  style={{ width: '100%', marginBottom: 8 }}
+                >
+                  Buy now · {formatMoney(item.priceCents)}
+                </a>
+                <a
+                  className="nn-btn nn-btn-ghost"
+                  href={paypalBuyUrl(item)}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => rememberPendingShopItem(item.id)}
+                  style={{ width: '100%' }}
+                >
+                  PayPal instead
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section className="nn-wrap" style={{ marginBottom: 56 }}>
           <div className="nn-sec-head">
             <div>
-              <span className="nn-kicker">Music · VIP · Sponsors</span>
+              <span className="nn-kicker">VIP · Sponsors</span>
               <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4vw, 38px)' }}>
                 Own the Music
               </h2>

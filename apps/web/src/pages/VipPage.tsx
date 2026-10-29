@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
-import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import { MERCH_ITEMS } from '../data/merch';
+import { publishedSongs } from '../data/publishedSongs';
 import { CASH_APP_URL } from '../lib/liveRoom';
-import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import '../styles/vip-luxury.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
+
+/** Release count derived from catalog data at runtime — never hardcoded. */
+const RELEASE_COUNT = new Set(publishedSongs.map((s) => s.slug)).size;
 
 export function VipPage() {
   return (
@@ -26,7 +29,7 @@ export function VipPage() {
           </h1>
 
           <p style={{ maxWidth: 660, margin: '0 auto 24px' }}>
-            All 47 official music releases stream 100% free forever. VIP memberships unlock uncompressed 24-bit WAV master archives, multi-track stem packs, live broadcast chat badges, and direct studio sponsorship.
+            All {RELEASE_COUNT} official music releases play as 1-minute previews on this site — full tracks live on Apple Music, Spotify, and every major platform. VIP memberships unlock uncompressed 24-bit WAV master archives, multi-track stem packs, live broadcast chat badges, and direct studio sponsorship.
           </p>
 
           <div className="vip-badge-row">
@@ -149,12 +152,9 @@ export function VipPage() {
           </div>
         </section>
 
-        {/* =========================================================================
-            ADSENSE PLACEMENT
-            ========================================================================= */}
-        <section style={{ maxWidth: 1200, margin: '0 auto 48px', padding: '0 16px' }}>
-          <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
-        </section>
+        {/* No AdSense unit on /vip (fast-track 2026-10-29, audit §4.3):
+            aggregate pricing surface for the full release set — ads-off
+            by route in explicitAdsGate. */}
 
       </div>
     </PublicLayoutV2>

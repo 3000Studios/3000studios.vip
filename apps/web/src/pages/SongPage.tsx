@@ -24,7 +24,8 @@ import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
 import { usePageMeta } from '../lib/usePageMeta';
 import '../v2/song-page.css';
 
-const REVEAL_DELAY_MS = 2000;
+/** Unique published releases, derived from data (never hardcoded). */
+const UNIQUE_RELEASE_COUNT = new Set(publishedSongs.map((s) => s.slug)).size;
 
 const normalizeTitle = (value: string) =>
   value
@@ -47,8 +48,10 @@ export function SongPage() {
       ? `Listen to "${song.title}" by 3000 Studios — official music, video, and streaming links.`
       : '3000 Studios song page.',
   });
-  const [readyVideoId, setReadyVideoId] = useState('');
-  const [revealedVideoId, setRevealedVideoId] = useState('');
+  // Sonic Print (fast-track 2026-10-29): the hero is a static poster.
+  // The official video loads ONLY on an explicit click — no autoplay
+  // video above the fold, ever.
+  const [videoStarted, setVideoStarted] = useState(false);
   const touchStart = useRef<number | null>(null);
   const officialVideo = useMemo(
     () => (song ? getOfficialVideoForTitle(song.title) : undefined),
@@ -75,14 +78,6 @@ export function SongPage() {
     // this page starts the cued track.
     if (index >= 0) playIndex(index);
   }, [song, playIndex]);
-
-  useEffect(() => {
-    if (!officialVideo) return;
-    const timer = window.setTimeout(() => {
-      setRevealedVideoId(officialVideo.videoId);
-    }, REVEAL_DELAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [officialVideo]);
 
   const move = (delta: number) => {
     if (!song) return;
@@ -122,8 +117,10 @@ export function SongPage() {
   }
 
   const progress = music.duration > 0 ? (music.currentTime / music.duration) * 100 : 0;
+  // Click-to-play only: this src is used solely after the visitor presses
+  // the poster's play button (a user gesture — autoplay here is theirs).
   const embed = officialVideo
-    ? `${youtubeEmbedUrl(officialVideo.videoId)}&autoplay=1&mute=1&controls=0&loop=1&playlist=${officialVideo.videoId}&playsinline=1`
+    ? `${youtubeEmbedUrl(officialVideo.videoId)}&autoplay=1&playsinline=1`
     : '';
   const buyUrl =
     publishedSongs.find((s) => s.slug === song.slug)?.buy ?? HYPERFOLLOW_URL;
@@ -140,16 +137,12 @@ export function SongPage() {
             <ArrowLeft size={15} weight="bold" />
             Collection
           </button>
-          <span>Swipe left or right · {rolloutSongs.length} verified releases</span>
+          <span>Swipe left or right · {UNIQUE_RELEASE_COUNT} verified releases</span>
         </div>
 
         <section
           className={`v2-song-cinema ${
-            officialVideo &&
-            revealedVideoId === officialVideo.videoId &&
-            readyVideoId === officialVideo.videoId
-              ? 'is-video'
-              : 'is-art'
+            officialVideo && videoStarted ? 'is-video' : 'is-art'
           }`}
           aria-label={`${song.title} visual experience`}
         >
@@ -163,24 +156,34 @@ export function SongPage() {
             src={song.coverImage}
             alt={`${song.title} album artwork`}
           />
-          {officialVideo ? (
+          {officialVideo && videoStarted ? (
             <iframe
               className="v2-song-cinema-video"
               src={embed}
               title={`${song.title} official video`}
               allow="autoplay; encrypted-media; picture-in-picture"
-              onLoad={() => setReadyVideoId(officialVideo.videoId)}
             />
           ) : null}
           <div className="v2-song-cinema-shade" aria-hidden="true" />
           <div className="v2-song-cinema-meta">
             <span className="v2-chip">
-              {officialVideo ? 'Official video' : 'Official release'}
+              {officialVideo ? 'Official video — tap poster to play' : 'Official release'}
             </span>
             <h1>{song.title}</h1>
             <p>
-              {song.artist} · {song.genre}
+              {song.artist} · {song.genre} · 1-minute preview on this page —
+              full track on Apple Music &amp; Spotify
             </p>
+            {officialVideo && !videoStarted && (
+              <button
+                type="button"
+                className="v2-btn v2-btn--gold v2-btn--sm"
+                onClick={() => setVideoStarted(true)}
+                style={{ marginTop: 12 }}
+              >
+                <Play size={16} weight="fill" /> Play official video
+              </button>
+            )}
           </div>
           <button
             className="v2-song-swipe previous"
@@ -220,8 +223,8 @@ export function SongPage() {
             </div>
             <p>
               {music.isPlaying
-                ? 'Audio-reactive experience live'
-                : 'Press play to activate the visual environment'}
+                ? 'Playing the 1-minute preview'
+                : 'Press play for the 1-minute preview — full track is on the streaming platforms'}
             </p>
           </div>
           {officialVideo ? (

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Header } from '../v2/Header';
 import { PageFade } from '../v2/Reveal';
-import { AdSenseUnit } from '../pages/PublicLayout';
-import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
+import { CockpitDossier, MissionTimeline, CommandRail } from './Cockpit';
 import { Preloader, CursorFX, Grain } from './chrome';
 import { HeroEQ } from './HeroEQ';
 import { Statement, ClipReveal, StudioGrid, CtaBand, Marquee } from './Sections';
@@ -49,6 +48,8 @@ export function HomePage() {
         <PageFade routeKey="/">
           <main>
             <HeroEQ live={live} />
+            <CockpitDossier live={live} />
+            <MissionTimeline />
             <ThunderdomeFeature />
             <LiveSection />
             <CoverWall />
@@ -65,15 +66,17 @@ export function HomePage() {
             <ClipReveal />
             <HorizontalReleases />
             <PromoShorts />
-            <div className="v3-wrap" style={{ padding: '0 6vw' }}>
-              <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
-            </div>
+            {/* No AdSense unit on home (fast-track 2026-10-29, audit §4.3):
+                home is an aggregate surface listing explicit titles, so it
+                is ads-off by route in explicitAdsGate — the unit is not
+                even mounted here. */}
             <MusicSection />
             <StudioGrid />
             <CtaBand />
           </main>
         </PageFade>
         <Footer />
+        <CommandRail />
       </div>
     </>
   );
