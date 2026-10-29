@@ -73,7 +73,15 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/thunder-dome/privacy": {
     "title": "Thunder Dome: AeroStrike Privacy Policy — 3000 Studios VIP",
-    "description": "Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios."
+    "description": "Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios.",
+    "noindex": true,
+    "noads": true
+  },
+  "/thunderdome-privacy": {
+    "title": "Thunder Dome: AeroStrike Privacy Policy — 3000 Studios VIP",
+    "description": "Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios.",
+    "noindex": true,
+    "noads": true
   },
   "/thunder-dome": {
     "title": "Thunder Dome — 3000 Studios VIP",
@@ -117,7 +125,9 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/privacy": {
     "title": "Privacy Policy — 3000 Studios VIP",
-    "description": "Privacy Policy for 3000studios.vip — how 3000 Studios collects, uses, and protects your information."
+    "description": "Privacy Policy for 3000studios.vip — how 3000 Studios collects, uses, and protects your information.",
+    "noindex": true,
+    "noads": true
   },
   "/command-deck": {
     "title": "Command Deck — 3000 Studios VIP",

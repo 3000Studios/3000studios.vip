@@ -4,5 +4,11 @@ Disallow: /admin
 Disallow: /agent
 Disallow: /command-deck
 Disallow: /go-live
+Disallow: /privacy
+Disallow: /privacy.html
+Disallow: /privacy-policy
+Disallow: /thunder-dome/privacy
+Disallow: /thunderdome-privacy
+Disallow: /thunderdome-privacy.html
 
 Sitemap: https://3000studios.vip/sitemap.xml

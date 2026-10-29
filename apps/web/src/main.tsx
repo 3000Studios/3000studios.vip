@@ -241,6 +241,19 @@ const router = createBrowserRouter([
         ),
       },
       {
+        // Play Console URL: same canonical policy component as
+        // /thunder-dome/privacy, served at the listing's hyphenated URL.
+        path: '/thunderdome-privacy',
+        element: (
+          <Titled
+            title="Thunder Dome: AeroStrike Privacy Policy"
+            description="Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios."
+          >
+            <RouteLoader><ThunderDomePrivacyPage /></RouteLoader>
+          </Titled>
+        ),
+      },
+      {
         path: '/thunder-dome',
         element: (
           <Titled
