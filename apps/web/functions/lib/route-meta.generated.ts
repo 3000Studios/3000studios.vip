@@ -213,8 +213,8 @@ export const SONG_ROUTES: Record<string, RouteMetaEntry> = {
       "slug": "am-i",
       "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b8/cd/64/b8cd6492-fcc5-6892-3ac4-4c2dc663294c/artwork.jpg/600x600bb.jpg",
       "apple": "https://music.apple.com/us/album/am-i/6808645226?i=6808645227&uo=4",
-      "youtubeId": "WONGGlSRycQ",
-      "duration": "6:36"
+      "youtubeId": "",
+      "duration": ""
     }
   },
   "am-i-wrong": {
@@ -428,20 +428,6 @@ export const SONG_ROUTES: Record<string, RouteMetaEntry> = {
     },
     "noindex": true,
     "noads": true
-  },
-  "deep-space-hum": {
-    "title": "Deep Space Hum — 3000 Studios VIP",
-    "description": "Listen to \"Deep Space Hum\" by 3000 Studios — official music, video, and streaming links.",
-    "image": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f2/c0/e4/f2c0e464-4e6f-35a8-16ba-77ae99a331b9/artwork.jpg/600x600bb.jpg",
-    "type": "music.song",
-    "song": {
-      "title": "Deep Space Hum",
-      "slug": "deep-space-hum",
-      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f2/c0/e4/f2c0e464-4e6f-35a8-16ba-77ae99a331b9/artwork.jpg/600x600bb.jpg",
-      "apple": "https://music.apple.com/us/album/deep-space-hum/6802888455?i=6802888529&uo=4",
-      "youtubeId": "v_IK7naCNiM",
-      "duration": "3:01"
-    }
   },
   "depopulated": {
     "title": "Depopulated — 3000 Studios VIP",
