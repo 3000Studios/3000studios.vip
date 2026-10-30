@@ -19,7 +19,6 @@
   <url><loc>https://3000studios.vip/live</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/music</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/podcast</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://3000studios.vip/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/projects</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/requests</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/shop</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
@@ -75,7 +74,6 @@
   <url><loc>https://3000studios.vip/sponsors</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/terms</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/thunder-dome</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://3000studios.vip/thunder-dome/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/video</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/vip</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>

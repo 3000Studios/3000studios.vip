@@ -15,6 +15,28 @@
 /index.html
   Cache-Control: no-cache, must-revalidate
 
+# Privacy policies remain directly reachable for people and Play review, but
+# are kept out of search indexes, snippets, archives, and shared caches.
+/privacy
+  Cache-Control: private, no-store, max-age=0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/privacy.html
+  Cache-Control: private, no-store, max-age=0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/thunder-dome/privacy
+  Cache-Control: private, no-store, max-age=0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/thunderdome-privacy
+  Cache-Control: private, no-store, max-age=0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/thunderdome-privacy.html
+  Cache-Control: private, no-store, max-age=0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
 /tiktok
   Cache-Control: no-store
 
