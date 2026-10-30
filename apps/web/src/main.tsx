@@ -99,58 +99,6 @@ const AgentCommandCenter = lazy(() =>
    barrel import used to pull every public page — and the old PublicLayout
    with its three.js wallpaper — into the entry chunk. Same pattern the
    admin routes already used. */
-const AboutPage = lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
-const BlogPage = lazy(() => import('./pages/BlogPage').then((m) => ({ default: m.BlogPage })));
-const BlogPostPage = lazy(() =>
-  import('./pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })),
-);
-const CommunityPage = lazy(() =>
-  import('./pages/CommunityPage').then((m) => ({ default: m.CommunityPage })),
-);
-const ContactPage = lazy(() =>
-  import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })),
-);
-const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })));
-const PrivacyPolicyPage = lazy(() =>
-  import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
-);
-const RequestsPage = lazy(() =>
-  import('./pages/RequestsPage').then((m) => ({ default: m.RequestsPage })),
-);
-const SponsorsPage = lazy(() =>
-  import('./pages/SponsorsPage').then((m) => ({ default: m.SponsorsPage })),
-);
-const ThunderDomePage = lazy(() =>
-  import('./pages/ThunderDomePage').then((m) => ({ default: m.ThunderDomePage })),
-);
-const ThunderDomePrivacyPage = lazy(() =>
-  import('./pages/ThunderDomePrivacyPage').then((m) => ({ default: m.ThunderDomePrivacyPage })),
-);
-const AppsPage = lazy(() => import('./pages/AppsPage').then((m) => ({ default: m.AppsPage })));
-const ProjectsPage = lazy(() =>
-  import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })),
-);
-const VipPage = lazy(() => import('./pages/VipPage').then((m) => ({ default: m.VipPage })));
-const MusicPage = lazy(() => import('./pages/MusicPage').then((m) => ({ default: m.MusicPage })));
-const VideoPage = lazy(() => import('./pages/VideoPage').then((m) => ({ default: m.VideoPage })));
-const LiveBroadcastPage = lazy(() =>
-  import('./pages/LiveBroadcastPage').then((m) => ({ default: m.LiveBroadcastPage })),
-);
-const PodcastPage = lazy(() =>
-  import('./pages/PodcastPage').then((m) => ({ default: m.PodcastPage })),
-);
-const BeatsPage = lazy(() => import('./pages/BeatsPage').then((m) => ({ default: m.BeatsPage })));
-const CommandDeckPage = lazy(() =>
-  import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })),
-);
-const PhoneGoLive = lazy(() =>
-  import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })),
-);
-const ShopPage = lazy(() => import('./pages/Shop').then((m) => ({ default: m.ShopPage })));
-const ConceptBoard = lazy(() =>
-  import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })),
-);
-
 function RouteLoader({ children }: { children: ReactNode }) {
   return (
     <Suspense fallback={<div className="routeLoader" aria-label="Loading" />}>{children}</Suspense>
