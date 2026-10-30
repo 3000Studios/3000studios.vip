@@ -144,13 +144,31 @@ export function LiveBroadcastPage() {
             </div>
           </div>
           <div className="nn-grid">
-            {LIVE_STREAM_CONFIG.schedule.map((s) => (
-              <article key={s.title} className="nn-card" style={{ padding: 22 }}>
-                <span className="nn-kicker">{s.when}</span>
-                <h3 style={{ color: '#fff', margin: '12px 0 6px' }}>{s.title}</h3>
-                <p style={{ color: 'var(--nn-muted)', fontSize: 14, margin: 0 }}>{s.note}</p>
-              </article>
-            ))}
+            {LIVE_STREAM_CONFIG.schedule.map((s) => {
+              // Fast-track 2026-10-29: schedule titles in data carry a
+              // "— LIVE" suffix, which contradicted the Offline hero state.
+              // The rendered label now derives from the DETECTED state:
+              // the suffix is stripped and a status chip states the truth.
+              const cleanTitle = s.title.replace(/\s*[—-]\s*LIVE\s*$/i, '');
+              return (
+                <article key={s.title} className="nn-card" style={{ padding: 22 }}>
+                  <span className="nn-kicker">{s.when}</span>
+                  <h3 style={{ color: '#fff', margin: '12px 0 6px' }}>{cleanTitle}</h3>
+                  <p style={{ color: 'var(--nn-muted)', fontSize: 14, margin: 0 }}>{s.note}</p>
+                  <span
+                    className={`nn-live-badge ${isLive ? 'is-live' : 'is-off'}`}
+                    style={{ marginTop: 12 }}
+                  >
+                    <span className="nn-dot" />
+                    {live === null
+                      ? 'Checking signal…'
+                      : isLive
+                        ? 'On air now — watch above'
+                        : 'Upcoming — not live yet'}
+                  </span>
+                </article>
+              );
+            })}
           </div>
         </section>
 

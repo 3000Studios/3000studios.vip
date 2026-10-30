@@ -202,7 +202,12 @@ export function ShopPage() {
 
   const cartCount = Object.values(cart).reduce((s, q) => s + q, 0);
   const merch = MERCH_ITEMS.filter((m) => m.kind === 'merch');
-  const digital = MERCH_ITEMS.filter((m) => m.kind !== 'merch');
+  // VIP-1 port note (2026-10-29): the stale-base build's "music" section
+  // (the $0.99 "Any official track" card) is deliberately NOT ported —
+  // the Oct 27 v2 flip retired track sales (previews on-site, full songs
+  // outbound), and the audit recommendation does not resurrect them.
+  // Sections: merch → Wear the Studio · plan/sponsor → Passes & Sponsor Slots.
+  const digital = MERCH_ITEMS.filter((m) => m.kind === 'plan' || m.kind === 'sponsor');
 
   const addToCart = (item: MerchItem) => {
     setQty(item.id, (cart[item.id] || 0) + 1);

@@ -21,9 +21,12 @@ export function Preloader() {
 
   useEffect(() => {
     if (done || reduce) return;
+    // Fast-track 2026-10-29 (audit Phase 2): the artificial preloader is
+    // capped at ~300 ms total — fast counter, short settle, quick exit.
+    // It is decoration, never a gate on content.
     let n = 0;
     const iv = window.setInterval(() => {
-      n = Math.min(100, n + Math.ceil(Math.random() * 12));
+      n = Math.min(100, n + 34);
       setCount(n);
       if (n >= 100) {
         window.clearInterval(iv);
@@ -34,10 +37,17 @@ export function Preloader() {
           } catch {
             /* private mode */
           }
-        }, 420);
+        }, 60);
       }
-    }, 95);
-    return () => window.clearInterval(iv);
+    }, 70);
+    const hardCap = window.setTimeout(() => {
+      window.clearInterval(iv);
+      setDone(true);
+    }, 300);
+    return () => {
+      window.clearInterval(iv);
+      window.clearTimeout(hardCap);
+    };
   }, [done, reduce]);
 
   return (
@@ -46,7 +56,7 @@ export function Preloader() {
         <motion.div
           className="v3-loader"
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
           aria-hidden="true"
         >
           <div className="v3-loader-n">{count}</div>
