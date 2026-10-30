@@ -165,8 +165,7 @@ export function BlogPage() {
                             muted
                             playsInline
                             loop
-                            autoPlay
-                            preload="metadata"
+                            preload="none"
                             poster={card.image}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />

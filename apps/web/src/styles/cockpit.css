@@ -1,0 +1,537 @@
+/* ==========================================================================
+   COCKPIT HYBRID — fast-track 2026-10-29 (audit §3.5)
+   Cockpit shell (home + Thunder Dome) + Sonic Print catalog (/music, /song).
+   Dark only. No light backgrounds anywhere in this sheet.
+   Techniques: CSS @property HUD gauges, container queries, scroll-linked
+   view() reveals, scroll-snap poster reel, click-to-play video facades.
+   ========================================================================== */
+
+@property --hud-p {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+@property --threat-hue {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 190;
+}
+
+:root {
+  --ck-bg: #05060a;
+  --ck-panel: #0a0d16;
+  --ck-panel-2: #0d1120;
+  --ck-line: rgba(0, 240, 255, 0.22);
+  --ck-gold: #f1b74e;
+  --ck-cyan: #00f0ff;
+  --ck-pink: #ff2fb3;
+  --ck-text: #f4f1ea;
+  --ck-muted: #9aa0ae;
+}
+
+/* ---------- Cockpit dossier hero (home) ---------- */
+.ck-dossier {
+  position: relative;
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: clamp(28px, 5vw, 56px) 6vw 8px;
+  color: var(--ck-text);
+}
+.ck-dossier-frame {
+  position: relative;
+  border: 1px solid var(--ck-line);
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 160% at 12% 0%, rgba(0, 240, 255, 0.1), transparent 55%),
+    radial-gradient(90% 140% at 88% 0%, rgba(241, 183, 78, 0.1), transparent 55%),
+    linear-gradient(160deg, var(--ck-panel-2), var(--ck-bg) 70%);
+  padding: clamp(22px, 4vw, 44px);
+  overflow: hidden;
+}
+.ck-dossier-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(0, 240, 255, 0.045) 34px 35px),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(0, 240, 255, 0.045) 34px 35px);
+  pointer-events: none;
+}
+.ck-dossier-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ck-cyan);
+  margin-bottom: 14px;
+}
+.ck-dossier-kicker .ck-status {
+  color: var(--ck-gold);
+}
+.ck-dossier h2 {
+  font-size: clamp(30px, 5.4vw, 58px);
+  line-height: 1.02;
+  margin: 0 0 12px;
+  text-wrap: balance;
+}
+.ck-dossier h2 em {
+  color: var(--ck-gold);
+  font-style: normal;
+}
+.ck-dossier p {
+  color: var(--ck-muted);
+  max-width: 62ch;
+  line-height: 1.7;
+  margin: 0 0 22px;
+}
+
+/* HUD gauges — container-query responsive readout strip */
+.ck-gauges {
+  container-type: inline-size;
+  container-name: gauges;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+@container gauges (max-width: 560px) {
+  .ck-gauge {
+    padding: 12px 10px;
+  }
+  .ck-gauge b {
+    font-size: 22px;
+  }
+}
+@media (max-width: 560px) {
+  .ck-gauges {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.ck-gauge {
+  --hud-p: 72%;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: rgba(3, 4, 8, 0.72);
+  padding: 16px 14px 12px;
+  overflow: hidden;
+  transition: --hud-p 1.2s ease;
+}
+.ck-gauge::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: var(--hud-p);
+  background: linear-gradient(90deg, var(--ck-cyan), var(--ck-gold));
+}
+.ck-gauge b {
+  display: block;
+  font-size: 30px;
+  line-height: 1;
+  color: #fff;
+}
+.ck-gauge span {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ck-muted);
+}
+
+/* Mission timeline — scroll-linked reveals */
+.ck-mission {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(36px, 6vw, 72px) 6vw;
+  color: var(--ck-text);
+}
+.ck-mission-list {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.ck-mission-step {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 16px;
+  align-items: start;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid hsl(var(--threat-hue) 90% 60%);
+  border-radius: 12px;
+  background: linear-gradient(120deg, rgba(13, 17, 32, 0.92), rgba(5, 6, 10, 0.92));
+  padding: 18px 20px;
+}
+.ck-mission-step .ck-step-n {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ck-gold);
+  line-height: 1;
+}
+.ck-mission-step h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  color: #fff;
+}
+.ck-mission-step p {
+  margin: 0;
+  color: var(--ck-muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+.ck-mission-step .ck-step-state {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ck-cyan);
+  border: 1px solid var(--ck-line);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+@supports (animation-timeline: view()) {
+  .ck-mission-step {
+    animation: ck-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+}
+@keyframes ck-rise {
+  from {
+    opacity: 0.25;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile bottom command rail — ONE primary CTA */
+.ck-rail {
+  display: none;
+}
+@media (max-width: 760px) {
+  .ck-rail {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid var(--ck-line);
+    background: rgba(5, 6, 10, 0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.65);
+  }
+  .ck-rail .ck-rail-note {
+    flex: 1;
+    min-width: 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--ck-muted);
+  }
+  .ck-rail .ck-rail-note strong {
+    display: block;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .ck-rail a {
+    flex: 0 0 auto;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f7cf7d, #d99a26);
+    color: #0a0800;
+    font-weight: 800;
+    text-decoration: none;
+  }
+}
+
+/* ---------- Sonic Print posters (/music) ---------- */
+.sp-hero-note {
+  border: 1px solid rgba(241, 183, 78, 0.35);
+  background: rgba(241, 183, 78, 0.07);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: var(--ck-text);
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 760px;
+  margin: 18px auto 0;
+}
+.sp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 22px;
+}
+.sp-poster {
+  container-type: inline-size;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--ck-panel);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 520px;
+}
+.sp-poster-art {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #000;
+}
+.sp-poster-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(1.06);
+}
+.sp-poster-art::after {
+  /* duotone field over the cover */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(0, 240, 255, 0.16), transparent 46%, rgba(5, 6, 10, 0.66));
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.sp-poster-n {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  background: rgba(5, 6, 10, 0.85);
+  color: var(--ck-gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 4px 9px;
+  border-radius: 6px;
+}
+.sp-poster-preview {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  background: rgba(5, 6, 10, 0.85);
+  color: var(--ck-cyan);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 6px;
+}
+.sp-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 30px;
+  padding: 10px 16px 0;
+}
+.sp-wave i {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--ck-cyan), rgba(0, 240, 255, 0.25));
+  display: block;
+}
+.sp-poster-body {
+  padding: 12px 16px 18px;
+}
+.sp-poster-body h3 {
+  margin: 0 0 4px;
+  font-size: 19px;
+  line-height: 1.2;
+  color: #fff;
+  text-wrap: balance;
+}
+.sp-poster-body h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.sp-liner {
+  color: var(--ck-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+.sp-poster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.sp-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f7cf7d, #d99a26);
+  color: #0a0800;
+  font-weight: 800;
+  cursor: pointer;
+}
+.sp-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--ck-text);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+@container (max-width: 300px) {
+  .sp-poster-body h3 {
+    font-size: 17px;
+  }
+}
+/* Mobile: vertical poster reel with scroll-snap */
+@media (max-width: 700px) {
+  .sp-reel {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scroll-snap-type: y proximity;
+    gap: 20px;
+  }
+  .sp-reel .sp-poster {
+    scroll-snap-align: start;
+  }
+}
+.sp-loadmore {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* ---------- Video facades (/video) ---------- */
+.vf-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--ck-panel);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 380px;
+}
+.vf-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.vf-facade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  background-color: #000;
+}
+.vf-facade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(5, 6, 10, 0.72));
+}
+.vf-play {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(241, 183, 78, 0.96);
+  color: #0a0800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 0 34px rgba(241, 183, 78, 0.5);
+}
+.vf-stage iframe,
+.vf-stage video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.vf-meta {
+  padding: 16px 18px 18px;
+}
+.vf-meta h3 {
+  margin: 0 0 4px;
+  color: #fff;
+  font-size: 17px;
+}
+.vf-meta p {
+  margin: 0;
+  color: var(--ck-muted);
+  font-size: 13px;
+}
+.vf-watch {
+  display: inline-flex;
+  margin-top: 12px;
+  color: var(--ck-cyan);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Thunder Dome status banner */
+.td-status {
+  max-width: 900px;
+  margin: 0 auto 28px;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-align: center;
+  color: var(--ck-text);
+  line-height: 1.65;
+  font-size: 14.5px;
+}
+.td-status strong {
+  color: var(--ck-cyan);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ck-mission-step {
+    animation: none;
+  }
+  .ck-gauge {
+    transition: none;
+  }
+}

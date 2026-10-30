@@ -53,11 +53,11 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/music": {
     "title": "Music Vault — 3000 Studios VIP",
-    "description": "The full 3000 Studios DistroKid catalog — 1-minute previews of every official release."
+    "description": "The 3000 Studios catalog — 1-minute previews on this site, full tracks on Apple Music, Spotify, and every major platform."
   },
   "/video": {
     "title": "Video Vault — 3000 Studios VIP",
-    "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free previews."
+    "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free to watch via YouTube."
   },
   "/live": {
     "title": "Live Command — 3000 Studios VIP",
@@ -77,7 +77,7 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/thunder-dome": {
     "title": "Thunder Dome — 3000 Studios VIP",
-    "description": "Thunder Dome by 3000 Studios — the top-down arena shooter. Play the build, watch the trailer."
+    "description": "Thunder Dome by 3000 Studios — the top-down arena shooter, in closed testing. Meet the bosses, watch the trailer, join the launch list."
   },
   "/apps": {
     "title": "Apps — 3000 Studios VIP",

@@ -92,7 +92,40 @@ export function isExplicitSong(song: unknown): boolean {
   return typeof entry.slug === 'string' && EXPLICIT_SONG_SLUGS.has(entry.slug);
 }
 
-/** Ads (script + units) are allowed only off explicit routes. */
+/**
+ * Aggregate surfaces that LIST explicit titles (audit 2026-10-29 §4.3).
+ * The old gate was route-based only for single song pages, so once a slot
+ * ID is configured an ad unit could still mount on the home page, the
+ * video vault, or a catalog list that renders explicit titles in the DOM.
+ * These surfaces are ads-off by route, regardless of slot configuration:
+ *   /        — home lists explicit shorts / catalog titles
+ *   /video   — catalog list includes explicit-flagged videos
+ *   /music   — catalog list includes explicit-flagged songs
+ *   /vip     — catalog/pricing surface listing the full release set
+ */
+export const AGGREGATE_ADS_OFF_ROUTES: ReadonlySet<string> = new Set([
+  '/',
+  '/video',
+  '/music',
+  '/vip',
+]);
+
+/** True when the route is an aggregate/catalog surface that lists explicit titles. */
+export function isAggregateAdsOffRoute(pathname: string): boolean {
+  const clean = pathname.replace(/\/$/, '') || '/';
+  return AGGREGATE_ADS_OFF_ROUTES.has(clean);
+}
+
+/**
+ * Content-level gate for ad units: a unit must not render on a page whose
+ * rendered item list contains ANY explicit-flagged entry. Callers that know
+ * their item list pass it here; route-only callers use adsAllowedOnRoute().
+ */
+export function adsAllowedForItems(items: readonly unknown[]): boolean {
+  return !items.some((item) => isExplicitSong(item));
+}
+
+/** Ads (script + units) are allowed only off explicit routes AND off aggregate surfaces. */
 export function adsAllowedOnRoute(pathname: string): boolean {
-  return !isExplicitRoute(pathname);
+  return !isExplicitRoute(pathname) && !isAggregateAdsOffRoute(pathname);
 }
