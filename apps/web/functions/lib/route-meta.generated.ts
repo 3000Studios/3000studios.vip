@@ -53,11 +53,11 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/music": {
     "title": "Music Vault — 3000 Studios VIP",
-    "description": "The full 3000 Studios DistroKid catalog — 1-minute previews of every official release."
+    "description": "The 3000 Studios catalog — 1-minute previews on this site, full tracks on Apple Music, Spotify, and every major platform."
   },
   "/video": {
     "title": "Video Vault — 3000 Studios VIP",
-    "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free previews."
+    "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free to watch via YouTube."
   },
   "/live": {
     "title": "Live Command — 3000 Studios VIP",
@@ -85,7 +85,7 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/thunder-dome": {
     "title": "Thunder Dome — 3000 Studios VIP",
-    "description": "Thunder Dome by 3000 Studios — the top-down arena shooter. Play the build, watch the trailer."
+    "description": "Thunder Dome by 3000 Studios — the top-down arena shooter, in closed testing. Meet the bosses, watch the trailer, join the launch list."
   },
   "/apps": {
     "title": "Apps — 3000 Studios VIP",
@@ -223,8 +223,8 @@ export const SONG_ROUTES: Record<string, RouteMetaEntry> = {
       "slug": "am-i",
       "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b8/cd/64/b8cd6492-fcc5-6892-3ac4-4c2dc663294c/artwork.jpg/600x600bb.jpg",
       "apple": "https://music.apple.com/us/album/am-i/6808645226?i=6808645227&uo=4",
-      "youtubeId": "WONGGlSRycQ",
-      "duration": "6:36"
+      "youtubeId": "",
+      "duration": ""
     }
   },
   "am-i-wrong": {
@@ -438,20 +438,6 @@ export const SONG_ROUTES: Record<string, RouteMetaEntry> = {
     },
     "noindex": true,
     "noads": true
-  },
-  "deep-space-hum": {
-    "title": "Deep Space Hum — 3000 Studios VIP",
-    "description": "Listen to \"Deep Space Hum\" by 3000 Studios — official music, video, and streaming links.",
-    "image": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f2/c0/e4/f2c0e464-4e6f-35a8-16ba-77ae99a331b9/artwork.jpg/600x600bb.jpg",
-    "type": "music.song",
-    "song": {
-      "title": "Deep Space Hum",
-      "slug": "deep-space-hum",
-      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f2/c0/e4/f2c0e464-4e6f-35a8-16ba-77ae99a331b9/artwork.jpg/600x600bb.jpg",
-      "apple": "https://music.apple.com/us/album/deep-space-hum/6802888455?i=6802888529&uo=4",
-      "youtubeId": "v_IK7naCNiM",
-      "duration": "3:01"
-    }
   },
   "depopulated": {
     "title": "Depopulated — 3000 Studios VIP",

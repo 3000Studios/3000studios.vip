@@ -1,63 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayCircle, FilmStrip, GameController } from '@phosphor-icons/react';
-import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
-import { UnlockCard } from '../components/UnlockCard';
-import {
-  grantUnlock,
-  isLivePayments,
-  readUnlocks,
-  settleUnlockReturn,
-} from '../lib/unlockPayments';
-import { ADSENSE_VIDEO_SLOT } from '../lib/adsense';
+import { VideoFacadeCard } from '../components/VideoFacadeCard';
 
+const PAGE_SIZE = 12;
+
+/**
+ * VIDEO VAULT — fast-track 2026-10-29 (audit Phase 1).
+ * The $1.00 full-video unlock is REMOVED entirely: it gated nothing (the
+ * preview and "full" YouTube IDs were the same) and its checkout was never
+ * connected. Videos are YouTube embeds presented as click-to-play facades
+ * (thumbnail + play button; the iframe loads only on click), paginated
+ * with Load More so the full catalog never mounts at once.
+ */
 export function VideoPage() {
-  // Post-payment settle: Stripe returns buyers to /video?unlocked=1&item=<id>.
-  // Grant ONLY here, ONLY for a real catalog id, ONLY when live payments are
-  // configured — never before or during checkout (fail-closed).
-  useEffect(() => {
-    if (!isLivePayments()) return;
-    const itemId = settleUnlockReturn();
-    if (!itemId) return;
-    const known = [...MUSIC_VIDEOS, ...CINEMATIC_VIDEOS].some((v) => v.id === itemId);
-    if (known) grantUnlock(itemId);
-  }, []);
-
   const [searchQuery, setSearchQuery] = useState('');
   const [tab, setTab] = useState<'music' | 'cinematics'>('music');
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   const q = searchQuery.toLowerCase();
   const music = MUSIC_VIDEOS.filter(
     (v) => v.title.toLowerCase().includes(q) || v.subtitle.toLowerCase().includes(q),
   );
-  const cinematics = CINEMATIC_VIDEOS.filter((v) => v.title.toLowerCase().includes(q));
+  const cinematics = CINEMATIC_VIDEOS.filter((v) =>
+    v.title.toLowerCase().includes(q),
+  );
 
   const items = tab === 'music' ? music : cinematics;
-  const unlockedCount = readUnlocks().length;
+  const shown = items.slice(0, visible);
 
   return (
     <PublicLayoutV2 wallpaper="beams">
       <div className="nn-scope">
         <section className="nn-hero">
           <span className="nn-kicker">
-            <FilmStrip size={14} style={{ verticalAlign: '-2px' }} /> Official cinema theater
+            <FilmStrip size={14} style={{ verticalAlign: '-2px' }} /> Official
+            cinema theater
           </span>
           <h1 className="nn-chrome" style={{ fontSize: 'clamp(38px, 8vw, 84px)', marginTop: 18 }}>
             VIDEO VAULT
           </h1>
           <p>
-            Every video plays a free preview right here. Full-video unlocks
-            ($1, yours forever, download included) open as soon as paid
-            checkout is connected — previews stay free either way.
-            {unlockedCount > 0 && (
-              <>
-                {' '}
-                <strong style={{ color: 'var(--nn-gold)' }}>
-                  {unlockedCount} unlocked on this device.
-                </strong>
-              </>
-            )}
+            Every video here plays <strong>free</strong> — tap a poster and it
+            plays right here via YouTube. No unlock, no paywall, no checkout:
+            the full videos live on the 3000 Studios YouTube channel.
           </p>
           <div className="nn-btn-row">
             <a
@@ -75,26 +63,45 @@ export function VideoPage() {
         </section>
 
         <section className="nn-wrap" style={{ marginBottom: 28 }}>
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginBottom: 20,
+            }}
+          >
             <button
               type="button"
               className={`nn-chip${tab === 'music' ? ' is-active' : ''}`}
-              onClick={() => setTab('music')}
+              onClick={() => {
+                setTab('music');
+                setVisible(PAGE_SIZE);
+              }}
             >
-              <FilmStrip size={14} style={{ verticalAlign: '-2px' }} /> Music videos ({MUSIC_VIDEOS.length})
+              <FilmStrip size={14} style={{ verticalAlign: '-2px' }} /> Music
+              videos ({MUSIC_VIDEOS.length})
             </button>
             <button
               type="button"
               className={`nn-chip${tab === 'cinematics' ? ' is-active' : ''}`}
-              onClick={() => setTab('cinematics')}
+              onClick={() => {
+                setTab('cinematics');
+                setVisible(PAGE_SIZE);
+              }}
             >
-              <GameController size={14} style={{ verticalAlign: '-2px' }} /> Thunder Dome cinematics ({CINEMATIC_VIDEOS.length})
+              <GameController size={14} style={{ verticalAlign: '-2px' }} />{' '}
+              Thunder Dome cinematics ({CINEMATIC_VIDEOS.length})
             </button>
             <input
               type="text"
               placeholder="Search videos..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setVisible(PAGE_SIZE);
+              }}
               className="nn-input"
               style={{ minWidth: 220 }}
             />
@@ -105,17 +112,29 @@ export function VideoPage() {
               No videos match “{searchQuery}”.
             </p>
           ) : (
-            <div className="nn-grid">
-              {items.map((item) => (
-                <UnlockCard key={item.id} item={item} />
-              ))}
-            </div>
+            <>
+              <div className="nn-grid">
+                {shown.map((item) => (
+                  <VideoFacadeCard key={item.id} item={item} />
+                ))}
+              </div>
+              {visible < items.length && (
+                <div className="sp-loadmore">
+                  <button
+                    type="button"
+                    className="nn-btn nn-btn-cyan"
+                    onClick={() => setVisible((v) => v + PAGE_SIZE)}
+                  >
+                    Load more videos ({items.length - visible} remaining)
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
 
-        <section className="nn-wrap">
-          <AdSenseUnit slot={ADSENSE_VIDEO_SLOT} />
-        </section>
+        {/* No AdSense unit on /video: aggregate surface listing explicit
+            titles — ads-off by route (audit §4.3). */}
 
         <footer className="nn-footer">
           <strong className="nn-chrome-gold">3000 STUDIOS</strong>

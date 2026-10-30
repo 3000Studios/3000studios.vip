@@ -12,6 +12,33 @@ import { AdminFab } from './components/AdminFab';
 import { SparkClickFX } from './components/SparkClickFX';
 import { StageFX } from './components/StageFX';
 import { HomePage } from './v3/HomePage';
+
+/* Route-level code splitting (fast-track 2026-10-29, audit Phase 2):
+   every secondary page is lazy-loaded. Only the home page and the layout
+   chrome stay in the initial bundle. */
+const AboutPage = lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
+const BlogPage = lazy(() => import('./pages/BlogPage').then((m) => ({ default: m.BlogPage })));
+const BlogPostPage = lazy(() => import('./pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })));
+const CommunityPage = lazy(() => import('./pages/CommunityPage').then((m) => ({ default: m.CommunityPage })));
+const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
+const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })));
+const RequestsPage = lazy(() => import('./pages/RequestsPage').then((m) => ({ default: m.RequestsPage })));
+const SponsorsPage = lazy(() => import('./pages/SponsorsPage').then((m) => ({ default: m.SponsorsPage })));
+const ThunderDomePage = lazy(() => import('./pages/ThunderDomePage').then((m) => ({ default: m.ThunderDomePage })));
+const ThunderDomePrivacyPage = lazy(() => import('./pages/ThunderDomePrivacyPage').then((m) => ({ default: m.ThunderDomePrivacyPage })));
+const AppsPage = lazy(() => import('./pages/AppsPage').then((m) => ({ default: m.AppsPage })));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })));
+const VipPage = lazy(() => import('./pages/VipPage').then((m) => ({ default: m.VipPage })));
+const MusicPage = lazy(() => import('./pages/MusicPage').then((m) => ({ default: m.MusicPage })));
+const VideoPage = lazy(() => import('./pages/VideoPage').then((m) => ({ default: m.VideoPage })));
+const LiveBroadcastPage = lazy(() => import('./pages/LiveBroadcastPage').then((m) => ({ default: m.LiveBroadcastPage })));
+const PodcastPage = lazy(() => import('./pages/PodcastPage').then((m) => ({ default: m.PodcastPage })));
+const BeatsPage = lazy(() => import('./pages/BeatsPage').then((m) => ({ default: m.BeatsPage })));
+const CommandDeckPage = lazy(() => import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })));
+const PhoneGoLive = lazy(() => import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })));
+const ShopPage = lazy(() => import('./pages/Shop').then((m) => ({ default: m.ShopPage })));
+const ConceptBoard = lazy(() => import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })));
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
@@ -72,58 +99,6 @@ const AgentCommandCenter = lazy(() =>
    barrel import used to pull every public page — and the old PublicLayout
    with its three.js wallpaper — into the entry chunk. Same pattern the
    admin routes already used. */
-const AboutPage = lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
-const BlogPage = lazy(() => import('./pages/BlogPage').then((m) => ({ default: m.BlogPage })));
-const BlogPostPage = lazy(() =>
-  import('./pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })),
-);
-const CommunityPage = lazy(() =>
-  import('./pages/CommunityPage').then((m) => ({ default: m.CommunityPage })),
-);
-const ContactPage = lazy(() =>
-  import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })),
-);
-const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })));
-const PrivacyPolicyPage = lazy(() =>
-  import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
-);
-const RequestsPage = lazy(() =>
-  import('./pages/RequestsPage').then((m) => ({ default: m.RequestsPage })),
-);
-const SponsorsPage = lazy(() =>
-  import('./pages/SponsorsPage').then((m) => ({ default: m.SponsorsPage })),
-);
-const ThunderDomePage = lazy(() =>
-  import('./pages/ThunderDomePage').then((m) => ({ default: m.ThunderDomePage })),
-);
-const ThunderDomePrivacyPage = lazy(() =>
-  import('./pages/ThunderDomePrivacyPage').then((m) => ({ default: m.ThunderDomePrivacyPage })),
-);
-const AppsPage = lazy(() => import('./pages/AppsPage').then((m) => ({ default: m.AppsPage })));
-const ProjectsPage = lazy(() =>
-  import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })),
-);
-const VipPage = lazy(() => import('./pages/VipPage').then((m) => ({ default: m.VipPage })));
-const MusicPage = lazy(() => import('./pages/MusicPage').then((m) => ({ default: m.MusicPage })));
-const VideoPage = lazy(() => import('./pages/VideoPage').then((m) => ({ default: m.VideoPage })));
-const LiveBroadcastPage = lazy(() =>
-  import('./pages/LiveBroadcastPage').then((m) => ({ default: m.LiveBroadcastPage })),
-);
-const PodcastPage = lazy(() =>
-  import('./pages/PodcastPage').then((m) => ({ default: m.PodcastPage })),
-);
-const BeatsPage = lazy(() => import('./pages/BeatsPage').then((m) => ({ default: m.BeatsPage })));
-const CommandDeckPage = lazy(() =>
-  import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })),
-);
-const PhoneGoLive = lazy(() =>
-  import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })),
-);
-const ShopPage = lazy(() => import('./pages/Shop').then((m) => ({ default: m.ShopPage })));
-const ConceptBoard = lazy(() =>
-  import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })),
-);
-
 function RouteLoader({ children }: { children: ReactNode }) {
   return (
     <Suspense fallback={<div className="routeLoader" aria-label="Loading" />}>{children}</Suspense>
@@ -168,7 +143,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="Music Vault"
-            description="The full 3000 Studios DistroKid catalog — 1-minute previews of every official release."
+            description="The 3000 Studios catalog — 1-minute previews on this site, full tracks on Apple Music, Spotify, and every major platform."
           >
             <RouteLoader><MusicPage /></RouteLoader>
           </Titled>
@@ -179,7 +154,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="Video Vault"
-            description="Official 3000 Studios music videos and Thunder Dome cinematics — free previews."
+            description="Official 3000 Studios music videos and Thunder Dome cinematics — free to watch via YouTube."
           >
             <RouteLoader><VideoPage /></RouteLoader>
           </Titled>
@@ -258,7 +233,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="Thunder Dome"
-            description="Thunder Dome by 3000 Studios — the top-down arena shooter. Play the build, watch the trailer."
+            description="Thunder Dome by 3000 Studios — the top-down arena shooter, in closed testing. Meet the bosses, watch the trailer, join the launch list."
           >
             <RouteLoader><ThunderDomePage /></RouteLoader>
           </Titled>

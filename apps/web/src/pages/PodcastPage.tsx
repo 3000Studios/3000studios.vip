@@ -10,10 +10,10 @@ const HERO_VIDEO = 'https://cdn.3000studios.vip/cinematics/game-intro-v1.mp4';
 const EPISODES = [
   {
     n: '01',
-    title: 'The Rebuild: New Website, Dollar Unlocks, and Beat Packs',
+    title: 'The Rebuild: New Website, Free Videos, and Beat Packs',
     duration: '6:38',
     blurb:
-      'Follow and Subscribe walk through the full 3000studios.vip rebuild, the $1 video unlocks, and the new beat pack drops hitting the store.',
+      'Follow and Subscribe walk through the full 3000studios.vip rebuild, the free Video Vault, and the new beat pack drops hitting the store.',
   },
   {
     n: '02',
@@ -67,14 +67,16 @@ export function PodcastPage() {
 
       {/* HERO — welcoming animated intro over a looping studio cinematic */}
       <section className="pod-hero">
+        {/* No autoplay above the fold (fast-track 2026-10-29): static
+            poster frame; the Spotify embed below is the player. */}
         <video
           className="pod-hero-video"
           src={HERO_VIDEO}
-          autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
+          poster="/media/official-3000-studios-profile.webp"
           aria-hidden="true"
         />
         <div className="pod-hero-shade" aria-hidden="true" />

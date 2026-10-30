@@ -68,10 +68,9 @@ export function AboutPage() {
               </p>
               <p style={{ margin: 0 }}>
                 The catalog is distributed globally across Spotify, Apple Music,
-                YouTube, and all major platforms via DistroKid. Every song is
-                paired with a cinematic official video — free previews play
-                right here, with $1 full-video unlocks opening as soon as paid
-                checkout is connected.
+                YouTube, and all major platforms via DistroKid. Songs play as
+                1-minute previews right here, full tracks live on the streaming
+                platforms, and the official videos play free via YouTube.
               </p>
               <p style={{ margin: 0 }}>
                 Beyond music: <strong style={{ color: 'var(--nn-gold)' }}>Thunder Dome:

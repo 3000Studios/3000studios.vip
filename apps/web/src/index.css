@@ -49,6 +49,7 @@
 @import './styles/acss-3000.css';
 @import './styles/vip-redesign.css';
 @import './liquid/liquid.css';
+@import './styles/cockpit.css';
 
 .routeLoader {
   min-height: 100vh;
