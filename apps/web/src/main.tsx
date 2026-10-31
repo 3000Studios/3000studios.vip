@@ -36,6 +36,7 @@ const LiveBroadcastPage = lazy(() => import('./pages/LiveBroadcastPage').then((m
 const PodcastPage = lazy(() => import('./pages/PodcastPage').then((m) => ({ default: m.PodcastPage })));
 const BeatsPage = lazy(() => import('./pages/BeatsPage').then((m) => ({ default: m.BeatsPage })));
 const CommandDeckPage = lazy(() => import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })));
+const OfficePage = lazy(() => import('./pages/OfficePage').then((m) => ({ default: m.OfficePage })));
 const PhoneGoLive = lazy(() => import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })));
 const ShopPage = lazy(() => import('./pages/Shop').then((m) => ({ default: m.ShopPage })));
 const ConceptBoard = lazy(() => import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })));
@@ -201,6 +202,17 @@ const router = createBrowserRouter([
             description="Owner dashboard — content stats and unlock payment controls."
           >
             <RouteLoader><CommandDeckPage /></RouteLoader>
+          </Titled>
+        ),
+      },
+      {
+        path: '/office',
+        element: (
+          <Titled
+            title="The Office"
+            description="Owner's office — private live window."
+          >
+            <RouteLoader><OfficePage /></RouteLoader>
           </Titled>
         ),
       },

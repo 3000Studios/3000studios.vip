@@ -153,6 +153,11 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
     "title": "Vault — 3000 Studios VIP",
     "description": "3000 Studios operator console.",
     "noindex": true
+  },
+  "/office": {
+    "title": "The Office — 3000 Studios VIP",
+    "description": "Owner's office — private live window.",
+    "noindex": true
   }
 };
 

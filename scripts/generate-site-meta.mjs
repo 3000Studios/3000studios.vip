@@ -161,13 +161,14 @@ const HAND = {
 };
 
 // Routes that exist but must never be indexed (owner/protected surfaces).
-const NOINDEX_PATHS = ['/command-deck', '/go-live', '/admin', '/agent', '/vault'];
+const NOINDEX_PATHS = ['/command-deck', '/go-live', '/admin', '/agent', '/vault', '/office'];
 const NOINDEX_TITLES = {
   '/command-deck': { title: brand('Command Deck'), description: 'Owner dashboard — content stats and unlock payment controls.' },
   '/go-live': { title: brand('Go Live'), description: 'Start a 3000 Studios live broadcast from your phone.' },
   '/admin': { title: brand('Admin'), description: '3000 Studios admin.' },
   '/agent': { title: brand('Agent Command Center'), description: '3000 Studios agent command center.' },
   '/vault': { title: brand('Vault'), description: '3000 Studios operator console.' },
+  '/office': { title: brand('The Office'), description: "Owner's office — private live window." },
 };
 
 /* --------------------------- crew B contracts ----------------------------- */
