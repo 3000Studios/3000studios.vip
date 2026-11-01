@@ -12,6 +12,7 @@ import { AdminFab } from './components/AdminFab';
 import { SparkClickFX } from './components/SparkClickFX';
 import { StageFX } from './components/StageFX';
 import { HomePage } from './v3/HomePage';
+import { WaterWallpaper } from './components/WaterWallpaper';
 
 /* Route-level code splitting (fast-track 2026-10-29, audit Phase 2):
    every secondary page is lazy-loaded. Only the home page and the layout
@@ -115,6 +116,10 @@ function FxGate({ children }: { children: React.ReactNode }) {
 function RootLayout() {
   return (
     <>
+      {/* Water wallpaper from 3000studios.space (Boss order, 2026-10-31):
+          fixed ripple canvas behind all public pages; self-excludes on
+          owner/office routes. */}
+      <WaterWallpaper />
       {/* VIP redesign 2026-10-27: fleet ACSS scroll progress bar (CSS-only). */}
       <div className="acss-progress" aria-hidden="true" />
       <FxGate>

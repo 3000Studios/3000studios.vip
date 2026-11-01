@@ -285,3 +285,20 @@ body.consent-open .v3-hero-inner {
 body.consent-open .md-hero-copy {
   padding-bottom: var(--consent-banner-h, 180px);
 }
+
+/* Water wallpaper (Boss order, 2026-10-31): the 3000studios.space liquid
+   ripple as the site background. Fixed full-viewport canvas behind #root;
+   #root gets its own stacking layer so every page paints above the water. */
+.water-wallpaper {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+#root {
+  position: relative;
+  z-index: 1;
+}
