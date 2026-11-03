@@ -95,7 +95,7 @@
   background: #090c14;
   display: grid;
   place-items: center;
-  cursor: pointer;
+  
 }
 .iconButton:hover,
 .iconButton:focus-visible {
@@ -299,7 +299,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  cursor: pointer;
+  
 }
 .toolRail button:hover,
 .toolRail button:focus-visible {
@@ -330,7 +330,7 @@
   place-items: center;
   align-content: center;
   gap: 7px;
-  cursor: pointer;
+  
 }
 .talkOrb svg {
   font-size: 30px;
@@ -378,11 +378,11 @@
   border: 1px solid rgba(45, 212, 255, 0.45);
   background: rgba(45, 212, 255, 0.08);
   color: var(--cyan);
-  cursor: pointer;
+  
 }
 .commandComposer button:disabled {
   opacity: 0.35;
-  cursor: not-allowed;
+  
 }
 .modeSwitch {
   display: grid;
@@ -404,7 +404,7 @@
   text-transform: uppercase;
   font-size: 9px;
   letter-spacing: 0.12em;
-  cursor: pointer;
+  
 }
 .modeSwitch button:last-child {
   border-right: 0;
@@ -426,7 +426,7 @@
   align-items: center;
   justify-content: center;
   gap: 9px;
-  cursor: pointer;
+  
   box-shadow: 0 0 24px rgba(255, 22, 38, 0.16);
 }
 .abortButton:hover,
@@ -459,7 +459,7 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #070a11;
-  cursor: pointer;
+  
 }
 .agentFooter button.connected {
   color: #57f2ba;
@@ -541,7 +541,7 @@
   min-height: 46px;
   padding: 0 18px;
   border-radius: 9px;
-  cursor: pointer;
+  
 }
 .primaryButton {
   color: #fff;
@@ -555,7 +555,7 @@
 }
 .primaryButton:disabled {
   opacity: 0.4;
-  cursor: not-allowed;
+  
 }
 .policyDialog {
   position: relative;
@@ -573,7 +573,7 @@
   color: #fff;
   display: grid;
   place-items: center;
-  cursor: pointer;
+  
 }
 .policyDialog ol {
   list-style: none;
@@ -607,7 +607,7 @@
   background: #c30b18;
   font-weight: 800;
   letter-spacing: 0.14em;
-  cursor: pointer;
+  
 }
 .isAborted::after {
   content: '';

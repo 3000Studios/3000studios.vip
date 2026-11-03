@@ -57,7 +57,7 @@
   border: none;
   background: transparent;
   color: var(--ink);
-  cursor: pointer;
+  
 }
 
 .lockMenuShackle {
@@ -364,7 +364,7 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(111, 244, 255, 0.03));
   color: var(--ink);
   text-align: left;
-  cursor: pointer;
+  
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -379,7 +379,7 @@
 
 .controlTile:disabled {
   opacity: 0.45;
-  cursor: not-allowed;
+  
 }
 
 .controlTile strong,

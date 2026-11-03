@@ -160,7 +160,7 @@ body {
   padding: 12px 22px;
   border-radius: var(--vip-radius-pill);
   border: none;
-  cursor: pointer;
+  
   text-decoration: none;
   box-shadow: 0 8px 24px -4px rgba(255, 215, 0, 0.4);
   transition: all 0.25s ease;
@@ -186,7 +186,7 @@ body {
   padding: 12px 20px;
   border-radius: var(--vip-radius-pill);
   border: 1px solid var(--vip-gold-border);
-  cursor: pointer;
+  
   text-decoration: none;
   transition: all 0.25s ease;
   white-space: nowrap;
@@ -265,7 +265,7 @@ body {
   font-weight: 800;
   font-size: 13px;
   text-decoration: none;
-  cursor: pointer;
+  
   transition: all 0.2s ease;
 }
 

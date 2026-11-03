@@ -94,7 +94,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
+  
   overflow: hidden;
 }
 .sdDrop:hover,
@@ -127,7 +127,7 @@
   background: #0c121e;
   color: var(--c-muted);
   text-align: left;
-  cursor: pointer;
+  
 }
 .sdModes button.active {
   color: #fff;

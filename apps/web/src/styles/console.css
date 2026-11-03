@@ -117,7 +117,7 @@
   font-weight: 500;
   border: 1px solid transparent;
   transition: background 0.16s, color 0.16s, border-color 0.16s;
-  cursor: pointer;
+  
   background: none;
   text-align: left;
   width: 100%;
@@ -415,14 +415,14 @@
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
-  cursor: pointer;
+  
   text-decoration: none;
   transition: background 0.15s, border-color 0.15s, transform 0.05s, opacity 0.15s;
   white-space: nowrap;
 }
 .cBtn:hover { border-color: var(--c-accent); background: rgba(91, 140, 255, 0.12); }
 .cBtn:active { transform: translateY(1px); }
-.cBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.cBtn:disabled { opacity: 0.45;  }
 .cBtn.primary {
   background: linear-gradient(135deg, var(--c-accent), #4a6fe0);
   border-color: transparent;
@@ -481,12 +481,12 @@
   border: 1px solid var(--c-line);
   background: var(--c-elevated);
   color: var(--c-ink);
-  cursor: pointer;
+  
   font-family: inherit;
   transition: border-color 0.15s, transform 0.08s, background 0.15s;
 }
 .cTile:hover { border-color: var(--c-accent); transform: translateY(-2px); }
-.cTile:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.cTile:disabled { opacity: 0.4;  transform: none; }
 .cTile strong { font-size: 13.5px; }
 .cTile span { font-size: 12px; color: var(--c-muted); line-height: 1.45; }
 
@@ -609,7 +609,7 @@
   color: #06101f;
   font: 850 18px/1 var(--font-body);
   box-shadow: 0 18px 36px -14px rgba(79, 209, 197, 0.72);
-  cursor: pointer;
+  
 }
 
 .dudePanel {
@@ -653,7 +653,7 @@
   border: 1px solid var(--c-line);
   background: rgba(255, 255, 255, 0.04);
   color: var(--c-muted);
-  cursor: pointer;
+  
 }
 
 .dudeMessages {
@@ -732,12 +732,12 @@
   background: var(--c-accent-2);
   color: #06101f;
   font: 750 12.5px/1 var(--font-body);
-  cursor: pointer;
+  
 }
 
 .dudeForm button:disabled {
   opacity: 0.45;
-  cursor: not-allowed;
+  
 }
 
 /* ---------- Responsive ---------- */
@@ -761,7 +761,7 @@
     border: 1px solid var(--c-line-strong);
     background: var(--c-elevated);
     color: var(--c-ink);
-    cursor: pointer;
+    
     font-size: 18px;
   }
   .cFormRow { grid-template-columns: 1fr; }
@@ -820,11 +820,11 @@
   display: inline-flex; align-items: center; gap: 7px;
   padding: 8px 14px; border-radius: var(--c-radius-sm);
   border: 1px solid var(--c-line-strong); background: var(--c-elevated);
-  color: var(--c-ink); font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--c-ink); font-size: 13px; font-weight: 600; 
   text-decoration: none; transition: background .15s, border-color .15s;
 }
 .console .btn:hover { border-color: var(--c-accent); background: rgba(91,140,255,.12); }
-.console .btn:disabled { opacity: .45; cursor: not-allowed; }
+.console .btn:disabled { opacity: .45;  }
 .console .btn.primary { background: linear-gradient(135deg, var(--c-accent), #4a6fe0); border-color: transparent; color: #fff; }
 .console .btn.danger { color: var(--c-bad); border-color: rgba(248,113,113,.3); }
 .console .btn.sm { padding: 5px 10px; font-size: 12px; }
@@ -882,7 +882,7 @@
 .console .toggle { display: flex; align-items: center; gap: 8px; }
 .console .commandStack { display: flex; flex-direction: column; gap: 12px; }
 .console .controlGrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); }
-.console .controlTile { text-align: left; display: flex; flex-direction: column; gap: 5px; padding: 15px; border-radius: var(--c-radius-sm); border: 1px solid var(--c-line); background: var(--c-elevated); color: var(--c-ink); cursor: pointer; }
+.console .controlTile { text-align: left; display: flex; flex-direction: column; gap: 5px; padding: 15px; border-radius: var(--c-radius-sm); border: 1px solid var(--c-line); background: var(--c-elevated); color: var(--c-ink);  }
 .console .controlTile:hover { border-color: var(--c-accent); }
 .console .controlTile strong { font-size: 13.5px; }
 .console .controlTile span { font-size: 12px; color: var(--c-muted); }

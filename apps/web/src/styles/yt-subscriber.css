@@ -31,7 +31,7 @@
   font-weight: 800;
   background: #111;
   color: #ffd36a;
-  cursor: pointer;
+  
 }
 .ytSubBannerClose {
   position: absolute;
@@ -40,7 +40,7 @@
   border: 0;
   background: transparent;
   font-size: 22px;
-  cursor: pointer;
+  
 }
 @keyframes ytBannerDrop {
   from { transform: translateY(-110%); }
@@ -58,7 +58,7 @@
   background: #c4302b;
   color: #fff;
   font-weight: 700;
-  cursor: pointer;
+  
   box-shadow: 0 10px 24px rgba(196, 48, 43, 0.4);
 }
 

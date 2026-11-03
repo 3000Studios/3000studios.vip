@@ -11,7 +11,7 @@
   border: 1px solid rgba(212, 175, 55, 0.6);
   background: linear-gradient(135deg, #a37a28 0%, #d4af37 35%, #9a9a9c 70%, #dcdcdc 100%);
   color: #111111;
-  cursor: pointer;
+  
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: var(--font-body);
   font-weight: 700;

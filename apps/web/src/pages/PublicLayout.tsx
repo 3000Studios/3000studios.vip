@@ -241,10 +241,6 @@ export function PublicLayout({
       data-page-wallpaper={variant}
       data-song-wallpaper={wallpaperVariant}
     >
-      <div className="filmLetterbox top" aria-hidden="true" />
-      <div className="filmLetterbox bottom" aria-hidden="true" />
-      <div className="filmGrain" aria-hidden="true" />
-      <div className="filmScan" aria-hidden="true" />
       <ReducedMotionGate>
         <AudioReactiveWallpaper />
         <ZombieFX />

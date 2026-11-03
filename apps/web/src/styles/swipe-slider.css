@@ -14,7 +14,7 @@
   opacity: 1;
   visibility: visible;
   touch-action: pan-y;
-  cursor: grab;
+  
 }
 
 .slickHome .slickTrack {
@@ -161,7 +161,7 @@
   border: 2px solid #fff;
   background: #fff;
   opacity: 0.35;
-  cursor: pointer;
+  
 }
 
 .slickHome .slick-dots li.slick-active button {
@@ -181,7 +181,7 @@
   background: rgba(0, 0, 0, 0.28);
   color: #fff;
   font-size: 42px;
-  cursor: pointer;
+  
 }
 
 .slickHome .slickArrow.prev {

@@ -45,7 +45,7 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
   overflow: hidden;
-  cursor: pointer;
+  
 }
 .releaseCarouselCard:hover,
 .releaseCarouselCard.is-playing {
@@ -122,7 +122,7 @@
   background: rgba(15, 23, 42, 0.8);
   color: #ffd700;
   font-size: 1.4rem;
-  cursor: pointer;
+  
   display: grid;
   place-items: center;
 }

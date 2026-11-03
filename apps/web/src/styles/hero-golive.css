@@ -42,7 +42,7 @@
   background: #ffd700;
   color: #160d00;
   font-weight: 800;
-  cursor: pointer;
+  
 }
 .heroVol { display: flex; align-items: center; gap: 8px; color: #f3e6b4; font-size: 12px; }
 .heroVol input { width: 120px; accent-color: #ffd700; }
@@ -93,7 +93,7 @@
   border: 0;
   border-radius: 999px;
   font-weight: 800;
-  cursor: pointer;
+  
 }
 .phoneGoLiveStart { background: #e10600; color: #fff; }
 .phoneGoLiveStop { background: #222; color: #fff; border: 1px solid #666; }

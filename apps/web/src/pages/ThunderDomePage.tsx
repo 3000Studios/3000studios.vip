@@ -207,7 +207,6 @@ export function ThunderDomePage() {
                           color: isSelected ? '#05060a' : color,
                           fontWeight: 800,
                           fontSize: 13,
-                          cursor: 'pointer',
                           boxShadow: isSelected ? `0 0 14px ${color}` : `0 0 6px ${color}55`,
                           transition: 'all 0.2s ease',
                         }}
@@ -236,7 +235,6 @@ export function ThunderDomePage() {
                         borderRadius: 8,
                         padding: '10px',
                         textAlign: 'left',
-                        cursor: 'pointer',
                         color: '#fff',
                         transition: 'all 0.2s ease',
                         boxShadow: isSelected ? `0 0 12px ${color}44` : undefined,
@@ -362,7 +360,6 @@ export function ThunderDomePage() {
                   style={{
                     padding: '24px',
                     borderColor: selectedShip.id === ship.id ? 'rgba(0, 240, 255, 0.8)' : undefined,
-                    cursor: 'pointer',
                   }}
                   onClick={() => setSelectedShip(ship)}
                 >

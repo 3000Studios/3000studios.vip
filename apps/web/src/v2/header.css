@@ -275,7 +275,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
   color: var(--v2-muted);
-  cursor: pointer;
+  
   transition:
     transform 0.25s var(--v2-ease),
     color 0.2s var(--v2-ease),
@@ -347,7 +347,7 @@
   border: 1px solid var(--v2-neon-line);
   background: rgba(0, 245, 147, 0.07);
   backdrop-filter: blur(10px);
-  cursor: pointer;
+  
   display: grid;
   place-items: center;
 }
@@ -442,7 +442,7 @@
   background: rgba(15, 24, 40, 0.6);
   color: var(--v2-text);
   font-size: 17px;
-  cursor: pointer;
+  
 }
 
 .v2-menu-list {

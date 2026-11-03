@@ -202,7 +202,7 @@ export function UnlockCard({ item }: { item: VideoCatalogItem }) {
                 disabled
                 aria-disabled="true"
                 title="Paid unlocks are not available yet"
-                style={{ flex: 1, opacity: 0.55, cursor: 'not-allowed' }}
+                style={{ flex: 1, opacity: 0.55 }}
               >
                 <Lock size={16} weight="fill" />
                 Unlock Full — coming soon

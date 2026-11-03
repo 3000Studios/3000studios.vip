@@ -162,7 +162,7 @@
   background: rgba(3, 10, 24, 0.58);
   backdrop-filter: blur(12px);
   font-size: 2rem;
-  cursor: pointer;
+  
 }
 .songSwipe.previous {
   left: 1rem;

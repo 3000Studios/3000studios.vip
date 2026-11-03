@@ -92,18 +92,3 @@ html, body, #root, .vipSite {
 @keyframes dividerRun {
   to { background-position: 220% 0; }
 }
-.boltCursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 400;
-  width: 20px;
-  height: 28px;
-  pointer-events: none;
-  background: linear-gradient(180deg, #fff, #ffe566 40%, #d4af37);
-  clip-path: polygon(35% 0, 70% 0, 48% 42%, 78% 42%, 22% 100%, 40% 52%, 18% 52%);
-  filter: drop-shadow(0 0 8px #ffd700);
-}
-@media (pointer: coarse) {
-  .boltCursor { opacity: 0.55; }
-}

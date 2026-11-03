@@ -3,7 +3,7 @@ import { Header } from '../v2/Header';
 import { PageFade } from '../v2/Reveal';
 import { detectIsLive, subscribeHostLive } from '../lib/streamLiveDetect';
 import { CockpitDossier, MissionTimeline, CommandRail } from './Cockpit';
-import { Preloader, CursorFX, Grain } from './chrome';
+import { Preloader } from './chrome';
 import { HeroEQ } from './HeroEQ';
 import { Statement, ClipReveal, StudioGrid, CtaBand, Marquee } from './Sections';
 import { HorizontalReleases } from './HorizontalReleases';
@@ -42,8 +42,6 @@ export function HomePage() {
     <>
       <div className="v3-root">
         <Preloader />
-        <CursorFX />
-        <Grain />
         <Header />
         <PageFade routeKey="/">
           <main>

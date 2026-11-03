@@ -22,7 +22,7 @@
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.45),
     0 0 20px rgba(255, 215, 0, 0.18);
-  cursor: pointer;
+  
   font: 900 0.78rem/1 Arial, Helvetica, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -64,7 +64,7 @@
   font: 900 0.88rem/1 Arial, Helvetica, sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  cursor: pointer;
+  
 }
 
 @media (min-width: 1081px) {
@@ -264,7 +264,6 @@
 
   .beatGoldLetter,
   .live3dLetter,
-  .filmGrain,
   .velvetGrain,
   .sparkBurst,
   .carouselStage {

@@ -57,7 +57,7 @@
   color: var(--v2-text);
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
+  
 }
 
 .v2-concept-checks input[type='checkbox'] {

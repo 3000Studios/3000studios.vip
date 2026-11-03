@@ -10,51 +10,6 @@
     background: #040308;
   }
 
-  .filmLetterbox {
-    pointer-events: none;
-    position: fixed;
-    left: 0;
-    right: 0;
-    height: clamp(10px, 2.2vh, 28px);
-    z-index: 70;
-    background: linear-gradient(180deg, #000, rgba(0, 0, 0, 0.85));
-  }
-  .filmLetterbox.top { top: 0; }
-  .filmLetterbox.bottom { bottom: 0; background: linear-gradient(0deg, #000, rgba(0, 0, 0, 0.85)); }
-
-  .filmGrain {
-    pointer-events: none;
-    position: fixed;
-    inset: 0;
-    z-index: 3;
-    opacity: 0.12;
-    mix-blend-mode: overlay;
-    background-image: repeating-radial-gradient(circle at 20% 40%, #fff 0 0.4px, transparent 0.6px 3px);
-    animation: filmFlicker 0.18s steps(2) infinite;
-  }
-
-  @keyframes filmFlicker {
-    0% { opacity: 0.08; transform: translate3d(0, 0, 0); }
-    100% { opacity: 0.16; transform: translate3d(-1%, 1%, 0); }
-  }
-
-  .filmScan {
-    pointer-events: none;
-    position: fixed;
-    inset: 0;
-    z-index: 2;
-    background: repeating-linear-gradient(
-      180deg,
-      transparent 0 2px,
-      rgba(255, 255, 255, 0.015) 2px 3px
-    );
-    animation: scanDrift 9s linear infinite;
-  }
-
-  @keyframes scanDrift {
-    to { background-position: 0 120px; }
-  }
-
   .cinePage {
     position: relative;
     z-index: 4;
@@ -292,7 +247,7 @@
     background: #d4af37;
     color: #16120a;
     font-weight: 800;
-    cursor: pointer;
+    
   }
 
   .modalClose {
@@ -303,11 +258,11 @@
     background: transparent;
     color: inherit;
     font-size: 1.6rem;
-    cursor: pointer;
+    
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .filmGrain, .filmScan, .cineHeroVideo, .cineMarqueeTrack, .cinePortal::before, .cineReel img {
+    .cineHeroVideo, .cineMarqueeTrack, .cinePortal::before, .cineReel img {
       animation: none !important;
     }
   }

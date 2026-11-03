@@ -122,7 +122,6 @@ export function BlogPage() {
                   onClick={() => setFilter(cat)}
                   className="v2-chip"
                   style={{
-                    cursor: 'pointer',
                     borderColor: filter === cat ? 'var(--v2-neon)' : undefined,
                     color: filter === cat ? 'var(--v2-neon)' : undefined,
                     background: filter === cat ? 'rgba(0, 240, 255, 0.12)' : undefined,

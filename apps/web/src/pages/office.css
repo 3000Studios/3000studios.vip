@@ -194,7 +194,7 @@
   letter-spacing: 0.04em;
   padding: 0.5rem 0.95rem;
   border-radius: 999px;
-  cursor: pointer;
+  
   transition:
     background 0.2s ease,
     transform 0.1s ease;
@@ -303,7 +303,7 @@
   color: #f4f1ea;
   font-size: 1.35rem;
   font-weight: 700;
-  cursor: pointer;
+  
   transition:
     background 0.15s ease,
     transform 0.08s ease;

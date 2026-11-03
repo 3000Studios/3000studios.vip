@@ -8,14 +8,14 @@
   height: clamp(520px, 68vh, 680px);
   perspective-origin: 50% 50%;
   overflow: hidden;
-  cursor: grab;
+  
   /* Vertical page scroll still works over the stage; horizontal drags spin. */
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
 .rotor-root:active {
-  cursor: grabbing;
+  
 }
 .rotor-root::before {
   content: '';

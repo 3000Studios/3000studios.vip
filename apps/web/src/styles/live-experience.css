@@ -251,7 +251,7 @@
     0 8px 30px rgba(0, 0, 0, 0.8),
     0 0 20px rgba(255, 215, 0, 0.35);
   color: #fef08a;
-  cursor: pointer;
+  
   backdrop-filter: blur(12px);
   animation: liveSoundPulse 2.5s infinite;
   max-width: calc(100% - 24px);
@@ -310,7 +310,7 @@
   background: rgba(16, 185, 129, 0.2);
   border: 1px solid rgba(16, 185, 129, 0.5);
   color: #6ee7b7;
-  cursor: pointer;
+  
   backdrop-filter: blur(8px);
   transition: background 0.2s ease;
 }

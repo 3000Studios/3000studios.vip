@@ -136,7 +136,7 @@ body {
   padding: 12px 26px;
   border-radius: 10px;
   border: 1px solid transparent;
-  cursor: pointer;
+  
   text-decoration: none;
   transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
   text-transform: uppercase;
@@ -264,7 +264,7 @@ body {
   border: 1px solid var(--nn-border);
   background: rgba(0, 240, 255, 0.05);
   color: var(--nn-muted);
-  cursor: pointer;
+  
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -490,7 +490,7 @@ body {
   background: linear-gradient(135deg, #ffe98a, var(--nn-gold) 60%, #c9930a);
   color: #0a0a0a;
   border: none;
-  cursor: pointer;
+  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -605,7 +605,7 @@ body {
   border: 1px solid var(--nn-border);
   background: rgba(0, 240, 255, 0.04);
   color: var(--nn-text);
-  cursor: pointer;
+  
 }
 
 .nn-pin-key:hover { background: rgba(0, 240, 255, 0.12); border-color: var(--nn-cyan); }
@@ -643,7 +643,7 @@ body {
   border-radius: 15px;
   border: 1px solid var(--nn-border);
   background: rgba(255, 255, 255, 0.06);
-  cursor: pointer;
+  
   transition: background 0.2s ease;
 }
 

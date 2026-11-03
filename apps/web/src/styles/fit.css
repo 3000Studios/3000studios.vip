@@ -30,7 +30,7 @@ img, video, iframe { max-width: 100%; }
   background: #ffd700;
   color: #16120a;
   font-weight: 800;
-  cursor: pointer;
+  
 }
 .musicDockBuy {
   display: inline-flex;
@@ -144,10 +144,7 @@ img, video, canvas {
 
 /* Prevent unwanted filter jitter / color flashing during transitions */
 .liveWallpaper,
-.liveWallpaperCanvas,
-.filmGrain,
-.filmScan,
-.filmLetterbox {
+.liveWallpaperCanvas {
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;

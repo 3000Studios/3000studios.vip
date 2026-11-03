@@ -255,7 +255,7 @@ body.vip-nav-open {
   border: 1px solid rgba(255, 215, 0, 0.35);
   background: linear-gradient(180deg, rgba(255, 215, 0, 0.14), rgba(0, 0, 0, 0.35));
   color: #f6e7b0;
-  cursor: pointer;
+  
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -322,7 +322,7 @@ body.vip-nav-open {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.28s ease;
-  cursor: pointer;
+  
 }
 
 /* ── Player chrome polish ── */

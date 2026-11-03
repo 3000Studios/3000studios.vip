@@ -70,68 +70,6 @@ export function Preloader() {
   );
 }
 
-/* ---------------- neon cursor ---------------- */
-export function CursorFX() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const reduce = usePrefersReducedMotion();
-
-  useEffect(() => {
-    if (reduce || !window.matchMedia('(pointer:fine)').matches) return;
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-    if (!dot || !ring) return;
-    // VIP-1000X fix #7: dot + ring stay hidden until the FIRST mousemove.
-    // They previously rendered at viewport centre on load — right on top
-    // of the hero headline between "CAN" and "SEE".
-    let mx = 0;
-    let my = 0;
-    let rx = 0;
-    let ry = 0;
-    let raf = 0;
-    let started = false;
-    const loop = () => {
-      rx += (mx - rx) * 0.16;
-      ry += (my - ry) * 0.16;
-      ring.style.transform = `translate(${rx - 19}px, ${ry - 19}px)`;
-      raf = requestAnimationFrame(loop);
-    };
-    const onMove = (e: MouseEvent) => {
-      mx = e.clientX;
-      my = e.clientY;
-      if (!started) {
-        started = true;
-        rx = mx;
-        ry = my;
-        dot.style.opacity = '1';
-        ring.style.opacity = '1';
-        raf = requestAnimationFrame(loop);
-      }
-      dot.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
-      const t = e.target as HTMLElement | null;
-      ring.classList.toggle('is-hot', !!t?.closest('a,button,.v3-card,.v3-track'));
-    };
-    window.addEventListener('mousemove', onMove, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, [reduce]);
-
-  if (reduce) return null;
-  return (
-    <>
-      <div ref={dotRef} className="v3-cursor" aria-hidden="true" style={{ opacity: 0 }} />
-      <div ref={ringRef} className="v3-ring" aria-hidden="true" style={{ opacity: 0 }} />
-    </>
-  );
-}
-
-/* ---------------- film grain ---------------- */
-export function Grain() {
-  return <div className="v3-grain" aria-hidden="true" />;
-}
-
 /* ---------------- marquee ---------------- */
 export function Marquee({ items }: { items: string[] }) {
   const seq = [...items, ...items, ...items, ...items];
