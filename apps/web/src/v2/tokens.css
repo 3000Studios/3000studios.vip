@@ -56,7 +56,11 @@
 .v2-root {
   position: relative;
   min-height: 100svh;
-  background: var(--v2-bg);
+  /* Transparent (2026-11-03): the 3000 Space Water canvas is the page
+     background now — an opaque var(--v2-bg) here hid the wallpaper on every
+     layout page. Owner/office routes still get the legacy Wallpaper layer
+     inside PublicLayoutV2, so their backdrop is unchanged. */
+  background: transparent;
   color: var(--v2-text);
   font-family: var(--v2-font-body);
   -webkit-font-smoothing: antialiased;

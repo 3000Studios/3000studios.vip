@@ -39,6 +39,14 @@ export function LiveLine() {
   return <hr className="v2-live-line" aria-hidden="true" />;
 }
 
+/* The 3000 Space Water (WaterWallpaper in RootLayout) is the site wallpaper
+   (Boss orders 2026-10-31 + 2026-11-03). The legacy v2 Wallpaper layer used
+   to paint over it on every layout page, so it now renders ONLY on the
+   routes where the space water itself is excluded (owner/office routes,
+   mirroring WaterWallpaper's EXCLUDED_PREFIXES) — those pages keep exactly
+   the backdrop they had. Everywhere else the water shows through. */
+const LEGACY_WALLPAPER_PREFIXES = ['/office', '/admin', '/agent', '/vault', '/command-deck', '/go-live'];
+
 export function PublicLayoutV2({
   children,
   wallpaper,
@@ -48,9 +56,12 @@ export function PublicLayoutV2({
 }) {
   const location = useLocation();
   const variant = wallpaper ?? wallpaperFor(location.pathname);
+  const legacyWallpaper = LEGACY_WALLPAPER_PREFIXES.some(
+    (p) => location.pathname === p || location.pathname.startsWith(`${p}/`),
+  );
   return (
     <div className="v2-root">
-      <Wallpaper variant={variant} />
+      {legacyWallpaper && <Wallpaper variant={variant} />}
       <Header />
       <div className="v2-main">
         <PageFade routeKey={location.pathname}>

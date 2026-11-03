@@ -16,7 +16,9 @@
 }
 
 .v3-root {
-  background: var(--v3-bg);
+  /* Transparent (2026-11-03): the 3000 Space Water canvas is the page
+     background now — an opaque #05060a here hid the wallpaper entirely. */
+  background: transparent;
   color: var(--v3-ink);
   font-family: var(--v3-font-body);
   overflow-x: clip;

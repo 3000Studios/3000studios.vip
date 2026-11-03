@@ -2,39 +2,37 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 
-/* WaterWallpaper — the "LIQUID SPLASH" water from 3000studios.space, ported
-   to 3000studios.vip as the site wallpaper (Boss order, 2026-10-31).
-   Same ripple-tank simulation as the space splash: a 200x112 height field,
-   classic 4-neighbour propagation with 0.985 damping, slope-shaded into an
-   offscreen ImageData and upscaled to the viewport. Rain drops keep it alive.
-   VIP additions: a slow base-colour cycle (deep blue -> teal -> violet ->
-   indigo), pause when the tab is hidden, and a static pre-rippled frame for
-   prefers-reduced-motion. Pointer-events are off — it is wallpaper, not a
-   widget — and it never renders on owner/office routes. */
+/* WaterWallpaper — the "3000 SPACE WATER" from 3000studios.space, running as
+   the 3000studios.vip site wallpaper (Boss order, 2026-10-31; restored to the
+   canonical shading 2026-11-03, Boss order — the first VIP port had flattened
+   the paint into a base colour + weak slope offsets and drifted the palette
+   through teal/violet/indigo, which is not the space water).
+
+   The simulation and shading below are the canonical implementation from
+   3000Studios/3000-space-water (src/space-water.js, itself verbatim from the
+   .space splash): a 200x112 height field, classic 4-neighbour propagation
+   with 0.985 damping, and the rich paint pass — height-mixed deep-blue
+   palette (dark trough -> lit crest), light-facing diffuse, tight + broad
+   specular, fresnel sky lift, caustic crest sparkle, motion glow, trough
+   shadow. Fixed deep-blue identity: no colour cycle.
+
+   Wallpaper adaptations only: rain drops keep it alive (same 850ms / 0.75 /
+   strength-13 as the original's ambient drops), the pointer still ripples
+   the water (window listeners — the canvas itself stays pointer-events:
+   none and page interaction is untouched), it pauses when the tab is
+   hidden, renders one static pre-rippled frame for prefers-reduced-motion,
+   and never renders on owner/office routes. */
 
 const EXCLUDED_PREFIXES = ['/office', '/admin', '/agent', '/vault', '/command-deck', '/go-live'];
 
 const GW = 200;
 const GH = 112;
 
-/* Base water colours the wallpaper slowly drifts through (RGB). */
-const PALETTE: ReadonlyArray<readonly [number, number, number]> = [
-  [7, 17, 36], // deep blue (the space original)
-  [3, 27, 34], // teal
-  [17, 10, 38], // violet
-  [6, 13, 40], // indigo
-  [7, 17, 36], // back to deep blue
-];
-const CYCLE_SECONDS = 72;
-
-function paletteAt(tSeconds: number): [number, number, number] {
-  const phase = ((tSeconds % CYCLE_SECONDS) + CYCLE_SECONDS) % CYCLE_SECONDS;
-  const seg = (phase / CYCLE_SECONDS) * (PALETTE.length - 1);
-  const i = Math.min(PALETTE.length - 2, Math.floor(seg));
-  const f = seg - i;
-  const a = PALETTE[i];
-  const b = PALETTE[i + 1];
-  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+/* Deterministic shimmer table for caustic sparkle (canonical). */
+const NOISE = new Uint8Array(256);
+for (let nI = 0; nI < 256; nI++) {
+  const sv = Math.sin(nI * 127.1) * 43758.5453;
+  NOISE[nI] = Math.floor((sv - Math.floor(sv)) * 256);
 }
 
 export function WaterWallpaper() {
@@ -94,19 +92,85 @@ export function WaterWallpaper() {
       cur = tmp;
     };
 
-    const paint = (base: [number, number, number]) => {
+    let frameN = 0;
+    /* Canonical paint — verbatim shading math from 3000-space-water
+       (src/space-water.js, the RICH SHADING pass of the .space original). */
+    const paint = () => {
       const data = img.data;
+      const shim = (frameN >> 1) * 7;
       for (let y = 0; y < GH; y++) {
         const row = y * GW;
         for (let x = 0; x < GW; x++) {
           const i = row + x;
           const dx = (x < GW - 1 ? prev[i + 1] : 0) - (x > 0 ? prev[i - 1] : 0);
           const dy = (y < GH - 1 ? prev[i + GW] : 0) - (y > 0 ? prev[i - GW] : 0);
-          const spec = Math.max(0, dx + dy) * 5;
+          const h = prev[i];
+          const lap =
+            (x > 0 ? prev[i - 1] : h) +
+            (x < GW - 1 ? prev[i + 1] : h) +
+            (y > 0 ? prev[i - GW] : h) +
+            (y < GH - 1 ? prev[i + GW] : h) -
+            4 * h;
           const o = i * 4;
-          data[o] = Math.max(0, Math.min(255, base[0] + dx * 2.2 + spec * 0.7));
-          data[o + 1] = Math.max(0, Math.min(255, base[1] + dx * 3 + dy * 1.2 + spec * 0.9));
-          data[o + 2] = Math.max(0, Math.min(255, base[2] + dx * 4 + dy * 2 + spec));
+          let t = 0.5 + h * 0.014;
+          t = t < 0 ? 0 : t > 1 ? 1 : t;
+          let r: number;
+          let g: number;
+          let b: number;
+          if (t < 0.5) {
+            const u = t * 2;
+            r = 5 + 4 * u;
+            g = 11 + 19 * u;
+            b = 30 + 38 * u;
+          } else {
+            const u = (t - 0.5) * 2;
+            r = 9 + 19 * u;
+            g = 30 + 52 * u;
+            b = 68 + 66 * u;
+          }
+          const dif = 1 + (dx * 0.85 + dy * 0.5) * 0.011;
+          const dc = dif < 0.55 ? 0.55 : dif > 1.45 ? 1.45 : dif;
+          r *= dc;
+          g *= dc;
+          b *= dc;
+          const sa = dx * 0.83 + dy * 0.55;
+          const su = sa > 0 ? (sa * 0.05 > 1 ? 1 : sa * 0.05) : 0;
+          const su2 = su * su;
+          const spec = su2 * su2 * 185 + su2 * 34;
+          r += spec * 0.75;
+          g += spec * 0.92;
+          b += spec;
+          const q = dx * dx + dy * dy;
+          const fr = q * 0.0035 > 0.55 ? 0.55 : q * 0.0035;
+          r += fr * 46;
+          g += fr * 88;
+          b += fr * 118; /* fresnel — grazing slopes catch the sky */
+          const cr = -lap * 0.016;
+          if (cr > 0) {
+            const cf = cr > 1 ? 1 : cr;
+            const nz = NOISE[(x * 31 + y * 57 + shim) & 255] / 255;
+            const sp = cf * cf * (0.5 + 0.5 * nz) * 118;
+            r += sp * 0.8;
+            g += sp * 0.95;
+            b += sp;
+          } /* caustic sparkle riding the crests */
+          const en = Math.min(1, q / 150); /* motion glow — wave energy lights the surface */
+          if (en > 0.02) {
+            const gl = en * en * 105;
+            r += gl * 0.45;
+            g += gl * 0.85;
+            b += gl;
+          }
+          if (h < 0) {
+            const sm = 1 + h * 0.006;
+            const smc = sm < 0.62 ? 0.62 : sm;
+            r *= smc;
+            g *= smc;
+            b *= smc;
+          } /* troughs fall into shadow */
+          data[o] = r < 0 ? 0 : r > 255 ? 255 : r;
+          data[o + 1] = g < 0 ? 0 : g > 255 ? 255 : g;
+          data[o + 2] = b < 0 ? 0 : b > 255 ? 255 : b;
           data[o + 3] = 255;
         }
       }
@@ -121,19 +185,48 @@ export function WaterWallpaper() {
         disturb(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 16);
       }
       for (let k = 0; k < 42; k++) step();
-      paint(paletteAt(0));
+      paint();
       window.removeEventListener('resize', size);
       return;
     }
 
+    /* Pointer interaction — same strengths as the .space original (press 30,
+       drag 11 along the path). Window-level + passive: the wallpaper never
+       intercepts input, clicks and text selection behave exactly as before. */
+    let lastX = -1;
+    let lastY = -1;
+    const onPointerDown = (e: PointerEvent) => {
+      disturb(e.clientX, e.clientY, 30);
+      lastX = e.clientX;
+      lastY = e.clientY;
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      if (lastX < 0) return;
+      const x = e.clientX;
+      const y = e.clientY;
+      const steps = Math.max(1, Math.round(Math.hypot(x - lastX, y - lastY) / 16));
+      for (let s = 0; s <= steps; s++) {
+        disturb(lastX + ((x - lastX) * s) / steps, lastY + ((y - lastY) * s) / steps, 11);
+      }
+      lastX = x;
+      lastY = y;
+    };
+    const onPointerUp = () => {
+      lastX = -1;
+      lastY = -1;
+    };
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerup', onPointerUp);
+
     let raf = 0;
     let running = true;
-    const start = performance.now();
     const frame = () => {
       if (!running) return;
       raf = requestAnimationFrame(frame);
+      frameN++;
       step();
-      paint(paletteAt((performance.now() - start) / 1000));
+      paint();
     };
     raf = requestAnimationFrame(frame);
 
@@ -159,6 +252,9 @@ export function WaterWallpaper() {
       cancelAnimationFrame(raf);
       window.clearInterval(rain);
       window.removeEventListener('resize', size);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [excluded, reduced]);
