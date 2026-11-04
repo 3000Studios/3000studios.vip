@@ -131,7 +131,12 @@
     if (!canvas || !canvas.getContext) throw new Error('LiquidSurface: canvas required');
     opts = opts || {};
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d', { alpha: false });
+    /* Alpha canvas (2026-11-04, Boss order): the hero no longer paints an
+       opaque lid over the page — the 3000 Space Water wallpaper behind the
+       hero must stay visible all the way up to the bottom of the nav bar.
+       The surface still paints its own deep floor toward the bottom of
+       the hero (see _draw), it just fades in instead of walling off. */
+    this.ctx = canvas.getContext('2d', { alpha: true });
     this.pal = readPalette();
     this.ripples = [];
     this.running = false;
@@ -245,11 +250,16 @@
     var W = this.canvas.width, H = this.canvas.height;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-    /* Base water: deep vertical falloff. */
+    /* Base: clear, then a deep floor that fades in from transparent —
+       the Space Water wallpaper shows through the upper hero (all the
+       way up to the nav bar) while the stage floor stays rich and dark
+       where the carousel rides. */
+    ctx.clearRect(0, 0, W, H);
     var g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, rgba(pal.bg, 1));
-    g.addColorStop(0.55, rgba(pal.deep, 1));
-    g.addColorStop(1, rgba(pal.bg, 1));
+    g.addColorStop(0, rgba(pal.bg, 0));
+    g.addColorStop(0.34, rgba(pal.bg, 0.08));
+    g.addColorStop(0.62, rgba(pal.deep, 0.6));
+    g.addColorStop(1, rgba(pal.bg, 0.96));
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
     /* Aurora blooms — two slow radial washes, hotter with the beat. */
@@ -259,9 +269,11 @@
       W * 0.5, pal.cyan, 0.08 + e * 0.12);
     this._bloom(ctx, W * 0.55, H * 1.05, W * 0.6, pal.magenta, 0.05 + e * 0.06);
 
-    /* Liquid-chrome wave bands — stacked sine ribbons near the floor. */
+    /* Liquid-chrome wave bands — stacked sine ribbons riding up from
+       the floor (raised 2026-11-04 so the surface reads higher in the
+       hero, toward the nav, per the Boss's water fix). */
     for (var i = 0; i < 3; i++) {
-      var baseY = H * (0.68 + i * 0.1);
+      var baseY = H * (0.6 + i * 0.1);
       var amp = (5 + i * 3.5) * this.sy * (0.55 + e * 1.15);
       var col = i === 1 ? pal.cyan : (i === 0 ? pal.violet : pal.magenta);
       ctx.beginPath();

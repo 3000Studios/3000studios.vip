@@ -14,7 +14,7 @@
        SONG      "Cinema Single" — deep-shadow cinema frame, glass player,
                                    gold→magenta progress, textured notes.
        SERVICES  "Concierge"     — staggered tier ledger, aurora feature tier.
-       ARENA     "Thunder Dome"  — cut-corner panels, cyan/crimson arena wash.
+       ARENA     "Aeropocalypse"  — cut-corner panels, cyan/crimson arena wash.
        LIVE      "Broadcast"     — signal glass, on-air glow ring, accented
                                    schedule ledger.
    - Performance is a hard gate: CSS only, no new JS, animations are
@@ -310,7 +310,7 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* 6. THUNDER DOME — "Arena"                                           */
+/* 6. AEROPOCALYPSE — "Arena"                                           */
 /* ------------------------------------------------------------------ */
 
 /* Arena hero: angular deck plate, cyan→gold wash, hard diagonal out. */
@@ -333,9 +333,9 @@ body {
   );
 }
 
-/* Home Thunder Dome feature panel: arena washes + cyan rim (no clip —
+/* Home Aeropocalypse feature panel: arena washes + cyan rim (no clip —
    the panel's gold ambient shadow must survive; the machined corner
-   cut lives on the Thunder Dome page itself). */
+   cut lives on the Aeropocalypse page itself). */
 .vip-arena-panel {
   border-color: oklch(0.87 0.15 200 / 0.35);
   background-image:

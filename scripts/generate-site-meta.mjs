@@ -347,19 +347,19 @@ const llmsTxt = `# 3000 Studios VIP
 > 3000 Studios is an independent, AI-driven music and media studio based in
 > Acworth, Georgia, run by Jeremy Swain. The studio releases original music
 > (new singles weekly, streaming on every platform), produces cinematic music
-> videos, broadcasts live shows, and develops Thunder Dome: AeroStrike, a
-> top-down arena shooter game. Every song previews free for one minute
+> videos, broadcasts live shows, and develops AEROPOCALYPSE: ONLINE, an
+> arcade flight combat game. Every song previews free for one minute
 > on the site; full songs stream on Apple Music, Spotify, and Amazon.
 
 ## Key pages
 
 - [Home — Official Music & Live Stage](${ORIGIN}/): The full catalog, live stage, official videos, and VIP visuals.
 - [Music Vault](${ORIGIN}/music): Stream every official 3000 Studios release free.
-- [Video Vault](${ORIGIN}/video): Official music videos and Thunder Dome cinematics.
+- [Video Vault](${ORIGIN}/video): Official music videos and Aeropocalypse cinematics.
 - [Live Stage](${ORIGIN}/live): Watch 3000 Studios live broadcasts.
 - [Podcast](${ORIGIN}/podcast): The 3000 Studios Podcast — every episode.
 - [Beat Packs](${ORIGIN}/beats): License 3000 Studios instrumentals and bundles.
-- [Thunder Dome](${ORIGIN}/thunder-dome): Thunder Dome: AeroStrike — the top-down arena shooter with 24 bosses.
+- [AEROPOCALYPSE: ONLINE](${ORIGIN}/aeropocalypse): AEROPOCALYPSE: ONLINE — the arcade flight combat game with 24 bosses.
 - [Shop](${ORIGIN}/shop): Merch, singles, and studio services.
 - [Blog](${ORIGIN}/blog): News, stories, and studio notes.
 - [Community Requests](${ORIGIN}/requests): Request a song, video, or cover.

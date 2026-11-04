@@ -14,20 +14,20 @@ export interface StudioProject {
 
 export const STUDIO_PROJECTS: StudioProject[] = [
   {
-    id: 'thunder-dome-combat-system',
-    title: 'Thunder Dome 24: High-Performance Canvas Combat Architecture',
+    id: 'aeropocalypse-combat-system',
+    title: 'AEROPOCALYPSE: ONLINE: High-Performance Canvas Combat Architecture',
     category: 'Game Engine Engineering',
     status: 'Shipped & Live',
     summary: 'A 60fps arcade flight fighter engineered entirely in TypeScript and Canvas 2D/WebGL without heavy game engine bloat.',
-    story: 'Designed to deliver arcade-speed responsive dogfights directly in mobile mobile web browsers, Thunder Dome employs spatial partition collision detection, custom particle emitters, and sub-frame input sampling to achieve zero touch latency on smartphones and desktop browsers alike.',
+    story: 'Designed to deliver arcade-speed responsive dogfights directly in mobile mobile web browsers, Aeropocalypse employs spatial partition collision detection, custom particle emitters, and sub-frame input sampling to achieve zero touch latency on smartphones and desktop browsers alike.',
     techStack: ['TypeScript', 'HTML5 Canvas', 'Spatial Grid Partitioning', 'Web Audio API'],
     metrics: [
       { label: 'Target Frame Rate', value: '60 FPS Lock' },
       { label: 'Active Bosses', value: '24 Phases' },
       { label: 'Bundle Size', value: '< 45 KB Gzip' },
     ],
-    actionLabel: 'Play Thunder Dome',
-    actionUrl: '/thunder-dome',
+    actionLabel: 'Play Aeropocalypse',
+    actionUrl: '/aeropocalypse',
     image: '/media/official-3000-studios-profile.png',
   },
   {

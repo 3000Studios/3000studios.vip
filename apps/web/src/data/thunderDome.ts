@@ -405,7 +405,7 @@ export const THUNDER_BOSSES: ThunderBoss[] = [
     environment: 'The Dimensional Core',
     weakness: 'Chronos Resonance Matrix',
     signatureAttack: 'Omni-Dimensional Oblivion',
-    description: 'The supreme artificial consciousness governing the Thunder Dome. Transcends physical matter with four shifting combat phases.',
+    description: 'The supreme artificial consciousness governing the Aeropocalypse. Transcends physical matter with four shifting combat phases.',
     armorRating: 'Quantum Singularity Lattice',
     scoreValue: 500000,
   },

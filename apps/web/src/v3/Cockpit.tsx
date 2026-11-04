@@ -19,7 +19,7 @@ export function CockpitDossier({ live }: { live: boolean }) {
   const gauges = [
     { value: songs, label: 'Official songs', pct: '100%' },
     { value: MUSIC_VIDEOS.length, label: 'Music videos', pct: '92%' },
-    { value: THUNDER_BOSSES.length, label: 'Dome bosses', pct: '64%' },
+    { value: THUNDER_BOSSES.length, label: 'Aeropocalypse bosses', pct: '64%' },
     { value: CINEMATIC_VIDEOS.length, label: 'Cinematics', pct: '78%' },
   ];
   return (
@@ -30,7 +30,7 @@ export function CockpitDossier({ live }: { live: boolean }) {
           <span className="ck-status">
             {live ? '● Stage live now' : '○ Stage offline — vault open'}
           </span>
-          <span>Thunder Dome: closed testing</span>
+          <span>Aeropocalypse: closed testing</span>
         </div>
         <h2>
           One cockpit. <em>Every mission.</em>
@@ -38,7 +38,7 @@ export function CockpitDossier({ live }: { live: boolean }) {
         <p>
           Music plays as 1-minute previews on this site — full tracks live on
           Apple Music, Spotify, and every major platform. Videos play free via
-          YouTube. Thunder Dome: AeroStrike is in closed testing, coming soon.
+          YouTube. AEROPOCALYPSE: ONLINE is in closed testing, coming soon.
         </p>
         <div className="ck-gauges" role="list" aria-label="Catalog status">
           {gauges.map((g) => (
@@ -72,7 +72,7 @@ const MISSION_STEPS = [
     n: '02',
     hue: 45,
     title: 'Watch — the Video Vault',
-    body: 'Official videos and Thunder Dome cinematics, free via YouTube. Tap a poster to play — nothing is locked and nothing is paywalled.',
+    body: 'Official videos and Aeropocalypse cinematics, free via YouTube. Tap a poster to play — nothing is locked and nothing is paywalled.',
     state: 'Live now',
     to: '/video',
     cta: 'Open the vault',
@@ -80,10 +80,10 @@ const MISSION_STEPS = [
   {
     n: '03',
     hue: 265,
-    title: 'Thunder Dome — closed testing',
+    title: 'Aeropocalypse — closed testing',
     body: '24 bosses, 24 arenas. AeroStrike is in closed testing on Google Play — public launch is coming soon. Study the boss dossier now.',
     state: 'Coming soon',
-    to: '/thunder-dome',
+    to: '/aeropocalypse',
     cta: 'Read the dossier',
   },
   {

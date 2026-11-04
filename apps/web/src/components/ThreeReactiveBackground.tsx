@@ -147,7 +147,7 @@ export function ThreeReactiveBackground() {
     let tabKey = 'home';
     if (path.includes('music')) tabKey = 'music';
     else if (path.includes('live')) tabKey = 'live';
-    else if (path.includes('thunder')) tabKey = 'thunderDome';
+    else if (path.includes('aeropocalypse') || path.includes('thunder')) tabKey = 'thunderDome';
 
     const tabVisuals: Record<string, () => THREE.BufferGeometry> = {
       home: () => new THREE.TorusKnotGeometry(8, 2.2, 100, 16),

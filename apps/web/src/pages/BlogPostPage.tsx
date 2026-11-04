@@ -7,7 +7,7 @@ import '../styles/vip-luxury.css';
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
-  const article = BLOG_ARTICLES.find((a) => a.slug === slug);
+  const article = BLOG_ARTICLES.find((a) => a.slug === slug || a.aliases?.includes(slug ?? ''));
 
   usePageMeta({
     title: article ? article.title : 'Blog',

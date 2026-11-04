@@ -57,7 +57,7 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/video": {
     "title": "Video Vault — 3000 Studios VIP",
-    "description": "Official 3000 Studios music videos and Thunder Dome cinematics — free to watch via YouTube."
+    "description": "Official 3000 Studios music videos and Aeropocalypse cinematics — free to watch via YouTube."
   },
   "/live": {
     "title": "Live Command — 3000 Studios VIP",
@@ -71,21 +71,27 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
     "title": "Beat Packs — 3000 Studios VIP",
     "description": "License 3000 Studios beat packs — instrumentals and bundles with instant delivery."
   },
+  "/aeropocalypse/privacy": {
+    "title": "AEROPOCALYPSE: ONLINE Privacy Policy — 3000 Studios VIP",
+    "description": "Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios.",
+    "noindex": true,
+    "noads": true
+  },
   "/thunder-dome/privacy": {
-    "title": "Thunder Dome: AeroStrike Privacy Policy — 3000 Studios VIP",
-    "description": "Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios.",
+    "title": "AEROPOCALYPSE: ONLINE Privacy Policy — 3000 Studios VIP",
+    "description": "Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios.",
     "noindex": true,
     "noads": true
   },
   "/thunderdome-privacy": {
-    "title": "Thunder Dome: AeroStrike Privacy Policy — 3000 Studios VIP",
-    "description": "Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios.",
+    "title": "AEROPOCALYPSE: ONLINE Privacy Policy — 3000 Studios VIP",
+    "description": "Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios.",
     "noindex": true,
     "noads": true
   },
-  "/thunder-dome": {
-    "title": "Thunder Dome — 3000 Studios VIP",
-    "description": "Thunder Dome by 3000 Studios — the top-down arena shooter, in closed testing. Meet the bosses, watch the trailer, join the launch list."
+  "/aeropocalypse": {
+    "title": "AEROPOCALYPSE: ONLINE — 3000 Studios VIP",
+    "description": "AEROPOCALYPSE: ONLINE by 3000 Studios — the arcade flight combat universe with 24 bosses, in closed testing. Meet the bosses, watch the trailer, join the launch list."
   },
   "/apps": {
     "title": "Apps — 3000 Studios VIP",
@@ -883,9 +889,9 @@ export const SONG_ROUTES: Record<string, RouteMetaEntry> = {
 };
 
 export const BLOG_ROUTES: Record<string, RouteMetaEntry> = {
-  "how-thunder-domes-24-bosses-were-designed": {
-    "title": "How Thunder Dome's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns — 3000 Studios VIP",
-    "description": "A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Thunder Dome’s 24 unique boss fights.",
+  "how-aeropocalypses-24-bosses-were-designed": {
+    "title": "How Aeropocalypse's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns — 3000 Studios VIP",
+    "description": "A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Aeropocalypse’s 24 unique boss fights.",
     "type": "article"
   },
   "inside-amped-ear-3000-spectral-audio": {
@@ -907,8 +913,10 @@ export const BLOG_ROUTES: Record<string, RouteMetaEntry> = {
 
 /** Crew B redirects contract: loser path -> canonical path (301 at the edge). */
 export const ROUTE_REDIRECTS: Record<string, string> = {
+  "/blog/how-thunder-domes-24-bosses-were-designed": "/blog/how-aeropocalypses-24-bosses-were-designed",
   "/song/i-always-feel-like": "/song/always-feel-like",
-  "/song/taqueesha-cant-never-get-right": "/song/taqueesha-cant-never-get"
+  "/song/taqueesha-cant-never-get-right": "/song/taqueesha-cant-never-get",
+  "/thunder-dome": "/aeropocalypse"
 };
 
 /** Prefixes that are real app routes (protected SPA surfaces). */

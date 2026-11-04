@@ -4,7 +4,7 @@ import { attachNavDance } from '../liquid/loader';
 
 const items = [
   { to: '/', label: 'Home', icon: '⌂' },
-  { to: '/thunder-dome', label: 'Games', icon: '🛸' },
+  { to: '/aeropocalypse', label: 'Games', icon: '🛸' },
   { to: '/music', label: 'Music', icon: '♪' },
   { to: '/apps', label: 'Apps', icon: '⚡' },
   { to: '/video', label: 'Video', icon: '▶' },

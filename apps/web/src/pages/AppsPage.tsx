@@ -39,8 +39,8 @@ export function AppsPage() {
           </p>
 
           <div className="vip-badge-row">
-            <Link className="vip-btn-gold" to="/thunder-dome">
-              🛸 Play Thunder Dome
+            <Link className="vip-btn-gold" to="/aeropocalypse">
+              🛸 Play Aeropocalypse
             </Link>
             <Link className="vip-btn-obsidian" to="/#music">
               ♪ Velvet Audio Engine

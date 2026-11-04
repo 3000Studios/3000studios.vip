@@ -42,7 +42,7 @@
 /* ---------- hero ---------- */
 .v3-hero { position: relative; min-height: 100svh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .v3-hero-canvas { position: absolute; inset: 0; }
-.v3-hero-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 30%, rgba(5,6,10,.55) 78%, rgba(5,6,10,.9)); pointer-events: none; }
+.v3-hero-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 38%, rgba(5,6,10,.28) 80%, rgba(5,6,10,.5)); pointer-events: none; }
 .v3-hero-inner { position: relative; z-index: 2; text-align: center; padding: 120px 20px 80px; max-width: 1080px; }
 .v3-kicker {
   font-family: var(--v3-font-grot); letter-spacing: 6px; font-size: 12px; color: var(--v3-cyan);

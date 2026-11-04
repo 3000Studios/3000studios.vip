@@ -24,7 +24,7 @@ export function AboutPage() {
   const stats = [
     { value: String(publishedSongs.length), label: 'Released tracks' },
     { value: String(MUSIC_VIDEOS.length), label: 'Official music videos' },
-    { value: String(THUNDER_BOSSES.length), label: 'Thunder Dome bosses' },
+    { value: String(THUNDER_BOSSES.length), label: 'Aeropocalypse bosses' },
     { value: String(CINEMATIC_VIDEOS.length), label: 'Game cinematics' },
   ];
 
@@ -73,7 +73,7 @@ export function AboutPage() {
                 platforms, and the official videos play free via YouTube.
               </p>
               <p style={{ margin: 0 }}>
-                Beyond music: <strong style={{ color: 'var(--nn-gold)' }}>Thunder Dome:
+                Beyond music: <strong style={{ color: 'var(--nn-gold)' }}>Aeropocalypse:
                 AeroStrike</strong>, a 24-boss arcade combat game; a growing apps
                 lab; and a live broadcast stage. One studio, every medium.
               </p>

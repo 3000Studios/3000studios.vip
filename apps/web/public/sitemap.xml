@@ -3,12 +3,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://3000studios.vip/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://3000studios.vip/about</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/aeropocalypse</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/apps</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/beats</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/blog</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/blog/building-production-site-on-cloudflare-pages</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://3000studios.vip/blog/how-3000-studios-uses-ai-to-build-faster</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://3000studios.vip/blog/how-thunder-domes-24-bosses-were-designed</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://3000studios.vip/blog/how-aeropocalypses-24-bosses-were-designed</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://3000studios.vip/blog/inside-amped-ear-3000-spectral-audio</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://3000studios.vip/community</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/concepts</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
@@ -73,7 +74,6 @@
   <url><loc>https://3000studios.vip/song/why-do-i-not-like-my-songs</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/sponsors</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/terms</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://3000studios.vip/thunder-dome</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/video</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/vip</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>

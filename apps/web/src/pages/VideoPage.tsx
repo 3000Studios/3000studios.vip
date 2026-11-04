@@ -92,7 +92,7 @@ export function VideoPage() {
               }}
             >
               <GameController size={14} style={{ verticalAlign: '-2px' }} />{' '}
-              Thunder Dome cinematics ({CINEMATIC_VIDEOS.length})
+              Aeropocalypse cinematics ({CINEMATIC_VIDEOS.length})
             </button>
             <input
               type="text"

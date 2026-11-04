@@ -27,8 +27,8 @@ export function ProjectsPage() {
           </p>
 
           <div className="vip-badge-row">
-            <Link className="vip-btn-gold" to="/thunder-dome">
-              🛸 Thunder Dome 24
+            <Link className="vip-btn-gold" to="/aeropocalypse">
+              🛸 AEROPOCALYPSE: ONLINE
             </Link>
             <Link className="vip-btn-obsidian" to="/apps">
               ⚡ Software Lab

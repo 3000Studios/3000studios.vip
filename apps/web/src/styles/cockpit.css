@@ -1,6 +1,6 @@
 /* ==========================================================================
    COCKPIT HYBRID — fast-track 2026-10-29 (audit §3.5)
-   Cockpit shell (home + Thunder Dome) + Sonic Print catalog (/music, /song).
+   Cockpit shell (home + Aeropocalypse) + Sonic Print catalog (/music, /song).
    Dark only. No light backgrounds anywhere in this sheet.
    Techniques: CSS @property HUD gauges, container queries, scroll-linked
    view() reveals, scroll-snap poster reel, click-to-play video facades.
@@ -505,7 +505,7 @@
   text-decoration: none;
 }
 
-/* Thunder Dome status banner */
+/* Aeropocalypse status banner */
 .td-status {
   max-width: 900px;
   margin: 0 auto 28px;

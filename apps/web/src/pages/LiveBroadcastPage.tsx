@@ -263,7 +263,7 @@ export function LiveBroadcastPage() {
             <Link to="/privacy">Privacy</Link>
             <Link to="/terms">Terms</Link>
             <Link to="/contact">Contact</Link>
-            <Link to="/thunder-dome/privacy">Thunder Dome Privacy</Link>
+            <Link to="/aeropocalypse/privacy">Aeropocalypse Privacy</Link>
           </nav>
           <p>© 2026 3000 Studios · All rights reserved</p>
         </footer>

@@ -53,8 +53,8 @@ export const NAV_ITEMS: NavItem[] = [
     external: true,
   },
   {
-    to: '/thunder-dome',
-    label: 'Thunder Dome',
+    to: '/aeropocalypse',
+    label: 'Aeropocalypse',
     icon: <GameController size={20} weight="duotone" />,
   },
   {

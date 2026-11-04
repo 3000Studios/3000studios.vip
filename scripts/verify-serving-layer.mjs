@@ -56,7 +56,7 @@ const samples = [
   '/',
   '/song/code-red',
   '/shop',
-  '/thunder-dome',
+  '/aeropocalypse',
   '/contact',
   '/blog/how-3000-studios-uses-ai-to-build-faster',
   '/this-should-404',
@@ -107,6 +107,10 @@ check('www -> 301 apex, path + query preserved', (() => {
   return r?.status === 301 && r.location === 'https://3000studios.vip/song/code-red?utm=share';
 })());
 check('apex is not redirected', redirectFor(new URL('https://3000studios.vip/shop')) === null);
+check('renamed game path /thunder-dome -> 301 /aeropocalypse', (() => {
+  const r = redirectFor(new URL('https://3000studios.vip/thunder-dome'));
+  return r?.status === 301 && r.location === 'https://3000studios.vip/aeropocalypse';
+})());
 check('owner surfaces resolve but are noindex', (() => {
   const cd = resolveRouteMeta('/command-deck');
   const vault = resolveRouteMeta('/vault/settings');

@@ -14,7 +14,7 @@ export function ThunderdomeFeature() {
   const preview = THUNDER_BOSSES.slice(0, 6);
 
   return (
-    <section className="v3-section" style={{ paddingTop: 0 }} aria-label="Thunder Dome feature">
+    <section className="v3-section" style={{ paddingTop: 0 }} aria-label="Aeropocalypse feature">
       <div className="v3-wrap">
         <Reveal>
           <div
@@ -33,10 +33,10 @@ export function ThunderdomeFeature() {
               <GameController size={14} /> Featured · 24-boss combat
             </div>
             <h2 className="v3-h2" style={{ fontSize: 'clamp(38px, 7vw, 76px)', marginTop: 12 }}>
-              Thunder <em>Dome</em>
+              Aero<em>pocalypse</em>
             </h2>
             <p className="v3-lead" style={{ margin: '0 auto', textAlign: 'center' }}>
-              24 hand-crafted bosses. 4 threat tiers. One dome. The premier
+              24 hand-crafted bosses. 4 threat tiers. One sky. The premier
               3000 Studios arcade flight combat universe — now in closed
               testing, public launch coming soon.
             </p>
@@ -71,8 +71,8 @@ export function ThunderdomeFeature() {
             </div>
 
             <div className="v3-cta-row">
-              <MagneticLink to="/thunder-dome" className="v3-btn v3-btn--gold">
-                <Play size={18} weight="fill" /> Enter the Dome
+              <MagneticLink to="/aeropocalypse" className="v3-btn v3-btn--gold">
+                <Play size={18} weight="fill" /> Enter the Sky
               </MagneticLink>
               <MagneticLink to="/video" className="v3-btn v3-btn--ghost">
                 Watch the cinematics

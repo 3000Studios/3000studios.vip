@@ -1,5 +1,7 @@
 export interface BlogArticle {
   slug: string;
+  /* Former slugs that must keep resolving after a rename. */
+  aliases?: string[];
   title: string;
   category: string;
   author: string;
@@ -17,38 +19,39 @@ export interface BlogArticle {
 
 export const BLOG_ARTICLES: BlogArticle[] = [
   {
-    slug: 'how-thunder-domes-24-bosses-were-designed',
-    title: "How Thunder Dome's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns",
+    slug: 'how-aeropocalypses-24-bosses-were-designed',
+    title: "How Aeropocalypse's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns",
     category: 'Game Design & Engineering',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-15',
     updatedAt: '2026-09-28',
     readTime: '6 min read',
-    summary: 'A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Thunder Dome’s 24 unique boss fights.',
+    summary: 'A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Aeropocalypse’s 24 unique boss fights.',
     leadParagraph: 'When building a high-speed arcade flight combat game in pure JavaScript and Canvas, the biggest architectural challenge is creating boss encounters that feel visually overwhelming while remaining completely fair, readable, and responsive on mobile touchscreens.',
     sections: [
       {
         heading: '1. The Mathematics of Bullet Emitters',
         body: [
-          'Rather than spawning hundreds of unmanaged particle objects every frame, Thunder Dome utilizes a high-efficiency pre-allocated object pool. Each boss phase calculates trigonometric bullet trajectories using parametric spiral equations:',
+          'Rather than spawning hundreds of unmanaged particle objects every frame, Aeropocalypse utilizes a high-efficiency pre-allocated object pool. Each boss phase calculates trigonometric bullet trajectories using parametric spiral equations:',
           'By varying the rotational delta θ and velocity vectors dynamically against the game clock, we create complex geometric bullet curtains—like the "Magma Caldera Eruption" in Level 2 or the "Chronos Vortex" in Level 24—with virtually zero garbage collection stutter.',
         ],
       },
       {
         heading: '2. Multi-Phase Telegraphing & Weak Points',
         body: [
-          'Every boss in Thunder Dome features distinct visual telegraphs before executing devastating signature attacks. Glowing obsidian armor plates shift to molten gold, indicating a 600ms vulnerability window where precision hits deal 3x critical damage.',
+          'Every boss in Aeropocalypse features distinct visual telegraphs before executing devastating signature attacks. Glowing obsidian armor plates shift to molten gold, indicating a 600ms vulnerability window where precision hits deal 3x critical damage.',
           'This dynamic risk-reward loop ensures that players who master evasive maneuvers can speedrun boss stages and climb the global leaderboards.',
         ],
       },
       {
         heading: '3. Mobile Touch Optimization & Input Latency',
         body: [
-          'On mobile devices, touch lag can destroy the arcade experience. Thunder Dome bypasses standard DOM event bubbling, capturing direct PointerEvents on the raw canvas viewport with sub-millisecond interpolation.',
+          'On mobile devices, touch lag can destroy the arcade experience. Aeropocalypse bypasses standard DOM event bubbling, capturing direct PointerEvents on the raw canvas viewport with sub-millisecond interpolation.',
         ],
       },
     ],
-    tags: ['Game Dev', 'TypeScript', 'Canvas 2D', 'Thunder Dome', 'Boss Design'],
+    tags: ['Game Dev', 'TypeScript', 'Canvas 2D', 'Aeropocalypse', 'Boss Design'],
+    aliases: ['how-thunder-domes-24-bosses-were-designed'],
   },
   {
     slug: 'inside-amped-ear-3000-spectral-audio',

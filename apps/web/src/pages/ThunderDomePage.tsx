@@ -30,7 +30,7 @@ export function ThunderDomePage() {
       <div className="md-scope vip-arena" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
         
         {/* =========================================================================
-            THUNDER DOME HERO: CARBON FIBER & CYBER-HUD COCKPIT
+            AEROPOCALYPSE HERO: CARBON FIBER & CYBER-HUD COCKPIT
             ========================================================================= */}
         <section className="vip-hero-hub" style={{ position: 'relative', overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -47,7 +47,7 @@ export function ThunderDomePage() {
 
           <h1 style={{ display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
             <span className="vip-gold-text" style={{ background: 'linear-gradient(135deg, #00f0ff, #fff 45%, #ffd700)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              THUNDER DOME
+              AEROPOCALYPSE
             </span>
           </h1>
 
@@ -66,7 +66,7 @@ export function ThunderDomePage() {
             <Link
               className="vip-btn-gold"
               to="/contact"
-              title="Thunder Dome: AeroStrike is in closed testing — join the launch list"
+              title="AEROPOCALYPSE: ONLINE is in closed testing — join the launch list"
             >
               ▣ Closed testing — join the launch list
             </Link>
@@ -79,7 +79,7 @@ export function ThunderDomePage() {
             <a className="vip-btn-obsidian" href="#weapon-armory">
               ⚔ Weapon Armory
             </a>
-            <Link className="vip-btn-obsidian" to="/thunder-dome/privacy">
+            <Link className="vip-btn-obsidian" to="/aeropocalypse/privacy">
               🔒 Privacy Policy
             </Link>
           </div>
@@ -90,10 +90,10 @@ export function ThunderDomePage() {
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 16px' }}>
           <div className="td-status">
             <strong>Launch status — Closed testing</strong>
-            Thunder Dome: AeroStrike is in closed testing on Google Play and
+            AEROPOCALYPSE: ONLINE is in closed testing on Google Play and
             is <strong>not yet on public sale</strong>. The boss roster, ship
             hangar, and armory below are the real launch content — join the
-            launch list and you will be first in when the Dome opens.
+            launch list and you will be first in when the skies open.
           </div>
         </div>
 
@@ -119,7 +119,7 @@ export function ThunderDomePage() {
             </div>
             <div style={{ padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
               <span style={{ color: 'var(--vip-text-muted)', fontSize: 13 }}>
-                Thunder Dome: AeroStrike — game intro cinematic. Full archive on the{' '}
+                AEROPOCALYPSE: ONLINE — game intro cinematic. Full archive on the{' '}
                 <Link to="/video" style={{ color: '#00f0ff' }}>Video Vault</Link>.
               </span>
               <Link className="vip-btn-obsidian" to="/video" style={{ fontSize: 12, padding: '8px 16px' }}>
@@ -442,7 +442,7 @@ export function ThunderDomePage() {
         )}
 
         {/* =========================================================================
-            MERCH TEASER: Thunder Dome gear
+            MERCH TEASER: Aeropocalypse gear
             ========================================================================= */}
         <section style={{ maxWidth: 1240, margin: '0 auto 56px', padding: '0 16px' }}>
           <div
@@ -456,16 +456,16 @@ export function ThunderDomePage() {
             }}
           >
             <span className="md-kicker" style={{ color: '#ffd700' }}>
-              🛒 Thunder Dome Supply Drop
+              🛒 Aeropocalypse Supply Drop
             </span>
             <h2
               className="vip-gold-text"
               style={{ fontSize: 'clamp(24px, 4.5vw, 38px)', margin: '10px 0 12px', fontWeight: 800 }}
             >
-              Wear the Dome
+              Wear the Sky
             </h2>
             <p style={{ color: 'var(--vip-text-muted)', fontSize: 15, maxWidth: 620, margin: '0 auto 22px', lineHeight: 1.6 }}>
-              Official Thunder Dome: AeroStrike merch is loading into the armory — tees, hoodies,
+              Official AEROPOCALYPSE: ONLINE merch is loading into the armory — tees, hoodies,
               and pilot gear forged in the neon-noir foundry. First drops land in the 3000 Studios
               store.
             </p>

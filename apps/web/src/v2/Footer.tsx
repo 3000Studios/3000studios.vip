@@ -27,7 +27,7 @@ const EXPLORE = [
   { to: '/#promos', label: 'Music Promo' },
   { to: '/beats', label: 'Music For Sale' },
   { to: '/podcast', label: 'Podcast' },
-  { to: '/thunder-dome', label: 'Thunder Dome' },
+  { to: '/aeropocalypse', label: 'Aeropocalypse' },
   { to: '/live', label: 'Live Stream' },
 ];
 
@@ -40,7 +40,7 @@ const STUDIO = [
   { to: SHOP_URL, label: 'Shop — boughtitonline.com', external: true },
   { to: 'https://paypal.me/3000Studios', label: 'Tip the studio — PayPal', external: true },
   { to: 'https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI', label: 'Podcast — Spotify', external: true },
-  { to: 'https://thunderdome.store', label: 'Thunder Dome — AeroStrike beta', external: true },
+  { to: 'https://aeropocalypse.pages.dev', label: 'AEROPOCALYPSE: ONLINE — official game site', external: true },
 ];
 
 const LEGAL = [

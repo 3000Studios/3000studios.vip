@@ -46,7 +46,7 @@ export const LIVE_STREAM_CONFIG: {
       note: 'Beat-making, mix feedback, and track premieres.',
     },
     {
-      title: 'Thunderdome Dev Stream',
+      title: 'Aeropocalypse Dev Stream',
       when: 'Sundays · 6 PM ET',
       note: 'Boss fights, build progress, and playtesting.',
     },

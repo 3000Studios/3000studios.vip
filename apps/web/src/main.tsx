@@ -160,7 +160,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="Video Vault"
-            description="Official 3000 Studios music videos and Thunder Dome cinematics — free to watch via YouTube."
+            description="Official 3000 Studios music videos and Aeropocalypse cinematics — free to watch via YouTube."
           >
             <RouteLoader><VideoPage /></RouteLoader>
           </Titled>
@@ -222,11 +222,26 @@ const router = createBrowserRouter([
         ),
       },
       {
+        // Canonical game privacy URL under the game's current name
+        // (AEROPOCALYPSE: ONLINE, renamed 2026-11-04). The two legacy
+        // paths below stay live because the Play Console listing and
+        // older links still point at them.
+        path: '/aeropocalypse/privacy',
+        element: (
+          <Titled
+            title="AEROPOCALYPSE: ONLINE Privacy Policy"
+            description="Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios."
+          >
+            <RouteLoader><ThunderDomePrivacyPage /></RouteLoader>
+          </Titled>
+        ),
+      },
+      {
         path: '/thunder-dome/privacy',
         element: (
           <Titled
-            title="Thunder Dome: AeroStrike Privacy Policy"
-            description="Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios."
+            title="AEROPOCALYPSE: ONLINE Privacy Policy"
+            description="Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios."
           >
             <RouteLoader><ThunderDomePrivacyPage /></RouteLoader>
           </Titled>
@@ -234,28 +249,32 @@ const router = createBrowserRouter([
       },
       {
         // Play Console URL: same canonical policy component as
-        // /thunder-dome/privacy, served at the listing's hyphenated URL.
+        // /aeropocalypse/privacy, served at the listing's hyphenated URL.
         path: '/thunderdome-privacy',
         element: (
           <Titled
-            title="Thunder Dome: AeroStrike Privacy Policy"
-            description="Privacy Policy for Thunder Dome: AeroStrike by 3000 Studios."
+            title="AEROPOCALYPSE: ONLINE Privacy Policy"
+            description="Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios."
           >
             <RouteLoader><ThunderDomePrivacyPage /></RouteLoader>
           </Titled>
         ),
       },
       {
-        path: '/thunder-dome',
+        path: '/aeropocalypse',
         element: (
           <Titled
-            title="Thunder Dome"
-            description="Thunder Dome by 3000 Studios — the top-down arena shooter, in closed testing. Meet the bosses, watch the trailer, join the launch list."
+            title="AEROPOCALYPSE: ONLINE"
+            description="AEROPOCALYPSE: ONLINE by 3000 Studios — the arcade flight combat universe with 24 bosses, in closed testing. Meet the bosses, watch the trailer, join the launch list."
           >
             <RouteLoader><ThunderDomePage /></RouteLoader>
           </Titled>
         ),
       },
+      // The game was renamed Thunder Dome -> AEROPOCALYPSE: ONLINE
+      // (Boss order, 2026-11-04). The old /thunder-dome path is NOT a
+      // router entry: it 301s at the edge via src/data/redirects.json
+      // (the meta generator turns it into a middleware redirect).
       {
         path: '/apps',
         element: (

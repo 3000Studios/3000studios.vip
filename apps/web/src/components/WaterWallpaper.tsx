@@ -236,6 +236,20 @@ export function WaterWallpaper() {
       }
     }, 850);
 
+    /* Ambient swell (wallpaper adaptation, 2026-11-04, Boss order — the
+       water must read as a living surface all the way up to the nav bar,
+       not just where a pointer has touched it): every ~2.8s a soft
+       wavefront rolls through — a line of gentle drops across the width
+       at a random height, so the surface is always visibly moving. */
+    const swell = window.setInterval(() => {
+      if (!running) return;
+      const y = Math.random() * window.innerHeight;
+      const n = 7;
+      for (let k = 0; k < n; k++) {
+        disturb(((k + 0.5) / n) * window.innerWidth, y, 9);
+      }
+    }, 2800);
+
     const onVisibility = () => {
       if (document.hidden) {
         running = false;
@@ -251,6 +265,7 @@ export function WaterWallpaper() {
       running = false;
       cancelAnimationFrame(raf);
       window.clearInterval(rain);
+      window.clearInterval(swell);
       window.removeEventListener('resize', size);
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);

@@ -2,7 +2,7 @@
    VIDEO CATALOG MANIFEST — single source of truth for all purchasable video
    content on 3000studios.vip.
    - Music videos: preview + full stream via YouTube embeds (no files bundled).
-   - Thunderdome cinematics: mp4s served from CINEMATIC_CDN so the web bundle
+   - Aeropocalypse cinematics: mp4s served from CINEMATIC_CDN so the web bundle
      stays light (Cloudflare Pages ~25MB/file limit). Point CINEMATIC_CDN at
      the real host (R2 bucket, YouTube unlisted playlist, Drive CDN, etc.)
      when the files are uploaded — no code changes needed anywhere else.
@@ -10,7 +10,7 @@
 
 import { officialReleaseVideos } from './officialReleases';
 
-/** Where the 30 Thunderdome cinematic mp4s are hosted. Swap this one value
+/** Where the 30 Aeropocalypse cinematic mp4s are hosted. Swap this one value
  *  when the files move to permanent hosting. */
 export const CINEMATIC_CDN = 'https://cdn.3000studios.vip/cinematics';
 
@@ -60,25 +60,25 @@ const musicVideos: VideoCatalogItem[] = officialReleaseVideos.map((v) => ({
   explicit: v.explicit,
 }));
 
-/* ---------------- Thunderdome cinematics (30 clips) ---------------- */
+/* ---------------- Aeropocalypse cinematics (30 clips) ---------------- */
 
 const CINEMATIC_FILES: Array<{ file: string; title: string; subtitle: string }> = [
-  { file: 'game-intro-v1.mp4', title: 'Game Intro — Variant 1', subtitle: 'Thunderdome cinematic' },
-  { file: 'game-intro-v2.mp4', title: 'Game Intro — Variant 2', subtitle: 'Thunderdome cinematic' },
-  { file: 'splash-v1.mp4', title: 'Splash Screen — Variant 1', subtitle: 'Thunderdome cinematic' },
-  { file: 'splash-v2.mp4', title: 'Splash Screen — Variant 2', subtitle: 'Thunderdome cinematic' },
-  { file: 'boss-incoming-v1.mp4', title: 'Boss Incoming — Variant 1', subtitle: 'Thunderdome cinematic' },
-  { file: 'boss-incoming-v2.mp4', title: 'Boss Incoming — Variant 2', subtitle: 'Thunderdome cinematic' },
-  { file: 'boss-victory-v1.mp4', title: 'Boss Victory — Variant 1', subtitle: 'Thunderdome cinematic' },
-  { file: 'boss-victory-v2.mp4', title: 'Boss Victory — Variant 2', subtitle: 'Thunderdome cinematic' },
-  { file: 'level-load-takeoff-v1.mp4', title: 'Level Load: Takeoff — V1', subtitle: 'Thunderdome cinematic' },
-  { file: 'level-load-takeoff-v2.mp4', title: 'Level Load: Takeoff — V2', subtitle: 'Thunderdome cinematic' },
-  { file: 'credits-finale-v1.mp4', title: 'Credits Finale — Variant 1', subtitle: 'Thunderdome cinematic' },
-  { file: 'credits-finale-v2.mp4', title: 'Credits Finale — Variant 2', subtitle: 'Thunderdome cinematic' },
-  { file: 'store-promo-v1.mp4', title: 'Store Promo — Variant 1', subtitle: 'Thunderdome cinematic' },
-  { file: 'store-promo-v2.mp4', title: 'Store Promo — Variant 2', subtitle: 'Thunderdome cinematic' },
-  { file: 'funny-barrel-roll-v1.mp4', title: 'Barrel Roll Bloopers — V1', subtitle: 'Thunderdome cinematic' },
-  { file: 'funny-barrel-roll-v2.mp4', title: 'Barrel Roll Bloopers — V2', subtitle: 'Thunderdome cinematic' },
+  { file: 'game-intro-v1.mp4', title: 'Game Intro — Variant 1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'game-intro-v2.mp4', title: 'Game Intro — Variant 2', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'splash-v1.mp4', title: 'Splash Screen — Variant 1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'splash-v2.mp4', title: 'Splash Screen — Variant 2', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'boss-incoming-v1.mp4', title: 'Boss Incoming — Variant 1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'boss-incoming-v2.mp4', title: 'Boss Incoming — Variant 2', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'boss-victory-v1.mp4', title: 'Boss Victory — Variant 1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'boss-victory-v2.mp4', title: 'Boss Victory — Variant 2', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'level-load-takeoff-v1.mp4', title: 'Level Load: Takeoff — V1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'level-load-takeoff-v2.mp4', title: 'Level Load: Takeoff — V2', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'credits-finale-v1.mp4', title: 'Credits Finale — Variant 1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'credits-finale-v2.mp4', title: 'Credits Finale — Variant 2', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'store-promo-v1.mp4', title: 'Store Promo — Variant 1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'store-promo-v2.mp4', title: 'Store Promo — Variant 2', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'funny-barrel-roll-v1.mp4', title: 'Barrel Roll Bloopers — V1', subtitle: 'Aeropocalypse cinematic' },
+  { file: 'funny-barrel-roll-v2.mp4', title: 'Barrel Roll Bloopers — V2', subtitle: 'Aeropocalypse cinematic' },
   { file: 'biome-volcanic-v1.mp4', title: 'Volcanic Biome — V1', subtitle: 'Environment showcase' },
   { file: 'biome-volcanic-v2.mp4', title: 'Volcanic Biome — V2', subtitle: 'Environment showcase' },
   { file: 'biome-arctic-v1.mp4', title: 'Arctic Biome — V1', subtitle: 'Environment showcase' },
