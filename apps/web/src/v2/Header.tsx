@@ -32,7 +32,6 @@ export const NAV_ITEMS: NavItem[] = [
     icon: <MusicNote size={20} weight="duotone" />,
     children: [
       { to: '/video', label: 'Videos' },
-      { to: '/#promos', label: 'Music Promo' },
       { to: '/beats', label: 'Music For Sale' },
     ],
   },

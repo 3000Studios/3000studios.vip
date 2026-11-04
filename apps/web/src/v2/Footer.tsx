@@ -24,7 +24,6 @@ const SOCIALS = [
 const EXPLORE = [
   { to: '/music', label: 'Music' },
   { to: '/video', label: 'Videos' },
-  { to: '/#promos', label: 'Music Promo' },
   { to: '/beats', label: 'Music For Sale' },
   { to: '/podcast', label: 'Podcast' },
   { to: '/aeropocalypse', label: 'Aeropocalypse' },

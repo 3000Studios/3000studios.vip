@@ -8,7 +8,6 @@ import { HeroEQ } from './HeroEQ';
 import { Statement, ClipReveal, StudioGrid, CtaBand, Marquee } from './Sections';
 import { HorizontalReleases } from './HorizontalReleases';
 import { MusicSection, settlePendingPurchase } from './MusicSection';
-import { PromoShorts } from './PromoShorts';
 import { CoverWall } from './CoverWall';
 import { LiveSection } from './LiveSection';
 import { ThunderdomeFeature } from './ThunderdomeFeature';
@@ -63,7 +62,6 @@ export function HomePage() {
             <Statement />
             <ClipReveal />
             <HorizontalReleases />
-            <PromoShorts />
             {/* No AdSense unit on home (fast-track 2026-10-29, audit §4.3):
                 home is an aggregate surface listing explicit titles, so it
                 is ads-off by route in explicitAdsGate — the unit is not
