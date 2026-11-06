@@ -115,5 +115,10 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: '_DaWxBrjXJM',
     spotifyUrl: 'https://open.spotify.com/episode/1maxjZQjGlJ3UzrBBVwjCx',
   },
-  { n: 15, title: 'The Market Held Its Breath', youtubeId: '4fCy2WB4fT0' },
+  {
+    n: 15,
+    title: 'The Market Held Its Breath',
+    youtubeId: '4fCy2WB4fT0',
+    spotifyUrl: 'https://open.spotify.com/episode/21pTgDP1HEcXu5rmtyUc6X',
+  },
 ];
