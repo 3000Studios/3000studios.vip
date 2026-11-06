@@ -79,7 +79,12 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: 'ZZ5E3PzSxeQ',
     spotifyUrl: 'https://open.spotify.com/episode/3iaIfv6TYphozJ59oQW8kM',
   },
-  { n: 9, title: 'Nobody Sits', youtubeId: 'nyaEn-7O9j0' },
+  {
+    n: 9,
+    title: 'Nobody Sits',
+    youtubeId: 'nyaEn-7O9j0',
+    spotifyUrl: 'https://open.spotify.com/episode/0dNtsdBoGJgHnGCTwD1nOP',
+  },
   { n: 10, title: 'The Laws of the House', youtubeId: 'wCtiz3IXbN4' },
   { n: 11, title: 'Empire Before Breakfast', youtubeId: 'hFKgXCLsXWM' },
   { n: 12, title: 'The Morning After the Map Changed', youtubeId: 'Qtq7TdHWoV4' },
