@@ -43,8 +43,18 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: 'AlGkXttvotQ',
     spotifyUrl: 'https://open.spotify.com/episode/1vQmBEQxVaBBI1Z4xw4DsH',
   },
-  { n: 3, title: 'The Library That Never Sleeps', youtubeId: 'ABrX5h0ggOY' },
-  { n: 4, title: 'Radar Is Dead', youtubeId: 'PqSK90GiHYQ' },
+  {
+    n: 3,
+    title: 'The Library That Never Sleeps',
+    youtubeId: 'ABrX5h0ggOY',
+    spotifyUrl: 'https://open.spotify.com/episode/0B0FQNeXKp7M8BaAPHkXx9',
+  },
+  {
+    n: 4,
+    title: 'Radar Is Dead',
+    youtubeId: 'PqSK90GiHYQ',
+    spotifyUrl: 'https://open.spotify.com/episode/1mPO9b8FFNquvV3UjnjDuH',
+  },
   { n: 5, title: 'The Big Kindness', youtubeId: 'Rw3RH7K1RxQ' },
   { n: 6, title: 'Seven Listeners', youtubeId: 'NKjfY5CdgTc' },
   { n: 7, title: 'The Night Shift', youtubeId: 'UTe6lfDHIIY' },
@@ -55,4 +65,5 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   { n: 12, title: 'The Morning After the Map Changed', youtubeId: 'Qtq7TdHWoV4' },
   { n: 13, title: 'Markets Throw a Parade', youtubeId: 'S0MCYcYPHu8' },
   { n: 14, title: 'AI Goes to the Ballot Box', youtubeId: '_DaWxBrjXJM' },
+  { n: 15, title: 'The Market Held Its Breath', youtubeId: '4fCy2WB4fT0' },
 ];
