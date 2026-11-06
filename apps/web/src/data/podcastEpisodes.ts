@@ -67,7 +67,12 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: 'NKjfY5CdgTc',
     spotifyUrl: 'https://open.spotify.com/episode/2VmhrbuFe0fxmZiMBosyEV',
   },
-  { n: 7, title: 'The Night Shift', youtubeId: 'UTe6lfDHIIY' },
+  {
+    n: 7,
+    title: 'The Night Shift',
+    youtubeId: 'UTe6lfDHIIY',
+    spotifyUrl: 'https://open.spotify.com/episode/7yozWRXxsstbxE938rHIQD',
+  },
   { n: 8, title: 'One Free Finding', youtubeId: 'ZZ5E3PzSxeQ' },
   { n: 9, title: 'Nobody Sits', youtubeId: 'nyaEn-7O9j0' },
   { n: 10, title: 'The Laws of the House', youtubeId: 'wCtiz3IXbN4' },
