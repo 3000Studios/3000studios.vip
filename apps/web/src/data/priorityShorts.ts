@@ -55,6 +55,19 @@ export const priorityShorts: PriorityShort[] = [
     "priority": true
   },
   {
+    "videoId": "rsCfczHMTIE",
+    "title": "Always Feel Like | 3000 Studios",
+    "kind": "short",
+    "priority": false
+  },
+  {
+    "videoId": "mo_Ji-wa9us",
+    "title": "Lick my Balls and Die in a Fire | 3000 Studios",
+    "kind": "short",
+    "priority": false,
+    "explicit": true
+  },
+  {
     "videoId": "MnoBxPuTWM0",
     "title": "3000 Studios - 3 K Swagger",
     "kind": "short",
