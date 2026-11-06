@@ -33,69 +33,24 @@ export function ThunderDomePage() {
             AEROPOCALYPSE HERO: CARBON FIBER & CYBER-HUD COCKPIT
             ========================================================================= */}
         <section className="vip-hero-hub" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="md-kicker" style={{ color: '#00f0ff', borderColor: 'rgba(0, 240, 255, 0.4)', background: 'rgba(0, 240, 255, 0.08)' }}>
-              ⚡ 24-LEVEL COMBAT FLIGHT SIMULATOR
-            </span>
-            <span className="md-kicker" style={{ color: '#ffd700' }}>
-              60 FPS ARCADE ENGINE
-            </span>
-            <span className="md-kicker" style={{ color: '#ff2fb3', borderColor: 'rgba(255, 47, 179, 0.45)', background: 'rgba(255, 47, 179, 0.08)' }}>
-              ● CLOSED TESTING — COMING SOON
-            </span>
-          </div>
+          <span className="md-kicker">3000 Studios · Arcade air combat</span>
 
-          <h1 style={{ display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="vip-gold-text" style={{ background: 'linear-gradient(135deg, #00f0ff, #fff 45%, #ffd700)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              AEROPOCALYPSE
-            </span>
-          </h1>
+          <h1 className="vip-gold-text">Aeropocalypse: Online</h1>
 
-          <p style={{ maxWidth: 680, margin: '0 auto 24px', fontSize: 'clamp(15px, 2.5vw, 18px)' }}>
-            Enter the premier 3000 Studios high-octane arcade flight combat universe. 24 hand-crafted celestial environments, 24 lethal multi-phase bosses, custom ship chassis, and sub-millisecond mobile touch dogfights.
+          <p style={{ maxWidth: 600, margin: '0 auto 24px', fontSize: 'clamp(16px, 2.5vw, 19px)' }}>
+            Take to the skies in a top-down air combat game. Watch the trailer,
+            meet the bosses, and explore the ships and weapons.
           </p>
 
           <div className="vip-badge-row">
-            <a
-              className="vip-btn-gold"
-              href="#boss-roster"
-              style={{ background: 'linear-gradient(135deg, #00f0ff, #0077aa)', color: '#05060a' }}
-            >
-              ▶ Inspect 24 Bosses
-            </a>
-            <Link
-              className="vip-btn-gold"
-              to="/contact"
-              title="AEROPOCALYPSE: ONLINE is in closed testing — join the launch list"
-            >
-              ▣ Closed testing — join the launch list
-            </Link>
-            <a className="vip-btn-obsidian" href="#dome-trailer">
-              🎬 Watch Trailer
-            </a>
-            <a className="vip-btn-obsidian" href="#ship-hangar">
-              🛸 Ship Hangar
-            </a>
-            <a className="vip-btn-obsidian" href="#weapon-armory">
-              ⚔ Weapon Armory
-            </a>
-            <Link className="vip-btn-obsidian" to="/aeropocalypse/privacy">
-              🔒 Privacy Policy
-            </Link>
+            <a className="vip-btn-gold" href="#dome-trailer">Watch the trailer</a>
+            <a className="vip-btn-obsidian" href="https://aeropocalypse.pages.dev/">Official game site</a>
+            <a className="vip-btn-obsidian" href="#boss-roster">Boss roster</a>
+            <a className="vip-btn-obsidian" href="#ship-hangar">Ship hangar</a>
+            <a className="vip-btn-obsidian" href="#weapon-armory">Weapon armory</a>
+            <Link className="vip-btn-obsidian" to="/aeropocalypse/privacy">Privacy policy</Link>
           </div>
         </section>
-
-        {/* Launch-status truth (fast-track 2026-10-29): closed testing /
-            coming soon — not a live purchasable product. */}
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 16px' }}>
-          <div className="td-status">
-            <strong>Launch status — Closed testing</strong>
-            AEROPOCALYPSE: ONLINE is in closed testing on Google Play and
-            is <strong>not yet on public sale</strong>. The boss roster, ship
-            hangar, and armory below are the real launch content — join the
-            launch list and you will be first in when the skies open.
-          </div>
-        </div>
 
         {/* =========================================================================
             TRAILER SLOT: cinematic embed

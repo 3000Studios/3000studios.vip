@@ -265,7 +265,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="AEROPOCALYPSE: ONLINE"
-            description="AEROPOCALYPSE: ONLINE by 3000 Studios — the arcade flight combat universe with 24 bosses, in closed testing. Meet the bosses, watch the trailer, join the launch list."
+            description="AEROPOCALYPSE: ONLINE by 3000 Studios — a top-down arcade air combat game. Watch the trailer and explore the bosses, ships, and weapons."
           >
             <RouteLoader><ThunderDomePage /></RouteLoader>
           </Titled>

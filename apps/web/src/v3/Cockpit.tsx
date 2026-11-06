@@ -30,7 +30,7 @@ export function CockpitDossier({ live }: { live: boolean }) {
           <span className="ck-status">
             {live ? '● Stage live now' : '○ Stage offline — vault open'}
           </span>
-          <span>Aeropocalypse: closed testing</span>
+          <span>Aeropocalypse: Online</span>
         </div>
         <h2>
           One cockpit. <em>Every mission.</em>
@@ -38,7 +38,7 @@ export function CockpitDossier({ live }: { live: boolean }) {
         <p>
           Music plays as 1-minute previews on this site — full tracks live on
           Apple Music, Spotify, and every major platform. Videos play free via
-          YouTube. AEROPOCALYPSE: ONLINE is in closed testing, coming soon.
+          YouTube. Explore Aeropocalypse: Online for gameplay and release updates.
         </p>
         <div className="ck-gauges" role="list" aria-label="Catalog status">
           {gauges.map((g) => (
@@ -80,11 +80,11 @@ const MISSION_STEPS = [
   {
     n: '03',
     hue: 265,
-    title: 'Aeropocalypse — closed testing',
-    body: '24 bosses, 24 arenas. AeroStrike is in closed testing on Google Play — public launch is coming soon. Study the boss dossier now.',
-    state: 'Coming soon',
+    title: 'Aeropocalypse: Online',
+    body: 'Watch the trailer and explore the bosses, ships, and weapons in the 3000 Studios arcade air combat game.',
+    state: 'Game preview',
     to: '/aeropocalypse',
-    cta: 'Read the dossier',
+    cta: 'Explore the game',
   },
   {
     n: '04',
