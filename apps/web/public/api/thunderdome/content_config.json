@@ -1,0 +1,9 @@
+{
+  "contentVersion": 1,
+  "dailyChallengeMultiplier": 1.0,
+  "featuredAircraftId": "apex_falcon",
+  "globalCreditDropMultiplier": 1.0,
+  "activeEventName": "VANGUARD INITIATIVE",
+  "announcements": ["Welcome to Aeropocalypse: Online // Sorties Ready"],
+  "bossTauntOverrides": {}
+}
