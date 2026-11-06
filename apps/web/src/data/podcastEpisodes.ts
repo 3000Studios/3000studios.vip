@@ -103,7 +103,12 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: 'Qtq7TdHWoV4',
     spotifyUrl: 'https://open.spotify.com/episode/3G78iWzyvzP9woH9DYNdJH',
   },
-  { n: 13, title: 'Markets Throw a Parade', youtubeId: 'S0MCYcYPHu8' },
+  {
+    n: 13,
+    title: 'Markets Throw a Parade',
+    youtubeId: 'S0MCYcYPHu8',
+    spotifyUrl: 'https://open.spotify.com/episode/4cR9Ibs2CF2Xyy93AZU2sP',
+  },
   { n: 14, title: 'AI Goes to the Ballot Box', youtubeId: '_DaWxBrjXJM' },
   { n: 15, title: 'The Market Held Its Breath', youtubeId: '4fCy2WB4fT0' },
 ];
