@@ -1,32 +1,26 @@
 import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
 import { Reveal, RevealGroup, RevealItem } from '../v2/Reveal';
-import { Clock, Headphones, Microphone, Play, Sparkle, SpotifyLogo } from '@phosphor-icons/react';
+import {
+  Headphones,
+  Microphone,
+  Play,
+  Sparkle,
+  SpotifyLogo,
+  YoutubeLogo,
+} from '@phosphor-icons/react';
+import { LazyYouTube } from '../components/LazyYouTube';
+import { PODCAST_EPISODES, PODCAST_SHOW, podcastWatchUrl } from '../data/podcastEpisodes';
 
-const SHOW_URL = 'https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI';
+const SHOW_URL = PODCAST_SHOW.spotifyShow;
 const SHOW_EMBED = 'https://open.spotify.com/embed/show/033SHVotmOb7vSOUOOcmFI';
 // Verified live 2026-10-05: R2 bucket "3000studios-cinematics", served via cdn.3000studios.vip (HTTP 200, video/mp4).
 const HERO_VIDEO = 'https://cdn.3000studios.vip/cinematics/game-intro-v1.mp4';
 
-const EPISODES = [
-  {
-    n: '01',
-    title: 'The Rebuild: New Website, Free Videos, and Beat Packs',
-    duration: '6:38',
-    blurb:
-      'Follow and Subscribe walk through the full 3000studios.vip rebuild, the free Video Vault, and the new beat pack drops hitting the store.',
-  },
-  {
-    n: '02',
-    title: "Night Shift: What's Next for 3000 Studios (Bonus Edition)",
-    duration: '4:47',
-    blurb:
-      'A late-night bonus session: what is coming next for 3000 Studios — new music, new videos, and the road ahead.',
-  },
-] as const;
-
 /**
- * /podcast — the 3000 Studios Podcast hub.
- * Hero streams a muted looping studio cinematic; the Spotify show embed is the player.
+ * /podcast — Follow and Subscribe, the 3000 Studios Podcast hub.
+ * Hero streams a muted looping studio cinematic; the Spotify show embed is
+ * the audio player; every episode (from src/data/podcastEpisodes.ts) gets a
+ * card with its YouTube embed and links.
  */
 export function PodcastPage() {
   return (
@@ -57,6 +51,9 @@ export function PodcastPage() {
           border: 1px solid rgba(0,240,255,.14); border-radius: 16px; background: rgba(10,14,20,.72); }
         .pod-ep-num { font-family: var(--nn-font); font-weight: 800; font-size: 30px; color: transparent;
           -webkit-text-stroke: 1.5px var(--nn-cyan); line-height: 1; }
+        .pod-ep-video { margin-top: 16px; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9;
+          background: #000; border: 1px solid rgba(0,240,255,.14); }
+        .pod-ep-video .lazyYouTube { width: 100%; height: 100%; }
         @media (max-width: 560px) { .pod-ep { grid-template-columns: 1fr; } .pod-ep-num { font-size: 22px; } }
         .pod-cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
         .nn-btn-big { padding: 16px 30px; font-size: 17px; border-radius: 14px; }
@@ -97,8 +94,9 @@ export function PodcastPage() {
             </Reveal>
             <Reveal delay={0.2}>
               <p className="v2-lede" style={{ maxWidth: 640, margin: '20px auto 0' }}>
-                Raw studio talk — the rebuild, the new website, the beat packs, and everything
-                coming next. No scripts, no filters, just the sound of 3000 Studios leveling up.
+                Follow and Subscribe is the official 3000 Studios podcast — the studio, the
+                music, the books, and the Aeropocalypse game, straight from the source. Every
+                episode is right below, streaming free.
               </p>
             </Reveal>
             <Reveal delay={0.3}>
@@ -164,23 +162,61 @@ export function PodcastPage() {
 
       <LiveLine />
 
-      {/* EPISODES */}
+      {/* EPISODES — rendered from src/data/podcastEpisodes.ts */}
       <section className="v2-section" id="episodes">
         <div className="v2-wrap" style={{ maxWidth: 860 }}>
           <Reveal>
-            <span className="v2-kicker">Latest Episodes</span>
+            <span className="v2-kicker">Every Episode</span>
           </Reveal>
           <Reveal delay={0.08}>
             <h2 className="v2-display" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
-              Fresh <span className="v2-grad-text">off the mic</span>
+              The full run — <span className="v2-grad-text">{PODCAST_EPISODES.length} episodes</span>
             </h2>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <p className="v2-lede" style={{ marginTop: 10 }}>
+              Watch every episode right here, or take the show with you:
+            </p>
+          </Reveal>
+          <Reveal delay={0.24}>
+            <div className="pod-cta-row" style={{ marginTop: 18 }}>
+              <a
+                className="nn-btn nn-btn-gold"
+                href={PODCAST_SHOW.youtubeChannel}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ padding: '12px 22px', fontSize: 15 }}
+              >
+                <YoutubeLogo size={18} weight="fill" style={{ marginRight: 8, verticalAlign: -3 }} />
+                YouTube Channel
+              </a>
+              <a
+                className="nn-btn nn-btn-ghost"
+                href={PODCAST_SHOW.spotifyShow}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ padding: '12px 22px', fontSize: 15 }}
+              >
+                <SpotifyLogo size={18} weight="fill" style={{ marginRight: 8, verticalAlign: -3 }} />
+                Spotify Show
+              </a>
+              <a
+                className="nn-btn nn-btn-ghost"
+                href={PODCAST_SHOW.substack}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ padding: '12px 22px', fontSize: 15 }}
+              >
+                Read on Substack
+              </a>
+            </div>
           </Reveal>
           <div style={{ marginTop: 26, gap: 18 }}>
           <RevealGroup className="v2-grid" stagger={0.12}>
-            {EPISODES.map((ep, i) => (
+            {PODCAST_EPISODES.map((ep) => (
               <RevealItem key={ep.n}>
-                <article className="pod-ep" id={`episode-${i + 1}`}>
-                  <div className="pod-ep-num">{ep.n}</div>
+                <article className="pod-ep" id={`episode-${ep.n}`}>
+                  <div className="pod-ep-num">{String(ep.n).padStart(2, '0')}</div>
                   <div>
                     <h3
                       style={{
@@ -191,34 +227,37 @@ export function PodcastPage() {
                         lineHeight: 1.3,
                       }}
                     >
-                      {ep.title}
+                      Ep. {ep.n} — {ep.title}
                     </h3>
-                    <p style={{ color: 'var(--v2-muted)', fontSize: 15, lineHeight: 1.6, margin: '0 0 14px' }}>
-                      {ep.blurb}
-                    </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          color: 'var(--nn-cyan)',
-                          fontWeight: 700,
-                          fontSize: 14,
-                        }}
-                      >
-                        <Clock size={15} weight="bold" /> {ep.duration}
-                      </span>
+                    <div className="pod-ep-video">
+                      <LazyYouTube
+                        videoId={ep.youtubeId}
+                        title={`Follow and Subscribe — Ep. ${ep.n}: ${ep.title}`}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginTop: 14 }}>
                       <a
                         className="nn-btn nn-btn-cyan"
-                        href={SHOW_URL}
+                        href={podcastWatchUrl(ep)}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ padding: '10px 20px', fontSize: 14 }}
                       >
-                        <Play size={15} weight="bold" style={{ marginRight: 8, verticalAlign: -2 }} />
-                        Play on Spotify
+                        <YoutubeLogo size={15} weight="fill" style={{ marginRight: 8, verticalAlign: -2 }} />
+                        Watch on YouTube
                       </a>
+                      {ep.spotifyUrl && (
+                        <a
+                          className="nn-btn nn-btn-ghost"
+                          href={ep.spotifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ padding: '10px 20px', fontSize: 14 }}
+                        >
+                          <SpotifyLogo size={15} weight="fill" style={{ marginRight: 8, verticalAlign: -2 }} />
+                          Listen on Spotify
+                        </a>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -250,17 +289,29 @@ export function PodcastPage() {
                 More episodes are on the way.
               </p>
               <p style={{ color: 'var(--v2-muted)', fontSize: 15, margin: '0 0 20px' }}>
-                Follow the show on Spotify so the next drop lands in your feed automatically.
+                Follow the show on Spotify and YouTube so the next drop lands in your feed
+                automatically.
               </p>
-              <a
-                className="nn-btn nn-btn-gold nn-btn-big"
-                href={SHOW_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SpotifyLogo size={20} weight="fill" style={{ marginRight: 10, verticalAlign: -3 }} />
-                Follow on Spotify
-              </a>
+              <div className="pod-cta-row" style={{ justifyContent: 'center', marginTop: 0 }}>
+                <a
+                  className="nn-btn nn-btn-gold nn-btn-big"
+                  href={SHOW_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <SpotifyLogo size={20} weight="fill" style={{ marginRight: 10, verticalAlign: -3 }} />
+                  Follow on Spotify
+                </a>
+                <a
+                  className="nn-btn nn-btn-ghost nn-btn-big"
+                  href={PODCAST_SHOW.youtubeChannel}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <YoutubeLogo size={20} weight="fill" style={{ marginRight: 10, verticalAlign: -3 }} />
+                  Subscribe on YouTube
+                </a>
+              </div>
             </div>
           </Reveal>
         </div>
