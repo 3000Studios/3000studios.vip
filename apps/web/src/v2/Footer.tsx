@@ -26,7 +26,7 @@ const EXPLORE = [
   { to: '/video', label: 'Videos' },
   { to: '/beats', label: 'Music For Sale' },
   { to: '/podcast', label: 'Podcast' },
-  { to: '/aeropocalypse', label: 'Aeropocalypse' },
+  { to: '/aeropocalypse', label: 'Aeropocalypse: Online' },
   { to: '/live', label: 'Live Stream' },
 ];
 

@@ -91,7 +91,7 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/aeropocalypse": {
     "title": "AEROPOCALYPSE: ONLINE — 3000 Studios VIP",
-    "description": "AEROPOCALYPSE: ONLINE by 3000 Studios — the arcade flight combat universe with 24 bosses, in closed testing. Meet the bosses, watch the trailer, join the launch list."
+    "description": "AEROPOCALYPSE: ONLINE by 3000 Studios — a top-down arcade air combat game. Watch the trailer and explore the bosses, ships, and weapons."
   },
   "/apps": {
     "title": "Apps — 3000 Studios VIP",

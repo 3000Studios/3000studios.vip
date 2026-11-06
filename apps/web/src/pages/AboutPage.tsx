@@ -74,7 +74,7 @@ export function AboutPage() {
               </p>
               <p style={{ margin: 0 }}>
                 Beyond music: <strong style={{ color: 'var(--nn-gold)' }}>Aeropocalypse:
-                AeroStrike</strong>, a 24-boss arcade combat game; a growing apps
+                Aeropocalypse: Online</strong>, a 24-boss arcade combat game; a growing apps
                 lab; and a live broadcast stage. One studio, every medium.
               </p>
             </div>

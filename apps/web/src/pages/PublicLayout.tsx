@@ -386,7 +386,7 @@ export function PublicLayout({
                 <li><a href="https://boughtitonline.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🛒 Store — Bought It Online</a></li>
                 <li><a href="https://paypal.me/3000Studios" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>♥ Tip the Studio (PayPal)</a></li>
                 <li><a href="https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎙 3000 Studios Podcast (Spotify)</a></li>
-                <li><a href="https://aeropocalypse.pages.dev" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎮 Thunderdome: AeroStrike Beta</a></li>
+                <li><a href="https://aeropocalypse.pages.dev" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎮 Aeropocalypse: Online</a></li>
               </ul>
             </div>
 
@@ -418,7 +418,7 @@ export function PublicLayout({
             <nav aria-label="3000 Studios family" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 20px', fontSize: 12 }}>
               <a href="https://www.youtube.com/@3000Studio" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>YouTube — @3000Studio</a>
               <a href="https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Spotify — 3000 Studios</a>
-              <a href="https://aeropocalypse.pages.dev" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Thunderdome</a>
+              <a href="https://aeropocalypse.pages.dev" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Aeropocalypse: Online</a>
               <a href="https://voicetowebsite.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>VoiceToWebsite</a>
               <a href="https://getnexa.space" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Nexa</a>
               <a href="https://swain.pro" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Swain.pro</a>
