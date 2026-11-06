@@ -109,6 +109,11 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: 'S0MCYcYPHu8',
     spotifyUrl: 'https://open.spotify.com/episode/4cR9Ibs2CF2Xyy93AZU2sP',
   },
-  { n: 14, title: 'AI Goes to the Ballot Box', youtubeId: '_DaWxBrjXJM' },
+  {
+    n: 14,
+    title: 'AI Goes to the Ballot Box',
+    youtubeId: '_DaWxBrjXJM',
+    spotifyUrl: 'https://open.spotify.com/episode/1maxjZQjGlJ3UzrBBVwjCx',
+  },
   { n: 15, title: 'The Market Held Its Breath', youtubeId: '4fCy2WB4fT0' },
 ];
