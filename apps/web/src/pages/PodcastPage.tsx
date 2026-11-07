@@ -229,6 +229,16 @@ export function PodcastPage() {
                     >
                       Ep. {ep.n} — {ep.title}
                     </h3>
+                    <p
+                      style={{
+                        color: 'var(--v2-muted, #b8b8c4)',
+                        fontSize: 15,
+                        lineHeight: 1.65,
+                        margin: '0 0 14px',
+                      }}
+                    >
+                      {ep.description}
+                    </p>
                     <div className="pod-ep-video">
                       <LazyYouTube
                         videoId={ep.youtubeId}
