@@ -36,6 +36,7 @@ const VideoPage = lazy(() => import('./pages/VideoPage').then((m) => ({ default:
 const LiveBroadcastPage = lazy(() => import('./pages/LiveBroadcastPage').then((m) => ({ default: m.LiveBroadcastPage })));
 const PodcastPage = lazy(() => import('./pages/PodcastPage').then((m) => ({ default: m.PodcastPage })));
 const BeatsPage = lazy(() => import('./pages/BeatsPage').then((m) => ({ default: m.BeatsPage })));
+const BooksPage = lazy(() => import('./pages/BooksPage').then((m) => ({ default: m.BooksPage })));
 const CommandDeckPage = lazy(() => import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })));
 const OfficePage = lazy(() => import('./pages/OfficePage').then((m) => ({ default: m.OfficePage })));
 const PhoneGoLive = lazy(() => import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })));
@@ -185,6 +186,17 @@ const router = createBrowserRouter([
             description="The 3000 Studios Podcast — stream every episode with Follow and Subscribe."
           >
             <RouteLoader><PodcastPage /></RouteLoader>
+          </Titled>
+        ),
+      },
+      {
+        path: '/books',
+        element: (
+          <Titled
+            title="Books"
+            description="Books by Jeremy Swain from 3000 Studios Press — ebooks sold direct from the studio store, print editions through IngramSpark."
+          >
+            <RouteLoader><BooksPage /></RouteLoader>
           </Titled>
         ),
       },
