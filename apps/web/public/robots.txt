@@ -4,12 +4,10 @@ Disallow: /admin
 Disallow: /agent
 Disallow: /command-deck
 Disallow: /go-live
-Disallow: /privacy
-Disallow: /privacy.html
-Disallow: /privacy-policy
-Disallow: /aeropocalypse/privacy
-Disallow: /thunder-dome/privacy
-Disallow: /thunderdome-privacy
-Disallow: /thunderdome-privacy.html
+
+# Privacy policies stay crawlable on purpose: the site privacy policy
+# (/privacy) and the game's policies are public pages that reviewers,
+# app stores, and visitors must be able to read. They were disallowed
+# here until 2026-11-07 — that block is removed and must not come back.
 
 Sitemap: https://3000studios.vip/sitemap.xml
