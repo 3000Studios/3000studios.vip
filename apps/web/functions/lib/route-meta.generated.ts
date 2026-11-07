@@ -78,19 +78,16 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   "/aeropocalypse/privacy": {
     "title": "AEROPOCALYPSE: ONLINE Privacy Policy — 3000 Studios VIP",
     "description": "Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios.",
-    "noindex": true,
     "noads": true
   },
   "/thunder-dome/privacy": {
     "title": "AEROPOCALYPSE: ONLINE Privacy Policy — 3000 Studios VIP",
     "description": "Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios.",
-    "noindex": true,
     "noads": true
   },
   "/thunderdome-privacy": {
     "title": "AEROPOCALYPSE: ONLINE Privacy Policy — 3000 Studios VIP",
     "description": "Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios.",
-    "noindex": true,
     "noads": true
   },
   "/aeropocalypse": {
@@ -136,7 +133,6 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   "/privacy": {
     "title": "Privacy Policy — 3000 Studios VIP",
     "description": "Privacy Policy for 3000studios.vip — how 3000 Studios collects, uses, and protects your information.",
-    "noindex": true,
     "noads": true
   },
   "/command-deck": {

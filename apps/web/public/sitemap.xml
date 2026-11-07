@@ -4,6 +4,7 @@
   <url><loc>https://3000studios.vip/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://3000studios.vip/about</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/aeropocalypse</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/aeropocalypse/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/apps</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/beats</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/blog</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
@@ -21,6 +22,7 @@
   <url><loc>https://3000studios.vip/live</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/music</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/podcast</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/projects</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/requests</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/shop</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
@@ -75,6 +77,8 @@
   <url><loc>https://3000studios.vip/song/why-do-i-not-like-my-songs</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/sponsors</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/terms</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/thunder-dome/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/thunderdome-privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/video</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/vip</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>

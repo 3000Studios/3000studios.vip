@@ -193,6 +193,17 @@ if (Array.isArray(explicitRaw)) {
 }
 explicitRoutes.delete('');
 const hasExplicitFile = explicitRaw !== null;
+// Privacy routes ride along in explicit-routes.json because the app-side
+// ad gate (explicitAdsGate) reads that one file — ads stay OFF on legal
+// pages. But a privacy policy must stay INDEXABLE: the AdSense site
+// standard and app-store review both require a crawlable policy, so for
+// these routes the explicit flag means no-ads ONLY, never noindex.
+const PRIVACY_ROUTES = new Set([
+  '/privacy',
+  '/aeropocalypse/privacy',
+  '/thunder-dome/privacy',
+  '/thunderdome-privacy',
+]);
 
 const redirectsRaw = readJsonIfExists('redirects.json');
 const redirects = {};
@@ -250,7 +261,11 @@ for (const a of articles) {
 }
 
 for (const path of explicitRoutes) {
-  if (routes[path]) routes[path] = { ...routes[path], noindex: true, noads: true };
+  if (routes[path]) {
+    routes[path] = PRIVACY_ROUTES.has(path)
+      ? { ...routes[path], noads: true }
+      : { ...routes[path], noindex: true, noads: true };
+  }
   const song = path.match(/^\/song\/(.+)$/);
   if (song && songMeta[song[1]]) songMeta[song[1]] = { ...songMeta[song[1]], noindex: true, noads: true };
   const blog = path.match(/^\/blog\/(.+)$/);
