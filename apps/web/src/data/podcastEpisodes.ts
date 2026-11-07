@@ -121,4 +121,22 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: '4fCy2WB4fT0',
     spotifyUrl: 'https://open.spotify.com/episode/21pTgDP1HEcXu5rmtyUc6X',
   },
+  {
+    n: 16,
+    title: 'The Robots Are Hiring Robots',
+    youtubeId: 'YMNuY5FAr1g',
+    spotifyUrl: 'https://open.spotify.com/episode/4iwOorlft2dPJm692U352z',
+  },
+  {
+    n: 17,
+    title: 'Vice City Countdown',
+    youtubeId: 'gUI6--JqCmw',
+    spotifyUrl: 'https://open.spotify.com/episode/26UC2PEmRxWwQimyDo71l1',
+  },
+  {
+    n: 18,
+    title: 'The Lunch Rush Special',
+    youtubeId: '-KnvUTwlBgk',
+    spotifyUrl: 'https://open.spotify.com/episode/2cLH5Xvamh0aARHgUbwGSp',
+  },
 ];
