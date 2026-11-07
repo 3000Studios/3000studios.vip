@@ -3,6 +3,11 @@ import { Reveal } from '../v2/Reveal';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
+/**
+ * CANONICAL PRIVACY TEXT — this page and public/privacy.html carry the
+ * same policy word for word. /privacy is the one canonical privacy URL;
+ * if you edit the policy, edit both surfaces in the same change.
+ */
 const sections: { heading: string; body: string }[] = [
   {
     heading: 'Who We Are',
@@ -10,35 +15,35 @@ const sections: { heading: string; body: string }[] = [
   },
   {
     heading: 'Information We Collect',
-    body: 'Contact messages. Our contact form opens your own email app addressed to us — the site itself does not store or transmit your message through a server. What you send by email (name, email address, message) is used only to reply.\n\nOn-device preferences. Playback settings, your cookie-consent choice, and unlock entitlements are stored in your browser\u2019s local storage on your own device. They are not sent to our servers.\n\nTechnical and security data. Our hosting provider (Cloudflare) processes standard technical data such as IP address, browser type, and pages visited to deliver the site, keep it secure, and prevent abuse.\n\nPromotional tools. Official 3000 Studios promo tools on this site may use TikTok Login Kit and Content Posting, YouTube embeds, and links to Instagram, Spotify, Apple Music, and DistroKid HyperFollow. Where you explicitly connect a TikTok account, TikTok may share a user identifier and the basic public profile fields its platform allows, used only to post official 3000 Studios clips you own. We do not sell access tokens.',
+    body: 'Contact messages. The contact form sends your message (name, email address, topic, and message text) to our studio inbox so we can reply. If the inbox cannot be reached, the form opens your own email app with the message addressed to us instead.\n\nOn-device preferences. Playback settings, your cookie-consent choice, and unlock entitlements are stored in your browser\u2019s local storage on your own device.\n\nTechnical and security data. Our hosting provider (Cloudflare) processes standard technical data such as IP address, browser type, pages visited, and approximate region to deliver the site, keep it secure, and prevent abuse.\n\nPromotional tools. Official 3000 Studios promo tools on this site may use TikTok Login Kit and Content Posting, YouTube embeds, and links to Instagram, Spotify, Apple Music, and DistroKid HyperFollow. Where you explicitly connect a TikTok account, TikTok may share a user identifier and the basic public profile fields its platform allows, and permission to upload a promo video as a draft or (after TikTok app review) a public post. We do not sell access tokens. It is used only to post 3000 Studios music clips you already own.\n\nYouTube. Videos are embedded in privacy-enhanced mode, which limits tracking until you play a video. Studio uploads use Google OAuth on our own machines, not visitor Google accounts, unless you explicitly sign in to a 3000 Studios tool.',
   },
   {
     heading: 'How We Use Information',
-    body: 'We use the information we collect to: operate and secure the site; stream music and video; answer contact and booking messages; process merch orders; measure traffic; and promote official releases. We do not sell your personal information.',
+    body: 'We use the information we collect to operate and secure the site; stream music and video; measure traffic; show ads (with your consent, as described below); answer contact, booking, and press messages; process merch orders; and promote official releases on TikTok, YouTube, Instagram, and our own pages. We do not sell personal data.',
   },
   {
     heading: 'Cookies and Advertising',
-    body: 'Necessary storage keeps the site working (preferences, consent choice, playback). With your consent, Google AdSense may use cookies or similar technologies (including the DoubleClick cookie) to serve and measure ads. You can change your consent choice at any time in your browser, and manage ad personalization in your Google ad settings.',
+    body: 'Necessary cookies and local storage keep the site working (preferences, consent choice, playback). With your consent, Google AdSense and similar partners may use cookies (including the DoubleClick DART cookie) to serve and measure ads. You can change your consent choice at any time in your browser. Opt out of personalized advertising in Google Ads Settings (google.com/settings/ads) or at aboutads.info/choices.',
   },
   {
     heading: 'Payments',
-    body: 'Merch purchases check out through Stripe payment links. Payment card details are entered on and processed by Stripe — we never see or store your card number.',
+    body: 'Merch and other purchases check out through Stripe or PayPal payment links. Payment card details are entered on and processed by the payment provider — we never see or store your card number.',
   },
   {
     heading: 'Embedded Media and Outbound Links',
-    body: 'YouTube videos are embedded in privacy-enhanced mode, which limits tracking until you play a video. When you follow links to YouTube, Spotify, Apple Music, TikTok, Instagram, Facebook, or DistroKid, those companies handle your data under their own privacy policies.',
+    body: 'When you use TikTok, YouTube, Instagram, Spotify, Apple Music, or DistroKid from our links, those companies process data under their own policies. TikTok Login Kit and Content Posting follow TikTok\u2019s developer terms. We only request user.info.basic and video.upload until Direct Post is approved; then we may also use video.publish for official 3000 Studios clips.',
   },
   {
     heading: 'Data Sharing',
-    body: 'We share data only with the service providers needed to run the site: Cloudflare (hosting and security), Google (advertising), and Stripe (payments). We do not sell personal information.',
+    body: 'We share data only with the service providers needed to run the site: Cloudflare (hosting and security), Google (advertising), and Stripe / PayPal (payments). We do not sell personal information.',
   },
   {
     heading: 'Data Retention',
-    body: 'Contact email is kept as long as needed to reply and for legal records. On-device preferences remain in your browser until you clear them. Server and security logs rotate on our hosting provider\u2019s standard schedule.',
+    body: 'Contact email is kept as long as needed to reply and for legal records. On-device preferences remain in your browser until you clear them. OAuth tokens for promo live on our studio systems, not in public pages. Server and security logs rotate on our hosting provider\u2019s standard schedule.',
   },
   {
     heading: 'Your Rights',
-    body: 'Depending on where you live, you may have the right to access, correct, or delete personal information we hold about you. Email mr.jwswain@gmail.com to exercise these rights. You can disconnect TikTok access any time in your TikTok app settings.',
+    body: 'Depending on where you live, you may have the right to access, correct, or delete personal information we hold about you. Email mr.jwswain@gmail.com to exercise these rights. You can disconnect TikTok access any time in your TikTok app settings. California / GDPR-style requests go to the same email.',
   },
   {
     heading: 'Children',
@@ -65,7 +70,7 @@ export function PrivacyPolicyPage() {
           </Reveal>
           <Reveal delay={0.16}>
             <p className="v2-lede" style={{ marginTop: 12, fontSize: 14 }}>
-              Effective date: October 5, 2026 · Operator: 3000 Studios
+              Effective date: November 7, 2026 · Operator: 3000 Studios
               (Jeremy Swain)
             </p>
           </Reveal>
