@@ -15,31 +15,12 @@
 /index.html
   Cache-Control: no-cache, must-revalidate
 
-# Privacy policies remain directly reachable for people and Play review, but
-# are kept out of search indexes, snippets, archives, and shared caches.
-/privacy
-  Cache-Control: private, no-store, max-age=0
-  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
-
-/privacy.html
-  Cache-Control: private, no-store, max-age=0
-  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
-
-/aeropocalypse/privacy
-  Cache-Control: private, no-store, max-age=0
-  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
-
-/thunder-dome/privacy
-  Cache-Control: private, no-store, max-age=0
-  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
-
-/thunderdome-privacy
-  Cache-Control: private, no-store, max-age=0
-  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
-
-/thunderdome-privacy.html
-  Cache-Control: private, no-store, max-age=0
-  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+# Privacy policies are public, indexable pages (2026-11-07, AdSense fix
+# wave): the AdSense site standard and app-store review both require a
+# crawlable policy. They previously carried X-Robots-Tag noindex +
+# private/no-store here — that block is removed and must not come back.
+# The policies stay reachable at /privacy and the game policy URLs with
+# normal caching, like every other public page.
 
 /tiktok
   Cache-Control: no-store
