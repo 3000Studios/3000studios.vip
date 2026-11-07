@@ -24,6 +24,7 @@ import {
   STATIC_ROUTES,
   type RouteMetaEntry,
 } from './route-meta.generated';
+import { ROUTE_CONTENT } from './route-content.generated';
 
 export const APEX_HOST = '3000studios.vip';
 export const WWW_HOST = 'www.3000studios.vip';
@@ -208,6 +209,60 @@ export type HtmlTransformResult = {
   noindex: boolean;
 };
 
+const POLICY_NAV =
+  '<nav aria-label="Site information"><p>' +
+  '<a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a> · ' +
+  '<a href="/about">About</a> · <a href="/contact">Contact</a> · ' +
+  '<a href="/books">Books</a> · <a href="/podcast">Podcast</a> · ' +
+  '<a href="/music">Music</a></p></nav>';
+
+/**
+ * Real body content for a route (AdSense "low value content" fix,
+ * 2026-11-07): the SPA shell's <body> is empty without JavaScript, so the
+ * middleware injects the page's substance into #root; the React app
+ * replaces it on boot for JS visitors. Rich pages come from
+ * route-content.generated.ts (built from the same data the app renders);
+ * song/blog pages are synthesized from their meta; any other indexable
+ * route gets its own title + description. Noindex (owner) surfaces and
+ * static files (no #root marker) are never touched.
+ */
+export function bodyContentFor(path: string, meta: RouteMetaEntry): string | null {
+  if (meta.noindex) return null;
+  const exact = ROUTE_CONTENT[path];
+  if (exact) return exact;
+  if (meta.song) {
+    const s = meta.song;
+    const links = [
+      s.youtubeId
+        ? `<a href="https://www.youtube.com/watch?v=${s.youtubeId}">Watch the official video on YouTube</a>`
+        : '',
+      s.apple ? `<a href="${s.apple}">Listen on Apple Music</a>` : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    return (
+      `<main>\n<h1>${escapeHtml(s.title)}</h1>\n` +
+      `<p>${escapeHtml(meta.description)}</p>\n` +
+      (s.duration ? `<p>Duration: ${escapeHtml(s.duration)}</p>\n` : '') +
+      (links ? `<p>${links}</p>\n` : '') +
+      `<p><a href="/music">Browse the full Music Vault</a> — every 3000 Studios song previews free for one minute on this site.</p>\n${POLICY_NAV}\n</main>`
+    );
+  }
+  if (path.startsWith('/blog/')) {
+    const title = meta.title.replace(/ — 3000 Studios VIP$/, '');
+    return (
+      `<main>\n<h1>${escapeHtml(title)}</h1>\n` +
+      `<p>${escapeHtml(meta.description)}</p>\n` +
+      `<p><a href="/blog">More from the 3000 Studios blog</a></p>\n${POLICY_NAV}\n</main>`
+    );
+  }
+  const title = meta.title.replace(/ — 3000 Studios VIP$/, '');
+  return (
+    `<main>\n<h1>${escapeHtml(title)}</h1>\n` +
+    `<p>${escapeHtml(meta.description)}</p>\n${POLICY_NAV}\n</main>`
+  );
+}
+
 /**
  * Full post-response decision for an HTML page response: known route ->
  * injected head, same status; unknown route -> injected 404 head + real 404.
@@ -222,9 +277,14 @@ export function transformHtmlResponse(input: {
   if (!meta) {
     return { status: 404, html: injectHead(input.html, NOT_FOUND_META, path), noindex: true };
   }
+  let html = injectHead(input.html, meta, path);
+  const content = bodyContentFor(path, meta);
+  if (content && html.includes('<div id="root"></div>')) {
+    html = html.replace('<div id="root"></div>', `<div id="root">${content}</div>`);
+  }
   return {
     status: input.status,
-    html: injectHead(input.html, meta, path),
+    html,
     noindex: Boolean(meta.noindex),
   };
 }

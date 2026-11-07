@@ -281,6 +281,212 @@ for (const path of explicitRoutes) {
   }
 }
 
+/* --------------------- crawlable body content (2026-11-07) -------------------
+ * AdSense "low value content" fix: the SPA shell's <body> is empty without
+ * JavaScript, so reviewers and crawlers saw no substance on any page. The
+ * Pages middleware now injects this real per-route body content — built
+ * here from the same source data the app renders — into the shell's #root.
+ * The React app replaces it on boot for JavaScript visitors; crawlers and
+ * no-JS readers get the full text. Copy mirrors the pages themselves.
+ */
+const escHtml = (s) =>
+  String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+const POLICY_NAV =
+  '<nav aria-label="Site information"><p>' +
+  '<a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a> · ' +
+  '<a href="/about">About</a> · <a href="/contact">Contact</a> · ' +
+  '<a href="/books">Books</a> · <a href="/podcast">Podcast</a> · ' +
+  '<a href="/music">Music</a></p></nav>';
+const wrapMain = (inner) => `<main>\n${inner}\n${POLICY_NAV}\n</main>`;
+
+/* Podcast episodes — parsed from the same catalog the /podcast page renders. */
+const podTs = read(join(WEB, 'src/data/podcastEpisodes.ts'));
+const podEpisodes = [];
+for (const m of podTs.matchAll(
+  /\{\s*n: (\d+),\s*title: '((?:[^'\\]|\\.)*)',\s*description:\s*'((?:[^'\\]|\\.)*)',\s*youtubeId: '([^']+)',(?:\s*spotifyUrl: '([^']+)',)?/g,
+)) {
+  podEpisodes.push({
+    n: Number(m[1]),
+    title: m[2].replace(/\\'/g, "'"),
+    description: m[3].replace(/\\'/g, "'"),
+    youtubeId: m[4],
+    spotifyUrl: m[5] || '',
+  });
+}
+podEpisodes.sort((a, b) => a.n - b.n);
+
+/* Books — the array literal in src/data/books.ts is plain JSON syntax. */
+const booksTs = read(join(WEB, 'src/data/books.ts'));
+let books = [];
+{
+  const start = booksTs.indexOf('export const BOOKS: BookEntry[] =');
+  const open = booksTs.indexOf('= [', start) + 2;
+  let depth = 0;
+  let end = -1;
+  for (let i = open; i < booksTs.length; i++) {
+    if (booksTs[i] === '[') depth++;
+    else if (booksTs[i] === ']') {
+      depth--;
+      if (depth === 0) {
+        end = i;
+        break;
+      }
+    }
+  }
+  if (start >= 0 && end > open) books = JSON.parse(booksTs.slice(open, end + 1));
+}
+
+/* Aeropocalypse bosses — parsed from the game's real roster data. */
+const tdTs = read(join(WEB, 'src/data/thunderDome.ts'));
+const bosses = [];
+for (const m of tdTs.matchAll(
+  /\{\s*id: (\d+),\s*name: '((?:[^'\\]|\\.)*)',\s*codename: '([^']+)',\s*level: (\d+),\s*threatLevel: '([^']+)',\s*environment: '((?:[^'\\]|\\.)*)',\s*weakness: '((?:[^'\\]|\\.)*)',\s*signatureAttack: '((?:[^'\\]|\\.)*)',\s*description: '((?:[^'\\]|\\.)*)',/g,
+)) {
+  bosses.push({
+    name: m[2].replace(/\\'/g, "'"),
+    codename: m[3],
+    level: Number(m[4]),
+    threatLevel: m[5],
+    environment: m[6].replace(/\\'/g, "'"),
+    signatureAttack: m[8].replace(/\\'/g, "'"),
+    description: m[9].replace(/\\'/g, "'"),
+  });
+}
+bosses.sort((a, b) => a.level - b.level);
+
+const routeContent = {};
+
+routeContent['/'] = wrapMain(
+  `<h1>3000 Studios VIP — Official Music &amp; Live Stage</h1>
+<p>3000 Studios is an independent music and media studio in Acworth, Georgia, run by Jeremy Swain — original music, cinematic video, the Follow and Subscribe podcast, books from 3000 Studios Press, and the game AEROPOCALYPSE: ONLINE. New singles weekly, on all platforms.</p>
+<h2>Music Vault</h2>
+<p>${songs.length} published songs. Every track previews free for one minute on this site; full songs stream on Apple Music, Spotify, and every major platform. <a href="/music">Browse the Music Vault</a>.</p>
+<h2>Follow and Subscribe — The 3000 Studios Podcast</h2>
+<p>${podEpisodes.length} episodes with hosts Follow and Subscribe: the day's biggest story, tech talk, a featured 3000 Studios song, and a surprise caller in every episode. <a href="/podcast">Watch and listen to every episode</a>.</p>
+<h2>Books — 3000 Studios Press</h2>
+<p>Books by Jeremy Swain: fiction, mystery, cookbooks, and creator guides. Ebooks are sold direct from the studio store; print editions are distributed through IngramSpark. <a href="/books">Browse the books</a>.</p>
+<h2>AEROPOCALYPSE: ONLINE</h2>
+<p>An arcade flight combat game with ${bosses.length} bosses, in closed testing on Google Play. <a href="/aeropocalypse">Meet the bosses and join the launch list</a>.</p>
+<h2>More from the studio</h2>
+<p><a href="/video">Official videos</a> · <a href="/blog">Blog and studio notes</a> · <a href="/live">Live broadcasts</a> · <a href="/beats">Beat packs for license</a> · <a href="/about">About the studio</a></p>`,
+);
+
+routeContent['/podcast'] = wrapMain(
+  `<h1>Follow and Subscribe — The 3000 Studios Podcast</h1>
+<p>Follow and Subscribe is the 3000 Studios podcast, hosted by Follow and Subscribe. Every episode opens with the day and the weather in Acworth, Georgia, takes on the biggest story going, talks tech, features a 3000 Studios song, and takes a surprise call — then signs off the same way every time: stay mentally happy, and mentally healthy. Watch free on YouTube or listen on Spotify.</p>
+<p>Show pages: <a href="https://www.youtube.com/@3000Studio">YouTube — @3000Studio</a> · <a href="https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI">Spotify — 3000 Studios Podcast</a> · <a href="https://3000studios.substack.com">Substack — 3000 Studios</a></p>` +
+    podEpisodes
+      .map(
+        (ep) => `
+<article>
+<h2>Ep. ${ep.n} — ${escHtml(ep.title)}</h2>
+<p>${escHtml(ep.description)}</p>
+<p><a href="https://www.youtube.com/watch?v=${ep.youtubeId}">Watch on YouTube</a>${
+          ep.spotifyUrl ? ` · <a href="${ep.spotifyUrl}">Listen on Spotify</a>` : ''
+        }</p>
+</article>`,
+      )
+      .join(''),
+);
+
+routeContent['/books'] = wrapMain(
+  `<h1>Books — 3000 Studios Press</h1>
+<p>Books by Jeremy Swain, published under the 3000 Studios Press imprint. The ebooks below are sold direct from the studio store on Payhip — $9.99 each, EPUB + PDF delivered at checkout: <a href="https://payhip.com/3000Studios">payhip.com/3000Studios</a>. Print editions are distributed through IngramSpark to bookstores and libraries worldwide.</p>` +
+    books
+      .map(
+        (b) => `
+<article>
+<h2>${escHtml(b.title)}</h2>
+<p><em>${escHtml(b.subtitle)}</em></p>
+<p>${escHtml(b.categories)}</p>
+<p>${escHtml(b.description)}</p>
+<p><a href="https://payhip.com/3000Studios">Buy the ebook — $9.99</a> · EPUB + PDF · by Jeremy Swain · 3000 Studios Press</p>
+</article>`,
+      )
+      .join('') +
+    `
+<h2>More ways to read</h2>
+<p>Grow the Channel, Compounding Content, and The Twelve Cookies of Christmas are also published on Leanpub. The wider 3000 Studios Press catalog — 44 published titles across fiction, mystery, cookbooks, and creator guides — is distributed in print through IngramSpark, so bookstores and libraries can order copies through their usual channels. Selected ebooks also appear on Kobo and XinXii.</p>`,
+);
+
+routeContent['/about'] = wrapMain(
+  `<h1>About 3000 Studios</h1>
+<p>Independent AI-driven music production, cinematic video, games, and creator media — from Acworth, Georgia to every screen on earth.</p>
+<h2>Built Different</h2>
+<p>3000 Studios is an independent music production label and creator media brand founded by Jeremy Swain. Every release begins in the studio: original songwriting, cutting-edge AI production assistance, and meticulous human arrangement, vocal production, mixing, and mastering.</p>
+<p>The catalog is distributed globally across Spotify, Apple Music, YouTube, and all major platforms via DistroKid. Songs play as 1-minute previews right here, full tracks live on the streaming platforms, and the official videos play free via YouTube.</p>
+<p>Beyond music: Aeropocalypse, a ${bosses.length}-boss arcade combat game; a growing apps lab; books from 3000 Studios Press; the Follow and Subscribe podcast; and a live broadcast stage. One studio, every medium.</p>
+<p>The catalog today: ${songs.length} released tracks, ${podEpisodes.length} podcast episodes, ${books.length} books in the studio store, and ${articles.length} published blog articles.</p>`,
+);
+
+routeContent['/contact'] = wrapMain(
+  `<h1>Book the Studio — Contact 3000 Studios</h1>
+<p>Sync licenses, music features, live stream bookings, brand sponsorships, and press — reach Jeremy Swain directly.</p>
+<p>3000 Studios is an independent music and media label run by Jeremy Swain out of Acworth, Georgia. Every message from the contact page lands in the studio inbox — pick the route that fits and include your timeline so the reply can be specific.</p>
+<h2>Booking, sync &amp; press</h2>
+<p>Email <a href="mailto:mr.jwswain@gmail.com">mr.jwswain@gmail.com</a> directly, or use the contact form on this page. For team and VIP list matters, write to <a href="mailto:Team@3000studios.vip">Team@3000studios.vip</a>.</p>
+<h2>Looking for something specific?</h2>
+<p>Song and video requests go through <a href="/requests">Requests</a>; homepage sponsorship slots are on <a href="/sponsors">Sponsors</a>; beat packs and licensing live on <a href="/beats">Beat Packs</a>; books are on the <a href="/books">Books</a> page; and merch is in the <a href="/shop">Shop</a>.</p>`,
+);
+
+routeContent['/music'] = wrapMain(
+  `<h1>Music Vault — 3000 Studios</h1>
+<p>The 3000 Studios catalog: ${songs.length} published songs. Every track previews free for one minute on this site; full tracks stream on Apple Music, Spotify, and every major platform.</p>
+<ul>
+${songs
+  .map(
+    (s) =>
+      `<li><a href="/song/${s.slug}">${escHtml(s.title)}</a>${s.duration ? ` — ${escHtml(s.duration)}` : ''}</li>`,
+  )
+  .join('\n')}
+</ul>`,
+);
+
+routeContent['/blog'] = wrapMain(
+  `<h1>Blog — 3000 Studios</h1>
+<p>News, stories, and studio notes from 3000 Studios.</p>` +
+    articles
+      .map(
+        (a) => `
+<article>
+<h2><a href="/blog/${a.slug}">${escHtml(a.title)}</a></h2>
+<p>${escHtml(a.summary)}</p>
+</article>`,
+      )
+      .join(''),
+);
+
+routeContent['/aeropocalypse'] = wrapMain(
+  `<h1>AEROPOCALYPSE: ONLINE</h1>
+<p>AEROPOCALYPSE: ONLINE by 3000 Studios is an arcade flight combat game with ${bosses.length} bosses, currently in closed testing on Google Play. Every stage ends in a boss fight — meet the full roster below, watch the trailer on the game page, and join the launch list.</p>
+<h2>The boss roster</h2>` +
+    bosses
+      .map(
+        (b) => `
+<article>
+<h3>Level ${b.level} — ${escHtml(b.name)} (${escHtml(b.codename)})</h3>
+<p>Threat class ${escHtml(b.threatLevel)} · ${escHtml(b.environment)} · Signature attack: ${escHtml(b.signatureAttack)}</p>
+<p>${escHtml(b.description)}</p>
+</article>`,
+      )
+      .join(''),
+);
+
+const routeContentTs = `// GENERATED by scripts/generate-site-meta.mjs — do not edit by hand.
+// Real per-route body content injected into the SPA shell by the Pages
+// middleware (functions/lib/route-meta.ts) so crawlers and no-JS readers
+// see the substance of each page. Sources: src/data/podcastEpisodes.ts,
+// src/data/books.ts, src/data/thunderDome.ts, src/data/publishedSongs.generated.json,
+// src/data/blogArticles.ts, and the public pages' own copy.
+// Re-run: npm run meta:generate (also runs as part of the web prebuild).
+
+export const ROUTE_CONTENT: Record<string, string> = ${JSON.stringify(routeContent, null, 2)};
+`;
+
 /* --------------------------------- outputs -------------------------------- */
 const generatedTs = `// GENERATED by scripts/generate-site-meta.mjs — do not edit by hand.
 // Sources: apps/web/src/main.tsx, src/data/publishedSongs.generated.json,
@@ -358,6 +564,7 @@ const llmsTxt = `# 3000 Studios VIP
 - [Video Vault](${ORIGIN}/video): Official music videos and Aeropocalypse cinematics.
 - [Live Stage](${ORIGIN}/live): Watch 3000 Studios live broadcasts.
 - [Podcast](${ORIGIN}/podcast): The 3000 Studios Podcast — every episode.
+- [Books](${ORIGIN}/books): Books by Jeremy Swain from 3000 Studios Press — ebooks in the studio store, print through IngramSpark.
 - [Beat Packs](${ORIGIN}/beats): License 3000 Studios instrumentals and bundles.
 - [AEROPOCALYPSE: ONLINE](${ORIGIN}/aeropocalypse): AEROPOCALYPSE: ONLINE — the arcade flight combat game with 24 bosses.
 - [Shop](${ORIGIN}/shop): Merch, singles, and studio services.
@@ -381,6 +588,7 @@ const llmsTxt = `# 3000 Studios VIP
 
 const outputs = new Map([
   [join(WEB, 'functions/lib/route-meta.generated.ts'), generatedTs],
+  [join(WEB, 'functions/lib/route-content.generated.ts'), routeContentTs],
   [join(WEB, 'public/sitemap.xml'), sitemapXml],
   [join(WEB, 'public/llms.txt'), llmsTxt],
 ]);

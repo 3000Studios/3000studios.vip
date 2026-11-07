@@ -67,6 +67,10 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
     "title": "Podcast — 3000 Studios VIP",
     "description": "The 3000 Studios Podcast — stream every episode with Follow and Subscribe."
   },
+  "/books": {
+    "title": "Books — 3000 Studios VIP",
+    "description": "Books by Jeremy Swain from 3000 Studios Press — ebooks sold direct from the studio store, print editions through IngramSpark."
+  },
   "/beats": {
     "title": "Beat Packs — 3000 Studios VIP",
     "description": "License 3000 Studios beat packs — instrumentals and bundles with instant delivery."
