@@ -178,4 +178,12 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: '-KnvUTwlBgk',
     spotifyUrl: 'https://open.spotify.com/episode/2cLH5Xvamh0aARHgUbwGSp',
   },
+  {
+    n: 19,
+    title: 'Saturday Gets Loud',
+    description:
+      'Broadcasting from the farmers market loft studio, where the brick is exposed, the coffee is enormous, and Saturday gets loud. Featuring the song “Why Do I” and a surprise call from Baron von Brunch from Baltimore.',
+    youtubeId: 'LUCBRBkkfKI',
+    spotifyUrl: 'https://open.spotify.com/episode/6tnwY5sBeEOVBrEp0rxv0l',
+  },
 ];
