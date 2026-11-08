@@ -186,4 +186,60 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     youtubeId: 'LUCBRBkkfKI',
     spotifyUrl: 'https://open.spotify.com/episode/6tnwY5sBeEOVBrEp0rxv0l',
   },
+  {
+    n: 20,
+    title: 'High Noon at the Empire',
+    description:
+      'Welcome back to Follow and Subscribe, the 3000 Studios podcast! I\'m Follow, broadcasting from the sky lounge studio, forty floors above the city. Featuring the song “Legit Funky” and a surprise call from Miss Maple from Minneapolis.',
+    youtubeId: 'JzWDJOcH7Co',
+    spotifyUrl: 'https://open.spotify.com/episode/3UMRoYjrC6tLMLxX53HHOy',
+  },
+  {
+    n: 21,
+    title: 'Golden Hour, Full Power',
+    description:
+      'Welcome back to Follow and Subscribe, the 3000 Studios podcast! I\'m Follow, broadcasting as the golden hour lights the studio. Featuring the song “Electric Skies” and a surprise call from Captain Comet from Cape Canaveral.',
+    youtubeId: 'rSqpQbKyouQ',
+    spotifyUrl: 'https://open.spotify.com/episode/63fgeWd7CCuzWNJg07faW7',
+  },
+  {
+    n: 22,
+    title: 'The Night Owl Network',
+    description:
+      'Welcome back to Follow and Subscribe, the 3000 Studios podcast! I\'m Follow, keeping the late crowd company on the night owl network. Featuring the song “If You Don\'t Play” and a surprise call from DJ Moonpie from Mobile.',
+    youtubeId: '66W3ahchN9E',
+    spotifyUrl: 'https://open.spotify.com/episode/7snLsclly3CDil2AP9XADv',
+  },
+  {
+    n: 23,
+    title: 'Sunday Starts Bright',
+    description:
+      'Welcome back to Follow and Subscribe, the 3000 Studios podcast! I\'m Follow, and Sunday starts bright. Featuring the song “Got Alot Going On” and a surprise call from Sister Sunrise from Savannah.',
+    youtubeId: 'ZBnIDHQNQrk',
+    spotifyUrl: 'https://open.spotify.com/episode/2Ktb8cb9nL35P1kpxpgm9M',
+  },
+  {
+    n: 24,
+    title: 'Noon in the Observatory',
+    description:
+      'Broadcasting from the observatory studio at high noon, where the telescopes are pointed at everything except the obvious. Featuring the song “Midnight Haunt” and a surprise call from Penny Telescope from Tucson.',
+    youtubeId: 'pl89_hp5LB4',
+    spotifyUrl: 'https://open.spotify.com/episode/3r1ZYFclXzcPmveLlpLGGC',
+  },
+  {
+    n: 25,
+    title: 'The Golden Depot',
+    description:
+      'Broadcasting from the golden depot studio, where every arrival is on time and every departure is dramatic. Featuring the song “Room Goes Cold” and a surprise call from Conductor Coco from Chattanooga.',
+    youtubeId: 'ed6aix_3jCg',
+    spotifyUrl: 'https://open.spotify.com/episode/0XDkwiq9P4k0IMbfVP27Mz',
+  },
+  {
+    n: 26,
+    title: 'Stars After Dark',
+    description:
+      'Broadcasting after dark, under a sky full of stars. Featuring the song “After Hours Heaven” and a surprise call from Moondust Molly from Marfa.',
+    youtubeId: 'Por8oQ_Xbd0',
+    spotifyUrl: 'https://open.spotify.com/episode/3oBgz0xIIjeCVxG50YhDnZ',
+  },
 ];
