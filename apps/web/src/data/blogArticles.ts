@@ -150,4 +150,87 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     ],
     tags: ['AI Workflows', 'Music Production', 'Indie Studio', 'Agentic Coding'],
   },
+  {
+    slug: 'from-demo-to-distrokid-how-a-3000-studios-single-is-made',
+    title: 'From Demo to DistroKid: How a 3000 Studios Single Is Made, Start to Finish',
+    category: 'Music Production',
+    author: 'Jeremy Swain',
+    publishedAt: '2026-11-04',
+    updatedAt: '2026-11-08',
+    readTime: '7 min read',
+    summary: 'The complete pipeline behind a 3000 Studios weekly single: idea capture, arrangement, vocal production, mix and master, artwork, and worldwide distribution — with the quality gates at each step.',
+    leadParagraph: 'A new 3000 Studios single lands every week, and from the outside it can look effortless: a title appears, a cover appears, and the song is suddenly on every platform. In reality every track passes through the same six-stage pipeline, and any stage can send it back. This is that pipeline, exactly as it runs in the studio.',
+    sections: [
+      {
+        heading: '1. Idea Capture and the Demo',
+        body: [
+          'Every song starts as a captured idea — a voice memo, a four-bar loop, a title with a mood attached. Ideas are logged the moment they happen, because the idea you do not write down is the one you lose. The demo that follows is deliberately rough: tempo, key, a scratch melody, and the emotional target of the track in one sentence. If the one-sentence target cannot be written, the idea is not ready, and it goes back into the log instead of into production.',
+          'Demos are also where the catalog stays honest. A demo that duplicates an existing release too closely gets caught here, while it is still cheap to change — a new angle, a new tempo, or a merge with another fragment in the log.',
+        ],
+      },
+      {
+        heading: '2. Arrangement and Production',
+        body: [
+          'Arrangement turns the demo into a structure: intro, verses, choruses, a bridge that earns its place, and an ending that resolves instead of stopping. Production builds the sound world around that structure — drums and low end first, because they decide how the track feels on real speakers, then harmonic layers, then the ear candy that rewards a second listen.',
+          'AI assistance is part of this stage at 3000 Studios, and we are open about it: generated stems and variations serve as raw material and a fast scratchpad. Nothing generated ships as-is. Every element is auditioned, edited, re-performed or re-processed, and arranged by hand before it is allowed into the mix.',
+        ],
+      },
+      {
+        heading: '3. Vocal Production, Mix, and Master',
+        body: [
+          'Vocals are recorded, comped, and tuned with a light hand — the goal is the performance, not the polish line. The mix then balances the track on three references: studio monitors, ordinary earbuds, and a car stereo, because most listeners will meet the song on the second and third. A mix that only works on expensive speakers is not finished.',
+          'Mastering targets the loudness and tonal standards the streaming platforms expect, without crushing the dynamics that make the track breathe. The master is checked as a full start-to-finish listen, in order, at listening volume — the same way a fan will hear it.',
+        ],
+      },
+      {
+        heading: '4. Artwork, Metadata, and Release',
+        body: [
+          'Cover art is made per release and checked against a simple rule: it has to read at thumbnail size, because that is how most people will first see it. Metadata — title, credits, genre, and the clean/explicit flag — is entered once, carefully, because a metadata error follows a song to every platform at once.',
+          'Distribution runs through DistroKid to Spotify, Apple Music, YouTube, and the other major platforms. On release day the track also lands here: a one-minute preview in the Music Vault, the official video in the Video Vault, and full streams one tap away on the listener’s platform of choice.',
+        ],
+      },
+    ],
+    tags: ['Music Production', 'Releases', 'DistroKid', 'Studio Process'],
+  },
+  {
+    slug: 'inside-3000-studios-press-how-a-book-is-published',
+    title: 'Inside 3000 Studios Press: How a Book Goes From Manuscript to Print and Ebook',
+    category: 'Publishing',
+    author: 'Jeremy Swain',
+    publishedAt: '2026-11-07',
+    updatedAt: '2026-11-10',
+    readTime: '7 min read',
+    summary: 'How 3000 Studios Press publishes a book: manuscript standards, editing passes, cover and interior production, EPUB validation, direct ebook sales, and print distribution through IngramSpark.',
+    leadParagraph: '3000 Studios Press is the book imprint of 3000 Studios, and it runs on the same principle as the music side: a real pipeline with quality gates, not a folder of drafts. This article walks a title through the whole route — manuscript, edits, production files, store listings, and print distribution.',
+    sections: [
+      {
+        heading: '1. The Manuscript Standard',
+        body: [
+          'A Press title starts with a complete manuscript, not a sample. Fiction titles are full novels; the creator guides are complete playbooks with checklists and plans a reader can execute. Before anything else happens, the manuscript is read end to end for structure: does the mystery play fair, does the guide keep its promises, does the cookbook’s twelfth recipe belong with the other eleven?',
+          'Only after the structural read does line editing begin — continuity, repetition, dead scenes, and the places where the writer knew what they meant but the reader cannot. The goal is a book that a stranger can finish and recommend, because that is the only marketing that compounds.',
+        ],
+      },
+      {
+        heading: '2. Production: Cover, Interior, and EPUB',
+        body: [
+          'Each book gets an original cover designed for its genre shelf, with the imprint line on the cover and the publisher information on the copyright page: written by Jeremy Swain, published under the 3000 Studios Press imprint. Interior files are built separately for print and ebook, because a PDF that prints beautifully is not the same file an e-reader wants.',
+          'Ebooks are validated, not assumed. Every EPUB passes a full EPUBCheck run before it is listed anywhere, and the file that is checked is the file that ships — checksums are kept so a store can never silently end up with a different build than the one that passed.',
+        ],
+      },
+      {
+        heading: '3. Selling Direct, and Print Through IngramSpark',
+        body: [
+          'Ebooks are sold direct from the studio store on Payhip at $9.99, in EPUB and PDF, delivered at checkout — the Books page on this site is the front door. Direct sales keep the relationship with the reader simple: one store, one price, both formats, no platform lock-in.',
+          'Print editions are distributed through IngramSpark, which puts Press titles into the catalogs bookstores and libraries actually order from. That split — direct for digital, IngramSpark for print — is deliberate: each channel does the job it is best at, and a reader who wants the physical book can order it through their usual store.',
+        ],
+      },
+      {
+        heading: '4. Why an Indie Press at All',
+        body: [
+          'The honest answer is control over the whole chain. A traditional route would put months between a finished manuscript and a reader, and would hand the pricing, the formats, and the release calendar to someone else. The Press keeps all four in the studio, which is how a catalog of dozens of titles can exist at all — each book is produced once, properly, and then it keeps working: on the shelf, in the store, and in the hands of the next reader who finds it.',
+        ],
+      },
+    ],
+    tags: ['Publishing', 'Books', '3000 Studios Press', 'IngramSpark'],
+  },
 ];

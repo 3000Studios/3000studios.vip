@@ -908,6 +908,16 @@ export const BLOG_ROUTES: Record<string, RouteMetaEntry> = {
     "title": "How 3000 Studios Uses AI to Accelerate Music, Visuals, and Code Production — 3000 Studios VIP",
     "description": "An honest look at how autonomous agent fleets, neural audio generation, and multimodal AI tools supercharge solo and indie studio execution.",
     "type": "article"
+  },
+  "from-demo-to-distrokid-how-a-3000-studios-single-is-made": {
+    "title": "From Demo to DistroKid: How a 3000 Studios Single Is Made, Start to Finish — 3000 Studios VIP",
+    "description": "The complete pipeline behind a 3000 Studios weekly single: idea capture, arrangement, vocal production, mix and master, artwork, and worldwide distribution — with the quality gates at each step.",
+    "type": "article"
+  },
+  "inside-3000-studios-press-how-a-book-is-published": {
+    "title": "Inside 3000 Studios Press: How a Book Goes From Manuscript to Print and Ebook — 3000 Studios VIP",
+    "description": "How 3000 Studios Press publishes a book: manuscript standards, editing passes, cover and interior production, EPUB validation, direct ebook sales, and print distribution through IngramSpark.",
+    "type": "article"
   }
 };
 
