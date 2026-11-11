@@ -94,6 +94,22 @@ for (const m of blogTs.matchAll(
 )) {
   articles.push({ slug: m[1], title: m[3], summary: m[4].replace(/\\'/g, "'") });
 }
+// Full article bodies (lead + sections) so each /blog/<slug> route can serve
+// its complete text to crawlers and no-JS readers, not just its summary.
+const unesc = (s) => s.replace(/\\'/g, "'").replace(/\\"/g, '"');
+const slugIdx = [...blogTs.matchAll(/slug:\s*'([^']+)'/g)];
+for (let i = 0; i < slugIdx.length; i++) {
+  const art = articles.find((a) => a.slug === slugIdx[i][1]);
+  if (!art) continue;
+  const seg = blogTs.slice(slugIdx[i].index, i + 1 < slugIdx.length ? slugIdx[i + 1].index : undefined);
+  const lead = seg.match(/leadParagraph:\s*'((?:[^'\\]|\\.)*)'/);
+  if (lead) art.leadParagraph = unesc(lead[1]);
+  art.sections = [];
+  for (const sm of seg.matchAll(/heading:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*body:\s*\[([\s\S]*?)\n\s*\]/g)) {
+    const body = [...sm[2].matchAll(/'((?:[^'\\]|\\.)*)'/g)].map((b) => unesc(b[1]));
+    art.sections.push({ heading: unesc(sm[1]), body });
+  }
+}
 
 /* ------------------------------ static routes ----------------------------- */
 const mainTs = read(join(WEB, 'src/main.tsx'));
@@ -373,6 +389,31 @@ for (const m of tdTs.matchAll(
 }
 bosses.sort((a, b) => a.level - b.level);
 
+/* -------------------- shop / beats / apps / projects data -------------------- */
+const parseItems = (file, re) => {
+  try {
+    return [...read(join(WEB, file)).matchAll(re)];
+  } catch {
+    return [];
+  }
+};
+const merchItems = parseItems(
+  'src/data/merch.ts',
+  /title:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*priceCents:\s*(\d+),[\s\S]{0,200}?blurb:\s*'((?:[^'\\]|\\.)*)',[\s\S]{0,300}?stripe:\s*'([^']+)'/g,
+).map((m) => ({ title: unesc(m[1]), price: `$${(Number(m[2]) / 100).toFixed(2)}`, blurb: unesc(m[3]), stripe: m[4] }));
+const beatItems = parseItems(
+  'src/data/beats.ts',
+  /title:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*handle:\s*'([^']+)',\s*\n\s*priceCents:\s*(\d+),[\s\S]{0,120}?blurb:\s*'((?:[^'\\]|\\.)*)'/g,
+).map((m) => ({ title: unesc(m[1]), handle: m[2], price: `$${(Number(m[3]) / 100).toFixed(2)}`, blurb: unesc(m[4]) }));
+const studioApps = parseItems(
+  'src/data/appsData.ts',
+  /name:\s*'((?:[^'\\]|\\.)*)',[\s\S]{0,300}?tagline:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*description:\s*'((?:[^'\\]|\\.)*)'/g,
+).map((m) => ({ name: unesc(m[1]), tagline: unesc(m[2]), description: unesc(m[3]) }));
+const studioProjects = parseItems(
+  'src/data/projectsData.ts',
+  /title:\s*'((?:[^'\\]|\\.)*)',[\s\S]{0,200}?summary:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*story:\s*'((?:[^'\\]|\\.)*)'/g,
+).map((m) => ({ title: unesc(m[1]), summary: unesc(m[2]), story: unesc(m[3]) }));
+
 const routeContent = {};
 
 routeContent['/'] = wrapMain(
@@ -489,6 +530,163 @@ routeContent['/aeropocalypse'] = wrapMain(
 </article>`,
       )
       .join(''),
+);
+
+// Full blog article bodies — the complete text of every post, served in the
+// prerendered shell so a review (human or automated) sees the real article.
+for (const a of articles) {
+  if (!a.sections || a.sections.length === 0) continue;
+  routeContent[`/blog/${a.slug}`] = wrapMain(
+    `<h1>${escHtml(a.title)}</h1>
+<p>${escHtml(a.leadParagraph || a.summary)}</p>` +
+      a.sections
+        .map(
+          (sec) => `
+<h2>${escHtml(sec.heading)}</h2>
+${sec.body.map((p) => `<p>${escHtml(p)}</p>`).join('\n')}`,
+        )
+        .join('') +
+      `
+<p><a href="/blog">More from the 3000 Studios blog</a></p>`,
+  );
+}
+
+routeContent['/shop'] = wrapMain(
+  `<h1>Shop — 3000 Studios VIP</h1>
+<p>The official 3000 Studios shop: signature merch, Vault passes with stem downloads, and the homepage sponsor slot. Every item checks out through Stripe; prices are in USD and exactly what the product cards on this page show.</p>` +
+    merchItems
+      .map(
+        (it) => `
+<article>
+<h2>${escHtml(it.title)} — ${it.price}</h2>
+<p>${escHtml(it.blurb)}</p>
+<p><a href="${it.stripe}">Buy with Stripe</a></p>
+</article>`,
+      )
+      .join('') +
+    `
+<h2>Books and beats</h2>
+<p>Books by Jeremy Swain are sold on the <a href="/books">Books</a> page through Payhip, and instrumental beat packs live on <a href="/beats">Beat Packs</a>. Payment card details are entered on the payment provider's own page — 3000 Studios never sees or stores your card number, as set out in the <a href="/privacy">Privacy Policy</a>.</p>`,
+);
+
+routeContent['/beats'] = wrapMain(
+  `<h1>Beat Packs — 3000 Studios VIP</h1>
+<p>License-ready instrumentals from the 3000 Studios catalog. Each beat is the instrumental of a released 3000 Studios track, delivered as an instant MP3 download after checkout through the studio storefront at boughtitonline.com. Buy single beats, or take the complete bundle and save.</p>` +
+    beatItems
+      .map(
+        (b) => `
+<article>
+<h2>${escHtml(b.title)} — ${b.price}</h2>
+<p>${escHtml(b.blurb)}</p>
+<p><a href="https://boughtitonline.com/products/${b.handle}">Buy the instrumental</a></p>
+</article>`,
+      )
+      .join('') +
+    `
+<article>
+<h2>3000 Studios Complete Instrumental Bundle (16 Tracks) — $49.00</h2>
+<p>Every instrumental in the catalog. One download. One price — $49.00 against $112.00 bought individually.</p>
+<p><a href="https://boughtitonline.com/products/3000-studios-complete-instrumental-bundle-16-tracks">Buy the bundle</a></p>
+</article>
+<h2>Licensing questions</h2>
+<p>For sync licensing, exclusives, and custom production, contact the studio through the <a href="/contact">Contact</a> page before purchasing so the right license can be written for your project.</p>`,
+);
+
+routeContent['/video'] = wrapMain(
+  `<h1>Video Vault — 3000 Studios VIP</h1>
+<p>Official 3000 Studios music videos and Aeropocalypse cinematics — free to watch via YouTube, right here on the site.</p>
+<h2>Music videos</h2>
+<p>Every single from the ${songs.length}-song catalog gets an official video on the 3000 Studios YouTube channel. Watch the videos here, then stream the full tracks on Apple Music, Spotify, and every major platform — the songs themselves live in the <a href="/music">Music Vault</a>.</p>
+<h2>Aeropocalypse cinematics</h2>
+<p>The opening, mid-game, and finale cinematics from AEROPOCALYPSE: ONLINE, the studio's 24-boss arcade flight combat game, screen in the vault alongside the music videos. Meet the full boss roster on the <a href="/aeropocalypse">Aeropocalypse page</a>.</p>
+<h2>Live broadcasts</h2>
+<p>Studio sessions, release drops, and game streams broadcast from the <a href="/live">Live stage</a> and are archived to the same YouTube channel.</p>`,
+);
+
+routeContent['/apps'] = wrapMain(
+  `<h1>Apps — 3000 Studios VIP</h1>
+<p>Apps and interactive projects from 3000 Studios: production audio tools, the Aeropocalypse game engine, and the studio's own web platform — designed, built, and maintained in-house in Acworth, Georgia.</p>` +
+    studioApps
+      .map(
+        (a) => `
+<article>
+<h2>${escHtml(a.name)}</h2>
+<p><em>${escHtml(a.tagline)}</em></p>
+<p>${escHtml(a.description)}</p>
+</article>`,
+      )
+      .join('') +
+    `
+<p>Engineering notes on how these apps are built are published on the <a href="/blog">studio blog</a>.</p>`,
+);
+
+routeContent['/projects'] = wrapMain(
+  `<h1>Projects — 3000 Studios VIP</h1>
+<p>Studio projects from 3000 Studios — music, video, software, and games. Each project page entry below is a real shipped or in-production build, with the story of how it was made.</p>` +
+    studioProjects
+      .map(
+        (p) => `
+<article>
+<h2>${escHtml(p.title)}</h2>
+<p>${escHtml(p.summary)}</p>
+<p>${escHtml(p.story)}</p>
+</article>`,
+      )
+      .join(''),
+);
+
+routeContent['/sponsors'] = wrapMain(
+  `<h1>Sponsor 3000 Studios</h1>
+<p>Put your brand in front of engaged music fans, independent creators, and live stream audiences worldwide. Sponsorships are sold in fixed packages with Stripe checkout — no auctions and no hidden tiers.</p>
+<article>
+<h2>Featured Music Video Sponsor — $99 / month</h2>
+<p>Logo and brand placement on 3000studios.vip for 30 days, a pinned sponsor shoutout in video descriptions and live streams, a direct link to your site or product, and instant Stripe activation. The same slot is listed in the <a href="/shop">Shop</a> as the Homepage sponsor slot.</p>
+</article>
+<article>
+<h2>Live Stream Presenting Partner — $250 / drop</h2>
+<p>Top banner and overlay on all live stream broadcasts, a custom visual ticker and verbal host acknowledgments, a dedicated sponsor segment during live drop events, and social media cross-promotion on TikTok and Instagram.</p>
+</article>
+<article>
+<h2>Title Sponsor &amp; Custom Sync — Custom Deal</h2>
+<p>Exclusive brand co-release across platform releases, custom song composition and soundtrack licensing, worldwide sync rights for ads, film, and gaming, and direct producer access with multi-channel distribution. Written by direct agreement — start through the <a href="/contact">Contact</a> page.</p>
+</article>`,
+);
+
+routeContent['/requests'] = wrapMain(
+  `<h1>Requests — 3000 Studios VIP</h1>
+<p>Request a song, video, or cover from 3000 Studios. Pitch your ideas for the next 3000 Studios track, and upvote the concepts you want to hear produced and mastered.</p>
+<h2>How requests work</h2>
+<p>Listeners submit song ideas, cover requests, and video concepts through the request board on this page. The studio reads every submission, and the most-upvoted concepts go into the production queue alongside the weekly release schedule. Winning requests are produced as full 3000 Studios tracks and released on all platforms, with the requester credited in the release notes.</p>
+<h2>What makes a strong request</h2>
+<p>A clear title or hook, the mood or genre you hear in your head, and a line about why this song should exist. Requests for covers are produced only where licensing allows; original concepts always take priority in the queue.</p>
+<p>For booking, sync, and press instead of song requests, use the <a href="/contact">Contact</a> page.</p>`,
+);
+
+routeContent['/community'] = wrapMain(
+  `<h1>Community — 3000 Studios VIP</h1>
+<p>The 3000 Studios community — requests, discussions, and fans. Talk music, production, and upcoming video drops, and connect with 3000 Studios fans worldwide.</p>
+<h2>Where the community lives</h2>
+<p>Day to day, the community gathers around the weekly single drops, the Follow and Subscribe podcast episodes, and the live broadcast chat. Song and video concepts are pitched and voted on through the <a href="/requests">Requests</a> board, episode discussion follows each release on the <a href="/podcast">Podcast</a> page, and live sessions run from the <a href="/live">Live stage</a>.</p>
+<h2>House rules</h2>
+<p>Keep it about the music and the work: no spam, no harassment, and no posting other people's personal information. Community spaces are moderated under the site's <a href="/terms">Terms of Use</a>, and the <a href="/privacy">Privacy Policy</a> explains what data the site itself collects (very little — preferences stay on your own device).</p>`,
+);
+
+routeContent['/live'] = wrapMain(
+  `<h1>Live Command — 3000 Studios VIP</h1>
+<p>Watch 3000 Studios live — broadcast deck, schedule, and chat. The live stage carries studio sessions, new-single drop parties, Aeropocalypse gameplay, and podcast recordings, streamed directly from the studio in Acworth, Georgia.</p>
+<h2>What broadcasts here</h2>
+<p>Live broadcasts are announced on this page and on the studio's social channels before they start. Between broadcasts, the stage shows the current schedule and the most recent sessions; every broadcast is archived to the 3000 Studios YouTube channel and linked from the <a href="/video">Video Vault</a>.</p>
+<h2>Podcast, live</h2>
+<p>Follow and Subscribe — the 3000 Studios podcast — records in front of the live audience on this stage. Finished episodes, with show notes and Spotify links, live on the <a href="/podcast">Podcast</a> page.</p>`,
+);
+
+routeContent['/vip'] = wrapMain(
+  `<h1>VIP Pass — 3000 Studios VIP</h1>
+<p>The VIP Pass unlocks the full 3000 Studios vault on this site: stem downloads for the catalog, full-length video access, and member-only drops — on top of everything that is already free here (one-minute previews of every song, all official videos via YouTube, every podcast episode, and the full blog).</p>
+<h2>Plans</h2>
+<p>Vault monthly is $3.99 for 31 days of VIP Pass and stem downloads; Vault yearly is $19.99 for 365 days. Both plans are sold in the <a href="/shop">Shop</a> and check out through Stripe. There is no auto-renew trap in the studio's own terms: a pass simply runs for the days purchased.</p>
+<h2>Stems</h2>
+<p>Stem downloads split released tracks into their component parts for licensed remixing and study. Licensing for anything beyond personal use is arranged through the <a href="/contact">Contact</a> page, and beat licensing for full instrumentals lives on <a href="/beats">Beat Packs</a>.</p>`,
 );
 
 const routeContentTs = `// GENERATED by scripts/generate-site-meta.mjs — do not edit by hand.
