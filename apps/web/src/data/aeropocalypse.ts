@@ -1,4 +1,4 @@
-export interface ThunderBoss {
+export interface AeroBoss {
   id: number;
   name: string;
   codename: string;
@@ -12,7 +12,7 @@ export interface ThunderBoss {
   scoreValue: number;
 }
 
-export interface ThunderShip {
+export interface AeroShip {
   id: string;
   name: string;
   role: string;
@@ -24,7 +24,7 @@ export interface ThunderShip {
   description: string;
 }
 
-export interface ThunderWeapon {
+export interface AeroWeapon {
   id: string;
   name: string;
   type: string;
@@ -33,7 +33,7 @@ export interface ThunderWeapon {
   description: string;
 }
 
-export const THUNDER_SHIPS: ThunderShip[] = [
+export const AERO_SHIPS: AeroShip[] = [
   {
     id: 'apex-phantom',
     name: 'Apex Phantom 3000',
@@ -69,7 +69,7 @@ export const THUNDER_SHIPS: ThunderShip[] = [
   },
 ];
 
-export const THUNDER_WEAPONS: ThunderWeapon[] = [
+export const AERO_WEAPONS: AeroWeapon[] = [
   {
     id: 'molten-vulcan',
     name: 'Molten Vulcan 4-Barrels',
@@ -96,7 +96,7 @@ export const THUNDER_WEAPONS: ThunderWeapon[] = [
   },
 ];
 
-export const THUNDER_BOSSES: ThunderBoss[] = [
+export const AERO_BOSSES: AeroBoss[] = [
   {
     id: 1,
     name: 'Vanguard Sentinel',

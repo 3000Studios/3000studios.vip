@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { publishedSongs } from '../data/publishedSongs';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
-import { THUNDER_BOSSES } from '../data/thunderDome';
+import { AERO_BOSSES } from '../data/aeropocalypse';
 
 /**
  * COCKPIT HYBRID shell pieces (fast-track 2026-10-29, audit §3.5):
@@ -19,7 +19,7 @@ export function CockpitDossier({ live }: { live: boolean }) {
   const gauges = [
     { value: songs, label: 'Official songs', pct: '100%' },
     { value: MUSIC_VIDEOS.length, label: 'Music videos', pct: '92%' },
-    { value: THUNDER_BOSSES.length, label: 'Aeropocalypse bosses', pct: '64%' },
+    { value: AERO_BOSSES.length, label: 'Aeropocalypse bosses', pct: '64%' },
     { value: CINEMATIC_VIDEOS.length, label: 'Cinematics', pct: '78%' },
   ];
   return (
@@ -81,7 +81,7 @@ const MISSION_STEPS = [
     n: '03',
     hue: 265,
     title: 'Aeropocalypse — closed testing',
-    body: '24 bosses, 24 arenas. AeroStrike is in closed testing on Google Play — public launch is coming soon. Study the boss dossier now.',
+    body: '25 stages, 25 bosses. AEROPOCALYPSE: ONLINE is in closed testing on Google Play — public launch is coming soon. Study the boss dossier now.',
     state: 'Coming soon',
     to: '/aeropocalypse',
     cta: 'Read the dossier',

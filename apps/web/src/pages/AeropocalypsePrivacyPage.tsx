@@ -38,7 +38,7 @@ const sections: { heading: string; body: string }[] = [
   },
 ];
 
-export function ThunderDomePrivacyPage() {
+export function AeropocalypsePrivacyPage() {
   return (
     <PublicLayoutV2 wallpaper="nebula">
       <section className="v2-section">

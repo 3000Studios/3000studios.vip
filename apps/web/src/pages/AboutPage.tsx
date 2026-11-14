@@ -10,7 +10,7 @@ import {
 import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import { publishedSongs } from '../data/publishedSongs';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
-import { THUNDER_BOSSES } from '../data/thunderDome';
+import { AERO_BOSSES } from '../data/aeropocalypse';
 
 const SOCIALS = [
   { name: 'YouTube', url: 'https://www.youtube.com/@3000Studio', Icon: YoutubeLogo },
@@ -24,7 +24,7 @@ export function AboutPage() {
   const stats = [
     { value: String(publishedSongs.length), label: 'Released tracks' },
     { value: String(MUSIC_VIDEOS.length), label: 'Official music videos' },
-    { value: String(THUNDER_BOSSES.length), label: 'Aeropocalypse bosses' },
+    { value: String(AERO_BOSSES.length), label: 'Aeropocalypse bosses' },
     { value: String(CINEMATIC_VIDEOS.length), label: 'Game cinematics' },
   ];
 

@@ -147,13 +147,13 @@ export function ThreeReactiveBackground() {
     let tabKey = 'home';
     if (path.includes('music')) tabKey = 'music';
     else if (path.includes('live')) tabKey = 'live';
-    else if (path.includes('aeropocalypse') || path.includes('thunder')) tabKey = 'thunderDome';
+    else if (path.includes('aeropocalypse') || path.includes('aeropocalypse')) tabKey = 'aeropocalypse';
 
     const tabVisuals: Record<string, () => THREE.BufferGeometry> = {
       home: () => new THREE.TorusKnotGeometry(8, 2.2, 100, 16),
       music: () => new THREE.IcosahedronGeometry(10, 3),
       live: () => new THREE.CylinderGeometry(6, 6, 12, 32, 8, true),
-      thunderDome: () => new THREE.OctahedronGeometry(9, 2)
+      aeropocalypse: () => new THREE.OctahedronGeometry(9, 2)
     };
 
     if (meshRef.current) {

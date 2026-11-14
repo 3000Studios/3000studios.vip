@@ -1,7 +1,7 @@
 import { GameController, Play } from '@phosphor-icons/react';
 import { Reveal } from '../v2/Reveal';
 import { MagneticLink } from './chrome';
-import { THUNDER_BOSSES } from '../data/thunderDome';
+import { AERO_BOSSES } from '../data/aeropocalypse';
 
 const THREAT_COLORS: Record<string, string> = {
   ALPHA: '#00f0ff',
@@ -10,8 +10,8 @@ const THREAT_COLORS: Record<string, string> = {
   NEXUS: '#ff3366',
 };
 
-export function ThunderdomeFeature() {
-  const preview = THUNDER_BOSSES.slice(0, 6);
+export function AeropocalypseFeature() {
+  const preview = AERO_BOSSES.slice(0, 6);
 
   return (
     <section className="v3-section" style={{ paddingTop: 0 }} aria-label="Aeropocalypse feature">
@@ -30,13 +30,13 @@ export function ThunderdomeFeature() {
               className="v3-eyebrow"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
             >
-              <GameController size={14} /> Featured · 24-boss combat
+              <GameController size={14} /> Featured · 25-boss combat
             </div>
             <h2 className="v3-h2" style={{ fontSize: 'clamp(38px, 7vw, 76px)', marginTop: 12 }}>
               Aero<em>pocalypse</em>
             </h2>
             <p className="v3-lead" style={{ margin: '0 auto', textAlign: 'center' }}>
-              24 hand-crafted bosses. 4 threat tiers. One sky. The premier
+              25 stages. 25 bosses. 4 threat tiers. One sky. The premier
               3000 Studios arcade flight combat universe — now in closed
               testing, public launch coming soon.
             </p>

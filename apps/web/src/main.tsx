@@ -26,8 +26,8 @@ const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default:
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })));
 const RequestsPage = lazy(() => import('./pages/RequestsPage').then((m) => ({ default: m.RequestsPage })));
 const SponsorsPage = lazy(() => import('./pages/SponsorsPage').then((m) => ({ default: m.SponsorsPage })));
-const ThunderDomePage = lazy(() => import('./pages/ThunderDomePage').then((m) => ({ default: m.ThunderDomePage })));
-const ThunderDomePrivacyPage = lazy(() => import('./pages/ThunderDomePrivacyPage').then((m) => ({ default: m.ThunderDomePrivacyPage })));
+const AeropocalypsePage = lazy(() => import('./pages/AeropocalypsePage').then((m) => ({ default: m.AeropocalypsePage })));
+const AeropocalypsePrivacyPage = lazy(() => import('./pages/AeropocalypsePrivacyPage').then((m) => ({ default: m.AeropocalypsePrivacyPage })));
 const AppsPage = lazy(() => import('./pages/AppsPage').then((m) => ({ default: m.AppsPage })));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })));
 const VipPage = lazy(() => import('./pages/VipPage').then((m) => ({ default: m.VipPage })));
@@ -244,7 +244,7 @@ const router = createBrowserRouter([
             title="AEROPOCALYPSE: ONLINE Privacy Policy"
             description="Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios."
           >
-            <RouteLoader><ThunderDomePrivacyPage /></RouteLoader>
+            <RouteLoader><AeropocalypsePrivacyPage /></RouteLoader>
           </Titled>
         ),
       },
@@ -255,7 +255,7 @@ const router = createBrowserRouter([
             title="AEROPOCALYPSE: ONLINE Privacy Policy"
             description="Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios."
           >
-            <RouteLoader><ThunderDomePrivacyPage /></RouteLoader>
+            <RouteLoader><AeropocalypsePrivacyPage /></RouteLoader>
           </Titled>
         ),
       },
@@ -268,7 +268,7 @@ const router = createBrowserRouter([
             title="AEROPOCALYPSE: ONLINE Privacy Policy"
             description="Privacy Policy for AEROPOCALYPSE: ONLINE by 3000 Studios."
           >
-            <RouteLoader><ThunderDomePrivacyPage /></RouteLoader>
+            <RouteLoader><AeropocalypsePrivacyPage /></RouteLoader>
           </Titled>
         ),
       },
@@ -276,10 +276,10 @@ const router = createBrowserRouter([
         path: '/aeropocalypse',
         element: (
           <Titled
-            title="AEROPOCALYPSE: ONLINE"
-            description="AEROPOCALYPSE: ONLINE by 3000 Studios — the arcade flight combat universe with 24 bosses, in closed testing. Meet the bosses, watch the trailer, join the launch list."
+            title="AEROPOCALYPSE: ONLINE — Cinematic Theater"
+            description="The official home of AEROPOCALYPSE: ONLINE by 3000 Studios — the cinematic premiere theater, 25 stages, 25 bosses, 15 jets and 19 weapons. In closed testing on Google Play; join the launch list."
           >
-            <RouteLoader><ThunderDomePage /></RouteLoader>
+            <RouteLoader><AeropocalypsePage /></RouteLoader>
           </Titled>
         ),
       },

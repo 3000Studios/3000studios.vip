@@ -10,7 +10,7 @@ import {
 import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import { publishedSongs } from '../data/publishedSongs';
 import { MUSIC_VIDEOS, CINEMATIC_VIDEOS } from '../data/videoCatalog';
-import { THUNDER_BOSSES } from '../data/thunderDome';
+import { AERO_BOSSES } from '../data/aeropocalypse';
 import {
   clearUnlocks,
   isLivePayments,
@@ -112,7 +112,7 @@ function Dashboard() {
     { num: String(publishedSongs.length), label: 'Catalog tracks' },
     { num: String(MUSIC_VIDEOS.length), label: 'Music videos' },
     { num: String(CINEMATIC_VIDEOS.length), label: 'Game cinematics' },
-    { num: String(THUNDER_BOSSES.length), label: 'Aeropocalypse bosses' },
+    { num: String(AERO_BOSSES.length), label: 'Aeropocalypse bosses' },
     { num: String(unlockCount), label: 'Unlocks granted (this device)' },
   ];
 
