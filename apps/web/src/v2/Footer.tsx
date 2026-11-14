@@ -7,10 +7,15 @@ import {
   InstagramLogo,
   TiktokLogo,
   FacebookLogo,
+  Newspaper,
   PaperPlaneTilt,
 } from '@phosphor-icons/react';
 
 const SHOP_URL = 'https://boughtitonline.com';
+const SUBSTACK_URL = 'https://3000studios.substack.com';
+const PAYHIP_URL = 'https://payhip.com/3000Studios';
+const GUMROAD_URL = 'https://3000studios.gumroad.com';
+const BN_URL = 'https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724';
 
 const SOCIALS = [
   { label: 'YouTube', href: 'https://www.youtube.com/@3000Studio', icon: <YoutubeLogo size={22} weight="duotone" /> },
@@ -19,6 +24,7 @@ const SOCIALS = [
   { label: 'Facebook', href: 'https://www.facebook.com/3000Studios.vip', icon: <FacebookLogo size={22} weight="duotone" /> },
   { label: 'Spotify', href: 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik', icon: <SpotifyLogo size={22} weight="duotone" /> },
   { label: 'Apple Music', href: 'https://music.apple.com/us/artist/3000-studios/6802721597', icon: <AppleLogo size={22} weight="duotone" /> },
+  { label: 'Substack', href: SUBSTACK_URL, icon: <Newspaper size={22} weight="duotone" /> },
 ];
 
 const EXPLORE = [
@@ -38,6 +44,10 @@ const STUDIO = [
   { to: '/requests', label: 'Request a song' },
   { to: '/contact', label: 'Contact / booking' },
   { to: SHOP_URL, label: 'Shop — boughtitonline.com', external: true },
+  { to: PAYHIP_URL, label: 'Books — Payhip store', external: true },
+  { to: GUMROAD_URL, label: 'Tools & bundles — Gumroad', external: true },
+  { to: BN_URL, label: 'Books at Barnes & Noble', external: true },
+  { to: SUBSTACK_URL, label: 'Studio newsletter — Substack', external: true },
   { to: 'https://paypal.me/3000Studios', label: 'Tip the studio — PayPal', external: true },
   { to: 'https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI', label: 'Podcast — Spotify', external: true },
   { to: 'https://aeropocalypse.pages.dev', label: 'AEROPOCALYPSE: ONLINE — official game site', external: true },

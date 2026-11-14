@@ -56,13 +56,53 @@ export function BooksPage() {
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, color: 'var(--nn-text)', lineHeight: 1.7 }}>
               <p style={{ margin: 0 }}>
+                <strong>Payhip (direct from the studio):</strong> the full
+                ebook shelf — every title above and dozens more — lives in the{' '}
+                <a href={BOOKS_STORE_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                  3000 Studios Payhip store
+                </a>
+                , {BOOKS_PRICE} each with EPUB + PDF delivered at checkout.
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong>Barnes & Noble (NOOK ebooks):</strong> the Screen-Free
+                Activities shelf is on NOOK —{' '}
+                <a href="https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                  Family Game Night Games
+                </a>
+                ,{' '}
+                <a href="https://www.barnesandnoble.com/w/grandparent-grandchild-activities-jeremy-swain/1151782669" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                  Grandparent Grandchild Activities
+                </a>
+                , and{' '}
+                <a href="https://www.barnesandnoble.com/w/camping-trip-activity-missions-jeremy-swain/1151782849" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                  Camping Trip Activity Missions
+                </a>
+                .
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong>Gumroad:</strong> book bundles and creator tools from
+                the studio are on the{' '}
+                <a href="https://3000studios.gumroad.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                  3000 Studios Gumroad store
+                </a>
+                .
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong>Substack (free):</strong> new chapters, releases, and
+                studio notes land first in the{' '}
+                <a href="https://3000studios.substack.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                  3000 Studios Substack
+                </a>
+                .
+              </p>
+              <p style={{ margin: 0 }}>
                 <strong>Leanpub:</strong> {LEANPUB_TITLES.join(', ')} are also
                 published on Leanpub.
               </p>
               <p style={{ margin: 0 }}>
                 <strong>Print:</strong> the wider 3000 Studios Press catalog —
-                44 published titles across fiction, mystery, cookbooks, and
-                creator guides — is distributed in print through IngramSpark,
+                fiction, mystery, cookbooks, activity books, and creator
+                guides — is distributed in print through IngramSpark,
                 so bookstores and libraries can order copies through their
                 usual channels. Selected ebooks also appear on Kobo and
                 XinXii.
