@@ -73,9 +73,16 @@ function Words({ text }: { text: string }) {
   );
 }
 
-function BookCard({ book, eager = false }: { book: StoreBook; eager?: boolean }) {
+function BookCard({ book, eager = false, copy = false }: { book: StoreBook; eager?: boolean; copy?: boolean }) {
   return (
-    <a className="em-book" href={book.url} target="_blank" rel="noopener noreferrer" aria-label={`${book.title}, ${STORE_PRICE} on Payhip`}>
+    <a
+      className="em-book"
+      href={book.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${book.title}, ${STORE_PRICE} on Payhip`}
+      tabIndex={copy ? -1 : undefined}
+    >
       <span className="em-book-cover">
         <img
           src={coverUrl(book, 320)}
@@ -95,17 +102,18 @@ function BookCard({ book, eager = false }: { book: StoreBook; eager?: boolean })
 }
 
 function Marquee({ books, reverse, dur }: { books: StoreBook[]; reverse?: boolean; dur: number }) {
-  // The track holds the row twice so the loop is seamless; the copy is
-  // hidden from assistive tech and from the tab order.
+  // The track holds the row twice so the loop is seamless. The copy stays
+  // clickable (it scrolls into view) but is hidden from assistive tech and
+  // skipped by the keyboard.
   return (
     <div className={`em-marquee${reverse ? ' rev' : ''}`} style={{ '--dur': `${dur}s` } as React.CSSProperties}>
       <div className="em-marquee-track">
         {books.map((b, i) => (
           <BookCard key={b.url} book={b} eager={i < 6} />
         ))}
-        <div aria-hidden="true" style={{ display: 'contents' }} inert>
+        <div aria-hidden="true" style={{ display: 'contents' }}>
           {books.map((b) => (
-            <BookCard key={`${b.url}-dup`} book={b} />
+            <BookCard key={`${b.url}-dup`} book={b} copy />
           ))}
         </div>
       </div>

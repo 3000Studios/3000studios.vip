@@ -329,6 +329,15 @@ html.em-music-on .em-dance-sm {
 }
 html.em-touching .em-touch-glow { opacity: 1; }
 
+/* The sticky header needs the viewport as its scroll container. Legacy rules
+   gave body and #root overflow-y: auto, which turned them into scroll boxes
+   that never scroll, so the header slid away with the page. */
+body,
+#root {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
 /* Page content sits above the aura. */
 .v2-root,
 .em-home { position: relative; z-index: 2; }
@@ -605,6 +614,23 @@ html.em-touching .em-touch-glow { opacity: 1; }
   opacity: 0;
 }
 .em-menu.is-open .em-menu-hud { animation: em-fadein 0.4s 0.35s forwards; }
+.em-menu-close {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 14px);
+  right: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--em-line);
+  background: radial-gradient(circle at 30% 30%, rgba(242, 200, 103, 0.22), rgba(0, 0, 0, 0.3));
+  color: var(--em-gold);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.3s var(--em-spring), border-color 0.3s;
+}
+.em-menu-close:hover { transform: rotate(90deg); border-color: var(--em-accent); }
+.em-menu-close:focus-visible { outline: 2px solid var(--em-accent); outline-offset: 3px; }
 .em-menu-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -839,6 +865,7 @@ html.em-touching .em-touch-glow { opacity: 1; }
 }
 .em-book-cover {
   position: relative;
+  display: block;
   aspect-ratio: 2 / 3;
   border-radius: 4px 10px 10px 4px;
   overflow: hidden;
@@ -984,6 +1011,7 @@ html.em-touching .em-touch-glow { opacity: 1; }
 }
 .em-thumb-img {
   position: relative;
+  display: block;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
   overflow: hidden;

@@ -17,6 +17,7 @@ import {
   SpeakerSlash,
   Play,
   Pause,
+  X,
 } from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { LiveBand } from '../empire/LiveBand';
@@ -206,6 +207,10 @@ export function Header() {
     playSfx(open ? 'close' : 'open');
     setOpen((o) => !o);
   };
+  const closeMenu = () => {
+    playSfx('close');
+    setOpen(false);
+  };
   const toggleSfx = () => {
     const next = !sfx;
     setSfxOn(next);
@@ -310,6 +315,9 @@ export function Header() {
         onTouchEnd={onTouchEnd}
       >
         <span className="em-menu-scan" aria-hidden="true" />
+        <button type="button" className="em-menu-close" onClick={closeMenu} aria-label="Close menu">
+          <X size={22} weight="bold" aria-hidden="true" />
+        </button>
         <div className="em-menu-hud" aria-hidden="true">
           <span>3000 Studios // nav</span>
           <span>{current ? `Now: ${current.label}` : 'Choose a page'}</span>
@@ -324,6 +332,7 @@ export function Header() {
                 to={item.to}
                 className={`em-tile${active ? ' is-active' : ''}${wide ? ' wide' : ''}`}
                 aria-current={active ? 'page' : undefined}
+                onClick={() => setOpen(false)}
                 style={{ '--i': i, '--c': item.color } as React.CSSProperties}
               >
                 {item.icon}

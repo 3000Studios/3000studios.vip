@@ -8,7 +8,7 @@ import { BOOK_STORE_URL, SUBSTACK_URL } from '../empire/links';
 
 type Filter = ShelfId | 'all';
 
-function Cover({ book, i }: { book: StoreBook; i: number }) {
+function Cover({ book, eager }: { book: StoreBook; eager: boolean }) {
   return (
     <a
       className="em-book"
@@ -23,7 +23,7 @@ function Cover({ book, i }: { book: StoreBook; i: number }) {
           alt={`${book.title} book cover`}
           width={320}
           height={480}
-          loading={i < 6 ? 'eager' : 'lazy'}
+          loading={eager ? 'eager' : 'lazy'}
           decoding="async"
         />
       </span>
@@ -90,7 +90,7 @@ export function BooksPage() {
 
         {shown.length === 0 && <p className="em-empty">No titles match “{q}”. Try another word.</p>}
 
-        {shelves.map((s) => {
+        {shelves.map((s, shelfIndex) => {
           const list = shown.filter((b) => b.cat === s.id);
           if (!list.length) return null;
           return (
@@ -105,7 +105,7 @@ export function BooksPage() {
               </div>
               <div className="em-shelf em-nostagger">
                 {list.map((b, i) => (
-                  <Cover key={b.url} book={b} i={i} />
+                  <Cover key={b.url} book={b} eager={shelfIndex === 0 && i < 6} />
                 ))}
               </div>
             </section>

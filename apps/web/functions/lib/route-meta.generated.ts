@@ -24,8 +24,8 @@ export type RouteMetaEntry = {
 
 export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   "/": {
-    "title": "3000 Studios VIP — Official Music & Live Stage",
-    "description": "3000 Studios — original music, cinematic videos, and live broadcasts from Acworth, Georgia. New singles weekly, on all platforms."
+    "title": "3000 Studios VIP — Aeropocalypse: Online, Music, Books & Podcast",
+    "description": "3000 Studios from Acworth, Georgia: AEROPOCALYPSE: ONLINE, free on Google Play, plus original music, books, the Follow and Subscribe podcast, and merch."
   },
   "/about": {
     "title": "About — 3000 Studios VIP",
