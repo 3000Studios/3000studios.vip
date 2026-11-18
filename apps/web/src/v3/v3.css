@@ -10,9 +10,9 @@
   --v3-mut: #9aa0ae;
   --v3-line: rgba(241, 183, 78, 0.16);
   --v3-glass: rgba(255, 255, 255, 0.04);
-  --v3-font-display: 'Playfair Display', Georgia, serif;
+  --v3-font-display: 'Big Shoulders Display', Georgia, serif;
   --v3-font-body: 'Manrope', system-ui, sans-serif;
-  --v3-font-grot: 'Space Grotesk', system-ui, sans-serif;
+  --v3-font-grot: 'Manrope', system-ui, sans-serif;
 }
 
 .v3-root {

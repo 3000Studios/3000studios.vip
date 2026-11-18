@@ -61,7 +61,7 @@ function LatestDrop() {
         onClick={() => (playing ? music.pause() : music.playTrack(song.src, song.title))}
         aria-label={playing ? `Pause ${song.title}` : `Play the latest drop: ${song.title}`}
       >
-        <img src={song.cover} alt="" aria-hidden="true" />
+        <img loading="lazy" decoding="async" src={song.cover} alt="" aria-hidden="true" />
         <span className="v3-drop-meta">
           <i>Latest drop</i>
           <b>{song.title}</b>

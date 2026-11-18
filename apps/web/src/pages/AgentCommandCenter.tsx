@@ -269,7 +269,7 @@ export function AgentCommandCenter() {
     <main className={`agentCenter v2-admin ${aborted ? 'isAborted' : ''}`}>
       <header className="agentTopbar">
         <div className="agentBrand">
-          <img src="/media/3k.jpg" alt="3000 Studios" />
+          <img loading="lazy" decoding="async" src="/media/3k.jpg" alt="3000 Studios" />
           <span>
             <strong>3000 Studios</strong>
             <small>Private command center</small>
@@ -300,7 +300,7 @@ export function AgentCommandCenter() {
               {listening ? 'Listening…' : busy ? 'Working…' : 'Always monitoring'}
             </span>
           </div>
-          <img
+          <img loading="lazy" decoding="async"
             className="hologramAvatar"
             src="/media/agent-hologram.png"
             alt="DUDE virtual assistant hologram"

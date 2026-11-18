@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AERO_PLAY_URL, AERO_SITE_URL } from '../empire/links';
 import { Link } from 'react-router-dom';
 import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { AERO_BOSSES, AERO_SHIPS, AERO_WEAPONS } from '../data/aeropocalypse';
@@ -88,7 +89,7 @@ export function AeropocalypsePage() {
                 />
               ) : (
                 <>
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={THEATER_POSTER}
                     alt="AEROPOCALYPSE: ONLINE — the hero jet bursts through the warp ring"
                   />
@@ -133,7 +134,7 @@ export function AeropocalypsePage() {
             ================================================================ */}
         <section className="aero-section" aria-label="Google Play launch">
           <div className="aero-panel aero-launch">
-            <img
+            <img loading="lazy" decoding="async"
               className="aero-launch-icon"
               src={GAME_ICON}
               alt="AEROPOCALYPSE: ONLINE game icon"
@@ -143,20 +144,21 @@ export function AeropocalypsePage() {
             <div>
               <span className="aero-kicker" style={{ letterSpacing: '0.24em' }}>
                 <span className="aero-status-dot" aria-hidden="true" />
-                Closed testing — live now
+                Live now on Google Play
               </span>
-              <h2 className="aero-h2">Launching on Google Play</h2>
+              <h2 className="aero-h2">On Google Play</h2>
               <p className="aero-lede" style={{ margin: '0 0 20px' }}>
-                AEROPOCALYPSE: ONLINE is in closed testing on Google Play and
-                is <strong style={{ color: 'var(--aero-text)' }}>not yet on public sale</strong>.
-                The public launch opens with the cinematic premiere above —
-                join the launch list and you will be first in when the skies
-                open.
+                AEROPOCALYPSE: ONLINE is free to play on Google Play, with
+                optional in-app purchases. Install it from the listing, and
+                find more of the game at aeropocalypse.online.
               </p>
               <div className="aero-cta-row">
-                <Link className="aero-btn-gold" to="/contact">
-                  ▣ Join the launch list
-                </Link>
+                <a className="aero-btn-gold" href={AERO_PLAY_URL} target="_blank" rel="noopener noreferrer">
+                  Get it on Google Play
+                </a>
+                <a className="aero-btn-ghost" href={AERO_SITE_URL} target="_blank" rel="noopener noreferrer">
+                  aeropocalypse.online
+                </a>
                 <Link className="aero-btn-ghost" to="/aeropocalypse/privacy">
                   🔒 Privacy Policy
                 </Link>

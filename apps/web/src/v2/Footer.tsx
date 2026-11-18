@@ -9,48 +9,56 @@ import {
   FacebookLogo,
   Newspaper,
   PaperPlaneTilt,
+  EnvelopeSimple,
+  GameController,
+  Lifebuoy,
 } from '@phosphor-icons/react';
+import { LiveBand } from '../empire/LiveBand';
+import { AERO_PLAY_URL, AERO_SITE_URL, BOOK_STORE_URL, SUBSTACK_URL, SUPPORT_EMAIL, TEAM_EMAIL } from '../empire/links';
 
 const SHOP_URL = 'https://boughtitonline.com';
-const SUBSTACK_URL = 'https://3000studios.substack.com';
-const PAYHIP_URL = 'https://payhip.com/3000Studios';
 const GUMROAD_URL = 'https://3000studios.gumroad.com';
 const BN_URL = 'https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724';
 
 const SOCIALS = [
-  { label: 'YouTube', href: 'https://www.youtube.com/@3000Studio', icon: <YoutubeLogo size={22} weight="duotone" /> },
-  { label: 'Instagram', href: 'https://www.instagram.com/3000studios.vip', icon: <InstagramLogo size={22} weight="duotone" /> },
-  { label: 'TikTok', href: 'https://www.tiktok.com/@3000studios.vip', icon: <TiktokLogo size={22} weight="duotone" /> },
-  { label: 'Facebook', href: 'https://www.facebook.com/3000Studios.vip', icon: <FacebookLogo size={22} weight="duotone" /> },
-  { label: 'Spotify', href: 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik', icon: <SpotifyLogo size={22} weight="duotone" /> },
-  { label: 'Apple Music', href: 'https://music.apple.com/us/artist/3000-studios/6802721597', icon: <AppleLogo size={22} weight="duotone" /> },
-  { label: 'Substack', href: SUBSTACK_URL, icon: <Newspaper size={22} weight="duotone" /> },
+  { label: 'YouTube', href: 'https://www.youtube.com/@3000Studio', icon: <YoutubeLogo size={20} weight="duotone" /> },
+  { label: 'Instagram', href: 'https://www.instagram.com/3000studios.vip', icon: <InstagramLogo size={20} weight="duotone" /> },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@3000studios.vip', icon: <TiktokLogo size={20} weight="duotone" /> },
+  { label: 'Facebook', href: 'https://www.facebook.com/3000Studios.vip', icon: <FacebookLogo size={20} weight="duotone" /> },
+  { label: 'Spotify', href: 'https://open.spotify.com/artist/6VVHgvCMlHO6Ah7dkAIlik', icon: <SpotifyLogo size={20} weight="duotone" /> },
+  { label: 'Apple Music', href: 'https://music.apple.com/us/artist/3000-studios/6802721597', icon: <AppleLogo size={20} weight="duotone" /> },
+  { label: 'Substack', href: SUBSTACK_URL, icon: <Newspaper size={20} weight="duotone" /> },
 ];
 
 const EXPLORE = [
+  { to: '/aeropocalypse', label: 'Aeropocalypse' },
+  { to: '/books', label: 'Books' },
   { to: '/music', label: 'Music' },
   { to: '/video', label: 'Videos' },
   { to: '/beats', label: 'Music For Sale' },
   { to: '/podcast', label: 'Podcast' },
-  { to: '/books', label: 'Books' },
-  { to: '/aeropocalypse', label: 'Aeropocalypse' },
   { to: '/live', label: 'Live Stream' },
 ];
 
 const STUDIO = [
   { to: '/about', label: 'About the studio' },
   { to: '/blog', label: 'Blog' },
+  { to: '/shop', label: 'Merch and VIP' },
+  { to: '/apps', label: 'Apps' },
   { to: '/community', label: 'Community' },
   { to: '/requests', label: 'Request a song' },
-  { to: '/contact', label: 'Contact / booking' },
-  { to: SHOP_URL, label: 'Shop — boughtitonline.com', external: true },
-  { to: PAYHIP_URL, label: 'Books — Payhip store', external: true },
-  { to: GUMROAD_URL, label: 'Tools & bundles — Gumroad', external: true },
-  { to: BN_URL, label: 'Books at Barnes & Noble', external: true },
-  { to: SUBSTACK_URL, label: 'Studio newsletter — Substack', external: true },
-  { to: 'https://paypal.me/3000Studios', label: 'Tip the studio — PayPal', external: true },
-  { to: 'https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI', label: 'Podcast — Spotify', external: true },
-  { to: 'https://aeropocalypse.pages.dev', label: 'AEROPOCALYPSE: ONLINE — official game site', external: true },
+  { to: '/sponsors', label: 'Sponsors' },
+];
+
+const STORES = [
+  { to: AERO_PLAY_URL, label: 'Aeropocalypse on Google Play' },
+  { to: AERO_SITE_URL, label: 'aeropocalypse.online' },
+  { to: BOOK_STORE_URL, label: 'Books on Payhip' },
+  { to: BN_URL, label: 'Books at Barnes and Noble' },
+  { to: GUMROAD_URL, label: 'Tools on Gumroad' },
+  { to: SHOP_URL, label: 'Bought It Online' },
+  { to: 'https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI', label: 'Podcast on Spotify' },
+  { to: 'https://paypal.me/3000Studios', label: 'Tip the studio on PayPal' },
 ];
 
 const LEGAL = [
@@ -69,10 +77,8 @@ export function Footer() {
     e.preventDefault();
     const value = email.trim();
     if (!value) return;
-    // Real capture (audit P1-7): signups POST to the studio inbox in D1.
-    // The old flow opened the visitor's mail client (mailto:) — anyone
-    // without one configured was silently lost. Mailto remains only as a
-    // fallback when the inbox endpoint is unreachable.
+    // Signups POST to the studio inbox; mailto is only the fallback when
+    // the inbox endpoint is unreachable (audit P1-7).
     void fetch('/api/requests', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -83,7 +89,7 @@ export function Footer() {
         setSent(true);
       })
       .catch(() => {
-        window.location.href = `mailto:Team@3000studios.vip?subject=${encodeURIComponent(
+        window.location.href = `mailto:${TEAM_EMAIL}?subject=${encodeURIComponent(
           'VIP list signup',
         )}&body=${encodeURIComponent(`Please add ${value} to the 3000 Studios VIP list.`)}`;
         setSent(true);
@@ -91,101 +97,124 @@ export function Footer() {
   };
 
   return (
-    <footer className="v2-footer">
-      <hr className="v2-live-line" />
-      <div className="v2-wrap v2-footer-grid">
-        <div className="v2-footer-brand">
-          <Link to="/" className="v2-brand" aria-label="3000 Studios home">
-            <img src="/media/official-3000-studios-profile-96.webp" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
-            <span className="v2-brand-word">
-              <strong>
-                3000<span className="v2-grad-text">Studios</span>
-              </strong>
-              <small>VIP · MUSIC · LIVE</small>
+    <footer className="em-footer">
+      <LiveBand variant="footer" />
+      <div className="em-footer-in">
+        <p className="em-footer-big" aria-hidden="true">
+          3000 Studios
+        </p>
+
+        <h2 className="em-kicker">Contact</h2>
+        <div className="em-contact">
+          <a className="em-card" href={`mailto:${SUPPORT_EMAIL}`}>
+            <span className="ic">
+              <Lifebuoy size={24} weight="duotone" />
             </span>
-          </Link>
-          <p className="v2-footer-blurb">
-            Independent music production from Acworth, Georgia. Original songs, cinematic videos,
-            and live broadcasts — straight from the studio.
-          </p>
-          <div className="v2-socials">
-            {SOCIALS.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`3000 Studios on ${s.label}`}
-                className="v2-social-btn"
-              >
-                {s.icon}
-              </a>
-            ))}
+            <span>
+              <b>Support</b>
+              <span>{SUPPORT_EMAIL}</span>
+            </span>
+          </a>
+          <a className="em-card" href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Aeropocalypse: Online')}`}>
+            <span className="ic">
+              <GameController size={24} weight="duotone" />
+            </span>
+            <span>
+              <b>Game help</b>
+              <span>Aeropocalypse questions and feedback</span>
+            </span>
+          </a>
+          <a className="em-card" href={`mailto:${TEAM_EMAIL}?subject=${encodeURIComponent('Booking and business')}`}>
+            <span className="ic">
+              <EnvelopeSimple size={24} weight="duotone" />
+            </span>
+            <span>
+              <b>Booking</b>
+              <span>{TEAM_EMAIL}</span>
+            </span>
+          </a>
+        </div>
+
+        <h2 className="em-kicker">Follow</h2>
+        <div className="em-socials">
+          {SOCIALS.map((s) => (
+            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`3000 Studios on ${s.label}`}>
+              {s.icon}
+              {s.label}
+            </a>
+          ))}
+        </div>
+
+        <div className="em-cols">
+          <div>
+            <h3>Explore</h3>
+            <ul>
+              {EXPLORE.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to}>{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>Studio</h3>
+            <ul>
+              {STUDIO.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to}>{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>Stores</h3>
+            <ul>
+              {STORES.map((l) => (
+                <li key={l.to}>
+                  <a href={l.to} target="_blank" rel="noopener noreferrer">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>VIP list</h3>
+            <p className="em-news-lede">New songs, books and game drops, first.</p>
+            {sent ? (
+              <p className="em-news-done">You are on the list.</p>
+            ) : (
+              <form className="em-news" onSubmit={subscribe}>
+                <label htmlFor="em-news-email" className="em-sr">
+                  Email address
+                </label>
+                <input
+                  id="em-news-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <button className="em-btn" type="submit" aria-label="Join the VIP list">
+                  <PaperPlaneTilt size={18} weight="bold" />
+                </button>
+              </form>
+            )}
           </div>
         </div>
 
-        <nav className="v2-footer-col" aria-label="Explore">
-          <h3>Explore</h3>
-          <ul>
-            {EXPLORE.map((l) => (
-              <li key={l.label}>
-                <Link to={l.to}>{l.label}</Link>
-              </li>
+        <div className="em-legal">
+          <span>© {new Date().getFullYear()} 3000 Studios. All rights reserved.</span>
+          <nav aria-label="Legal">
+            {LEGAL.map((l) => (
+              <Link key={l.to} to={l.to}>
+                {l.label}
+              </Link>
             ))}
-          </ul>
-        </nav>
-
-        <nav className="v2-footer-col" aria-label="Studio">
-          <h3>Studio</h3>
-          <ul>
-            {STUDIO.map((l) => (
-              <li key={l.label}>
-                {'external' in l && l.external ? (
-                  <a href={l.to} target="_blank" rel="noreferrer">
-                    {l.label}
-                  </a>
-                ) : (
-                  <Link to={l.to}>{l.label}</Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="v2-footer-col v2-footer-news" id="vip-list">
-          <h3>Join the VIP list</h3>
-          <p>Get new drops, live alerts, and exclusives first.</p>
-          {sent ? (
-            <p className="v2-news-done">You&apos;re in — welcome to the VIP list.</p>
-          ) : (
-            <form onSubmit={subscribe} className="v2-news-form">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@email.com"
-                aria-label="Email address"
-                className="v2-input"
-              />
-              <button type="submit" className="v2-btn v2-btn--sm" aria-label="Join the VIP list">
-                <PaperPlaneTilt size={16} weight="bold" /> Join
-              </button>
-            </form>
-          )}
+          </nav>
         </div>
-      </div>
-
-      <div className="v2-wrap v2-footer-bottom">
-        <p>© {new Date().getFullYear()} 3000 Studios · Acworth, Georgia. All rights reserved.</p>
-        <nav aria-label="Legal">
-          {LEGAL.map((l, i) => (
-            <span key={l.to}>
-              {i > 0 && <i className="v2-dot" aria-hidden="true" />}
-              <Link to={l.to}>{l.label}</Link>
-            </span>
-          ))}
-        </nav>
       </div>
     </footer>
   );

@@ -1,8 +1,8 @@
 /* Public visual finish: one type system and restrained moving-gloss treatment. */
 :root {
-  --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Big Shoulders Display', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-  --md-font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --md-font-display: 'Big Shoulders Display', ui-sans-serif, system-ui, sans-serif;
   --md-font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
 }
 

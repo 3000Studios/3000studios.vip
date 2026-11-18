@@ -257,7 +257,7 @@ export function PublicLayout({
           onClick={() => setOpen(false)}
           aria-label="3000 Studios VIP home"
         >
-          <img
+          <img loading="lazy" decoding="async"
             className="officialProfileLogo"
             src="/media/official-3000-studios-profile.webp"
             alt="3000 Studios — official artist profile"
@@ -347,7 +347,7 @@ export function PublicLayout({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32, margin: '36px 0 32px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <img src="/media/official-3000-studios-profile.webp" alt="3000 Studios" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid #ffd700' }} />
+                <img loading="lazy" decoding="async" src="/media/official-3000-studios-profile.webp" alt="3000 Studios" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid #ffd700' }} />
                 <strong style={{ color: '#ffd700', fontSize: 18, fontFamily: 'Syne, sans-serif' }}>3000 STUDIOS</strong>
               </div>
               <p style={{ color: 'var(--vip-text-muted)', fontSize: 13, lineHeight: 1.6, margin: '0 0 16px' }}>
@@ -390,7 +390,7 @@ export function PublicLayout({
                 <li><a href="https://3000studios.substack.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>📰 Studio Newsletter — Substack</a></li>
                 <li><a href="https://paypal.me/3000Studios" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>♥ Tip the Studio (PayPal)</a></li>
                 <li><a href="https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎙 3000 Studios Podcast (Spotify)</a></li>
-                <li><a href="https://aeropocalypse.pages.dev" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎮 Aeropocalypse: Online</a></li>
+                <li><a href="https://aeropocalypse.online" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎮 Aeropocalypse: Online</a></li>
               </ul>
             </div>
 
@@ -413,10 +413,10 @@ export function PublicLayout({
           {/* 3000 Studios family — Site Standard footer law */}
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <p style={{ color: 'var(--vip-text-muted)', fontSize: 13, lineHeight: 1.6, margin: '0 0 12px' }}>
-              🚀 <strong style={{ color: 'var(--vip-cream)' }}>Aeropocalypse</strong> — the new arena game from 3000 Studios — is in{' '}
-              <strong style={{ color: 'var(--vip-cream)' }}>closed testing on Google Play</strong> now.{' '}
-              <a href="https://aeropocalypse.pages.dev" target="_blank" rel="noopener noreferrer" style={{ color: '#ffd700', fontWeight: 700, textDecoration: 'underline' }}>
-                Join the beta →
+              🚀 <strong style={{ color: 'var(--vip-cream)' }}>Aeropocalypse</strong> — the new arena game from 3000 Studios — is{' '}
+              <strong style={{ color: 'var(--vip-cream)' }}>live on Google Play</strong> now.{' '}
+              <a href="https://aeropocalypse.online" target="_blank" rel="noopener noreferrer" style={{ color: '#ffd700', fontWeight: 700, textDecoration: 'underline' }}>
+                Visit aeropocalypse.online →
               </a>
             </p>
             <nav aria-label="3000 Studios family" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 20px', fontSize: 12 }}>
@@ -426,7 +426,7 @@ export function PublicLayout({
               <a href="https://payhip.com/3000Studios" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Payhip Books</a>
               <a href="https://3000studios.gumroad.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Gumroad</a>
               <a href="https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Barnes & Noble</a>
-              <a href="https://aeropocalypse.pages.dev" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Aeropocalypse</a>
+              <a href="https://aeropocalypse.online" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Aeropocalypse</a>
               <a href="https://voicetowebsite.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>VoiceToWebsite</a>
               <a href="https://getnexa.space" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Nexa</a>
               <a href="https://swain.pro" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Swain.pro</a>

@@ -11,7 +11,9 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminFab } from './components/AdminFab';
 import { SparkClickFX } from './components/SparkClickFX';
 import { StageFX } from './components/StageFX';
-import { HomePage } from './v3/HomePage';
+import { EmpireHome } from './empire/EmpireHome';
+import { EmpireFX } from './empire/EmpireFX';
+import './empire/empire.css';
 import { WaterWallpaper } from './components/WaterWallpaper';
 
 /* Route-level code splitting (fast-track 2026-10-29, audit Phase 2):
@@ -123,6 +125,9 @@ function RootLayout() {
       <WaterWallpaper />
       {/* VIP redesign 2026-10-27: fleet ACSS scroll progress bar (CSS-only). */}
       <div className="acss-progress" aria-hidden="true" />
+      {/* EMPIRE redesign 2026-11-18: per-page live aura, touch glow, click
+          sounds + rings, scroll reveals, music-reactive headers, phone tilt. */}
+      <EmpireFX />
       <FxGate>
         <SparkClickFX />
         <StageFX />
@@ -144,7 +149,7 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: '/', element: <HomePage /> },
+      { path: '/', element: <EmpireHome /> },
       {
         path: '/music',
         element: (
@@ -194,7 +199,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="Books"
-            description="Books by Jeremy Swain from 3000 Studios Press — ebooks sold direct from the studio store, print editions through IngramSpark."
+            description="All 93 books by Jeremy Swain from 3000 Studios Press: fantasy, mystery, cookbooks, creator playbooks and more, $9.99 each direct from the studio store."
           >
             <RouteLoader><BooksPage /></RouteLoader>
           </Titled>
@@ -277,7 +282,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="AEROPOCALYPSE: ONLINE — Cinematic Theater"
-            description="The official home of AEROPOCALYPSE: ONLINE by 3000 Studios — the cinematic premiere theater, 25 stages, 25 bosses, 15 jets and 19 weapons. In closed testing on Google Play; join the launch list."
+            description="The official home of AEROPOCALYPSE: ONLINE by 3000 Studios — 25 stages, 25 bosses and 25 original songs. Free to play on Google Play, with party co-op and 1v1 duels."
           >
             <RouteLoader><AeropocalypsePage /></RouteLoader>
           </Titled>

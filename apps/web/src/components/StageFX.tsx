@@ -21,7 +21,20 @@ export function StageFX() {
       }
     };
 
-    const mm = (e: PointerEvent) => onMove(e.clientX, e.clientY);
+    // At most one layout read + style write per frame (pointermove can fire
+    // several times per frame; each call measured header + footer).
+    let px = 0;
+    let py = 0;
+    let raf = 0;
+    const flush = () => {
+      raf = 0;
+      onMove(px, py);
+    };
+    const mm = (e: PointerEvent) => {
+      px = e.clientX;
+      py = e.clientY;
+      if (!raf) raf = requestAnimationFrame(flush);
+    };
     window.addEventListener('pointermove', mm, { passive: true });
 
     const splash = (e: PointerEvent) => {
@@ -40,6 +53,7 @@ export function StageFX() {
     return () => {
       window.removeEventListener('pointermove', mm);
       window.removeEventListener('pointerdown', splash);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, []);
   return null;
