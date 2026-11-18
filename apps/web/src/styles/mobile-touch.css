@@ -451,10 +451,13 @@
     padding: 1rem 1.1rem !important;
   }
 
-  /* Cookie / consent: keep it from covering primary CTA */
-  [class*="cookie"],
-  [class*="consent"],
-  [id*="cookie"],
+  /* Cookie / consent: keep it from covering primary CTA.
+     html and body are excluded: body carries .consent-open while the banner
+     is up, and this rule used to shift the whole page up 72px and narrow it,
+     pushing the site header off the top of the screen on phones. */
+  :not(html, body)[class*="cookie"],
+  :not(html, body)[class*="consent"],
+  :not(html, body)[id*="cookie"],
   .cc-window,
   .cookie-banner {
     bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)) !important;
