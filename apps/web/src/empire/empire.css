@@ -946,7 +946,7 @@ body,
 .em-hero-in { position: relative; z-index: 2; padding: 120px 0 clamp(36px, 7vw, 70px); }
 .em-hero h1 {
   margin: 14px 0 0;
-  font: 900 clamp(30px, calc(min(1220px, 100vw - 32px) / 9.6), 128px)/0.86 var(--em-display);
+  font: 900 clamp(34px, calc(min(1220px, 100vw - 32px) / 7.2), 150px)/0.9 var(--em-display);
   letter-spacing: 0.005em;
   overflow-wrap: anywhere;
   text-transform: uppercase;
@@ -958,7 +958,7 @@ body,
   filter: drop-shadow(0 2px 0 #6b4f17) drop-shadow(0 4px 0 #3c2b0b) drop-shadow(0 6px 0 #241a06) drop-shadow(0 26px 40px rgba(0, 0, 0, 0.8));
   animation: em-sheen 6s linear infinite;
 }
-.em-hero h1 .sub { display: block; font-size: 0.42em; letter-spacing: 0.12em; }
+.em-hero h1 .sub { display: block; margin-top: 0.12em; font-size: 0.5em; line-height: 1; letter-spacing: 0.14em; }
 .em-hero-lede { max-width: 56ch; margin: 18px 0 26px; font-size: clamp(15px, 2.4vw, 19px); line-height: 1.6; color: #e9e2d2; }
 .em-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; }
 .em-hero-stats { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 28px; font: 700 12px/1 var(--em-mono); letter-spacing: 0.16em; color: var(--em-dim); text-transform: uppercase; }
