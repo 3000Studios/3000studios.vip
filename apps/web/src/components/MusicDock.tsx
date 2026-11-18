@@ -35,7 +35,9 @@ export function MusicDock() {
   if (pathname.startsWith('/admin') || pathname.startsWith('/vault') || pathname.startsWith('/agent')) {
     return null;
   }
-  if (!visible) return null;
+  // Music is opt-in (empire redesign 2026-11-18): the dock only appears
+  // once a visitor has pressed play, never on first load.
+  if (!visible || !music.isPlaying) return null;
 
   const kind = playbackKind(music.activeSong.src);
   // On-site playback is previews only (music model flip, 2026-10-27) —
