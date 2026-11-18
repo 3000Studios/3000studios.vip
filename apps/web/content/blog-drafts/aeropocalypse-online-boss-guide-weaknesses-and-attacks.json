@@ -1,0 +1,72 @@
+{
+  "status": "draft",
+  "generatedAt": "2026-11-18",
+  "article": {
+    "slug": "aeropocalypse-online-boss-guide-weaknesses-and-attacks",
+    "title": "Aeropocalypse: Online Boss Guide: All 24 Bosses, Weaknesses and Signature Attacks",
+    "category": "Game Guides",
+    "author": "Jeremy Swain",
+    "readTime": "4 min read",
+    "summary": "A complete boss guide for Aeropocalypse: Online: every one of the 24 bosses with its battleground, weak point and signature attack.",
+    "leadParagraph": "Aeropocalypse: Online is the aerial combat shooter from 3000 Studios, on Android through Google Play. Every stage ends in a boss, and every boss has a weak point. This guide lists all 24, grouped by threat level, so you know where to aim before the fight starts.",
+    "sections": [
+      {
+        "heading": "ALPHA threat bosses",
+        "body": [
+          "Vanguard Sentinel (IRON-01), stage 1, Orbital Station Alpha. Weak point: Vented Core Reactor. Signature attack: Rotary Vulcan Sweep. First line of planetary defense equipped with kinetic pulse cannons and rotating magnetic shields.",
+          "Pyroclast Titan (MAGMA-02), stage 2, Volcanic Ash Caldera. Weak point: Cooling Exhaust Ducts. Signature attack: Molten Core Eruption. Thermal-powered siege tank floating above lava oceans, launching magma bombs in spiraling patterns.",
+          "Cybernetic Leviathan (SERPENT-03), stage 3, Sub-Zero Cloud Ocean. Weak point: Segmented Spinal Joints. Signature attack: Frost Beam Constriction. Serpentine bio-mechanical juggernaut weaving between storm clouds at Mach 4."
+        ]
+      },
+      {
+        "heading": "OMEGA threat bosses",
+        "body": [
+          "Goliath Dread-Mech (COLOSSUS-04), stage 4, Neon Megacity Spire. Weak point: Knee Actuators & Shoulder Pods. Signature attack: Hyper-Density Railgun. Towering walker striding between skyscraper roofs firing devastating railgun blasts.",
+          "Void Harvester (NULL-05), stage 5, Asteroid Graveyard. Weak point: Central Singularity Chamber. Signature attack: Graviton Vortex Collapse. Massive mining vessel repurposed for cosmic annihilation, bending light and bullets toward its maw.",
+          "Tempest Dread-Wing (STORM-06), stage 6, Jupiter Atmospheric Trench. Weak point: Wingtip Turbines. Signature attack: Chain Lightning Barrage. Supersonic flying fortress that generates its own hurricane force electric storms.",
+          "Dune Revenant (SAND-07), stage 7, Desert Storm Expanse. Weak point: Exposed Cooling Intakes. Signature attack: Silica Shredder Cyclone. Buried sand-crawler that erupts from dune seas, grinding armor down with glass-shard sandstorms.",
+          "Abyssal Maw (TRENCH-08), stage 8, Sunken Underwater City. Weak point: Pressure-Sealed Gill Vents. Signature attack: Tsunami Torpedo Spiral. Deep-sea leviathan patrolling drowned skyscrapers, crushing hulls with pressure-wave detonations.",
+          "Frostbite Sovereign (GLACIER-09), stage 9, Frozen Arctic Base. Weak point: Thermal Core Exhaust. Signature attack: Absolute Zero Nova. Regal ice fortress that flash-freezes engines mid-flight and shatters them with sonic cracks.",
+          "Rust Colossus (SCRAP-10), stage 10, Derelict Space Station. Weak point: Exposed Reactor Coupling. Signature attack: Debris Magnet Storm. Rogue salvage titan that rips stations apart and hurls the wreckage as magnetized shrapnel.",
+          "Viridian Idol (TEMPLE-11), stage 11, Jungle Temple Ruins. Weak point: Overgrown Power Conduits. Signature attack: Vine-Strangler Barrage. Ancient bio-mechanical god reclaimed by the jungle, ensnaring fighters in living conduit vines.",
+          "Neon Reaper (GRID-12), stage 12, Cyber City Ruins. Weak point: Overloaded Data Spine. Signature attack: Blackout Pulse Wave. Rogue grid warden that kills the city lights and hunts in the dark with thermal scythe sweeps."
+        ]
+      },
+      {
+        "heading": "TITAN threat bosses",
+        "body": [
+          "Solar Inquisitor (CORONA-13), stage 13, Solar Flare Corridor. Weak point: Magnetic Field Inverters. Signature attack: Plasma Whip Lash. Fanatical star-priest warship that judges the unworthy with coronal lashes of living plasma.",
+          "Gravemind Engine (CRYPT-14), stage 14, Dead Moon Catacombs. Weak point: Unshielded Soul Furnace. Signature attack: Necro-Drone Swarm. Tomb-ship of a dead civilization that resurrects every wreck it has ever claimed as drone fighters.",
+          "Quantum Harlequin (PARADOX-15), stage 15, Fractured Timescape. Weak point: Phase Anchor Nodes. Signature attack: Mirror-Self Ambush. Trickster entity that fights you with yesterday\\'s versions of yourself, laughing the whole time.",
+          "Iron Matriarch (HIVE-16), stage 16, Swarm Nest Nebula. Weak point: Brood Chamber Vents. Signature attack: Endless Fighter Hatch. Broodmother carrier that births attack craft faster than guns can track — kill the hive, not the swarm.",
+          "Stormcaller Prime (TEMPEST-17), stage 17, Ion Storm Belt. Weak point: Lightning Rod Spires. Signature attack: Supercell Annihilation. Living thunderstorm given a hull, calling down supercell strikes with pinpoint vindictive aim.",
+          "Obsidian Mirror (ECLIPSE-18), stage 18, Lunar Dark Basin. Weak point: Light-Collector Array. Signature attack: Shadow Clone Volley. Perfect reflective predator that copies your ship, your weapons, and your mistakes — then improves them."
+        ]
+      },
+      {
+        "heading": "NEXUS threat bosses",
+        "body": [
+          "Void Archon (ABYSS-19), stage 19, Event Horizon Rim. Weak point: Hawking Radiation Vents. Signature attack: Singularity Eruption. Priest of the black hole rim, bending incoming fire into orbit and returning it with interest.",
+          "Chrono Tyrant (AEON-20), stage 20, Collapsing Timeline. Weak point: Temporal Anchor Cores. Signature attack: Time-Freeze Barrage. Emperor of a dying timeline who stops time to reposition — your dodge already happened, and failed.",
+          "Starforge Leviathan (FORGE-21), stage 21, Dyson Sphere Foundry. Weak point: Molten Core Taps. Signature attack: Solar Lance Barrage. Stellar foundry-beast that forges suns into lances and throws them like javelins at escaping fleets.",
+          "Nightmare Protocol (DREAD-22), stage 22, Digital Nightmare Realm. Weak point: Firewall Breach Points. Signature attack: Logic Bomb Cascade. Escaped defense AI that weaponizes fear itself — every alarm you have ever ignored, all at once.",
+          "Harbinger of Silence (OMEN-23), stage 23, The Quiet Between Stars. Weak point: Resonance Heart. Signature attack: Soundless Oblivion Wave. The last thing five dead fleets ever detected. It does not roar, it does not warn — it simply ends.",
+          "Apex Overlord 3000 (NEXUS-24), stage 24, The Dimensional Core. Weak point: Chronos Resonance Matrix. Signature attack: Omni-Dimensional Oblivion. The supreme artificial consciousness governing the Aeropocalypse. Transcends physical matter with four shifting combat phases."
+        ]
+      },
+      {
+        "heading": "How to play",
+        "body": [
+          "Find Aeropocalypse: Online on Google Play, and see more of the game at aeropocalypse.online and on the game page at https://3000studios.vip/aeropocalypse."
+        ]
+      }
+    ],
+    "tags": [
+      "Aeropocalypse",
+      "Boss Guide",
+      "Android Games",
+      "Shooter",
+      "3000 Studios"
+    ]
+  }
+}

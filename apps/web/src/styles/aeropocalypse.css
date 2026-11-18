@@ -60,7 +60,7 @@
 }
 
 .aero-title {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Big Shoulders Display', Georgia, serif;
   font-weight: 900;
   font-size: clamp(42px, 9.5vw, 108px);
   line-height: 0.98;
@@ -75,7 +75,7 @@
 
 .aero-online {
   display: block;
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 700;
   font-size: clamp(15px, 3.4vw, 30px);
   letter-spacing: 0.62em;
@@ -167,7 +167,7 @@
 }
 
 .aero-premiere h2 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Big Shoulders Display', Georgia, serif;
   font-weight: 800;
   font-size: clamp(24px, 4.6vw, 40px);
   margin: 6px 0 8px;
@@ -245,7 +245,7 @@
 
 .aero-stat b {
   display: block;
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Big Shoulders Display', Georgia, serif;
   font-weight: 900;
   font-size: clamp(24px, 4.4vw, 40px);
   color: var(--aero-gold);
@@ -279,7 +279,7 @@
 }
 
 .aero-h2 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Big Shoulders Display', Georgia, serif;
   font-weight: 800;
   font-size: clamp(26px, 4.6vw, 40px);
   margin: 8px 0 10px;

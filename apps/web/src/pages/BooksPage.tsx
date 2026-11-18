@@ -1,133 +1,165 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart } from '@phosphor-icons/react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
-import { BOOKS, BOOKS_PRICE, BOOKS_STORE_URL, LEANPUB_TITLES } from '../data/books';
+import { LEANPUB_TITLES } from '../data/books';
+import { SHELVES, STORE_BOOKS, STORE_PRICE, coverUrl, type ShelfId, type StoreBook } from '../data/storeBooks';
+import { BOOK_STORE_URL, SUBSTACK_URL } from '../empire/links';
+
+type Filter = ShelfId | 'all';
+
+function Cover({ book, eager }: { book: StoreBook; eager: boolean }) {
+  return (
+    <a
+      className="em-book"
+      href={book.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${book.title}, ${STORE_PRICE} on Payhip`}
+    >
+      <span className="em-book-cover">
+        <img
+          src={coverUrl(book, 320)}
+          alt={`${book.title} book cover`}
+          width={320}
+          height={480}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </span>
+      <span className="em-book-meta">
+        <b>{book.title}</b>
+        <span>{STORE_PRICE} · Buy on Payhip</span>
+      </span>
+    </a>
+  );
+}
 
 export function BooksPage() {
+  const [filter, setFilter] = useState<Filter>('all');
+  const [q, setQ] = useState('');
+
+  const shown = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return STORE_BOOKS.filter(
+      (b) => (filter === 'all' || b.cat === filter) && (!needle || b.title.toLowerCase().includes(needle)),
+    );
+  }, [filter, q]);
+
+  const counts = useMemo(() => {
+    const c = new Map<ShelfId, number>();
+    for (const b of STORE_BOOKS) c.set(b.cat, (c.get(b.cat) ?? 0) + 1);
+    return c;
+  }, []);
+
+  const shelves = filter === 'all' ? SHELVES.filter((s) => counts.get(s.id)) : SHELVES.filter((s) => s.id === filter);
+
   return (
     <PublicLayoutV2>
-      <div className="nn-scope">
-        <section className="nn-hero">
-          <span className="nn-kicker">3000 Studios Press</span>
-          <h1 className="nn-chrome" style={{ fontSize: 'clamp(38px, 8vw, 84px)', marginTop: 18 }}>
-            BOOKS
-          </h1>
-          <p>
-            Books by Jeremy Swain, published under the 3000 Studios Press
-            imprint. The ebooks below are sold direct from the studio store —
-            {` ${BOOKS_PRICE} `}each, EPUB + PDF delivered at checkout. Print
-            editions are distributed through IngramSpark to bookstores and
-            libraries worldwide.
-          </p>
-        </section>
-
-        <section className="nn-wrap" style={{ marginBottom: 48 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 880, margin: '0 auto' }}>
-            {BOOKS.map((book) => (
-              <article key={book.id} className="nn-glass" style={{ padding: 'clamp(22px, 4vw, 34px)' }}>
-                <span className="nn-kicker nn-kicker--gold">{book.categories}</span>
-                <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(22px, 4vw, 32px)', margin: '10px 0 4px' }}>
-                  {book.title}
-                </h2>
-                <p style={{ color: 'var(--nn-cyan)', margin: '0 0 14px', fontSize: 16 }}>{book.subtitle}</p>
-                <p style={{ color: 'var(--nn-text)', lineHeight: 1.7, margin: '0 0 18px' }}>{book.description}</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'center' }}>
-                  <a
-                    className="nn-btn nn-btn-gold"
-                    href={BOOKS_STORE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ShoppingCart size={17} /> Buy the ebook — {BOOKS_PRICE}
-                  </a>
-                  <span style={{ color: 'var(--nn-muted)', fontSize: 13 }}>
-                    EPUB + PDF · by Jeremy Swain · 3000 Studios Press
-                  </span>
-                </div>
-              </article>
-            ))}
+      <div className="em-wrap" style={{ paddingTop: 'clamp(28px, 6vw, 64px)' }}>
+        <header className="em-sec-head" style={{ marginBottom: 8 }}>
+          <div>
+            <span className="em-kicker">3000 Studios Press</span>
+            <h1 style={{ fontSize: 'clamp(54px, 13vw, 140px)', margin: '10px 0 0' }}>Books</h1>
+            <p>
+              {STORE_BOOKS.length} original titles by Jeremy Swain. {STORE_PRICE} each, sold direct from the studio store on Payhip,
+              delivered as an instant download at checkout. Tap any cover to buy.
+            </p>
           </div>
-        </section>
+          <a className="em-btn" href={BOOK_STORE_URL} target="_blank" rel="noopener noreferrer">
+            Open the store
+          </a>
+        </header>
 
-        <section className="nn-wrap" style={{ marginBottom: 48 }}>
-          <div className="nn-glass" style={{ padding: 'clamp(22px, 4vw, 34px)', maxWidth: 880, margin: '0 auto' }}>
-            <h2 className="nn-chrome" style={{ fontSize: 'clamp(22px, 4vw, 30px)', marginTop: 0 }}>
-              MORE WAYS TO READ
+        <div className="em-shelfnav" role="toolbar" aria-label="Filter books by shelf">
+          <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>
+            All · {STORE_BOOKS.length}
+          </button>
+          {SHELVES.filter((s) => counts.get(s.id)).map((s) => (
+            <button key={s.id} type="button" aria-pressed={filter === s.id} onClick={() => setFilter(s.id)}>
+              {s.label} · {counts.get(s.id)}
+            </button>
+          ))}
+        </div>
+
+        <label className="em-search">
+          <MagnifyingGlass size={18} weight="bold" aria-hidden="true" />
+          <span className="em-sr">Search books</span>
+          <input type="search" placeholder="Search titles" value={q} onChange={(e) => setQ(e.target.value)} />
+        </label>
+
+        {shown.length === 0 && <p className="em-empty">No titles match “{q}”. Try another word.</p>}
+
+        {shelves.map((s, shelfIndex) => {
+          const list = shown.filter((b) => b.cat === s.id);
+          if (!list.length) return null;
+          return (
+            <section key={s.id} className="em-sec" style={{ paddingTop: 34 }} aria-labelledby={`shelf-${s.id}`}>
+              <div className="em-sec-head">
+                <div>
+                  <h2 id={`shelf-${s.id}`} style={{ fontSize: 'clamp(30px, 6vw, 54px)', margin: 0 }}>
+                    {s.label}
+                  </h2>
+                  <p>{s.blurb}</p>
+                </div>
+              </div>
+              <div className="em-shelf em-nostagger">
+                {list.map((b, i) => (
+                  <Cover key={b.url} book={b} eager={shelfIndex === 0 && i < 6} />
+                ))}
+              </div>
+            </section>
+          );
+        })}
+
+        <section className="em-sec" aria-labelledby="more-ways">
+          <div className="em-card" style={{ padding: 'clamp(20px, 4vw, 34px)' }}>
+            <h2 id="more-ways" style={{ fontSize: 'clamp(26px, 5vw, 40px)', marginTop: 0 }}>
+              More ways to read
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, color: 'var(--nn-text)', lineHeight: 1.7 }}>
-              <p style={{ margin: 0 }}>
-                <strong>Payhip (direct from the studio):</strong> the full
-                ebook shelf — every title above and dozens more — lives in the{' '}
-                <a href={BOOKS_STORE_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
-                  3000 Studios Payhip store
-                </a>
-                , {BOOKS_PRICE} each with EPUB + PDF delivered at checkout.
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Barnes & Noble (NOOK ebooks):</strong> the Screen-Free
-                Activities shelf is on NOOK —{' '}
-                <a href="https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+            <ul className="em-ways">
+              <li>
+                <b>Barnes and Noble (NOOK):</b>{' '}
+                <a href="https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724" target="_blank" rel="noopener noreferrer">
                   Family Game Night Games
                 </a>
                 ,{' '}
-                <a href="https://www.barnesandnoble.com/w/grandparent-grandchild-activities-jeremy-swain/1151782669" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                <a href="https://www.barnesandnoble.com/w/grandparent-grandchild-activities-jeremy-swain/1151782669" target="_blank" rel="noopener noreferrer">
                   Grandparent Grandchild Activities
-                </a>
-                , and{' '}
-                <a href="https://www.barnesandnoble.com/w/camping-trip-activity-missions-jeremy-swain/1151782849" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+                </a>{' '}
+                and{' '}
+                <a href="https://www.barnesandnoble.com/w/camping-trip-activity-missions-jeremy-swain/1151782849" target="_blank" rel="noopener noreferrer">
                   Camping Trip Activity Missions
                 </a>
                 .
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Gumroad:</strong> book bundles and creator tools from
-                the studio are on the{' '}
-                <a href="https://3000studios.gumroad.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+              </li>
+              <li>
+                <b>Gumroad:</b> book bundles and creator tools on the{' '}
+                <a href="https://3000studios.gumroad.com" target="_blank" rel="noopener noreferrer">
                   3000 Studios Gumroad store
                 </a>
                 .
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Substack (free):</strong> new chapters, releases, and
-                studio notes land first in the{' '}
-                <a href="https://3000studios.substack.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--nn-cyan)' }}>
+              </li>
+              <li>
+                <b>Substack (free):</b> new chapters and releases land first in the{' '}
+                <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer">
                   3000 Studios Substack
                 </a>
                 .
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Leanpub:</strong> {LEANPUB_TITLES.join(', ')} are also
-                published on Leanpub.
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Print:</strong> the wider 3000 Studios Press catalog —
-                fiction, mystery, cookbooks, activity books, and creator
-                guides — is distributed in print through IngramSpark,
-                so bookstores and libraries can order copies through their
-                usual channels. Selected ebooks also appear on Kobo and
-                XinXii.
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Questions about a title, bulk orders, or rights:</strong>{' '}
-                <Link to="/contact" style={{ color: 'var(--nn-cyan)' }}>
-                  contact the studio
-                </Link>
-                .
-              </p>
-            </div>
+              </li>
+              <li>
+                <b>Leanpub:</b> {LEANPUB_TITLES.join(', ')}.
+              </li>
+              <li>
+                <b>Print:</b> the wider catalog is distributed in print through IngramSpark, so bookstores and libraries can
+                order copies. Selected ebooks also appear on Kobo and XinXii.
+              </li>
+              <li>
+                <b>Bulk orders or rights:</b> <Link to="/contact">contact the studio</Link>.
+              </li>
+            </ul>
           </div>
         </section>
-
-        <footer className="nn-footer">
-          <strong className="nn-chrome-gold">3000 STUDIOS</strong>
-          <nav>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-            <Link to="/about">About</Link>
-            <Link to="/contact">Contact</Link>
-          </nav>
-          <p>© 2026 3000 Studios · All rights reserved</p>
-        </footer>
       </div>
     </PublicLayoutV2>
   );

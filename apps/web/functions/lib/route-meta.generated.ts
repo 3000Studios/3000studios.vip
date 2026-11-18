@@ -24,8 +24,8 @@ export type RouteMetaEntry = {
 
 export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   "/": {
-    "title": "3000 Studios VIP — Official Music & Live Stage",
-    "description": "3000 Studios — original music, cinematic videos, and live broadcasts from Acworth, Georgia. New singles weekly, on all platforms."
+    "title": "3000 Studios VIP — Aeropocalypse: Online, Music, Books & Podcast",
+    "description": "3000 Studios from Acworth, Georgia: AEROPOCALYPSE: ONLINE, free on Google Play, plus original music, books, the Follow and Subscribe podcast, and merch."
   },
   "/about": {
     "title": "About — 3000 Studios VIP",
@@ -69,7 +69,7 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/books": {
     "title": "Books — 3000 Studios VIP",
-    "description": "Books by Jeremy Swain from 3000 Studios Press — ebooks sold direct from the studio store, print editions through IngramSpark."
+    "description": "All 93 books by Jeremy Swain from 3000 Studios Press: fantasy, mystery, cookbooks, creator playbooks and more, $9.99 each direct from the studio store."
   },
   "/beats": {
     "title": "Beat Packs — 3000 Studios VIP",
@@ -92,7 +92,7 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   },
   "/aeropocalypse": {
     "title": "AEROPOCALYPSE: ONLINE — Cinematic Theater — 3000 Studios VIP",
-    "description": "The official home of AEROPOCALYPSE: ONLINE by 3000 Studios — the cinematic premiere theater, 25 stages, 25 bosses, 15 jets and 19 weapons. In closed testing on Google Play; join the launch list."
+    "description": "The official home of AEROPOCALYPSE: ONLINE by 3000 Studios — 25 stages, 24 bosses and 25 original songs. Free to play on Google Play, with party co-op and 1v1 duels."
   },
   "/apps": {
     "title": "Apps — 3000 Studios VIP",

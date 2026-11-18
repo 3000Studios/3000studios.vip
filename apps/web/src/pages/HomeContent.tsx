@@ -58,7 +58,7 @@ export function HomeContent() {
                 target="_blank"
                 rel="noreferrer"
               >
-                <img
+                <img loading="lazy" decoding="async"
                   src="/media/covers/not-giving-up-tonight.jpg"
                   alt="Not Giving Up Tonight official video"
                 />

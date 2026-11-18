@@ -1,375 +1,369 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
+  House,
+  GameController,
+  BookOpen,
   MusicNote,
+  FilmStrip,
+  Waveform,
   Microphone,
   ShoppingBag,
-  GameController,
   Broadcast,
+  Article,
+  DeviceMobile,
   EnvelopeSimple,
-  CaretDown,
+  SpeakerHigh,
+  SpeakerSlash,
+  Play,
+  Pause,
+  X,
 } from '@phosphor-icons/react';
-import { usePrefersReducedMotion } from '../lib/mediaQuery';
-import { attachNavDance, syncAllNavCurrent } from '../liquid/loader';
+import { useGlobalMusic } from '../components/GlobalMusic';
+import { LiveBand } from '../empire/LiveBand';
+import { isSfxOn, playSfx, setSfxOn } from '../empire/sfx';
+import { AERO_PLAY_URL, AERO_SITE_URL, SUPPORT_EMAIL } from '../empire/links';
 
-export type NavChild = { to: string; label: string; external?: boolean };
-export type NavItem = {
-  to?: string;
-  label: string;
-  icon: React.ReactNode;
-  external?: boolean;
-  children?: NavChild[];
-};
+type Item = { to: string; label: string; sub: string; icon: React.ReactNode; color: string; nav?: boolean };
 
-export const SHOP_URL = 'https://boughtitonline.com';
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const NAV_ITEMS: NavItem[] = [
-  {
-    to: '/music',
-    label: 'Music',
-    icon: <MusicNote size={20} weight="duotone" />,
-    children: [
-      { to: '/video', label: 'Videos' },
-      { to: '/beats', label: 'Music For Sale' },
-    ],
-  },
-  {
-    to: '/podcast',
-    label: 'Podcast',
-    icon: <Microphone size={20} weight="duotone" />,
-    children: [
-      { to: '/podcast#episodes', label: 'All Episodes' },
-      { to: '/podcast#episode-1', label: 'Episode One' },
-      { to: '/podcast#episode-2', label: 'Episode Two' },
-    ],
-  },
-  {
-    to: SHOP_URL,
-    label: 'Shop',
-    icon: <ShoppingBag size={20} weight="duotone" />,
-    external: true,
-  },
-  {
-    to: '/aeropocalypse',
-    label: 'Aeropocalypse',
-    icon: <GameController size={20} weight="duotone" />,
-  },
-  {
-    to: '/live',
-    label: 'Live Stream',
-    icon: <Broadcast size={20} weight="duotone" />,
-  },
-  {
-    to: '/contact',
-    label: 'Contact',
-    icon: <EnvelopeSimple size={20} weight="duotone" />,
-  },
+const ITEMS: Item[] = [
+  { to: '/', label: 'Home', sub: 'The empire', icon: <House size={20} weight="duotone" />, color: '#f2c867' },
+  { to: '/aeropocalypse', label: 'Aeropocalypse', sub: 'Our game on Google Play', icon: <GameController size={22} weight="duotone" />, color: '#ff5a2c', nav: true },
+  { to: '/books', label: 'Books', sub: '93 titles', icon: <BookOpen size={20} weight="duotone" />, color: '#f2c867', nav: true },
+  { to: '/music', label: 'Music', sub: 'Songs and albums', icon: <MusicNote size={20} weight="duotone" />, color: '#9b6bff', nav: true },
+  { to: '/video', label: 'Videos', sub: 'Music videos', icon: <FilmStrip size={20} weight="duotone" />, color: '#ff3d7f', nav: true },
+  { to: '/podcast', label: 'Podcast', sub: 'Every episode', icon: <Microphone size={20} weight="duotone" />, color: '#3df2a8', nav: true },
+  { to: '/beats', label: 'Beats', sub: 'Music for sale', icon: <Waveform size={20} weight="duotone" />, color: '#3ee8ff' },
+  { to: '/shop', label: 'Shop', sub: 'Merch and VIP', icon: <ShoppingBag size={20} weight="duotone" />, color: '#f2c867', nav: true },
+  { to: '/live', label: 'Live', sub: 'Live stream', icon: <Broadcast size={20} weight="duotone" />, color: '#ff3d3d' },
+  { to: '/blog', label: 'Blog', sub: 'News and guides', icon: <Article size={20} weight="duotone" />, color: '#3ee8ff', nav: true },
+  { to: '/apps', label: 'Apps', sub: 'Studio apps', icon: <DeviceMobile size={20} weight="duotone" />, color: '#3df2a8' },
+  { to: '/contact', label: 'Contact', sub: SUPPORT_EMAIL, icon: <EnvelopeSimple size={20} weight="duotone" />, color: '#9b6bff', nav: true },
 ];
 
-function isActive(pathname: string, hash: string, to: string) {
-  if (to.startsWith('/#')) {
-    return pathname === '/' && hash === to.slice(1);
-  }
-  if (to.includes('#')) {
-    const [p, h] = to.split('#');
-    return pathname === p && hash === h;
-  }
-  return pathname === to || (to !== '/' && pathname.startsWith(`${to}/`));
+function activeItem(pathname: string): Item | undefined {
+  if (pathname === '/') return ITEMS[0];
+  if (pathname.startsWith('/song/')) return ITEMS.find((i) => i.to === '/music');
+  if (pathname.startsWith('/thunder')) return ITEMS.find((i) => i.to === '/aeropocalypse');
+  return ITEMS.find((i) => i.to !== '/' && (pathname === i.to || pathname.startsWith(`${i.to}/`)));
 }
 
-function itemActive(pathname: string, hash: string, item: NavItem): boolean {
-  if (item.to && !item.external && isActive(pathname, hash, item.to)) return true;
-  return !!item.children?.some((c) => isActive(pathname, hash, c.to));
-}
+const short = (label: string) => (label === 'Aeropocalypse' ? 'Game' : label);
 
-/** Hamburger button: idle pulse, morphs into an X on tap. */
-function Burger({ open, onToggle }: { open: boolean; onToggle: () => void }) {
-  const reduce = usePrefersReducedMotion();
+/** Animated 3000 Studios mark: the official badge inside two orbiting rings. */
+function Logo() {
   return (
-    <motion.button
-      type="button"
-      className={`v2-burger${open ? ' is-open' : ''}${reduce ? '' : ' v2-burger--idle'}`}
-      aria-expanded={open}
-      aria-label={open ? 'Close menu' : 'Open menu'}
-      onClick={onToggle}
-      whileTap={reduce ? undefined : { scale: 0.88 }}
-    >
-      <span className="v2-burger-bars" aria-hidden="true">
-        <i className="b1" />
-        <i className="b2" />
-        <i className="b3" />
+    <Link to="/" className="em-logo" aria-label="3000 Studios home">
+      <span className="em-logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40">
+          <defs>
+            <linearGradient id="emRingG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#fff3c9" />
+              <stop offset="0.5" stopColor="#f2c867" />
+              <stop offset="1" stopColor="#8a6a24" />
+            </linearGradient>
+            <clipPath id="emCoreClip">
+              <circle cx="20" cy="20" r="12.5" />
+            </clipPath>
+          </defs>
+          <g className="ring">
+            <circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#emRingG)" strokeWidth="1.4" strokeDasharray="22 6 4 6" />
+          </g>
+          <g className="ring2">
+            <circle cx="20" cy="20" r="15.3" fill="none" stroke="#3ee8ff" strokeOpacity="0.7" strokeWidth="0.8" strokeDasharray="2 4" />
+          </g>
+          <g className="core">
+            <image href="/media/official-3000-studios-profile-96.webp" x="7.5" y="7.5" width="25" height="25" clipPath="url(#emCoreClip)" />
+          </g>
+        </svg>
       </span>
-    </motion.button>
-  );
-}
-
-function DesktopDrop({ item }: { item: NavItem }) {
-  const location = useLocation();
-  const active = itemActive(location.pathname, location.hash, item);
-  return (
-    <div className={`v2-nav-drop${active ? ' is-active' : ''}`}>
-      <NavLink
-        to={item.to!}
-        className={`v2-nav-link${active ? ' is-active' : ''}`}
-        aria-haspopup="true"
-      >
-        {item.label}
-        <CaretDown size={13} weight="bold" className="v2-drop-caret" aria-hidden="true" />
-      </NavLink>
-      <div className="v2-drop-menu" role="menu">
-        {item.children!.map((c) => (
-          <NavLink
-            key={c.label}
-            to={c.to}
-            role="menuitem"
-            className={({ isActive: rrActive }) =>
-              `v2-drop-link${
-                isActive(location.pathname, location.hash, c.to) || rrActive
-                  ? ' is-active'
-                  : ''
-              }`
-            }
-          >
-            {c.label}
-          </NavLink>
-        ))}
-      </div>
-    </div>
+      <span className="em-logo-word">
+        <b>
+          {'3000'.split('').map((c, i) => (
+            <span key={i} style={{ '--i': i } as React.CSSProperties}>
+              {c}
+            </span>
+          ))}
+        </b>
+        <small>STUDIOS</small>
+      </span>
+    </Link>
   );
 }
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false);
+  const { pathname } = useLocation();
+  const music = useGlobalMusic();
   const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const location = useLocation();
-  const reduce = usePrefersReducedMotion();
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [sfx, setSfx] = useState(isSfxOn);
+  const headerRef = useRef<HTMLElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+  const current = activeItem(pathname);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  /* Liquid A nav dance (v2, 2026-10-27): the specialist's NavDance
-     grooves both nav forms to the shared LiquidBeat hub; the current
-     page's link stays steadily lit (pinned in liquid.css). */
-  useEffect(() => {
-    void attachNavDance(document.querySelector('.v2-nav-desktop'));
-  }, []);
-  useEffect(() => {
-    if (open) void attachNavDance(document.querySelector('.v2-mobile-nav'));
-  }, [ open ]);
-  useEffect(() => {
-    syncAllNavCurrent();
-  }, [location.pathname, location.hash]);
-
-  useEffect(() => {
-    // Close the mobile menu on navigation (back/forward/programmatic).
-    // Navigation-driven, not a render loop: React bails out when already closed.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  /* Close the menu on navigation. */
+  const [lastPath, setLastPath] = useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
     setOpen(false);
-    setExpanded(null);
-  }, [location.pathname, location.hash]);
+  }
 
+  /* Scroll: shrink + glass, hide on the way down, spring back on the way up,
+     and a progress line along the bottom edge. One rAF per frame max. */
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
+    let lastY = window.scrollY;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const y = window.scrollY;
+      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      headerRef.current?.style.setProperty('--em-scroll', (y / max).toFixed(4));
+      setScrolled(y > 24);
+      if (Math.abs(y - lastY) > 6) {
+        setHidden(y > lastY && y > 260);
+        lastY = y;
+      }
     };
-  }, [open ]);
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    raf = requestAnimationFrame(update);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
-  const hash = location.hash;
+  /* Sliding page indicator under the desktop nav. */
+  const movePill = useCallback((el: HTMLElement | null) => {
+    const pill = pillRef.current;
+    if (!pill) return;
+    if (!el) {
+      pill.style.opacity = '0';
+      return;
+    }
+    pill.style.opacity = '1';
+    pill.style.left = `${el.offsetLeft}px`;
+    pill.style.width = `${el.offsetWidth}px`;
+  }, []);
+  const pillHome = useCallback(() => {
+    movePill(navRef.current?.querySelector<HTMLElement>('a.is-active') ?? null);
+  }, [movePill]);
+  useLayoutEffect(() => {
+    pillHome();
+    // Webfonts change link widths once they load.
+    void document.fonts?.ready.then(pillHome);
+    window.addEventListener('resize', pillHome);
+    return () => window.removeEventListener('resize', pillHome);
+  }, [pathname, pillHome]);
+
+  /* Menu: lock scroll, Escape closes, focus returns to the burger. */
+  useEffect(() => {
+    if (!open) {
+      if (wasOpen.current) burgerRef.current?.focus({ preventScroll: true });
+      wasOpen.current = false;
+      return;
+    }
+    wasOpen.current = true;
+    const html = document.documentElement;
+    const prev = html.style.overflow;
+    html.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      html.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  /* Swipe right, or down from the top, to close the menu. */
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touch.current = { x: t.clientX, y: t.clientY };
+  };
+  const onTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const s = touch.current;
+    touch.current = null;
+    if (!s) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - s.x;
+    const dy = t.clientY - s.y;
+    const atTop = e.currentTarget.scrollTop <= 0;
+    if ((dx > 80 && Math.abs(dy) < 60) || (atTop && dy > 110 && Math.abs(dx) < 60)) {
+      playSfx('close');
+      setOpen(false);
+    }
+  };
+
+  const toggleMenu = () => {
+    playSfx(open ? 'close' : 'open');
+    setOpen((o) => !o);
+  };
+  const closeMenu = () => {
+    playSfx('close');
+    setOpen(false);
+  };
+  const toggleSfx = () => {
+    const next = !sfx;
+    setSfxOn(next);
+    setSfx(next);
+    if (next) playSfx('tap');
+  };
 
   return (
     <>
-      <header className={`v2-header acss-sticky${scrolled ? ' is-scrolled' : ''}`}>
-        <div className="v2-header-inner acss-sticky__bar">
-          <Link to="/" className="v2-brand" aria-label="3000 Studios home">
-            <img src="/media/official-3000-studios-profile-96.webp" alt="3000 Studios — official artist profile" className="v2-brand-logo" />
-            <span className="v2-brand-word">
-              <strong>
-                3000<span className="v2-grad-text">Studios</span>
-              </strong>
-              <small>VIP · MUSIC · LIVE</small>
-            </span>
-          </Link>
-
-          <nav className="v2-nav-desktop" aria-label="Primary">
-            {NAV_ITEMS.map((item) =>
-              item.external ? (
-                <a
-                  key={item.label}
-                  href={item.to}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="v2-nav-link"
+      <header
+        ref={headerRef}
+        className={`em-header${scrolled ? ' is-scrolled' : ''}${hidden && !open ? ' is-hidden' : ''}`}
+      >
+        <div className="em-header-bar">
+          <LiveBand variant="header" />
+          <Logo />
+          <nav ref={navRef} className="em-nav" aria-label="Main" onMouseLeave={pillHome}>
+            <span ref={pillRef} className="em-nav-pill" aria-hidden="true" />
+            {ITEMS.filter((i) => i.nav).map((item, i) => {
+              const active = current?.to === item.to;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={active ? 'is-active' : undefined}
+                  aria-current={active ? 'page' : undefined}
+                  style={{ '--i': i } as React.CSSProperties}
+                  onMouseEnter={(e) => movePill(e.currentTarget)}
+                  onFocus={(e) => movePill(e.currentTarget)}
                 >
-                  {item.label}
-                </a>
-              ) : item.children ? (
-                <DesktopDrop key={item.label} item={item} />
-              ) : (
-                <NavLink
-                  key={item.label}
-                  to={item.to!}
-                  className={({ isActive: rrActive }) =>
-                    `v2-nav-link${
-                      itemActive(location.pathname, hash, item) || rrActive ? ' is-active' : ''
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ),
-            )}
+                  {short(item.label)}
+                </Link>
+              );
+            })}
           </nav>
-
-          <div className="v2-header-actions">
+          <div className="em-header-actions">
+            {current && (
+              <span className="em-where" aria-label={`You are on ${current.label}`}>
+                <i aria-hidden="true" />
+                {short(current.label)}
+              </span>
+            )}
+            <button
+              type="button"
+              className="em-iconbtn"
+              onClick={music.toggle}
+              aria-pressed={music.isPlaying}
+              aria-label={music.isPlaying ? 'Pause music' : 'Play music'}
+              title={music.isPlaying ? `Playing ${music.activeTitle}` : 'Play music'}
+              data-em-silent
+            >
+              {music.isPlaying ? <Pause size={18} weight="fill" /> : <Play size={18} weight="fill" />}
+            </button>
+            <button
+              type="button"
+              className="em-iconbtn"
+              onClick={toggleSfx}
+              aria-pressed={sfx}
+              aria-label={sfx ? 'Turn click sounds off' : 'Turn click sounds on'}
+              data-em-silent
+            >
+              {sfx ? <SpeakerHigh size={18} weight="duotone" /> : <SpeakerSlash size={18} weight="duotone" />}
+            </button>
             <a
-              className="v2-btn v2-btn--sm v2-header-cta"
+              className="em-btn em-subscribe"
               href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Subscribe
             </a>
-            <Burger open={open} onToggle={() => setOpen((v) => !v)} />
+            <button
+              ref={burgerRef}
+              type="button"
+              className={`em-burger${open ? ' is-open' : ''}`}
+              aria-expanded={open}
+              aria-controls="em-menu"
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              onClick={toggleMenu}
+              data-em-silent
+            >
+              <span aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+            </button>
           </div>
+          <span className="em-scrollline" aria-hidden="true" />
         </div>
-        <span className="v2-header-line" aria-hidden="true" />
       </header>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="v2-mobile-menu"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site menu"
-            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.86, y: -18 }}
-            animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: -12 }}
-            transition={
-              reduce ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 30 }
-            }
-          >
-            <motion.button
-              type="button"
-              className="v2-menu-close"
-              aria-label="Close menu"
-              onClick={() => setOpen(false)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              ✕
-            </motion.button>
-            <nav aria-label="Mobile">
-              <ul className="v2-menu-list">
-                {NAV_ITEMS.map((item, i) => {
-                  const isOpen = expanded === item.label;
-                  const active = itemActive(location.pathname, hash, item);
-                  return (
-                    <motion.li
-                      key={item.label}
-                      initial={reduce ? { opacity: 0 } : { opacity: 0, x: -26 }}
-                      animate={reduce ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                      transition={
-                        reduce
-                          ? { duration: 0.12 }
-                          : { delay: 0.05 + i * 0.045, type: 'spring', stiffness: 320, damping: 26 }
-                      }
-                    >
-                      {item.external ? (
-                        <a
-                          href={item.to}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="v2-menu-link"
-                          onClick={() => setOpen(false)}
-                        >
-                          <span className="v2-menu-icon">{item.icon}</span>
-                          <span>{item.label}</span>
-                          <span className="v2-menu-arrow" aria-hidden="true">
-                            ↗
-                          </span>
-                        </a>
-                      ) : item.children ? (
-                        <>
-                          <div className={`v2-menu-parent${active ? ' is-active' : ''}`}>
-                            <NavLink
-                              to={item.to!}
-                              className="v2-menu-link"
-                              onClick={() => setOpen(false)}
-                            >
-                              <span className="v2-menu-icon">{item.icon}</span>
-                              <span>{item.label}</span>
-                            </NavLink>
-                            <button
-                              type="button"
-                              className={`v2-menu-expand${isOpen ? ' is-open' : ''}`}
-                              aria-expanded={isOpen}
-                              aria-label={`Expand ${item.label} submenu`}
-                              onClick={() => setExpanded(isOpen ? null : item.label)}
-                            >
-                              <CaretDown size={18} weight="bold" aria-hidden="true" />
-                            </button>
-                          </div>
-                          <AnimatePresence initial={false}>
-                            {isOpen && (
-                              <motion.ul
-                                className="v2-menu-sub"
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.22 }}
-                              >
-                                {item.children.map((c) => (
-                                  <li key={c.label}>
-                                    <NavLink
-                                      to={c.to}
-                                      className={`v2-menu-sublink${
-                                        isActive(location.pathname, hash, c.to)
-                                          ? ' is-active'
-                                          : ''
-                                      }`}
-                                      onClick={() => setOpen(false)}
-                                    >
-                                      {c.label}
-                                    </NavLink>
-                                  </li>
-                                ))}
-                              </motion.ul>
-                            )}
-                          </AnimatePresence>
-                        </>
-                      ) : (
-                        <NavLink
-                          to={item.to!}
-                          className={`v2-menu-link${active ? ' is-active' : ''}`}
-                          onClick={() => setOpen(false)}
-                        >
-                          <span className="v2-menu-icon">{item.icon}</span>
-                          <span>{item.label}</span>
-                          <span className="v2-menu-arrow" aria-hidden="true">
-                            →
-                          </span>
-                        </NavLink>
-                      )}
-                    </motion.li>
-                  );
-                })}
-              </ul>
-            </nav>
-            {/* VIP-1000X fix #5: the hamburger menu's Subscribe button was
-                removed — the header nav Subscribe CTA is the single
-                subscribe pattern site-wide. */}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div
+        id="em-menu"
+        className={`em-menu${open ? ' is-open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site menu"
+        aria-hidden={!open}
+        inert={!open}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        <span className="em-menu-scan" aria-hidden="true" />
+        <button type="button" className="em-menu-close" onClick={closeMenu} aria-label="Close menu">
+          <X size={22} weight="bold" aria-hidden="true" />
+        </button>
+        <div className="em-menu-hud" aria-hidden="true">
+          <span>3000 Studios // nav</span>
+          <span>{current ? `Now: ${current.label}` : 'Choose a page'}</span>
+        </div>
+        <nav className="em-menu-grid" aria-label="All pages">
+          {ITEMS.map((item, i) => {
+            const active = current?.to === item.to;
+            const wide = item.to === '/aeropocalypse';
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`em-tile${active ? ' is-active' : ''}${wide ? ' wide' : ''}`}
+                aria-current={active ? 'page' : undefined}
+                onClick={() => setOpen(false)}
+                style={{ '--i': i, '--c': item.color } as React.CSSProperties}
+              >
+                {item.icon}
+                <span className="n">{String(i + 1).padStart(2, '0')}</span>
+                <span>
+                  <span className="t">{item.label}</span>
+                  <span className="s">{item.sub}</span>
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="em-menu-foot">
+          <a href={AERO_PLAY_URL} target="_blank" rel="noopener noreferrer">
+            Get it on Google Play
+          </a>
+          <a href={AERO_SITE_URL} target="_blank" rel="noopener noreferrer">
+            aeropocalypse.online
+          </a>
+          <a href="https://3000studios.substack.com" target="_blank" rel="noopener noreferrer">
+            Substack
+          </a>
+          <a href="https://boughtitonline.com" target="_blank" rel="noopener noreferrer">
+            Bought It Online
+          </a>
+          <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+        </div>
+        <p className="em-swipehint" aria-hidden="true">
+          Swipe right to close
+        </p>
+      </div>
     </>
   );
 }

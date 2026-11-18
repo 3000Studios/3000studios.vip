@@ -28,14 +28,22 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --touch: 44px;
-  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --font-body: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-display: 'Big Shoulders Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
   font-family: var(--font-body);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-button, input, textarea, select, a, span, p, h1, h2, h3, h4, h5, h6 {
+/* Legacy screens get one body face. The redesign's own components
+   (and the page headings it styles) are left out so their display and mono
+   faces apply. */
+:is(button, input, textarea, select, a, span, p, h1, h2, h3, h4, h5, h6):not(
+    :is(.em-header, .em-menu, .em-footer, .em-home, .em-wrap) *,
+    .em-3d,
+    .v2-main h1,
+    .v2-main h2
+  ) {
   font-family: var(--font-body) !important;
 }

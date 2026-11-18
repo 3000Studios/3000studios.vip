@@ -155,7 +155,7 @@ export function SongPage() {
             style={{ backgroundImage: `url(${song.coverImage})` }}
             aria-hidden="true"
           />
-          <img
+          <img loading="lazy" decoding="async"
             className="v2-song-cinema-cover"
             src={song.coverImage}
             alt={`${song.title} album artwork`}

@@ -140,9 +140,9 @@ const brand = (t) => (t === SITE || t.endsWith(`— ${SITE}`) ? t : `${t} — ${
 // v3 HomePage, NotFoundPage).
 const HAND = {
   '/': {
-    title: '3000 Studios VIP — Official Music & Live Stage',
+    title: '3000 Studios VIP — Aeropocalypse: Online, Music, Books & Podcast',
     description:
-      '3000 Studios — original music, cinematic videos, and live broadcasts from Acworth, Georgia. New singles weekly, on all platforms.',
+      '3000 Studios from Acworth, Georgia: AEROPOCALYPSE: ONLINE, free on Google Play, plus original music, books, the Follow and Subscribe podcast, and merch.',
   },
   '/about': {
     title: brand('About'),
@@ -350,28 +350,20 @@ for (const m of podTs.matchAll(
 }
 podEpisodes.sort((a, b) => a.n - b.n);
 
-/* Books — the array literal in src/data/books.ts is plain JSON syntax. */
-const booksTs = read(join(WEB, 'src/data/books.ts'));
-let books = [];
-{
-  const start = booksTs.indexOf('export const BOOKS: BookEntry[] =');
-  const open = booksTs.indexOf('= [', start) + 2;
-  let depth = 0;
-  let end = -1;
-  for (let i = open; i < booksTs.length; i++) {
-    if (booksTs[i] === '[') depth++;
-    else if (booksTs[i] === ']') {
-      depth--;
-      if (depth === 0) {
-        end = i;
-        break;
-      }
-    }
-  }
-  if (start >= 0 && end > open) books = JSON.parse(booksTs.slice(open, end + 1));
+/* Studio store catalog — one JSON object per line in src/data/storeBooks.ts. */
+const storeTs = read(join(WEB, 'src/data/storeBooks.ts'));
+const storeBooks = [...storeTs.matchAll(/^\s*(\{"title":.*\}),?\s*$/gm)].map((m) => JSON.parse(m[1]));
+const shelves = [...storeTs.matchAll(/\{ id: '([a-z]+)', label: '((?:[^'\\]|\\.)*)', blurb: '((?:[^'\\]|\\.)*)' \}/g)].map((m) => ({
+  id: m[1],
+  label: m[2].replace(/\\'/g, "'"),
+  blurb: m[3].replace(/\\'/g, "'"),
+}));
+const linksTs = read(join(WEB, 'src/empire/links.ts'));
+const playUrl = (linksTs.match(/AERO_PLAY_URL = '([^']+)'/) || [])[1];
+if (!storeBooks.length || !shelves.length || !playUrl) {
+  throw new Error('generate-site-meta: could not read the store catalog or the Google Play link');
 }
 
-/* Aeropocalypse bosses — parsed from the game's real roster data. */
 const tdTs = read(join(WEB, 'src/data/aeropocalypse.ts'));
 const bosses = [];
 for (const m of tdTs.matchAll(
@@ -424,9 +416,9 @@ routeContent['/'] = wrapMain(
 <h2>Follow and Subscribe — The 3000 Studios Podcast</h2>
 <p>${podEpisodes.length} episodes with hosts Follow and Subscribe: the day's biggest story, tech talk, a featured 3000 Studios song, and a surprise caller in every episode. <a href="/podcast">Watch and listen to every episode</a>.</p>
 <h2>Books — 3000 Studios Press</h2>
-<p>Books by Jeremy Swain: fiction, mystery, cookbooks, and creator guides. Ebooks are sold direct from the studio store; print editions are distributed through IngramSpark. <a href="/books">Browse the books</a>.</p>
+<p>${storeBooks.length} books by Jeremy Swain: fantasy, mystery, holiday cookbooks, creator playbooks, references, and exam prep. $9.99 each from the studio store, delivered as an instant download. <a href="/books">Browse the books</a>.</p>
 <h2>AEROPOCALYPSE: ONLINE</h2>
-<p>An arcade flight combat game — 25 stages and 25 boss encounters, in closed testing on Google Play. <a href="/aeropocalypse">Enter the cinematic theater and join the launch list</a>.</p>
+<p>An arcade flight combat game with 25 stages and ${bosses.length} bosses, free to play on Google Play. <a href="${playUrl}">Get it on Google Play</a> · <a href="https://aeropocalypse.online">aeropocalypse.online</a> · <a href="/aeropocalypse">The game page</a>.</p>
 <h2>More from the studio</h2>
 <p><a href="/video">Official videos</a> · <a href="/blog">Blog and studio notes</a> · <a href="/live">Live broadcasts</a> · <a href="/beats">Beat packs for license</a> · <a href="/about">About the studio</a></p>`,
 );
@@ -451,17 +443,19 @@ routeContent['/podcast'] = wrapMain(
 
 routeContent['/books'] = wrapMain(
   `<h1>Books — 3000 Studios Press</h1>
-<p>Books by Jeremy Swain, published under the 3000 Studios Press imprint. The ebooks below are sold direct from the studio store on Payhip — $9.99 each, EPUB + PDF delivered at checkout: <a href="https://payhip.com/3000Studios">payhip.com/3000Studios</a>. Print editions are distributed through IngramSpark to bookstores and libraries worldwide.</p>` +
-    books
+<p>${storeBooks.length} original titles by Jeremy Swain, published under the 3000 Studios Press imprint. $9.99 each, sold direct from the studio store on Payhip and delivered as an instant download at checkout: <a href="https://payhip.com/3000Studios">payhip.com/3000Studios</a>.</p>` +
+    shelves
+      .filter((sh) => storeBooks.some((b) => b.cat === sh.id))
       .map(
-        (b) => `
-<article>
-<h2>${escHtml(b.title)}</h2>
-<p><em>${escHtml(b.subtitle)}</em></p>
-<p>${escHtml(b.categories)}</p>
-<p>${escHtml(b.description)}</p>
-<p><a href="https://payhip.com/3000Studios">Buy the ebook — $9.99</a> · EPUB + PDF · by Jeremy Swain · 3000 Studios Press</p>
-</article>`,
+        (sh) => `
+<section>
+<h2>${escHtml(sh.label)}</h2>
+<p>${escHtml(sh.blurb)}</p>
+<ul>${storeBooks
+          .filter((b) => b.cat === sh.id)
+          .map((b) => `<li><a href="${escHtml(b.url)}">${escHtml(b.title)}</a> · $9.99</li>`)
+          .join('')}</ul>
+</section>`,
       )
       .join('') +
     `
@@ -476,7 +470,7 @@ routeContent['/about'] = wrapMain(
 <p>3000 Studios is an independent music production label and creator media brand founded by Jeremy Swain. Every release begins in the studio: original songwriting, cutting-edge AI production assistance, and meticulous human arrangement, vocal production, mixing, and mastering.</p>
 <p>The catalog is distributed globally across Spotify, Apple Music, YouTube, and all major platforms via DistroKid. Songs play as 1-minute previews right here, full tracks live on the streaming platforms, and the official videos play free via YouTube.</p>
 <p>Beyond music: Aeropocalypse, a ${bosses.length}-boss arcade combat game; a growing apps lab; books from 3000 Studios Press; the Follow and Subscribe podcast; and a live broadcast stage. One studio, every medium.</p>
-<p>The catalog today: ${songs.length} released tracks, ${podEpisodes.length} podcast episodes, ${books.length} books in the studio store, and ${articles.length} published blog articles.</p>`,
+<p>The catalog today: ${songs.length} released tracks, ${podEpisodes.length} podcast episodes, ${storeBooks.length} books in the studio store, and ${articles.length} published blog articles.</p>`,
 );
 
 routeContent['/contact'] = wrapMain(
@@ -518,7 +512,7 @@ routeContent['/blog'] = wrapMain(
 
 routeContent['/aeropocalypse'] = wrapMain(
   `<h1>AEROPOCALYPSE: ONLINE</h1>
-<p>AEROPOCALYPSE: ONLINE by 3000 Studios is an arcade flight combat game — 25 stages, 25 boss encounters, 15 jets, 19 weapons, 32 paint schemes, and a 30-track soundtrack — currently in closed testing on Google Play and launching soon. The full cinematic premieres in the theater on the game page; meet the full roster below and join the launch list.</p>
+<p>AEROPOCALYPSE: ONLINE by 3000 Studios is an arcade flight combat game with 25 stages, ${bosses.length} bosses, and 25 original songs, with party co-op and 1v1 duels. It is free to play on Google Play: <a href="${playUrl}">get it on Google Play</a>. More at <a href="https://aeropocalypse.online">aeropocalypse.online</a>. Meet the full boss roster below.</p>
 <h2>The boss roster</h2>` +
     bosses
       .map(

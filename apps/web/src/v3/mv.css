@@ -14,18 +14,18 @@
   --mv-dim: rgba(226, 236, 255, 0.62);
   --mv-line: rgba(226, 236, 255, 0.16);
   --mv-panel: rgba(3, 8, 18, 0.66);
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
   color: var(--mv-ink);
   position: relative;
 }
-.mv-display { font-family: 'Anton', 'Arial Narrow', sans-serif !important; font-weight: 400; }
+.mv-display { font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif !important; font-weight: 400; }
 .mv-wrap { padding-left: 4%; padding-right: 4%; }
 .mv-eyebrow {
   font-size: 11px; letter-spacing: 0.4em; text-transform: uppercase;
   color: var(--mv-accent); margin-bottom: 16px;
 }
 .mv-root h2.mv-h2 {
-  font-family: 'Anton', 'Arial Narrow', sans-serif !important; font-weight: 400;
+  font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif !important; font-weight: 400;
   font-size: clamp(44px, 7.5vw, 96px); line-height: 0.95;
   text-transform: uppercase; letter-spacing: 0.01em;
 }
@@ -120,7 +120,7 @@
 .mv-titleblock { position: relative; z-index: 6; margin-top: -8.5vw; padding-left: 1%; pointer-events: none; }
 @media (min-width: 768px) { .mv-titleblock { margin-top: -6.2vw; } }
 .mv-root h1.mv-bigname {
-  font-family: 'Anton', 'Arial Narrow', sans-serif !important; font-weight: 400; text-transform: uppercase;
+  font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif !important; font-weight: 400; text-transform: uppercase;
   font-size: 16.5vw; line-height: 0.82; letter-spacing: 0.005em;
   text-shadow: 0 6px 44px rgba(0,0,0,0.55);
 }
@@ -139,7 +139,7 @@
 .mv-marquee:hover .track { animation-play-state: paused; }
 @keyframes mv-reel { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .mv-marquee .item {
-  font-family: 'Anton', 'Arial Narrow', sans-serif !important; text-transform: uppercase;
+  font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif !important; text-transform: uppercase;
   font-size: 20px; letter-spacing: 0.06em; padding: 0 26px; color: var(--mv-ink);
 }
 .mv-marquee .item i { color: var(--mv-accent); font-style: normal; padding-right: 26px; }
@@ -222,7 +222,7 @@
 .mv-tile .num { font-size: 12px; color: var(--mv-accent); transition: color 0.3s; }
 .mv-tile:hover .num { color: #fff; }
 .mv-tile .pname {
-  font-family: 'Anton', 'Arial Narrow', sans-serif !important; text-transform: uppercase;
+  font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif !important; text-transform: uppercase;
   font-size: clamp(26px, 3.4vw, 44px); letter-spacing: 0.02em; transition: letter-spacing 0.3s;
 }
 .mv-tile:hover .pname { letter-spacing: 0.07em; }

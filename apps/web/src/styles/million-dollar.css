@@ -10,7 +10,7 @@
   --md-muted: #b8bdc9;
   --md-line: rgba(212, 175, 55, 0.28);
   --md-radius: 16px;
-  --md-font-display: 'Playfair Display', Georgia, serif;
+  --md-font-display: 'Big Shoulders Display', Georgia, serif;
   --md-font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
   --md-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --md-dock-h: calc(58px + env(safe-area-inset-bottom, 0px));
