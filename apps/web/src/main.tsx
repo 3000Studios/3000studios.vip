@@ -282,7 +282,7 @@ const router = createBrowserRouter([
         element: (
           <Titled
             title="AEROPOCALYPSE: ONLINE — Cinematic Theater"
-            description="The official home of AEROPOCALYPSE: ONLINE by 3000 Studios — 25 stages, 25 bosses and 25 original songs. Free to play on Google Play, with party co-op and 1v1 duels."
+            description="The official home of AEROPOCALYPSE: ONLINE by 3000 Studios — 25 stages, 24 bosses and 25 original songs. Free to play on Google Play, with party co-op and 1v1 duels."
           >
             <RouteLoader><AeropocalypsePage /></RouteLoader>
           </Titled>
