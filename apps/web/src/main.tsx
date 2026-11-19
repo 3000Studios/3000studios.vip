@@ -28,10 +28,14 @@ import {
   ProjectsPage,
   VipPage,
   MusicPage,
-  VideoPage,
 } from './pages/Home';
-import { LiveBroadcastPage } from './pages/LiveBroadcastPage';
 import { PodcastPage } from './pages/PodcastPage';
+import { BooksPage } from './pages/BooksPage';
+import { BookDetailPage } from './pages/BookDetailPage';
+import { AeropocalypsePage } from './pages/AeropocalypsePage';
+import { VideoVaultPage } from './pages/VideoVaultPage';
+import { LiveCommandPage } from './pages/LiveCommandPage';
+import { SitemapPage } from './pages/SitemapPage';
 import { BeatsPage } from './pages/BeatsPage';
 import { CommandDeckPage } from './pages/CommandDeckPage';
 import { HomePage } from './v3/HomePage';
@@ -147,7 +151,7 @@ const router = createBrowserRouter([
             title="Video Vault"
             description="Official 3000 Studios music videos and Thunderdome cinematics — free previews, $1 full unlocks."
           >
-            <VideoPage />
+            <VideoVaultPage />
           </Titled>
         ),
       },
@@ -158,7 +162,7 @@ const router = createBrowserRouter([
             title="Live Command"
             description="Watch 3000 Studios live — broadcast deck, schedule, and chat."
           >
-            <LiveBroadcastPage />
+            <LiveCommandPage />
           </Titled>
         ),
       },
@@ -354,6 +358,43 @@ const router = createBrowserRouter([
       { path: '/copyright', element: <LegalPage type="copyright" /> },
       { path: '/cookies', element: <LegalPage type="cookies" /> },
       { path: '/disclaimer', element: <LegalPage type="disclaimer" /> },
+      {
+        path: '/books',
+        element: (
+          <Titled
+            title="The Bookshelf — 3000 Studios Press"
+            description="Fiction, mystery, cookbooks and creator guides. Ebooks are $9.99, EPUB and PDF, sold direct. Print through IngramSpark."
+          >
+            <BooksPage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/books/:slug',
+        element: <BookDetailPage />,
+      },
+      {
+        path: '/aeropocalypse',
+        element: (
+          <Titled
+            title="Aeropocalypse: Online"
+            description="Arcade flight combat in closed testing on Google Play — 25 stages, 24 named bosses."
+          >
+            <AeropocalypsePage />
+          </Titled>
+        ),
+      },
+      {
+        path: '/sitemap',
+        element: (
+          <Titled
+            title="All Pages — 3000 Studios"
+            description="Every page on 3000studios.vip — music, video, podcast, books, games, shop, and studio."
+          >
+            <SitemapPage />
+          </Titled>
+        ),
+      },
       { path: '*', element: <NotFoundPage /> },
       {
         path: '/admin',

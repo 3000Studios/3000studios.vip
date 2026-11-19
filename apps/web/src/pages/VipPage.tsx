@@ -1,162 +1,140 @@
 import { Link } from 'react-router-dom';
-import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
+import { PublicLayoutV2, LiveLine, AdSenseUnit } from '../v2/PublicLayoutV2';
+import { Reveal, RevealGroup, RevealItem } from '../v2/Reveal';
 import { MERCH_ITEMS } from '../data/merch';
-import { CASH_APP_URL } from '../lib/liveRoom';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
-import '../styles/vip-luxury.css';
+import '../styles/commerce.css';
 
 const OWNER_EMAIL = 'mr.jwswain@gmail.com';
 
+type VipTier = {
+  id: string;
+  tag: string;
+  name: string;
+  price: string;
+  body: string;
+  cta: string;
+  featured?: boolean;
+};
+
+/**
+ * /vip — Behind the velvet rope, mockup section 11. Four tiers exactly.
+ * Monthly / yearly buy through the existing Stripe payment links in
+ * data/merch.ts; the sync tier is a talk-to-the-studio mailto. Front-end
+ * wiring only — coordinator to confirm the Stripe links are the live ones.
+ */
+const TIERS: VipTier[] = [
+  {
+    id: 'free',
+    tag: 'Previews + Full Songs',
+    name: 'Free Previews',
+    price: 'Free',
+    body: 'Every track previews free for a full minute. Full songs one tap away on Apple Music, Spotify and Amazon Music.',
+    cta: 'Open the vault',
+  },
+  {
+    id: 'monthly',
+    tag: 'Monthly',
+    name: 'Vault Pass',
+    price: '$3.99 / mo',
+    body: 'Full vault access, unreleased stems, exclusive drops and a priority live-stream badge for 31 days.',
+    cta: 'Get Vault Pass',
+  },
+  {
+    id: 'yearly',
+    tag: 'Best Value',
+    name: 'Vault All-Access',
+    price: '$19.99 / yr',
+    body: 'A full year with 2 months free. Every stem, the high-res catalog archive and the Discord role.',
+    cta: 'Go All-Access',
+    featured: true,
+  },
+  {
+    id: 'sync',
+    tag: 'Sync',
+    name: 'Film & Commercial',
+    price: '$99 / mo',
+    body: 'Licensing for film, ads and commercial use. Talk to the studio for terms.',
+    cta: 'Talk to the studio',
+  },
+];
+
 export function VipPage() {
+  const monthly = MERCH_ITEMS.find((m) => m.id === 'monthly');
+  const yearly = MERCH_ITEMS.find((m) => m.id === 'yearly');
+
   return (
     <PublicLayoutV2 wallpaper="aurora">
-      <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
-        
-        {/* =========================================================================
-            VIP HERO: MOLTEN GOLD & OBSIDIAN VAULT
-            ========================================================================= */}
-        <section className="vip-hero-hub">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="md-kicker">✦ THE INNER SANCTUM</span>
-            <span className="md-kicker" style={{ color: '#ffd700' }}>3000 STUDIOS VIP ACCESS</span>
-          </div>
+      <section className="v2-section commerce-hero">
+        <div className="v2-wrap">
+          <Reveal>
+            <span className="commerce-kicker">3000 Studios VIP</span>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <h1 className="commerce-title">
+              Behind the <span className="commerce-gold">velvet rope</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <p className="commerce-lede">
+              Early drops, vault tracks and member perks. Start free, go deeper when you want.
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
-          <h1 style={{ display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="vip-gold-text">VIP VAULT & PASSES</span>
-          </h1>
+      <LiveLine />
 
-          <p style={{ maxWidth: 660, margin: '0 auto 24px' }}>
-            All 47 official music releases stream 100% free forever. VIP memberships unlock uncompressed 24-bit WAV master archives, multi-track stem packs, live broadcast chat badges, and direct studio sponsorship.
-          </p>
+      <section className="v2-section" style={{ paddingTop: 0 }}>
+        <div className="v2-wrap">
+          <RevealGroup className="commerce-grid commerce-grid--4" stagger={0.08}>
+            {TIERS.map((tier) => (
+              <RevealItem key={tier.id}>
+                <article
+                  className={`commerce-card${tier.featured ? ' commerce-card--featured' : ''}`}
+                  style={{ height: '100%' }}
+                >
+                  <span className="commerce-card-tag">{tier.tag}</span>
+                  <h2 className="commerce-card-title">{tier.name}</h2>
+                  <p className="commerce-card-body">{tier.body}</p>
+                  <div className="commerce-price">{tier.price}</div>
+                  {tier.id === 'free' ? (
+                    <Link className="nn-btn nn-btn-ghost" to="/music" style={{ width: '100%', textAlign: 'center' }}>
+                      {tier.cta} →
+                    </Link>
+                  ) : tier.id === 'sync' ? (
+                    <a
+                      className="nn-btn nn-btn-ghost"
+                      href={`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent('Sync License Request — 3000 Studios')}`}
+                      style={{ width: '100%', textAlign: 'center' }}
+                    >
+                      {tier.cta} →
+                    </a>
+                  ) : (
+                    <a
+                      className="nn-btn nn-btn-gold"
+                      href={(tier.id === 'monthly' ? monthly?.stripe : yearly?.stripe) ?? '#'}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ width: '100%', textAlign: 'center' }}
+                    >
+                      {tier.cta} →
+                    </a>
+                  )}
+                </article>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
 
-          <div className="vip-badge-row">
-            <a className="vip-btn-gold" href="#vip-tiers">
-              ★ View VIP Tiers
-            </a>
-            <a className="vip-btn-obsidian" href={CASH_APP_URL} target="_blank" rel="noreferrer">
-              $ Tip $addcashGift
-            </a>
-            <Link className="vip-btn-obsidian" to="/#music">
-              ♪ Free Catalog
-            </Link>
-          </div>
-        </section>
-
-        {/* =========================================================================
-            VIP TIERS GRID
-            ========================================================================= */}
-        <section id="vip-tiers" style={{ maxWidth: 1280, margin: '0 auto 56px', padding: '0 16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
-            
-            {/* 99c Single */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                99¢ Single
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Own Any Track</h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '0 0 16px', flex: 1 }}>
-                Lossless 24-bit studio master audio download + personal license. Yours to keep forever.
-              </p>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', marginBottom: 16 }}>$0.99</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'track')?.stripe ?? '#'}>
-                Buy Track
-              </a>
-            </article>
-
-            {/* Monthly VIP */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ color: '#00f0ff', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                VIP Monthly
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Vault Pass</h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '0 0 16px', flex: 1 }}>
-                Full vault access, unreleased stems, exclusive drops, and priority live stream badge for 31 days.
-              </p>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#00f0ff', marginBottom: 16 }}>$3.99 / mo</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'monthly')?.stripe ?? '#'}>
-                Go VIP Monthly
-              </a>
-            </article>
-
-            {/* Annual VIP */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column', borderColor: 'rgba(255, 215, 0, 0.7)', boxShadow: '0 0 30px rgba(255, 215, 0, 0.25)' }}>
-              <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                ★ Best Value
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Vault All-Access</h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '0 0 16px', flex: 1 }}>
-                Full year VIP access with 2 months free. Every stem, high-res catalog archive, and Discord role.
-              </p>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', marginBottom: 16 }}>$19.99 / yr</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'yearly')?.stripe ?? '#'}>
-                Go VIP Yearly
-              </a>
-            </article>
-
-            {/* Sync Licensing */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ color: '#a855f7', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                Sync License
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Film & Commercial</h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '0 0 16px', flex: 1 }}>
-                Worldwide sync clearance for YouTube creators, films, video games, ads, and TV broadcasts.
-              </p>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#a855f7', marginBottom: 16 }}>Custom</div>
-              <a
-                className="vip-btn-obsidian"
-                href={`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent('Sync License Request — 3000 Studios')}`}
-              >
-                Request Sync
-              </a>
-            </article>
-
-            {/* Brand Sponsor */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                Sponsor Tier
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Brand Placement</h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '0 0 16px', flex: 1 }}>
-                Prominent brand placement on 3000studios.vip and live stream tickers for 30 days.
-              </p>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#ffd700', marginBottom: 16 }}>$99 / mo</div>
-              <a className="vip-btn-gold" href={MERCH_ITEMS.find((m) => m.id === 'sponsor')?.stripe ?? '#'}>
-                Sponsor Now
-              </a>
-            </article>
-
-            {/* Cash App Direct Boost */}
-            <article className="vip-glass-card" style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ color: '#00d632', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                Direct Tip
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 22, margin: '6px 0 2px', fontWeight: 800 }}>Cash App Tip</h2>
-              <p style={{ color: 'var(--vip-text-muted)', fontSize: 14, margin: '0 0 16px', flex: 1 }}>
-                Direct 1-tap artist tip to $addcashGift. Instant drop power and sound session support.
-              </p>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#00d632', marginBottom: 16 }}>Any $</div>
-              <a
-                className="vip-btn-gold"
-                href={CASH_APP_URL}
-                target="_blank"
-                rel="noreferrer"
-                style={{ background: 'linear-gradient(135deg, #00d632, #009922)', color: '#fff' }}
-              >
-                Tip $addcashGift
-              </a>
-            </article>
-          </div>
-        </section>
-
-        {/* =========================================================================
-            ADSENSE PLACEMENT
-            ========================================================================= */}
-        <section style={{ maxWidth: 1200, margin: '0 auto 48px', padding: '0 16px' }}>
+      <section className="v2-section" style={{ paddingTop: 0 }}>
+        <div className="v2-wrap">
           <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
-        </section>
+        </div>
+      </section>
 
-      </div>
+      <LiveLine />
     </PublicLayoutV2>
   );
 }

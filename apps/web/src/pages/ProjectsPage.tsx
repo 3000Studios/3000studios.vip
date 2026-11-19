@@ -2,20 +2,22 @@ import { Link } from 'react-router-dom';
 import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { STUDIO_PROJECTS } from '../data/projectsData';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
-import '../styles/vip-luxury.css';
+import '../styles/commerce.css';
 
+/**
+ * /projects — Featured Projects, mockup section 10. Three case studies
+ * with a Read the build link each. Project names follow the mockup
+ * (Aeropocalypse: Online); the repo previously called the game
+ * Thunder Dome 24 — see NOTES.md.
+ */
 export function ProjectsPage() {
   return (
     <PublicLayoutV2 wallpaper="aurora">
       <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
-        
-        {/* =========================================================================
-            PROJECTS HERO
-            ========================================================================= */}
         <section className="vip-hero-hub">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span className="md-kicker">✦ PRODUCTION PORTFOLIO</span>
-            <span className="md-kicker" style={{ color: '#00f0ff' }}>ENGINEERING & CREATIVE CASE STUDIES</span>
+            <span className="md-kicker">✦ Production Portfolio</span>
+            <span className="md-kicker" style={{ color: '#00f0ff' }}>Engineering & Creative Case Studies</span>
           </div>
 
           <h1 style={{ display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -23,12 +25,12 @@ export function ProjectsPage() {
           </h1>
 
           <p style={{ maxWidth: 660, margin: '0 auto 24px' }}>
-            Real systems engineered and shipped by 3000 Studios. Deep architectural case studies spanning game engines, audio DSP software, and edge-first web platforms.
+            How the studio builds: the architecture behind the game, the analyzer and this site.
           </p>
 
           <div className="vip-badge-row">
             <Link className="vip-btn-gold" to="/thunder-dome">
-              🛸 Thunder Dome 24
+              🛸 Aeropocalypse: Online
             </Link>
             <Link className="vip-btn-obsidian" to="/apps">
               ⚡ Software Lab
@@ -39,9 +41,6 @@ export function ProjectsPage() {
           </div>
         </section>
 
-        {/* =========================================================================
-            PROJECT CASE STUDIES
-            ========================================================================= */}
         <section style={{ maxWidth: 1240, margin: '0 auto 56px', padding: '0 16px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {STUDIO_PROJECTS.map((proj, idx) => (
@@ -68,7 +67,6 @@ export function ProjectsPage() {
                   {proj.story}
                 </p>
 
-                {/* Metrics Row */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, marginBottom: 24 }}>
                   {proj.metrics.map((m, i) => (
                     <div key={i} style={{ background: 'rgba(0, 0, 0, 0.4)', padding: '12px 16px', borderRadius: 8, border: '1px solid rgba(255, 215, 0, 0.2)' }}>
@@ -78,7 +76,6 @@ export function ProjectsPage() {
                   ))}
                 </div>
 
-                {/* Tech Stack & Action */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {proj.techStack.map((tech) => (
@@ -89,7 +86,7 @@ export function ProjectsPage() {
                   </div>
 
                   <Link to={proj.actionUrl} className="vip-btn-gold">
-                    {proj.actionLabel} ↗
+                    {proj.actionLabel} →
                   </Link>
                 </div>
               </article>
@@ -97,13 +94,9 @@ export function ProjectsPage() {
           </div>
         </section>
 
-        {/* =========================================================================
-            ADSENSE PLACEMENT
-            ========================================================================= */}
         <section style={{ maxWidth: 1200, margin: '0 auto 48px', padding: '0 16px' }}>
           <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
         </section>
-
       </div>
     </PublicLayoutV2>
   );

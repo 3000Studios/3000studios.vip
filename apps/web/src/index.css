@@ -45,6 +45,11 @@
 @import './v2/header.css';
 @import './v2/footer.css';
 @import './v3/v3.css';
+@import './v3/home-empire.css';
+@import './styles/books.css';
+@import './styles/music-vault.css';
+@import './styles/game-vip.css';
+@import './styles/commerce.css';
 
 .routeLoader {
   min-height: 100vh;

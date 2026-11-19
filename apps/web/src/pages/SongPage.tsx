@@ -1,114 +1,151 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-} from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, ShoppingBag, YoutubeLogo } from '@phosphor-icons/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { Pause, Play } from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { LazyYouTube } from '../components/LazyYouTube';
-import { rolloutSongs } from '../data/music';
-import { publishedSongs } from '../data/publishedSongs';
 import { HYPERFOLLOW_URL } from '../lib/commerce';
 import {
-  getOfficialVideoForTitle,
-  youtubeEmbedUrl,
-  youtubeWatchUrl,
-} from '../data/officialReleases';
-import { priorityShorts } from '../data/priorityShorts';
-import { publishedShorts } from '../data/publishedShorts';
-import { getSongBySlug } from '../data/songs';
-import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
+  getVaultSongBySlug,
+  featuredVaultSongs,
+  vaultSongs,
+  type VaultSong,
+} from '../data/vaultSongs';
+import { youtubeWatchUrl } from '../data/officialReleases';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import { usePageMeta } from '../lib/usePageMeta';
-import '../v2/song-page.css';
 
-const REVEAL_DELAY_MS = 2000;
+/**
+ * SongPage — /song/:slug, one release page per vault song.
+ *
+ * - The song is looked up in the deduped vault (vaultSongs), never in the
+ *   un-deduped rollout list, so /song/am-i-wrong resolves to the one kept
+ *   row instead of the first of two duplicate rows.
+ * - Nothing auto-plays. No mount-time playback, no autoplaying video
+ *   iframe: the preview starts only on the Play preview press (capped at
+ *   60 seconds), and the video mounts only after the visitor presses the
+ *   video poster.
+ * - The video comes from the unified official-release list (see
+ *   vaultSongs.getVaultVideoId): curated entries first, then
+ *   officialReleases.generated.json, matched by exact normalized title.
+ *   Songs with no video show the preview player only — no video id is
+ *   ever invented.
+ * - No carousel on this route: "More from the vault" is a static grid.
+ */
 
-const normalizeTitle = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/3000 studios/g, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
+const PREVIEW_CAP_SECONDS = 60;
+const COVER_FALLBACK = '/media/official-3000-studios-profile.png';
+const MORE_COUNT = 7;
+
+function formatTime(seconds: number): string {
+  const clamped = Math.max(0, Math.min(PREVIEW_CAP_SECONDS, Math.floor(seconds)));
+  const minutes = Math.floor(clamped / 60);
+  const remainder = clamped % 60;
+  return `${minutes}:${String(remainder).padStart(2, '0')}`;
+}
 
 export function SongPage() {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   const music = useGlobalMusic();
-  const { playIndex } = music;
-  const song = getSongBySlug(slug || '');
+  const song = getVaultSongBySlug(slug || '');
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
+  // Gate for the 1:00 cap effect. Mirrors `previewing` as a ref so the
+  // effect can clear the gate when the cap fires (or the track changes)
+  // without calling setState inside the effect. It carries the slug it was
+  // started for, so a slug change invalidates a stale gate inside the
+  // effect — refs must never be touched during render.
+  const previewGateRef = useRef<{ slug: string } | null>(null);
+
   usePageMeta({
     title: song ? `3000 Studios - ${song.title}` : 'Song',
     description: song
       ? `Listen to "${song.title}" by 3000 Studios — official music, video, and streaming links.`
       : '3000 Studios song page.',
   });
-  const [readyVideoId, setReadyVideoId] = useState('');
-  const [revealedVideoId, setRevealedVideoId] = useState('');
-  const touchStart = useRef<number | null>(null);
-  const officialVideo = useMemo(
-    () => (song ? getOfficialVideoForTitle(song.title) : undefined),
-    [song],
-  );
-  const relatedShorts = useMemo(() => {
+
+  // A fresh slug resets the video and preview state. Adjusted during
+  // render — the React-endorsed pattern for resetting state when a
+  // param changes — never setState inside an effect for this.
+  const [prevSlug, setPrevSlug] = useState(slug);
+  if (prevSlug !== slug) {
+    setPrevSlug(slug);
+    setVideoOpen(false);
+    setPreviewing(false);
+  }
+
+  const moreSongs: VaultSong[] = useMemo(() => {
     if (!song) return [];
-    const title = normalizeTitle(song.title);
-    const matching = publishedShorts.filter((short) => {
-      const candidate = normalizeTitle(short.title);
-      return title.length > 3 && (candidate.includes(title) || title.includes(candidate));
-    });
-    const candidates = matching.length ? matching : priorityShorts;
-    return candidates
-      .filter((short) => short.videoId !== officialVideo?.videoId)
-      .slice(0, 3);
-  }, [song, officialVideo]);
+    const featured = featuredVaultSongs.filter(
+      (candidate) => candidate.slug !== song.slug,
+    );
+    if (featured.length >= MORE_COUNT) return featured.slice(0, MORE_COUNT);
+    const rest = vaultSongs.filter(
+      (candidate) =>
+        candidate.slug !== song.slug &&
+        !featured.some((item) => item.slug === candidate.slug),
+    );
+    return [...featured, ...rest].slice(0, MORE_COUNT);
+  }, [song]);
 
+  const isPreviewPlaying =
+    !!song && previewing && music.activeTitle === song.title && music.isPlaying;
+  const previewTime =
+    !!song && previewing && music.activeTitle === song.title
+      ? music.currentTime
+      : 0;
+
+  // 1:00 preview cap: stop this song's preview at 60 seconds and rewind it.
   useEffect(() => {
+    const gate = previewGateRef.current;
+    if (!song || !gate || gate.slug !== slug) {
+      previewGateRef.current = null;
+      return;
+    }
+    if (music.activeTitle !== song.title) {
+      previewGateRef.current = null;
+      return;
+    }
+    if (music.isPlaying && music.currentTime >= PREVIEW_CAP_SECONDS) {
+      music.pause();
+      music.seekTo(0);
+      previewGateRef.current = null;
+    }
+  }, [song, slug, music]);
+
+  const handlePreview = () => {
     if (!song) return;
-    const index = rolloutSongs.findIndex((track) => track.slug === song.slug);
-    if (index >= 0) playIndex(index, { autoplay: true });
-  }, [song, playIndex]);
-
-  useEffect(() => {
-    if (!officialVideo) return;
-    const timer = window.setTimeout(() => {
-      setRevealedVideoId(officialVideo.videoId);
-    }, REVEAL_DELAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [officialVideo]);
-
-  const move = (delta: number) => {
-    if (!song) return;
-    const index = rolloutSongs.findIndex((track) => track.slug === song.slug);
-    const next = rolloutSongs[(index + delta + rolloutSongs.length) % rolloutSongs.length];
-    if (next) navigate(`/song/${next.slug}`);
-  };
-
-  const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
-    if (event.pointerType === 'mouse') return;
-    touchStart.current = event.clientX;
-  };
-
-  const onPointerUp = (event: ReactPointerEvent<HTMLElement>) => {
-    if (touchStart.current === null) return;
-    const distance = event.clientX - touchStart.current;
-    touchStart.current = null;
-    if (distance < -56) move(1);
-    if (distance > 56) move(-1);
+    if (isPreviewPlaying) {
+      music.pause();
+      setPreviewing(false);
+      previewGateRef.current = null;
+      return;
+    }
+    if (music.activeTitle === song.title && !music.isPlaying) {
+      music.play();
+      setPreviewing(true);
+      previewGateRef.current = { slug: song.slug };
+      return;
+    }
+    const src = song.preview || song.src;
+    if (!src) return;
+    window.dispatchEvent(
+      new CustomEvent('3000-play-track', {
+        detail: { src, title: song.title, slug: song.slug },
+      }),
+    );
+    setPreviewing(true);
+    previewGateRef.current = { slug: song.slug };
   };
 
   if (!song) {
     return (
       <PublicLayoutV2 wallpaper="eq">
-        <main className="v2-song-page">
-          <div className="v2-card v2-song-notfound">
-            <h1>
-              Track <span className="v2-grad-text">unavailable</span>
-            </h1>
-            <Link className="v2-btn" to="/music">
-              Back to music
+        <main className="mv-scope mv-song">
+          <div className="mv-notfound">
+            <h1>Track unavailable</h1>
+            <p>This song is not in the public Music Vault.</p>
+            <Link className="mv-btn mv-btn-gold" to="/music">
+              Back to the vault
             </Link>
           </div>
         </main>
@@ -116,172 +153,189 @@ export function SongPage() {
     );
   }
 
-  const progress = music.duration > 0 ? (music.currentTime / music.duration) * 100 : 0;
-  const embed = officialVideo
-    ? `${youtubeEmbedUrl(officialVideo.videoId)}&autoplay=1&mute=1&controls=0&loop=1&playlist=${officialVideo.videoId}&playsinline=1`
+  const progress = Math.min(100, (previewTime / PREVIEW_CAP_SECONDS) * 100);
+  const poster = song.videoId
+    ? `https://i.ytimg.com/vi/${song.videoId}/maxresdefault.jpg`
     : '';
-  const buyUrl =
-    publishedSongs.find((s) => s.slug === song.slug)?.buy ?? HYPERFOLLOW_URL;
 
   return (
     <PublicLayoutV2 wallpaper="eq">
-      <main
-        className="v2-song-page"
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-      >
-        <div className="v2-song-topline">
-          <button className="v2-song-back" type="button" onClick={() => navigate('/music')}>
-            <ArrowLeft size={15} weight="bold" />
-            Collection
-          </button>
-          <span>Swipe left or right · {rolloutSongs.length} verified releases</span>
-        </div>
+      <main className="mv-scope mv-song">
+        <Link className="mv-back" to="/music">
+          ← Back to the vault
+        </Link>
 
-        <section
-          className={`v2-song-cinema ${
-            officialVideo &&
-            revealedVideoId === officialVideo.videoId &&
-            readyVideoId === officialVideo.videoId
-              ? 'is-video'
-              : 'is-art'
-          }`}
-          aria-label={`${song.title} visual experience`}
-        >
-          <div
-            className="v2-song-cinema-glow"
-            style={{ backgroundImage: `url(${song.coverImage})` }}
-            aria-hidden="true"
-          />
-          <img
-            className="v2-song-cinema-cover"
-            src={song.coverImage}
-            alt={`${song.title} album artwork`}
-          />
-          {officialVideo ? (
-            <iframe
-              className="v2-song-cinema-video"
-              src={embed}
-              title={`${song.title} official video`}
-              allow="autoplay; encrypted-media; picture-in-picture"
-              onLoad={() => setReadyVideoId(officialVideo.videoId)}
+        <section className="mv-song-hero" aria-labelledby="song-title">
+          <span className="mv-kicker">Single · 3000 Studios</span>
+          <h1 id="song-title" className="mv-title">
+            {song.title}
+          </h1>
+          <p className="mv-sub">
+            Official music video on YouTube. Preview a minute here, then take
+            the full song to your platform.
+          </p>
+
+          <div className="mv-song-layout">
+            <img
+              className="mv-song-cover"
+              src={song.cover}
+              alt={`${song.title} cover art`}
+              onError={(event) => {
+                (event.target as HTMLImageElement).src = COVER_FALLBACK;
+              }}
             />
-          ) : null}
-          <div className="v2-song-cinema-shade" aria-hidden="true" />
-          <div className="v2-song-cinema-meta">
-            <span className="v2-chip">
-              {officialVideo ? 'Official video' : 'Official release'}
-            </span>
-            <h1>{song.title}</h1>
-            <p>
-              {song.artist} · {song.genre}
-            </p>
+
+            <div className="mv-player">
+              <button
+                type="button"
+                className="mv-btn mv-btn-gold mv-btn-play"
+                onClick={handlePreview}
+                aria-label={
+                  isPreviewPlaying
+                    ? `Pause ${song.title} preview`
+                    : `Play ${song.title} preview`
+                }
+              >
+                {isPreviewPlaying ? (
+                  <Pause size={20} weight="fill" />
+                ) : (
+                  <Play size={20} weight="fill" />
+                )}
+                {isPreviewPlaying ? 'Pause preview' : 'Play preview'}
+              </button>
+              <div
+                className="mv-progress"
+                role="progressbar"
+                aria-label="Preview progress"
+                aria-valuemin={0}
+                aria-valuemax={PREVIEW_CAP_SECONDS}
+                aria-valuenow={Math.floor(previewTime)}
+              >
+                <div
+                  className="mv-progress-fill"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="mv-time" aria-live="off">
+                {formatTime(previewTime)} / 1:00
+              </p>
+              <p className="mv-quiet">
+                Preview a minute here — nothing plays until you press play.
+              </p>
+
+              <div className="mv-platform-row">
+                <a
+                  className="mv-btn mv-btn-gold"
+                  href={HYPERFOLLOW_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Spotify →
+                </a>
+                {song.apple ? (
+                  <a
+                    className="mv-btn mv-btn-ghost"
+                    href={song.apple}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Apple Music →
+                  </a>
+                ) : null}
+                {song.videoId ? (
+                  <a
+                    className="mv-btn mv-btn-ghost"
+                    href={youtubeWatchUrl(song.videoId)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Watch the video →
+                  </a>
+                ) : null}
+              </div>
+
+              <p className="mv-credits">
+                <span>2026 Released</span>
+                <span aria-hidden="true">·</span>
+                <span>DistroKid Distribution</span>
+              </p>
+            </div>
           </div>
-          <button
-            className="v2-song-swipe previous"
-            type="button"
-            onClick={() => move(-1)}
-            aria-label="Previous song"
-          >
-            ‹
-          </button>
-          <button
-            className="v2-song-swipe next"
-            type="button"
-            onClick={() => move(1)}
-            aria-label="Next song"
-          >
-            ›
-          </button>
         </section>
 
-        <section className="v2-card v2-song-player">
-          <button
-            className="v2-song-play"
-            type="button"
-            onClick={music.toggle}
-            aria-label={music.isPlaying ? 'Pause' : 'Play'}
-          >
-            {music.isPlaying ? <Pause size={24} weight="fill" /> : <Play size={24} weight="fill" />}
-          </button>
-          <div className="v2-song-progress-group">
-            <div
-              className="v2-song-progress"
-              role="progressbar"
-              aria-label="Playback progress"
-              aria-valuenow={Math.round(progress)}
-            >
-              <div className="v2-song-progress-fill" style={{ width: `${progress}%` }} />
-            </div>
+        {song.videoId ? (
+          <section className="mv-section" aria-labelledby="video-heading">
+            <h2 id="video-heading">Official video</h2>
+            {videoOpen ? (
+              <LazyYouTube
+                videoId={song.videoId}
+                title={`${song.title} official video`}
+                autoLoad
+                muted={false}
+                controls
+              />
+            ) : (
+              <button
+                type="button"
+                className="mv-video-poster"
+                onClick={() => setVideoOpen(true)}
+                aria-label={`Play the ${song.title} official video`}
+                style={{ backgroundImage: `url(${poster})` }}
+              >
+                <span className="mv-video-play" aria-hidden="true">
+                  ▶
+                </span>
+                <span className="mv-video-label">Watch the video</span>
+              </button>
+            )}
+          </section>
+        ) : (
+          <section className="mv-section" aria-labelledby="video-heading">
+            <h2 id="video-heading">Official video</h2>
             <p>
-              {music.isPlaying
-                ? 'Audio-reactive experience live'
-                : 'Press play to activate the visual environment'}
+              No official video for this song yet — preview it above, then
+              hear the full song on your platform.
             </p>
-          </div>
-          {officialVideo ? (
-            <a
-              className="v2-btn v2-btn--blue v2-btn--sm"
-              href={youtubeWatchUrl(officialVideo.videoId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <YoutubeLogo size={18} weight="fill" />
-              Watch on YouTube
-            </a>
-          ) : null}
-          <div className="v2-song-buy-row">
-            <a
-              className="v2-btn v2-btn--gold v2-btn--sm"
-              href={buyUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <ShoppingBag size={16} weight="fill" />
-              Buy this track
-            </a>
-            <Link className="v2-btn v2-btn--ghost v2-btn--sm" to="/beats">
-              Beats & instrumentals
+          </section>
+        )}
+
+        <section className="mv-section" aria-labelledby="more-heading">
+          <div className="mv-sec-head">
+            <div>
+              <span className="mv-eyebrow">More from the vault</span>
+              <h2 id="more-heading">Keep listening</h2>
+            </div>
+            <Link className="mv-sec-link" to="/music">
+              All songs →
             </Link>
           </div>
-        </section>
-
-        <section className="v2-card v2-song-about">
-          <h2>About this release</h2>
-          <p>{song.description}</p>
-          <p className="v2-song-vibe">{song.vibe}</p>
-        </section>
-
-        <section className="v2-card v2-song-shorts" aria-labelledby="song-shorts-title">
-          <div className="v2-song-shorts-head">
-            <div>
-              <span>Official channel</span>
-              <h2 id="song-shorts-title">Shorts & clips</h2>
-            </div>
-            <a href="https://www.youtube.com/@3000Studio/shorts" target="_blank" rel="noreferrer">
-              All Shorts ↗
-            </a>
-          </div>
-          <div className="v2-song-shorts-rail">
-            {relatedShorts.map((short) => (
-              <article className="v2-song-short-card" key={short.videoId}>
-                <LazyYouTube
-                  className="v2-song-short-frame"
-                  videoId={short.videoId}
-                  title={short.title}
-                  muted
-                />
-                <a href={youtubeWatchUrl(short.videoId)} target="_blank" rel="noreferrer">
-                  {short.title}
-                </a>
+          <div className="mv-more-grid">
+            {moreSongs.map((item) => (
+              <article key={item.slug} className="mv-card">
+                <div className="mv-card-cover">
+                  <Link to={`/song/${item.slug}`} aria-label={item.title}>
+                    <img
+                      src={item.cover}
+                      alt={`${item.title} cover art`}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(event) => {
+                        (event.target as HTMLImageElement).src = COVER_FALLBACK;
+                      }}
+                    />
+                  </Link>
+                </div>
+                <div className="mv-card-body">
+                  <h3>
+                    <Link to={`/song/${item.slug}`}>{item.title}</Link>
+                  </h3>
+                  <span>3000 Studios · Single</span>
+                </div>
               </article>
             ))}
           </div>
         </section>
       </main>
-      <div className="v2-wrap">
-        <LiveLine />
-      </div>
     </PublicLayoutV2>
   );
 }

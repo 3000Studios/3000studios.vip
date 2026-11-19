@@ -1,0 +1,534 @@
+/* books.css — 3000 Studios Press / THE BOOKSHELF.
+ *
+ * Scoped to .books-* classes only. Uses the --md-* token namespace
+ * (Design.md §2). No !important on shared classes; the single
+ * reduced-motion block below is the allowed utility exception.
+ * Mobile-first. Animations are transform/opacity only.
+ */
+
+.books-page,
+.books-detail {
+  --books-page-pad: clamp(16px, 4vw, 40px);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(224, 38, 60, 0.07), transparent 38%),
+    linear-gradient(180deg, #07080d 0%, #05060a 100%);
+  color: var(--md-cream, #f4efe2);
+  font-family: var(--md-font-body, 'Source Sans 3', system-ui, sans-serif);
+  min-height: 100svh;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ---------- Shared type ---------- */
+
+.books-kicker {
+  color: var(--md-gold-hi, #f6dd8a);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+
+.books-title {
+  background: linear-gradient(100deg, #fff 10%, var(--md-gold-hi, #f6dd8a) 38%, var(--md-gold, #d4af37) 55%, #fff 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: var(--md-font-display, 'Playfair Display', Georgia, serif);
+  font-size: clamp(44px, 11vw, 96px);
+  line-height: 0.95;
+  margin: 0 0 16px;
+}
+
+/* ---------- BooksPage hero ---------- */
+
+.books-hero {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: clamp(40px, 8vh, 88px) var(--books-page-pad) 8px;
+  text-align: center;
+}
+
+.books-lede {
+  color: var(--md-muted, #a7adbd);
+  font-size: clamp(17px, 2.6vw, 21px);
+  line-height: 1.55;
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+.books-count {
+  align-items: center;
+  color: var(--md-cream, #f4efe2);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 15px;
+  gap: 8px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  margin: 28px 0 0;
+  text-transform: uppercase;
+}
+
+.books-count__num {
+  color: var(--md-gold-hi, #f6dd8a);
+  font-family: var(--md-font-display, 'Playfair Display', Georgia, serif);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.books-count__dot {
+  color: var(--md-gold, #d4af37);
+}
+
+.books-count__price {
+  color: var(--md-gold-hi, #f6dd8a);
+  font-weight: 700;
+}
+
+/* ---------- Shelf grid ---------- */
+
+.books-shelf {
+  display: grid;
+  gap: clamp(20px, 4vw, 32px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 40px var(--books-page-pad) 24px;
+  perspective: 1200px;
+}
+
+.books-card__link {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
+.books-card__link:focus-visible {
+  outline: 2px solid var(--md-gold-hi, #f6dd8a);
+  outline-offset: 6px;
+  border-radius: var(--md-radius, 18px);
+}
+
+.books-card__stage {
+  --books-rx: 0deg;
+  --books-ry: 0deg;
+  --books-lift: 0px;
+  aspect-ratio: 2 / 3;
+  display: block;
+  position: relative;
+  transform:
+    translateY(var(--books-lift))
+    rotateX(var(--books-rx))
+    rotateY(var(--books-ry));
+  transform-style: preserve-3d;
+  transition: transform 0.45s var(--md-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  will-change: transform;
+}
+
+.books-card__link:hover .books-card__stage,
+.books-card__link:focus-visible .books-card__stage {
+  --books-lift: -10px;
+}
+
+.books-card__stage::after {
+  border-radius: 10px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  content: '';
+  inset: 0;
+  position: absolute;
+  transition: box-shadow 0.45s var(--md-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  z-index: -1;
+}
+
+.books-card__link:hover .books-card__stage::after,
+.books-card__link:focus-visible .books-card__stage::after {
+  box-shadow: var(--md-shadow-lift, 0 24px 60px rgba(0, 0, 0, 0.55));
+}
+
+/* Spine + sheen, purely decorative. */
+.books-card__spine {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 22%);
+  border-radius: 10px 0 0 10px;
+  inset: 0 auto 0 0;
+  position: absolute;
+  width: 14px;
+}
+
+.books-card__shine {
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 32%);
+  border-radius: 10px;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.45s var(--md-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.books-card__link:hover .books-card__shine,
+.books-card__link:focus-visible .books-card__shine {
+  opacity: 1;
+}
+
+.books-cover {
+  border: 1px solid var(--md-line, rgba(212, 175, 55, 0.22));
+  border-radius: 10px;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.books-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 14px;
+}
+
+.books-card__category {
+  color: var(--md-gold-hi, #f6dd8a);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.books-card__title {
+  font-family: var(--md-font-display, 'Playfair Display', Georgia, serif);
+  font-size: clamp(19px, 3.4vw, 24px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.books-card__subtitle {
+  color: var(--md-muted, #a7adbd);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.books-card__buy {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.books-card__price {
+  color: var(--md-gold-hi, #f6dd8a);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.books-card__formats {
+  color: var(--md-muted, #a7adbd);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---------- "More ways to read" ---------- */
+
+.books-more {
+  border-top: 1px solid var(--md-line, rgba(212, 175, 55, 0.22));
+  margin: 24px auto 0;
+  max-width: 1200px;
+  padding: 36px var(--books-page-pad) 8px;
+  text-align: center;
+}
+
+.books-more__title {
+  font-family: var(--md-font-display, 'Playfair Display', Georgia, serif);
+  font-size: clamp(24px, 5vw, 34px);
+  margin: 0 0 10px;
+}
+
+.books-more__body {
+  color: var(--md-muted, #a7adbd);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 620px;
+}
+
+.books-more__back {
+  margin: 24px 0 0;
+}
+
+.books-more__link,
+.books-detail__back-link {
+  color: var(--md-gold-hi, #f6dd8a);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.books-more__link:hover,
+.books-detail__back-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- BookWallpaper ---------- */
+
+.books-wallpaper {
+  inset: 0;
+  overflow: clip;
+  position: absolute;
+}
+
+.books-wallpaper__canvas {
+  display: block;
+  inset: 0;
+  position: absolute;
+}
+
+.books-wallpaper__glow {
+  background: radial-gradient(circle, rgba(246, 221, 138, 0.22) 0%, rgba(246, 221, 138, 0) 70%);
+  border-radius: 50%;
+  height: 220px;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transition: opacity 0.3s ease;
+  width: 220px;
+}
+
+.books-wallpaper--cookies {
+  background: linear-gradient(170deg, #3a1f0d 0%, #1c0f06 55%, #0b0d14 100%);
+}
+
+.books-wallpaper--ember {
+  background: linear-gradient(170deg, #20090a 0%, #12060a 55%, #05060a 100%);
+}
+
+.books-wallpaper--foxglove {
+  background: linear-gradient(170deg, #170d24 0%, #0d1520 60%, #05060a 100%);
+}
+
+.books-wallpaper--larkspur {
+  background: linear-gradient(180deg, #060a18 0%, #0a1226 55%, #05060a 100%);
+}
+
+.books-wallpaper--marginalia {
+  background: linear-gradient(170deg, #d8c9a3 0%, #bfae82 55%, #8f7d58 100%);
+}
+
+.books-wallpaper--hidden {
+  background: linear-gradient(170deg, #0a1a1a 0%, #071014 60%, #05060a 100%);
+}
+
+.books-wallpaper--grow {
+  background: linear-gradient(170deg, #1c0608 0%, #12060a 55%, #05060a 100%);
+}
+
+.books-wallpaper--compounding {
+  background: linear-gradient(170deg, #0d1a24 0%, #0a1218 60%, #05060a 100%);
+}
+
+/* ---------- BookDetailPage ---------- */
+
+.books-detail__hero {
+  min-height: 62svh;
+  overflow: clip;
+  position: relative;
+}
+
+.books-detail__hero-inner {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 48px var(--books-page-pad);
+  position: absolute;
+}
+
+.books-detail__hero-inner .books-cover {
+  aspect-ratio: 2 / 3;
+  box-shadow: var(--md-shadow-lift, 0 24px 60px rgba(0, 0, 0, 0.55));
+  height: auto;
+  max-width: min(78vw, 340px);
+  width: 100%;
+}
+
+.books-detail__body {
+  margin: 0 auto;
+  max-width: 720px;
+  padding: 40px var(--books-page-pad) 8px;
+  text-align: center;
+}
+
+.books-detail__title {
+  font-family: var(--md-font-display, 'Playfair Display', Georgia, serif);
+  font-size: clamp(38px, 9vw, 72px);
+  line-height: 1.02;
+  margin: 0 0 14px;
+}
+
+.books-detail__subtitle {
+  color: var(--md-muted, #a7adbd);
+  font-size: clamp(18px, 3vw, 22px);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.books-detail__buy {
+  border: 1px solid var(--md-line, rgba(212, 175, 55, 0.22));
+  border-radius: var(--md-radius, 18px);
+  background: linear-gradient(160deg, rgba(212, 175, 55, 0.09), rgba(255, 255, 255, 0.02));
+  margin: 36px 0 0;
+  padding: 28px 22px;
+}
+
+.books-detail__price {
+  color: var(--md-gold-hi, #f6dd8a);
+  font-size: 40px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.books-detail__price-note {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.books-detail__formats {
+  color: var(--md-muted, #a7adbd);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  margin: 6px 0 0;
+  text-transform: uppercase;
+}
+
+.books-detail__buy-btn {
+  background: linear-gradient(160deg, var(--md-gold-hi, #f6dd8a), var(--md-gold, #d4af37));
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.35);
+  color: #1a1206;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  margin-top: 20px;
+  padding: 15px 28px;
+  transition: transform 0.25s var(--md-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.books-detail__buy-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.books-detail__buy-btn:focus-visible {
+  outline: 2px solid var(--md-gold-hi, #f6dd8a);
+  outline-offset: 4px;
+}
+
+.books-detail__print,
+.books-detail__leanpub {
+  color: var(--md-muted, #a7adbd);
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 14px 0 0;
+}
+
+.books-detail__leanpub {
+  color: var(--md-gold-hi, #f6dd8a);
+}
+
+.books-detail__back {
+  margin: 32px 0 0;
+}
+
+.books-detail__more {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 48px var(--books-page-pad) 8px;
+}
+
+.books-detail__more-title {
+  font-family: var(--md-font-display, 'Playfair Display', Georgia, serif);
+  font-size: clamp(24px, 5vw, 34px);
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.books-detail__more-list {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.books-detail__more-link {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
+.books-detail__more-link .books-cover {
+  aspect-ratio: 2 / 3;
+  height: auto;
+  transition: transform 0.3s var(--md-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.books-detail__more-link:hover .books-cover {
+  transform: translateY(-4px);
+}
+
+.books-detail__more-name {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  padding-top: 10px;
+}
+
+.books-detail__more-price {
+  color: var(--md-gold-hi, #f6dd8a);
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (min-width: 720px) {
+  .books-shelf {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .books-detail__more-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .books-detail__hero-inner .books-cover {
+    max-width: 380px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .books-shelf {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .books-card__stage,
+  .books-card__stage::after,
+  .books-card__shine,
+  .books-detail__buy-btn,
+  .books-detail__more-link .books-cover,
+  .books-wallpaper__glow {
+    transition: none !important;
+  }
+
+  .books-card__stage {
+    transform: none !important;
+  }
+}

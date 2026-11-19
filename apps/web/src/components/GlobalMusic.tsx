@@ -251,14 +251,16 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   const seek = seekTo;
 
-  // Start the site soundtrack on each fresh load. Browsers that disallow audible
-  // autoplay leave the visible music control available for the required tap.
+  // Load the first track paused on each fresh load. Nothing auto-plays:
+  // the Boss's rule is that music starts only when the visitor presses
+  // play (Studio Radio toggle, a preview button, or the music dock).
+  // The analyser is still connected so the audio-reactive header works
+  // the moment playback starts.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
-    localStorage.setItem(MUSIC_ON_KEY, '1');
-    playIndex(startIndex, { autoplay: true });
+    playIndex(startIndex);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       try {
@@ -296,12 +298,23 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Advance only after a full-length track ends. Short clips are previews
+  // (Apple ~30s, capped at 60s on song pages): when a preview ends, the
+  // next track must NOT start on its own - the visitor presses play again.
   useEffect(() => {
-    const onEnded = () => playIndex(activeIndex + 1, { autoplay: true });
+    const onEnded = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (isPlaying && audio.duration > 65) {
+        playIndex(activeIndex + 1, { autoplay: true });
+      } else {
+        setIsPlaying(false);
+      }
+    };
     const audio = audioRef.current;
     audio?.addEventListener('ended', onEnded);
     return () => audio?.removeEventListener('ended', onEnded);
-  }, [activeIndex, playIndex]);
+  }, [activeIndex, playIndex, isPlaying]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -390,7 +403,7 @@ export function GlobalMusicProvider({ children }: { children: ReactNode }) {
 
   return (
     <MusicContext.Provider value={api}>
-      <audio ref={audioRef} autoPlay preload="metadata" playsInline crossOrigin="anonymous" />
+      <audio ref={audioRef} preload="metadata" playsInline crossOrigin="anonymous" />
       {children}
     </MusicContext.Provider>
   );

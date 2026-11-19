@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   YoutubeLogo,
@@ -7,10 +6,11 @@ import {
   InstagramLogo,
   TiktokLogo,
   FacebookLogo,
-  PaperPlaneTilt,
+  Play,
+  Pause,
 } from '@phosphor-icons/react';
-
-const SHOP_URL = 'https://boughtitonline.com';
+import { EmpireBrand, SHOP_URL } from './Header';
+import { useGlobalMusic } from '../components/GlobalMusic';
 
 const SOCIALS = [
   { label: 'YouTube', href: 'https://www.youtube.com/@3000Studio', icon: <YoutubeLogo size={22} weight="duotone" /> },
@@ -21,64 +21,95 @@ const SOCIALS = [
   { label: 'Apple Music', href: 'https://music.apple.com/us/artist/3000-studios/6802721597', icon: <AppleLogo size={22} weight="duotone" /> },
 ];
 
-const EXPLORE = [
-  { to: '/music', label: 'Music' },
-  { to: '/video', label: 'Videos' },
-  { to: '/#promos', label: 'Music Promo' },
-  { to: '/beats', label: 'Music For Sale' },
+type FooterLink = { to: string; label: string; external?: boolean };
+
+// Link columns per the redesign mockup. "Books" points at /books, a route
+// the books slice adds — see home/NOTES.md. "Aeropocalypse" points at the
+// live game route /thunder-dome until the Aeropocalypse slice ships
+// /aeropocalypse.
+const PLAY: FooterLink[] = [
+  { to: '/thunder-dome', label: 'Aeropocalypse' },
+  { to: '/apps', label: 'Apps' },
+  { to: '/projects', label: 'Projects' },
+  { to: '/live', label: 'Live' },
+];
+
+const LISTEN: FooterLink[] = [
+  { to: '/music', label: 'Music Vault' },
+  { to: '/video', label: 'Video Vault' },
   { to: '/podcast', label: 'Podcast' },
-  { to: '/thunder-dome', label: 'Thunderdome' },
-  { to: '/live', label: 'Live Stream' },
+  { to: '/beats', label: 'Beat Packs' },
 ];
 
-const STUDIO = [
-  { to: '/about', label: 'About the studio' },
+const BUY: FooterLink[] = [
+  { to: '/books', label: 'Books' },
+  { to: SHOP_URL, label: 'Shop', external: true },
+  { to: '/vip', label: 'VIP' },
+  { to: '/sponsors', label: 'Sponsors' },
+];
+
+const STUDIO: FooterLink[] = [
+  { to: '/about', label: 'About' },
   { to: '/blog', label: 'Blog' },
-  { to: '/community', label: 'Community' },
-  { to: '/requests', label: 'Request a song' },
-  { to: '/contact', label: 'Contact / booking' },
-  { to: SHOP_URL, label: 'Shop — boughtitonline.com', external: true },
+  { to: '/requests', label: 'Requests' },
+  { to: '/contact', label: 'Contact' },
 ];
 
-const LEGAL = [
-  { to: '/privacy', label: 'Privacy' },
-  { to: '/privacy-policy', label: 'Privacy Policy' },
-  { to: '/terms', label: 'Terms' },
-  { to: '/copyright', label: 'Copyright' },
-  { to: '/cookies', label: 'Cookies' },
-  { to: '/disclaimer', label: 'Disclaimer' },
-];
+function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
+  return (
+    <nav className="v2-footer-col" aria-label={title}>
+      <h3>{title}</h3>
+      <ul>
+        {links.map((l) => (
+          <li key={l.label}>
+            {l.external ? (
+              <a href={l.to} target="_blank" rel="noreferrer">
+                {l.label}
+              </a>
+            ) : (
+              <Link to={l.to}>{l.label}</Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/**
+ * Studio Radio status line. GlobalMusic owns playback; the footer only
+ * reflects it. Nothing plays until a visitor presses play.
+ */
+function StudioRadio() {
+  const { isPlaying, toggle, activeTitle } = useGlobalMusic();
+  return (
+    <div className="v2-footer-radio">
+      <span className="v2-footer-radio-label">Studio Radio</span>
+      <button
+        type="button"
+        className={`v2-footer-radio-btn${isPlaying ? ' is-on' : ''}`}
+        onClick={toggle}
+        aria-pressed={isPlaying}
+        aria-label={isPlaying ? `Pause Studio Radio, now playing ${activeTitle}` : 'Play Studio Radio'}
+      >
+        {isPlaying ? <Pause size={15} weight="fill" /> : <Play size={15} weight="fill" />}
+        <span>{isPlaying ? `On · ${activeTitle}` : 'Off until you press play'}</span>
+      </button>
+    </div>
+  );
+}
 
 export function Footer() {
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
-
-  const subscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    window.location.href = `mailto:Team@3000studios.vip?subject=${encodeURIComponent(
-      'VIP list signup',
-    )}&body=${encodeURIComponent(`Please add ${email.trim()} to the 3000 Studios VIP list.`)}`;
-    setSent(true);
-  };
-
   return (
-    <footer className="v2-footer">
+    <footer className="v2-footer v2-footer--empire">
       <hr className="v2-live-line" />
-      <div className="v2-wrap v2-footer-grid">
+      <div className="v2-wrap v2-footer-grid v2-footer-grid--empire">
         <div className="v2-footer-brand">
-          <Link to="/" className="v2-brand" aria-label="3000 Studios home">
-            <img src="/media/official-3000-studios-profile.png" alt="" className="v2-brand-logo" />
-            <span className="v2-brand-word">
-              <strong>
-                3000<span className="v2-grad-text">Studios</span>
-              </strong>
-              <small>VIP · MUSIC · LIVE</small>
-            </span>
+          <Link to="/" className="v2-brand v2-brand--empire" aria-label="3000 Studios home">
+            <EmpireBrand />
           </Link>
           <p className="v2-footer-blurb">
-            Independent music production from Acworth, Georgia. Original songs, cinematic videos,
-            and live broadcasts — straight from the studio.
+            Independent music, games, books, software and live media, run by Jeremy Swain.
           </p>
           <div className="v2-socials">
             {SOCIALS.map((s) => (
@@ -96,67 +127,24 @@ export function Footer() {
           </div>
         </div>
 
-        <nav className="v2-footer-col" aria-label="Explore">
-          <h3>Explore</h3>
-          <ul>
-            {EXPLORE.map((l) => (
-              <li key={l.label}>
-                <Link to={l.to}>{l.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <FooterColumn title="Play" links={PLAY} />
+        <FooterColumn title="Listen" links={LISTEN} />
+        <FooterColumn title="Buy" links={BUY} />
+        <FooterColumn title="Studio" links={STUDIO} />
+      </div>
 
-        <nav className="v2-footer-col" aria-label="Studio">
-          <h3>Studio</h3>
-          <ul>
-            {STUDIO.map((l) => (
-              <li key={l.label}>
-                {'external' in l && l.external ? (
-                  <a href={l.to} target="_blank" rel="noreferrer">
-                    {l.label}
-                  </a>
-                ) : (
-                  <Link to={l.to}>{l.label}</Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="v2-footer-col v2-footer-news">
-          <h3>Join the VIP list</h3>
-          <p>Get new drops, live alerts, and exclusives first.</p>
-          {sent ? (
-            <p className="v2-news-done">Opening your mail app — hit send and you&apos;re in.</p>
-          ) : (
-            <form onSubmit={subscribe} className="v2-news-form">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@email.com"
-                aria-label="Email address"
-                className="v2-input"
-              />
-              <button type="submit" className="v2-btn v2-btn--sm" aria-label="Join the VIP list">
-                <PaperPlaneTilt size={16} weight="bold" /> Join
-              </button>
-            </form>
-          )}
-        </div>
+      <div className="v2-wrap v2-footer-radio-row">
+        <StudioRadio />
       </div>
 
       <div className="v2-wrap v2-footer-bottom">
-        <p>© {new Date().getFullYear()} 3000 Studios · Acworth, Georgia. All rights reserved.</p>
+        <p>3000 Studios. All rights reserved.</p>
         <nav aria-label="Legal">
-          {LEGAL.map((l, i) => (
-            <span key={l.to}>
-              {i > 0 && <i className="v2-dot" aria-hidden="true" />}
-              <Link to={l.to}>{l.label}</Link>
-            </span>
-          ))}
+          <Link to="/privacy">Privacy</Link>
+          <i className="v2-dot" aria-hidden="true" />
+          <Link to="/terms">Terms</Link>
+          <i className="v2-dot" aria-hidden="true" />
+          <Link to="/sitemap">All pages</Link>
         </nav>
       </div>
     </footer>

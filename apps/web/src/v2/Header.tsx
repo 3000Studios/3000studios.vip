@@ -8,9 +8,13 @@ import {
   GameController,
   Broadcast,
   EnvelopeSimple,
+  BookOpen,
+  AppWindow,
+  Crown,
   CaretDown,
 } from '@phosphor-icons/react';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
+import { useAudioBeat } from '../lib/useAudioBeat';
 
 export type NavChild = { to: string; label: string; external?: boolean };
 export type NavItem = {
@@ -23,8 +27,16 @@ export type NavItem = {
 
 export const SHOP_URL = 'https://boughtitonline.com';
 
+// The game lives at /thunder-dome today; the Aeropocalypse slice owns the
+// future /aeropocalypse route. Books links to /books, owned by the books
+// slice — see home/NOTES.md. Both are flagged there, not silently dropped.
 // eslint-disable-next-line react-refresh/only-export-components
 export const NAV_ITEMS: NavItem[] = [
+  {
+    to: '/thunder-dome',
+    label: 'Games',
+    icon: <GameController size={20} weight="duotone" />,
+  },
   {
     to: '/music',
     label: 'Music',
@@ -46,20 +58,30 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
+    to: '/books',
+    label: 'Books',
+    icon: <BookOpen size={20} weight="duotone" />,
+  },
+  {
+    to: '/apps',
+    label: 'Apps',
+    icon: <AppWindow size={20} weight="duotone" />,
+  },
+  {
+    to: '/live',
+    label: 'Live',
+    icon: <Broadcast size={20} weight="duotone" />,
+  },
+  {
+    to: '/vip',
+    label: 'VIP',
+    icon: <Crown size={20} weight="duotone" />,
+  },
+  {
     to: SHOP_URL,
     label: 'Shop',
     icon: <ShoppingBag size={20} weight="duotone" />,
     external: true,
-  },
-  {
-    to: '/thunder-dome',
-    label: 'Thunderdome',
-    icon: <GameController size={20} weight="duotone" />,
-  },
-  {
-    to: '/live',
-    label: 'Live Stream',
-    icon: <Broadcast size={20} weight="duotone" />,
   },
   {
     to: '/contact',
@@ -82,6 +104,28 @@ function isActive(pathname: string, hash: string, to: string) {
 function itemActive(pathname: string, hash: string, item: NavItem): boolean {
   if (item.to && !item.external && isActive(pathname, hash, item.to)) return true;
   return !!item.children?.some((c) => isActive(pathname, hash, c.to));
+}
+
+/**
+ * Empire brand mark, per the redesign mockup: 3K monogram, 3000 STUDIOS
+ * wordmark, EST. ACWORTH GA. The wordmark and monogram glow pulse with
+ * `--header-beat` (see useAudioBeat) — transform/opacity only, still when
+ * nothing plays or under prefers-reduced-motion.
+ */
+export function EmpireBrand() {
+  return (
+    <span className="v2-brand-word">
+      <span className="v2-brand-mark v2-brand-mark--beat" aria-hidden="true">
+        3K
+      </span>
+      <span className="v2-brand-word--beat">
+        <strong>
+          3000<span className="v2-brand-gold">STUDIOS</span>
+        </strong>
+        <small>EST. ACWORTH GA</small>
+      </span>
+    </span>
+  );
 }
 
 /** Hamburger button: idle pulse, morphs into an X on tap. */
@@ -147,6 +191,10 @@ export function Header() {
   const location = useLocation();
   const reduce = usePrefersReducedMotion();
 
+  // Audio-reactive header: drives --header-beat from the shared analyser.
+  // Fully still when nothing plays or under prefers-reduced-motion.
+  useAudioBeat();
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
@@ -167,7 +215,7 @@ export function Header() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [open ]);
+  }, [open]);
 
   const hash = location.hash;
 
@@ -175,14 +223,8 @@ export function Header() {
     <>
       <header className={`v2-header${scrolled ? ' is-scrolled' : ''}`}>
         <div className="v2-header-inner">
-          <Link to="/" className="v2-brand" aria-label="3000 Studios home">
-            <img src="/media/official-3000-studios-profile.png" alt="" className="v2-brand-logo" />
-            <span className="v2-brand-word">
-              <strong>
-                3000<span className="v2-grad-text">Studios</span>
-              </strong>
-              <small>VIP · MUSIC · LIVE</small>
-            </span>
+          <Link to="/" className="v2-brand v2-brand--empire" aria-label="3000 Studios home">
+            <EmpireBrand />
           </Link>
 
           <nav className="v2-nav-desktop" aria-label="Primary">

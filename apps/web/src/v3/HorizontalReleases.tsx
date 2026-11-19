@@ -81,6 +81,14 @@ export function HorizontalReleases() {
   const maxIndex = Math.max(0, videos.length - perView);
 
   const [index, setIndex] = useState(0);
+  // Keep the slide index in range when perView changes. Adjusted during
+  // render — the React-endorsed pattern for syncing state to a value
+  // change — never setState inside an effect for this.
+  const [prevMaxIndex, setPrevMaxIndex] = useState(maxIndex);
+  if (prevMaxIndex !== maxIndex) {
+    setPrevMaxIndex(maxIndex);
+    setIndex((i) => Math.min(i, maxIndex));
+  }
   const [userPaused, setUserPaused] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [dragPx, setDragPx] = useState(0);
@@ -90,11 +98,6 @@ export function HorizontalReleases() {
   const suppressClick = useRef(false);
 
   const paused = userPaused || reducedMotion;
-
-  // keep index in range when perView changes
-  useEffect(() => {
-    setIndex((i) => Math.min(i, maxIndex));
-  }, [maxIndex]);
 
   // auto-rotate timer
   useEffect(() => {

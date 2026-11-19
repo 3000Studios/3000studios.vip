@@ -1,175 +1,262 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MagnifyingGlass, PlayCircle } from '@phosphor-icons/react';
-import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
-import { publishedSongs } from '../data/publishedSongs';
-import { SongCarousel } from '../components/SongCarousel';
-import { OFFICIAL_PLATFORM_LINKS } from '../data/platforms';
+import { MagnifyingGlass, Pause, Play } from '@phosphor-icons/react';
+import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
+import { HYPERFOLLOW_URL, PLATFORMS } from '../lib/commerce';
 import { useGlobalMusic } from '../components/GlobalMusic';
-import { ADSENSE_HOME_SLOT } from '../lib/adsense';
+import { VaultCarousel } from '../components/VaultCarousel';
+import {
+  VAULT_SONG_COUNT,
+  featuredVaultSongs,
+  vaultSongs,
+  type VaultSong,
+} from '../data/vaultSongs';
+
+/**
+ * MusicPage — /music, the public Music Vault.
+ *
+ * - DistroKid-only: every song comes from vaultSongs (the deduped
+ *   publishedSongs.generated.json). Private library songs never appear.
+ * - Exactly ONE carousel on this route: VaultCarousel (featured 8).
+ *   The catalog below it is a plain searchable list, not a carousel.
+ * - Nothing auto-plays. No hero video, no mount-time playback: a preview
+ *   starts only when a visitor presses a preview button, and it is capped
+ *   at 60 seconds.
+ */
+
+const PREVIEW_CAP_SECONDS = 60;
+const COVER_FALLBACK = '/media/official-3000-studios-profile.png';
+
+function platformUrl(id: string): string {
+  return PLATFORMS.find((platform) => platform.id === id)?.url ?? HYPERFOLLOW_URL;
+}
+
+function normalizeSearch(value: string): string {
+  return value.toLowerCase().trim();
+}
 
 export function MusicPage() {
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'ALL' | 'ORIGINALS' | 'SINGLES'>('ALL');
   const music = useGlobalMusic();
+  // The preview this page started. A ref, not state: the render never reads
+  // it (play state comes from the global player), and the 1:00 cap effect
+  // can clear it without calling setState inside an effect.
+  const previewingRef = useRef<{
+    slug: string;
+    title: string;
+  } | null>(null);
 
-  const filteredSongs = useMemo(() => {
-    return publishedSongs.filter((song) => {
-      const matchSearch = song.title.toLowerCase().includes(search.toLowerCase());
-      if (!matchSearch) return false;
-      if (filter === 'ORIGINALS') return song.title.toLowerCase().includes('original') || !song.title.toLowerCase().includes('single');
-      if (filter === 'SINGLES') return song.title.toLowerCase().includes('single') || true;
-      return true;
-    });
-  }, [search, filter]);
+  const query = normalizeSearch(search);
+  const filteredSongs = useMemo(
+    () =>
+      vaultSongs.filter((song) =>
+        normalizeSearch(song.title).includes(query),
+      ),
+    [query],
+  );
 
-  const handlePlaySong = (song: typeof publishedSongs[0]) => {
-    const src = song.preview || song.src;
-    if (src) {
-      window.dispatchEvent(
-        new CustomEvent('3000-play-track', {
-          detail: { src, title: song.title, slug: song.slug },
-        })
-      );
+  const handlePlaySong = (song: VaultSong) => {
+    const isActive = music.activeTitle === song.title;
+    if (isActive && music.isPlaying) {
+      music.pause();
+      previewingRef.current = null;
+      return;
     }
+    if (isActive && !music.isPlaying) {
+      music.play();
+      previewingRef.current = { slug: song.slug, title: song.title };
+      return;
+    }
+    const src = song.preview || song.src;
+    if (!src) return;
+    window.dispatchEvent(
+      new CustomEvent('3000-play-track', {
+        detail: { src, title: song.title, slug: song.slug },
+      }),
+    );
+    previewingRef.current = { slug: song.slug, title: song.title };
   };
+
+  // 1:00 preview cap: stop a vault preview at 60 seconds and rewind it.
+  // Gated on the preview this page started, so the global player's other
+  // playback is never touched.
+  useEffect(() => {
+    const previewing = previewingRef.current;
+    if (!previewing) return;
+    if (music.activeTitle !== previewing.title) {
+      previewingRef.current = null;
+      return;
+    }
+    if (music.isPlaying && music.currentTime >= PREVIEW_CAP_SECONDS) {
+      music.pause();
+      music.seekTo(0);
+      previewingRef.current = null;
+    }
+  }, [music]);
 
   return (
     <PublicLayoutV2 wallpaper="aurora">
-      <div className="nn-scope">
-        <section className="nn-hero">
-          <video
-            className="nn-hero-video-bg"
-            src="https://cdn.3000studios.vip/cinematics/game-intro-v1.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-hidden="true"
-          />
-          <div className="nn-hero-shade" aria-hidden="true" />
-          <div className="nn-btn-row" style={{ marginBottom: 18 }}>
-            <span className="nn-kicker">✦ Official discography</span>
-            <span className="nn-kicker nn-kicker--gold">{publishedSongs.length} master releases</span>
-          </div>
-          <h1 className="nn-chrome" style={{ fontSize: 'clamp(38px, 8vw, 84px)' }}>
-            MUSIC VAULT
-          </h1>
-          <p>
-            Original high-energy electronic, bass, hip-hop, and cybernetic
-            compositions produced by Jeremy Swain. Every official DistroKid
-            release streams free in full.
+      <div className="mv-scope">
+        <section className="mv-hero">
+          <span className="mv-kicker">Official discography · DistroKid</span>
+          <h1 className="mv-title">{VAULT_SONG_COUNT} SONGS. ONE VAULT.</h1>
+          <p className="mv-sub">
+            Every track previews free for one minute. Full songs live on
+            Spotify, Apple Music and every other platform.
           </p>
-          <div className="nn-btn-row">
+          <div className="mv-platform-row" aria-label="Listen on">
             <a
-              className="nn-btn nn-btn-gold"
-              href="https://distrokid.com/hyperfollow/3000studios"
+              className="mv-btn mv-btn-gold"
+              href={platformUrl('spotify')}
               target="_blank"
               rel="noreferrer"
             >
-              ✦ HyperFollow hub
+              Spotify →
             </a>
             <a
-              className="nn-btn nn-btn-ghost"
-              href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
+              className="mv-btn mv-btn-ghost"
+              href={platformUrl('apple')}
               target="_blank"
               rel="noreferrer"
             >
-              ▶ YouTube channel
+              Apple Music →
             </a>
-            <Link className="nn-btn nn-btn-ghost" to="/video">
-              ▣ Music videos
-            </Link>
+            <a
+              className="mv-btn mv-btn-ghost"
+              href={platformUrl('youtube')}
+              target="_blank"
+              rel="noreferrer"
+            >
+              YouTube →
+            </a>
+            <a
+              className="mv-btn mv-btn-ghost"
+              href={HYPERFOLLOW_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              HyperFollow hub →
+            </a>
           </div>
+          <p className="mv-quiet">
+            Nothing plays until you press play. Previews run one minute.
+          </p>
         </section>
 
-        <section className="nn-wrap" style={{ marginBottom: 40 }}>
-          <div className="nn-glass" style={{ padding: 20 }}>
-            <div style={{ textAlign: 'center', marginBottom: 14, fontSize: 12, color: 'var(--nn-muted)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>
-              Stream 3000 Studios across verified platforms
-            </div>
-            <div className="nn-btn-row">
-              {OFFICIAL_PLATFORM_LINKS.map((p) => (
-                <a
-                  key={p.name}
-                  href={p.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="nn-btn nn-btn-ghost"
-                  style={{ fontSize: 13, padding: '8px 16px' }}
-                >
-                  <span style={{ color: p.color }}>{p.icon}</span>
-                  <span>{p.name}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="nn-wrap" style={{ marginBottom: 56 }}>
-          <div className="nn-sec-head">
+        <section className="mv-section" aria-labelledby="featured-heading">
+          <div className="mv-sec-head">
             <div>
-              <h2 className="nn-chrome-gold" style={{ fontSize: 'clamp(24px, 4.5vw, 36px)' }}>
-                Official Music Vault ({filteredSongs.length} Tracks)
-              </h2>
-              <p>Click play on any song to stream instantly or open the high-res detail page.</p>
+              <span className="mv-eyebrow">Featured</span>
+              <h2 id="featured-heading">New in the vault</h2>
             </div>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-              {(['ALL', 'ORIGINALS', 'SINGLES'] as const).map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setFilter(cat)}
-                  className={`nn-chip${filter === cat ? ' is-active' : ''}`}
-                >
-                  {cat}
-                </button>
-              ))}
-              <span style={{ position: 'relative' }}>
-                <MagnifyingGlass
-                  size={16}
-                  style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--nn-muted)' }}
-                />
-                <input
-                  type="text"
-                  placeholder="Search catalog..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="nn-input"
-                  style={{ paddingLeft: 38, minWidth: 180 }}
-                />
-              </span>
-            </div>
+            <a className="mv-sec-link" href="#catalog">
+              All {VAULT_SONG_COUNT} songs ↓
+            </a>
           </div>
-
-          <SongCarousel
-            songs={filteredSongs}
+          <VaultCarousel
+            songs={featuredVaultSongs}
             onPlay={handlePlaySong}
             activeTitle={music.activeSong.title}
             isPlaying={music.isPlaying}
           />
+        </section>
 
-          <div style={{ textAlign: 'center', marginTop: 28 }}>
-            <Link className="nn-btn nn-btn-cyan" to="/video">
-              <PlayCircle size={18} /> Unlock full videos + downloads — $1
-            </Link>
+        <section
+          id="catalog"
+          className="mv-section"
+          aria-labelledby="catalog-heading"
+        >
+          <div className="mv-sec-head">
+            <div>
+              <span className="mv-eyebrow">The full catalog</span>
+              <h2 id="catalog-heading">
+                All {VAULT_SONG_COUNT} songs
+              </h2>
+              <p>
+                {query
+                  ? `Showing ${filteredSongs.length} of ${VAULT_SONG_COUNT} songs.`
+                  : 'Every DistroKid release, one minute free each.'}
+              </p>
+            </div>
+            <label className="mv-search">
+              <span className="mv-search-icon" aria-hidden="true">
+                <MagnifyingGlass size={18} />
+              </span>
+              <span className="mv-sr-only">Find a song</span>
+              <input
+                type="search"
+                placeholder="Find a song"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                aria-label="Find a song"
+              />
+            </label>
           </div>
-        </section>
 
-        <section className="nn-wrap">
-          <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
+          {filteredSongs.length === 0 ? (
+            <div className="mv-empty-block">
+              <p>No songs match “{search}”.</p>
+              <button
+                type="button"
+                className="mv-btn mv-btn-ghost mv-btn-sm"
+                onClick={() => setSearch('')}
+              >
+                Clear search
+              </button>
+            </div>
+          ) : (
+            <ol className="mv-catalog">
+              {filteredSongs.map((song) => {
+                const vaultIndex = vaultSongs.findIndex(
+                  (candidate) => candidate.slug === song.slug,
+                );
+                const isActive =
+                  music.activeTitle === song.title && music.isPlaying;
+                return (
+                  <li key={song.slug} className="mv-row">
+                    <span className="mv-row-num" aria-hidden="true">
+                      {String(vaultIndex + 1).padStart(2, '0')}
+                    </span>
+                    <img
+                      className="mv-row-cover"
+                      src={song.cover}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      onError={(event) => {
+                        (event.target as HTMLImageElement).src = COVER_FALLBACK;
+                      }}
+                    />
+                    <span className="mv-row-title">
+                      <Link to={`/song/${song.slug}`}>{song.title}</Link>
+                      <span>3000 Studios · Single</span>
+                    </span>
+                    <span className="mv-row-length">1:00</span>
+                    <button
+                      type="button"
+                      className={`mv-btn mv-btn-preview${isActive ? ' is-playing' : ''}`}
+                      onClick={() => handlePlaySong(song)}
+                      aria-label={
+                        isActive
+                          ? `Pause ${song.title} preview`
+                          : `Preview ${song.title}`
+                      }
+                    >
+                      {isActive ? <Pause size={16} weight="fill" /> : <Play size={16} weight="fill" />}
+                      {isActive ? 'Pause' : 'Preview'}
+                    </button>
+                    <Link
+                      className="mv-btn mv-btn-ghost mv-btn-sm"
+                      to={`/song/${song.slug}`}
+                    >
+                      Details →
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
         </section>
-
-        <footer className="nn-footer">
-          <strong className="nn-chrome-gold">3000 STUDIOS</strong>
-          <nav>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-            <Link to="/contact">Contact</Link>
-          </nav>
-          <p>© 2026 3000 Studios · All rights reserved</p>
-        </footer>
       </div>
     </PublicLayoutV2>
   );

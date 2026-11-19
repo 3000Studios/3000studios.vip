@@ -1,33 +1,34 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
+import { Reveal } from '../v2/Reveal';
 import { STUDIO_APPS } from '../data/appsData';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
-import '../styles/vip-luxury.css';
+import '../styles/commerce.css';
+
+/**
+ * /apps — Apps Lab, mockup section 9. Filters ALL / Audio Tool / Game /
+ * AI Engine / Web Platform; the four mockup cards with the mockup's
+ * descriptions. Game card follows the mockup name (Aeropocalypse: Online);
+ * the repo previously called it Thunder Dome 24 — see NOTES.md.
+ */
+const CATEGORIES = ['ALL', 'Audio Tool', 'Game', 'AI Engine', 'Web Platform'] as const;
 
 export function AppsPage() {
   const [filter, setFilter] = useState<string>('ALL');
 
-  const categories = ['ALL', 'Audio Tool', 'Game', 'AI Engine', 'Web Platform'];
-  const filteredApps = filter === 'ALL'
-    ? STUDIO_APPS
-    : STUDIO_APPS.filter((a) => a.category === filter);
+  const filteredApps =
+    filter === 'ALL' ? STUDIO_APPS : STUDIO_APPS.filter((a) => a.category === filter);
 
   return (
     <PublicLayoutV2 wallpaper="aurora">
       <div className="md-scope" style={{ minHeight: '100vh', paddingBottom: '90px' }}>
-        
-        {/* =========================================================================
-            APPS HERO: MACHINED CHROME & SOFTWARE MATRIX
-            ========================================================================= */}
         <section className="vip-hero-hub">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
             <span className="md-kicker" style={{ color: '#00f0ff', borderColor: 'rgba(0, 240, 255, 0.4)' }}>
-              ✦ 3000 STUDIOS SOFTWARE LAB
+              ✦ 3000 Studios Software Lab
             </span>
-            <span className="md-kicker">
-              PRODUCTION APPLICATIONS
-            </span>
+            <span className="md-kicker">Production Applications</span>
           </div>
 
           <h1 style={{ display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -40,9 +41,9 @@ export function AppsPage() {
 
           <div className="vip-badge-row">
             <Link className="vip-btn-gold" to="/thunder-dome">
-              🛸 Play Thunder Dome
+              🛸 Play Aeropocalypse
             </Link>
-            <Link className="vip-btn-obsidian" to="/#music">
+            <Link className="vip-btn-obsidian" to="/music">
               ♪ Velvet Audio Engine
             </Link>
             <Link className="vip-btn-obsidian" to="/live">
@@ -51,17 +52,15 @@ export function AppsPage() {
           </div>
         </section>
 
-        {/* =========================================================================
-            FILTER TABS
-            ========================================================================= */}
         <section style={{ maxWidth: 1240, margin: '0 auto 36px', padding: '0 16px' }}>
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-            {categories.map((cat) => (
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }} role="group" aria-label="Filter apps">
+            {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setFilter(cat)}
                 className="vip-btn-obsidian"
+                aria-pressed={filter === cat}
                 style={{
                   fontSize: 13,
                   padding: '8px 18px',
@@ -76,9 +75,6 @@ export function AppsPage() {
           </div>
         </section>
 
-        {/* =========================================================================
-            APPS GRID: PRODUCT LAUNCH TILES
-            ========================================================================= */}
         <section style={{ maxWidth: 1240, margin: '0 auto 56px', padding: '0 16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
             {filteredApps.map((app) => (
@@ -110,7 +106,6 @@ export function AppsPage() {
                   {app.description}
                 </p>
 
-                {/* Highlights */}
                 <div style={{ background: 'rgba(0, 0, 0, 0.4)', padding: '14px', borderRadius: 8, border: '1px solid rgba(255, 215, 0, 0.15)', marginBottom: 20 }}>
                   <span style={{ color: '#fff', fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 8, textTransform: 'uppercase' }}>
                     Key Architectural Capabilities:
@@ -122,7 +117,6 @@ export function AppsPage() {
                   </ul>
                 </div>
 
-                {/* Tech Stack Chips */}
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 24, marginTop: 'auto' }}>
                   {app.techStack.map((tech) => (
                     <span key={tech} style={{ background: 'rgba(255, 255, 255, 0.06)', color: 'var(--vip-cream)', fontSize: 11, padding: '3px 8px', borderRadius: 4 }}>
@@ -131,7 +125,6 @@ export function AppsPage() {
                   ))}
                 </div>
 
-                {/* Action CTA */}
                 {app.actionUrl.startsWith('/') ? (
                   <Link to={app.actionUrl} className="vip-btn-gold" style={{ textAlign: 'center' }}>
                     {app.actionLabel} ↗
@@ -144,15 +137,18 @@ export function AppsPage() {
               </article>
             ))}
           </div>
+          {filteredApps.length === 0 && (
+            <Reveal>
+              <p style={{ color: 'var(--vip-text-muted)', textAlign: 'center', padding: '40px 0' }}>
+                No apps in this category yet.
+              </p>
+            </Reveal>
+          )}
         </section>
 
-        {/* =========================================================================
-            ADSENSE PLACEMENT
-            ========================================================================= */}
         <section style={{ maxWidth: 1200, margin: '0 auto 48px', padding: '0 16px' }}>
           <AdSenseUnit slot={ADSENSE_HOME_SLOT} />
         </section>
-
       </div>
     </PublicLayoutV2>
   );

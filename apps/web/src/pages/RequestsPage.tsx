@@ -1,33 +1,51 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { Fire, Sparkle } from '@phosphor-icons/react';
+import { Sparkle } from '@phosphor-icons/react';
 import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
 import { Reveal, RevealGroup, RevealItem } from '../v2/Reveal';
+import '../styles/commerce.css';
 
 type RequestIdea = {
   id: string;
   name: string;
   idea: string;
   mood: string;
-  votes: number;
   createdAt: string;
 };
 
+const MOODS = [
+  { value: 'cinematic', label: 'Cinematic Epic' },
+  { value: 'street', label: 'Heavy Street Anthem' },
+  { value: 'club', label: 'Club & EDM Energy' },
+  { value: 'soul', label: 'Soul & Spiritual' },
+  { value: 'story', label: 'Deep Storytelling' },
+] as const;
+
+const STORAGE_KEY = '3000studios-requests-v1';
+
+/**
+ * /requests — Concept board, mockup section 14.
+ * Pick a mood tile, describe the idea, send it to the studio.
+ * Front-end only: submissions persist in this browser's localStorage and
+ * land on the concept board below. No backend endpoint is wired yet —
+ * coordinator to connect the send path (see NOTES.md).
+ */
 export function RequestsPage() {
   const [ideas, setIdeas] = useState<RequestIdea[]>(() => {
     try {
-      const raw = localStorage.getItem('3000studios-requests-v1');
+      const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? (JSON.parse(raw) as RequestIdea[]) : [];
     } catch {
       return [];
     }
   });
   const [name, setName] = useState('');
-  const [mood, setMood] = useState('cinematic');
+  const [mood, setMood] = useState<string>('cinematic');
   const [idea, setIdea] = useState('');
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     try {
-      localStorage.setItem('3000studios-requests-v1', JSON.stringify(ideas));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
     } catch {
       /* ignore */
     }
@@ -40,80 +58,104 @@ export function RequestsPage() {
       {
         id: crypto.randomUUID(),
         name: name.trim() || 'VIP Producer',
-        mood,
+        mood: MOODS.find((m) => m.value === mood)?.label ?? mood,
         idea: idea.trim().slice(0, 360),
-        votes: 1,
         createdAt: new Date().toISOString(),
       },
       ...current,
     ]);
     setIdea('');
-  }
-
-  function handleVote(id: string) {
-    setIdeas((current) =>
-      current.map((item) => (item.id === id ? { ...item, votes: item.votes + 1 } : item))
-    );
+    setSent(true);
   }
 
   return (
     <PublicLayoutV2 wallpaper="waves">
-      <section className="v2-section">
+      <section className="v2-section commerce-hero">
         <div className="v2-wrap" style={{ maxWidth: 960 }}>
           <Reveal>
-            <span className="v2-kicker">Studio Lab</span>
+            <span className="commerce-kicker">Concept Board</span>
           </Reveal>
           <Reveal delay={0.08}>
-            <h1 className="v2-display">
-              Song Request & <span className="v2-grad-text">Concept Board</span>
+            <h1 className="commerce-title">
+              Commission <span className="commerce-gold">a track</span>
             </h1>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="v2-lede" style={{ marginTop: 16, maxWidth: 540 }}>
-              Pitch your ideas for the next 3000 Studios track. Upvote concepts you want
-              to hear produced and mastered.
+            <p className="commerce-lede">
+              Pick a mood, tell the studio the idea, and it lands on the concept board.
             </p>
           </Reveal>
 
           <Reveal delay={0.24}>
-            <div className="v2-card" style={{ padding: 'clamp(20px, 4vw, 32px)', marginTop: 32 }}>
+            <div className="commerce-moods" role="group" aria-label="Pick a mood">
+              {MOODS.map((m) => (
+                <button
+                  key={m.value}
+                  type="button"
+                  className="commerce-mood"
+                  aria-pressed={mood === m.value}
+                  onClick={() => setMood(m.value)}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.3}>
+            <div className="v2-card" style={{ padding: 'clamp(20px, 4vw, 32px)', marginTop: 28, textAlign: 'left' }}>
               <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <div className="v2-grid-2">
-                  <input
-                    className="v2-input"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name or producer tag"
-                    maxLength={42}
-                    aria-label="Your name or producer tag"
-                  />
-                  <select
-                    className="v2-input"
-                    value={mood}
-                    onChange={(e) => setMood(e.target.value)}
-                    aria-label="Song mood"
-                  >
-                    <option value="cinematic">Cinematic Epic</option>
-                    <option value="street">Heavy Street Anthem</option>
-                    <option value="club">Club & EDM Energy</option>
-                    <option value="soul">Soul & Spiritual</option>
-                    <option value="story">Deep Storytelling</option>
-                  </select>
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: 6, color: 'var(--v2-text)', fontSize: 14, fontWeight: 700 }}>
+                    Mood
+                    <select
+                      className="v2-input"
+                      value={mood}
+                      onChange={(e) => setMood(e.target.value)}
+                      aria-label="Mood"
+                    >
+                      {MOODS.map((m) => (
+                        <option key={m.value} value={m.value}>
+                          {m.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: 6, color: 'var(--v2-text)', fontSize: 14, fontWeight: 700 }}>
+                    Your name
+                    <input
+                      className="v2-input"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      maxLength={80}
+                      aria-label="Your name"
+                    />
+                  </label>
                 </div>
-                <textarea
-                  className="v2-input"
-                  value={idea}
-                  onChange={(e) => setIdea(e.target.value)}
-                  placeholder="What theme, melody, or style should the next song have?"
-                  maxLength={360}
-                  rows={3}
-                  style={{ resize: 'vertical' }}
-                  aria-label="Your song concept"
-                />
+                <label style={{ display: 'flex', flexDirection: 'column', gap: 6, color: 'var(--v2-text)', fontSize: 14, fontWeight: 700 }}>
+                  The idea
+                  <textarea
+                    className="v2-input"
+                    value={idea}
+                    onChange={(e) => setIdea(e.target.value)}
+                    placeholder="What should the track sound like?"
+                    maxLength={360}
+                    rows={4}
+                    style={{ resize: 'vertical' }}
+                    aria-label="The idea"
+                    required
+                  />
+                </label>
                 <button type="submit" className="v2-btn" style={{ alignSelf: 'flex-start', minWidth: 200 }}>
                   <Sparkle size={18} weight="fill" />
-                  Submit Concept
+                  Send to the studio
                 </button>
+                {sent && (
+                  <p style={{ color: 'var(--v2-muted)', fontSize: 14, margin: 0 }} role="status">
+                    Sent — your idea is on the concept board below.
+                  </p>
+                )}
               </form>
             </div>
           </Reveal>
@@ -125,10 +167,7 @@ export function RequestsPage() {
       <section className="v2-section" style={{ paddingTop: 0 }}>
         <div className="v2-wrap" style={{ maxWidth: 960 }}>
           <div className="v2-sec-head">
-            <h2 className="v2-sec-title">
-              <Fire size={26} weight="duotone" style={{ verticalAlign: '-4px', color: 'var(--v2-neon)' }} />{' '}
-              Top Requested Concepts
-            </h2>
+            <h2 className="v2-sec-title">The Concept Board</h2>
             <span className="v2-chip">{ideas.length} ideas</span>
           </div>
           <RevealGroup>
@@ -144,33 +183,15 @@ export function RequestsPage() {
                 <RevealItem key={item.id}>
                   <article
                     className="v2-card v2-card--lift"
-                    style={{
-                      padding: 20,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: 16,
-                      flexWrap: 'wrap',
-                    }}
+                    style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 6 }}
                   >
-                    <div style={{ flex: 1, minWidth: 260 }}>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
-                        <span className="v2-chip">{item.mood}</span>
-                        <strong style={{ color: 'var(--v2-text)', fontSize: 14 }}>{item.name}</strong>
-                      </div>
-                      <p style={{ color: 'var(--v2-text)', fontSize: 15, margin: '4px 0 0', lineHeight: 1.5 }}>
-                        {item.idea}
-                      </p>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <span className="v2-chip">{item.mood}</span>
+                      <strong style={{ color: 'var(--v2-text)', fontSize: 14 }}>{item.name}</strong>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleVote(item.id)}
-                      className="v2-btn v2-btn--ghost v2-btn--sm"
-                      style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-                    >
-                      <Fire size={18} weight="fill" />
-                      <strong>{item.votes} Votes</strong>
-                    </button>
+                    <p style={{ color: 'var(--v2-text)', fontSize: 15, margin: '4px 0 0', lineHeight: 1.5 }}>
+                      {item.idea}
+                    </p>
                   </article>
                 </RevealItem>
               ))}

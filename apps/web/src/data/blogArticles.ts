@@ -13,47 +13,57 @@ export interface BlogArticle {
     body: string[];
   }[];
   tags: string[];
+  /** Long-read pull quote, only where the mockup supplies one. */
+  pullQuote?: string;
 }
 
+/**
+ * The six Studio Notes posts from the redesign mockup (sections 15–16).
+ * Titles and categories follow the mockup exactly. Four articles carry the
+ * full body copy already in the repo; the last two have no body copy in the
+ * repo, so they ship as long-read shells (title + category only) until the
+ * studio supplies the text — see NOTES.md.
+ */
 export const BLOG_ARTICLES: BlogArticle[] = [
   {
-    slug: 'how-thunder-domes-24-bosses-were-designed',
-    title: "How Thunder Dome's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns",
-    category: 'Game Design & Engineering',
+    slug: 'aeropocalypse-bosses',
+    title: "How Aeropocalypse's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns",
+    category: 'Games',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-15',
     updatedAt: '2026-09-28',
     readTime: '6 min read',
-    summary: 'A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Thunder Dome’s 24 unique boss fights.',
+    summary: 'A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Aeropocalypse’s 24 unique boss fights.',
     leadParagraph: 'When building a high-speed arcade flight combat game in pure JavaScript and Canvas, the biggest architectural challenge is creating boss encounters that feel visually overwhelming while remaining completely fair, readable, and responsive on mobile touchscreens.',
     sections: [
       {
         heading: '1. The Mathematics of Bullet Emitters',
         body: [
-          'Rather than spawning hundreds of unmanaged particle objects every frame, Thunder Dome utilizes a high-efficiency pre-allocated object pool. Each boss phase calculates trigonometric bullet trajectories using parametric spiral equations:',
+          'Rather than spawning hundreds of unmanaged particle objects every frame, Aeropocalypse utilizes a high-efficiency pre-allocated object pool. Each boss phase calculates trigonometric bullet trajectories using parametric spiral equations:',
           'By varying the rotational delta θ and velocity vectors dynamically against the game clock, we create complex geometric bullet curtains—like the "Magma Caldera Eruption" in Level 2 or the "Chronos Vortex" in Level 24—with virtually zero garbage collection stutter.',
         ],
       },
       {
         heading: '2. Multi-Phase Telegraphing & Weak Points',
         body: [
-          'Every boss in Thunder Dome features distinct visual telegraphs before executing devastating signature attacks. Glowing obsidian armor plates shift to molten gold, indicating a 600ms vulnerability window where precision hits deal 3x critical damage.',
+          'Every boss in Aeropocalypse features distinct visual telegraphs before executing devastating signature attacks. Glowing obsidian armor plates shift to molten gold, indicating a 600ms vulnerability window where precision hits deal 3x critical damage.',
           'This dynamic risk-reward loop ensures that players who master evasive maneuvers can speedrun boss stages and climb the global leaderboards.',
         ],
       },
       {
         heading: '3. Mobile Touch Optimization & Input Latency',
         body: [
-          'On mobile devices, touch lag can destroy the arcade experience. Thunder Dome bypasses standard DOM event bubbling, capturing direct PointerEvents on the raw canvas viewport with sub-millisecond interpolation.',
+          'On mobile devices, touch lag can destroy the arcade experience. Aeropocalypse bypasses standard DOM event bubbling, capturing direct PointerEvents on the raw canvas viewport with sub-millisecond interpolation.',
         ],
       },
     ],
-    tags: ['Game Dev', 'TypeScript', 'Canvas 2D', 'Thunder Dome', 'Boss Design'],
+    pullQuote: 'Four threat classes set the pace: ALPHA, OMEGA, TITAN and NEXUS.',
+    tags: ['Game Dev', 'TypeScript', 'Canvas 2D', 'Aeropocalypse', 'Boss Design'],
   },
   {
     slug: 'inside-amped-ear-3000-spectral-audio',
     title: 'Inside Amped Ear 3000: Real-Time Audio Analysis & Low-Latency Web Audio DSP',
-    category: 'Audio Engineering',
+    category: 'Software',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-10',
     updatedAt: '2026-09-25',
@@ -86,7 +96,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: 'building-production-site-on-cloudflare-pages',
     title: 'Building a Zero-Lag Production Website on Cloudflare Pages & Workers',
-    category: 'Web Architecture',
+    category: 'Engineering',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-05',
     updatedAt: '2026-09-22',
@@ -118,7 +128,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: 'how-3000-studios-uses-ai-to-build-faster',
     title: 'How 3000 Studios Uses AI to Accelerate Music, Visuals, and Code Production',
-    category: 'AI Workflows',
+    category: 'Studio',
     author: 'Jeremy Swain',
     publishedAt: '2026-08-30',
     updatedAt: '2026-09-20',
@@ -147,4 +157,40 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     ],
     tags: ['AI Workflows', 'Music Production', 'Indie Studio', 'Agentic Coding'],
   },
+  {
+    slug: 'from-demo-to-distrokid',
+    title: 'From Demo to DistroKid: How a 3000 Studios Single Is Made, Start to Finish',
+    category: 'Music',
+    author: 'Jeremy Swain',
+    publishedAt: '',
+    updatedAt: '',
+    readTime: '',
+    summary: '',
+    leadParagraph: '',
+    sections: [],
+    tags: ['DistroKid', 'Music Production', 'Singles'],
+  },
+  {
+    slug: 'inside-3000-studios-press',
+    title: 'Inside 3000 Studios Press: How a Book Goes From Manuscript to Print and Ebook',
+    category: 'Press',
+    author: 'Jeremy Swain',
+    publishedAt: '',
+    updatedAt: '',
+    readTime: '',
+    summary: '',
+    leadParagraph: '',
+    sections: [],
+    tags: ['3000 Studios Press', 'Books', 'Publishing'],
+  },
 ];
+
+/** Old slug for the bosses article — kept resolving so existing links keep working. */
+export const BLOG_SLUG_ALIASES: Record<string, string> = {
+  'how-thunder-domes-24-bosses-were-designed': 'aeropocalypse-bosses',
+};
+
+export function findBlogArticle(slug: string): BlogArticle | undefined {
+  const resolved = BLOG_SLUG_ALIASES[slug] ?? slug;
+  return BLOG_ARTICLES.find((a) => a.slug === resolved);
+}
