@@ -5,6 +5,7 @@ import { PublicLayoutV2, AdSenseUnit } from '../v2/PublicLayoutV2';
 import { AERO_BOSSES, AERO_SHIPS, AERO_WEAPONS } from '../data/aeropocalypse';
 import { AERO_STILLS } from '../data/aeropocalypseStills';
 import { CINEMATIC_CDN } from '../data/videoCatalog';
+import { AeroTrailer } from '../components/AeroTrailer';
 import { ADSENSE_HOME_SLOT } from '../lib/adsense';
 import '../styles/aeropocalypse.css';
 
@@ -125,6 +126,8 @@ export function AeropocalypsePage() {
             ))}
           </div>
         </div>
+
+        <AeroTrailer title="The official trailer" />
 
         {/* ================================================================
             GOOGLE PLAY LAUNCH PANEL — honest pre-launch CTA.
