@@ -1,6 +1,7 @@
 @import './styles/acss-fleet.css';
 @import './styles/variables.css';
 @import './styles/theme.css';
+@import './styles/foundation.css';
 @import './styles/vip-luxury.css';
 @import './styles/next-gen.css';
 @import './styles/global.css';

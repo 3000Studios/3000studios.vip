@@ -1,0 +1,31 @@
+{
+  "at": "2026-09-21T09:47:49.340Z",
+  "siteUrl": "https://3000studios.vip",
+  "checks": [
+    {
+      "id": "robots",
+      "ok": true,
+      "detail": "apps/web/public/robots.txt"
+    },
+    {
+      "id": "sitemap",
+      "ok": true,
+      "detail": "apps/web/public/sitemap.xml"
+    },
+    {
+      "id": "ads_txt",
+      "ok": true,
+      "detail": "apps/web/public/ads.txt"
+    },
+    {
+      "id": "headers",
+      "ok": true,
+      "detail": "apps/web/public/_headers"
+    },
+    {
+      "id": "web_package",
+      "ok": true,
+      "detail": "production website remains apps/web"
+    }
+  ]
+}

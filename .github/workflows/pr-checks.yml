@@ -1,0 +1,46 @@
+name: PR checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - phase3/cinematic-foundation
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: typecheck lint test build playwright
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Typecheck web
+        run: npx tsc -b --pretty false
+        working-directory: apps/web
+      - name: Lint web
+        run: npx eslint src --max-warnings=0
+        working-directory: apps/web
+      - name: Web unit tests
+        run: npx vitest run
+        working-directory: apps/web
+      - name: Studio OS tests
+        run: npm run test -w studio-os
+      - name: Release-machine tests
+        run: npm run test -w release-machine
+      - name: Production web build
+        run: npm run build -w web
+      - name: Playwright Chromium
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - name: Playwright smoke
+        run: npx playwright test
+        working-directory: apps/web

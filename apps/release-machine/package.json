@@ -1,0 +1,23 @@
+{
+  "name": "release-machine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "3000 Studios release-machine CLI (drag/drop UI later). Uses studio-os orchestrator.",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "node -e \"process.exit(0)\"",
+    "job": "node --import tsx src/cli.ts",
+    "ui": "node --import tsx src/server.ts"
+  },
+  "dependencies": {
+    "studio-os": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
+  }
+}

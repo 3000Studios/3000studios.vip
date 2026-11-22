@@ -1,0 +1,18 @@
+{
+  "beforeGlobalCssKb": 245.16,
+  "largestFiles": [
+    { "file": "landing.css", "kb": 71.7, "rules": 505, "now": "HomeContent/LegacyPages only" },
+    { "file": "console.css", "kb": 25.3, "now": "Admin/Shell" },
+    { "file": "lock.css", "kb": 17.6, "now": "Admin" },
+    { "file": "stream-studio.css", "kb": 15.3, "now": "Live" },
+    { "file": "admin-easy.css", "kb": 9.0, "now": "Admin" },
+    { "file": "music-deck.css", "kb": 7.3, "now": "MusicDeck" },
+    { "file": "song-drop.css", "kb": 7.0, "now": "SongDrop" },
+    { "file": "million-dollar.css", "kb": 11.0, "now": "SwipeHome" }
+  ],
+  "criticalKept": [
+    "variables", "theme", "global", "components", "foundation",
+    "cinematic-vip", "nav-epic", "film-world", "premium-shell",
+    "platform-finish", "mobile-touch", "mobile-polish", "site-polish"
+  ]
+}

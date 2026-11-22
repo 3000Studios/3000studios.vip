@@ -1,0 +1,17 @@
+{
+  "release": "Not Giving Up Tonight",
+  "slug": "not-giving-up-tonight",
+  "youtubeId": "tIY1WU9N_RU",
+  "audio": "/media/not-giving-up-tonight.mp3",
+  "cover": "/media/covers/not-giving-up-tonight.jpg",
+  "probe": {
+    "duration": 228.16,
+    "sampleRate": 44100,
+    "channels": 2,
+    "loudnessLufs": -14.37,
+    "waveformBuckets": 64
+  },
+  "pipeline": "blocked_approval (expected until owner --approve)",
+  "webmaster": "apps/web/src/data/studioOsCatalog.generated.json",
+  "playwright": "package @playwright/test not installed; HTTP smoke used instead"
+}

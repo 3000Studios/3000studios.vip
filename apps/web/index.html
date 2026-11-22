@@ -17,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://www.youtube-nocookie.com" />
     <link rel="preconnect" href="https://i.ytimg.com" />
+    <link rel="preload" as="image" href="/media/hero-lcp-480.webp" type="image/webp" fetchpriority="high" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
@@ -77,8 +78,15 @@
       }
     </script>
     <title>3000 Studios VIP — Official Music & Live Stage</title>
+    <!--HOME_SHELL_CSS-->
   </head>
   <body>
+    <!--HOME_SHELL-->
+    <script>
+      if (location.pathname === '/' || location.pathname === '') {
+        document.documentElement.classList.add('is-home-lcp');
+      }
+    </script>
     <div id="root"></div>
     <div id="consent-banner"></div>
     <script type="module" src="/src/main.tsx"></script>

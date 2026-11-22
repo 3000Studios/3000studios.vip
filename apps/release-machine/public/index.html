@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3000 Studios Release Machine</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #0b0b0c; color: #eee; margin: 0; padding: 24px; }
+      h1 { color: #d4af37; }
+      .card { border: 1px solid #333; border-radius: 12px; padding: 16px; margin: 12px 0; background: #141416; }
+      button { background: #d4af37; border: 0; padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+      pre { white-space: pre-wrap; font-size: 12px; }
+      input, select { padding: 8px; border-radius: 8px; border: 1px solid #444; background: #111; color: #fff; }
+    </style>
+  </head>
+  <body>
+    <h1>Release Machine</h1>
+    <p>Drop an approved master. DistroKid submit stays manual.</p>
+    <div class="card">
+      <form id="f">
+        <p><label>Title <input name="title" required value="Not Giving Up Tonight" /></label></p>
+        <p><label>Artist <input name="artist" value="3000 Studios" /></label></p>
+        <p><label>Master path <input name="master" style="width:70%" value="apps/web/public/media/not-giving-up-tonight.mp3" /></label></p>
+        <p><label>Cover <input name="cover" style="width:70%" value="/media/covers/not-giving-up-tonight.jpg" /></label></p>
+        <p><label>YouTube id <input name="youtube" value="tIY1WU9N_RU" /></label></p>
+        <p><label><input type="checkbox" name="approved" /> Owner approved to pass publish gate</label></p>
+        <button type="submit">Run pipeline</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Job</h2>
+      <pre id="out">Idle</pre>
+    </div>
+    <script>
+      document.getElementById('f').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const body = Object.fromEntries(fd.entries());
+        body.approved = fd.get('approved') === 'on';
+        document.getElementById('out').textContent = 'Running…';
+        const res = await fetch('/api/run', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+        document.getElementById('out').textContent = await res.text();
+      });
+    </script>
+  </body>
+</html>

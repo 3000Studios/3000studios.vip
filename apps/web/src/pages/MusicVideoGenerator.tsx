@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import '../styles/music-video-generator.css';
 
 type Platform = 'youtube' | 'shorts' | 'tiktok' | 'instagram';
 type VideoStyle = 'cinematic' | 'neon' | 'street' | 'surreal' | 'performance' | 'visualizer';

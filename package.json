@@ -25,7 +25,11 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "music-video:package": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Create-MusicVideoPackage.ps1",
-    "env:sync": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Sync-CloudflareEnv.ps1"
+    "music-video:package": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Create-MusicVideoPackage.ps1",
+    "env:sync": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Sync-CloudflareEnv.ps1",
+    "os:test": "npm run test -w studio-os",
+    "os:job": "npm run job -w release-machine --",
+    "os:audit": "npm run audit:site -w studio-os"
   },
   "repository": {
     "type": "git",
@@ -47,6 +51,7 @@
     "@vitest/coverage-v8": "^4.1.12",
     "eslint": "^10.13.0",
     "playwright": "^1.64.1",
+    "@playwright/test": "1.64.1",
     "prettier": "^3.9.10",
     "turbo": "^2.9.6",
     "typescript": "^6.0.3",

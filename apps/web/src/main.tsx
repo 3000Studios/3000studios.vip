@@ -44,6 +44,7 @@ const OfficePage = lazy(() => import('./pages/OfficePage').then((m) => ({ defaul
 const PhoneGoLive = lazy(() => import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })));
 const ShopPage = lazy(() => import('./pages/Shop').then((m) => ({ default: m.ShopPage })));
 const ConceptBoard = lazy(() => import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })));
+const WallpaperPage = lazy(() => import('./pages/WallpaperPage').then((m) => ({ default: m.WallpaperPage })));
 import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
@@ -355,6 +356,17 @@ const router = createBrowserRouter([
             description="3000 Studios concept board — ideas in progress, vote on what gets made."
           >
             <RouteLoader><ConceptBoard /></RouteLoader>
+          </Titled>
+        ),
+      },
+      {
+        path: '/wallpaper',
+        element: (
+          <Titled
+            title="Live Wallpaper"
+            description="3000 Studios live video wallpaper — the studio stage as your backdrop."
+          >
+            <RouteLoader><WallpaperPage /></RouteLoader>
           </Titled>
         ),
       },

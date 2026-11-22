@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { DudeAgent } from './DudeAgent';
 import '../v2/admin.css';
+import '../styles/app.css';
+import '../styles/console.css';
 
 const NAV = [
   {

@@ -30,6 +30,7 @@ const navItems = [
   { to: '/community', label: 'Chat', icon: '◎', hint: 'Community' },
   { to: '/requests', label: 'Requests', icon: '♬', hint: 'Pitch Songs' },
   { to: '/sponsors', label: 'Sponsors', icon: '◆', hint: 'Partners' },
+  { to: '/wallpaper', label: 'Wallpaper', icon: '🎨', hint: 'Live visuals' },
   { to: '/about', label: 'About', icon: '◇', hint: 'The Studio' },
   { to: '/contact', label: 'Contact', icon: '✉', hint: 'Direct Inquiry' },
   { to: '/admin', label: 'Admin', icon: '⚙', hint: 'Owner Console' },

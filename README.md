@@ -21,8 +21,12 @@ Turborepo monorepo (npm workspaces):
 |---------|------|
 | `apps/web` | React 19 + Vite 8 + React Router → Cloudflare Pages (`3000studios-vip`) |
 | `apps/api` | Hono Worker `apex-citadel-api` + D1 + R2 (owner/ops API) |
-| `apps/web/functions` | Cloudflare Pages Functions (`/api/*` live-room, stream-config, pay, …) |
+| `functions` | Cloudflare Pages Functions (`/api/*` live-room, stream-config, pay, …) |
+| `apps/release-machine` | CLI for song package + release jobs (Phase 1) |
+| `packages/studio-os` | Master orchestrator, cost/fallback routers, manifests, audits |
 | `packages/shared` | Shared Zod types |
+
+Songwriting canon: `SONGWRITING.md`. Orchestrator: `ORCHESTRATOR.md`. See `PROJECT_INDEX.md` and `docs/ARCHITECTURE.md`.
 
 ## Local dev
 
@@ -52,6 +56,14 @@ node apps/web/scripts/repair-catalog-paths.mjs   # copies DistroKid-named MP3s �
 ## Owner vault / ops (Apex Citadel)
 
 Protected routes (`/vault`, `/agent`) and the Worker API are the **owner monitoring / self-healing control center** for the site portfolio. Fail-closed Cloudflare Access is intentional — do not weaken it for public music playback.
+
+Studio OS checks:
+
+   ```bash
+   npm run test
+   npm run os:test
+   npm run os:audit
+   ```
 
 Vault features: site health, incidents, Stream vault, Dude agent, AdSense observability.
 

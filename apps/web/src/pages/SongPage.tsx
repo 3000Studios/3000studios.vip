@@ -22,6 +22,7 @@ import {
 import { priorityShorts } from '../data/priorityShorts';
 import { publishedShorts } from '../data/publishedShorts';
 import { getSongBySlug } from '../data/songs';
+import { getStudioOsRelease } from '../data/studioOsCatalog';
 import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
 import { usePageMeta } from '../lib/usePageMeta';
 import '../v2/song-page.css';
@@ -59,6 +60,7 @@ export function SongPage() {
     () => (song ? getOfficialVideoForTitle(song.title) : undefined),
     [song],
   );
+  const osRelease = song ? getStudioOsRelease(song.slug) : undefined;
   const relatedShorts = useMemo(() => {
     if (!song) return [];
     const title = normalizeTitle(song.title);
@@ -302,9 +304,46 @@ export function SongPage() {
 
         <section className="v2-card v2-song-about acss-texture">
           <h2>About this release</h2>
-          <p>{song.description}</p>
+          <p>{osRelease?.story || osRelease?.description || song.description}</p>
+          {osRelease?.releaseDate ? <p>Released {osRelease.releaseDate}</p> : null}
+          {osRelease?.duration ? <p>{osRelease.duration}</p> : null}
           <p className="v2-song-vibe">{song.vibe}</p>
         </section>
+
+        {osRelease?.lyrics ? (
+          <section className="v2-card v2-song-about acss-texture">
+            <h2>Lyrics</h2>
+            <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{osRelease.lyrics}</pre>
+          </section>
+        ) : null}
+
+        {osRelease?.credits && osRelease.credits.length > 0 ? (
+          <section className="v2-card v2-song-about acss-texture">
+            <h2>Credits</h2>
+            <ul>
+              {osRelease.credits.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {osRelease?.streaming && Object.keys(osRelease.streaming).length > 0 ? (
+          <section className="v2-card v2-song-about acss-texture">
+            <h2>Listen</h2>
+            <ul>
+              {Object.entries(osRelease.streaming).map(([k, url]) =>
+                url ? (
+                  <li key={k}>
+                    <a href={url} target="_blank" rel="noreferrer">
+                      {k}
+                    </a>
+                  </li>
+                ) : null,
+              )}
+            </ul>
+          </section>
+        ) : null}
 
         <section className="v2-card v2-song-shorts" aria-labelledby="song-shorts-title">
           <div className="v2-song-shorts-head">
