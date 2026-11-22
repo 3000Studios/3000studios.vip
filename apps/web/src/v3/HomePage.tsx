@@ -94,11 +94,12 @@ export function HomePage() {
   };
 
   useEffect(() => {
-    if (playing) bumpIdle();
+    if (!playing) return undefined;
+    const id = window.setTimeout(bumpIdle, 0);
     return () => {
+      window.clearTimeout(id);
       if (idleTimer.current) window.clearTimeout(idleTimer.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing]);
 
   const selectVideo = (v: OfficialReleaseVideo, autoplay: boolean) => {

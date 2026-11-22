@@ -33,6 +33,7 @@ export function ThreeReactiveBackground() {
 
   useEffect(() => {
     if (!mountRef.current) return;
+    const mount = mountRef.current;
 
     // GPU fallback guard (VIP-1000X fix #11): mobile browsers without an
     // available WebGL/WebGPU adapter must fall back cleanly to the page's
@@ -74,7 +75,7 @@ export function ThreeReactiveBackground() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
 
-    mountRef.current.appendChild(renderer.domElement);
+    mount.appendChild(renderer.domElement);
 
     camera.position.z = 25;
 
@@ -132,8 +133,8 @@ export function ThreeReactiveBackground() {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('click', attachAudio);
       cancelAnimationFrame(animationFrameId);
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
+      if (mount.contains(renderer.domElement)) {
+        mount.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };

@@ -240,8 +240,9 @@ function OfficeWindow() {
   );
 
   useEffect(() => {
-    void start('auto');
+    const id = window.setTimeout(() => void start('auto'), 0);
     return () => {
+      window.clearTimeout(id);
       runRef.current += 1;
       teardown();
     };
