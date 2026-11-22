@@ -58,7 +58,7 @@ const STORES = [
   { to: GUMROAD_URL, label: 'Tools on Gumroad' },
   { to: SHOP_URL, label: 'Bought It Online' },
   { to: 'https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI', label: 'Podcast on Spotify' },
-  { to: 'https://paypal.me/3000Studios', label: 'Tip the studio on PayPal' },
+  { to: 'https://www.paypal.com/donate/?business=mr.jwswain@gmail.com&currency_code=USD', label: 'Tip the studio on PayPal' },
 ];
 
 const LEGAL = [

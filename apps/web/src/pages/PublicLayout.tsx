@@ -388,7 +388,7 @@ export function PublicLayout({
                 <li><a href="https://3000studios.gumroad.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🧰 Tools & Bundles — Gumroad</a></li>
                 <li><a href="https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>📖 Books at Barnes & Noble</a></li>
                 <li><a href="https://3000studios.substack.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>📰 Studio Newsletter — Substack</a></li>
-                <li><a href="https://paypal.me/3000Studios" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>♥ Tip the Studio (PayPal)</a></li>
+                <li><a href="https://www.paypal.com/donate/?business=mr.jwswain@gmail.com&currency_code=USD" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>♥ Tip the Studio (PayPal)</a></li>
                 <li><a href="https://open.spotify.com/show/033SHVotmOb7vSOUOOcmFI" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎙 3000 Studios Podcast (Spotify)</a></li>
                 <li><a href="https://aeropocalypse.online" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>🎮 Aeropocalypse: Online</a></li>
               </ul>
