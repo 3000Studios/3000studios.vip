@@ -174,6 +174,16 @@ const HAND = {
     description:
       'Legal disclaimer for 3000 Studios — the site provides music, media, and entertainment information, not professional advice.',
   },
+  '/shipping': {
+    title: brand('Shipping Policy'),
+    description:
+      'Shipping policy for 3000studios.vip — physical merch ships via standard carriers, digital products are delivered electronically, usually within 24 hours.',
+  },
+  '/returns': {
+    title: brand('Returns & Refunds'),
+    description:
+      'Returns and refunds for 3000studios.vip — 30-day returns on physical merch, digital products final sale once delivered, replacements for corrupted or wrong files.',
+  },
 };
 
 // Routes that exist but must never be indexed (owner/protected surfaces).
