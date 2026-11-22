@@ -27,6 +27,7 @@ import { PODCAST_EPISODES, PODCAST_SHOW, podcastWatchUrl } from '../data/podcast
 import { MERCH_ITEMS } from '../data/merch';
 import { AERO_STILLS } from '../data/aeropocalypseStills';
 import { AERO_BOSSES } from '../data/aeropocalypse';
+import { AeroTrailer } from '../components/AeroTrailer';
 import { BLOG_ARTICLES } from '../data/blogArticles';
 import { AERO_PLAY_URL, AERO_SITE_URL, BOOK_STORE_URL, SUBSTACK_URL } from './links';
 
@@ -232,6 +233,18 @@ export function EmpireHome() {
             </div>
           </div>
         </section>
+
+        {/* 1b. Official trailer, opt-in: nothing loads until tapped. */}
+        <AeroTrailer>
+          <div className="em-hero-cta" style={{ marginTop: 22 }}>
+            <a className="em-btn em-btn--play" href={AERO_PLAY_URL} target="_blank" rel="noopener noreferrer">
+              <GooglePlayLogo size={20} weight="fill" /> Google Play
+            </a>
+            <Link className="em-btn em-btn--ghost" to="/aeropocalypse">
+              Game page <ArrowUpRight size={16} weight="bold" />
+            </Link>
+          </div>
+        </AeroTrailer>
 
         {/* 2. Book covers at the top. */}
         <section className="em-sec em-nostagger" aria-labelledby="em-books-title" style={{ paddingTop: 34 }}>
