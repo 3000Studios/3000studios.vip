@@ -22,7 +22,6 @@
   <url><loc>https://3000studios.vip/copyright</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/disclaimer</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/live</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://3000studios.vip/links</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/music</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/podcast</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
@@ -50,6 +49,7 @@
   <url><loc>https://3000studios.vip/song/crabs-n-aidas</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/song/cruise-voltage</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/song/cuddly-bunny</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://3000studios.vip/song/deep-space-hum</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/song/depopulated</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/song/die-in-a-fire</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://3000studios.vip/song/dont-tell-me-what-that-is</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
@@ -86,4 +86,5 @@
   <url><loc>https://3000studios.vip/thunderdome-privacy</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/video</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://3000studios.vip/vip</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://3000studios.vip/wallpaper</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>

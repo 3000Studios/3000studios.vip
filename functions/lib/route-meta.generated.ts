@@ -51,6 +51,14 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
     "title": "Legal Disclaimer — 3000 Studios VIP",
     "description": "Legal disclaimer for 3000 Studios — the site provides music, media, and entertainment information, not professional advice."
   },
+  "/shipping": {
+    "title": "Shipping Policy — 3000 Studios VIP",
+    "description": "Shipping policy for 3000studios.vip — physical merch ships via standard carriers, digital products are delivered electronically, usually within 24 hours."
+  },
+  "/returns": {
+    "title": "Returns & Refunds — 3000 Studios VIP",
+    "description": "Returns and refunds for 3000studios.vip — 30-day returns on physical merch, digital products final sale once delivered, replacements for corrupted or wrong files."
+  },
   "/music": {
     "title": "Music Vault — 3000 Studios VIP",
     "description": "The 3000 Studios catalog — 1-minute previews on this site, full tracks on Apple Music, Spotify, and every major platform."
@@ -113,6 +121,10 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
   "/concepts": {
     "title": "Concepts — 3000 Studios VIP",
     "description": "3000 Studios concept board — ideas in progress, vote on what gets made."
+  },
+  "/wallpaper": {
+    "title": "Live Wallpaper — 3000 Studios VIP",
+    "description": "3000 Studios live video wallpaper — the studio stage as your backdrop."
   },
   "/community": {
     "title": "Community — 3000 Studios VIP",
@@ -449,6 +461,20 @@ export const SONG_ROUTES: Record<string, RouteMetaEntry> = {
     },
     "noindex": true,
     "noads": true
+  },
+  "deep-space-hum": {
+    "title": "Deep Space Hum — 3000 Studios VIP",
+    "description": "Listen to \"Deep Space Hum\" by 3000 Studios — official music, video, and streaming links.",
+    "image": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f2/c0/e4/f2c0e464-4e6f-35a8-16ba-77ae99a331b9/artwork.jpg/600x600bb.jpg",
+    "type": "music.song",
+    "song": {
+      "title": "Deep Space Hum",
+      "slug": "deep-space-hum",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f2/c0/e4/f2c0e464-4e6f-35a8-16ba-77ae99a331b9/artwork.jpg/600x600bb.jpg",
+      "apple": "https://music.apple.com/us/album/deep-space-hum/6802888455?i=6802888529&uo=4",
+      "youtubeId": "v_IK7naCNiM",
+      "duration": "3:01"
+    }
   },
   "depopulated": {
     "title": "Depopulated — 3000 Studios VIP",
