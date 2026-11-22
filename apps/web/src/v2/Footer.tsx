@@ -31,7 +31,7 @@ const SOCIALS = [
 ];
 
 const EXPLORE = [
-  { to: '/aeropocalypse', label: 'Aeropocalypse' },
+  { to: '/aeropocalypse', label: 'Aeropocalypse: Online' },
   { to: '/books', label: 'Books' },
   { to: '/music', label: 'Music' },
   { to: '/video', label: 'Videos' },

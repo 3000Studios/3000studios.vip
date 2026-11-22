@@ -426,7 +426,7 @@ export function PublicLayout({
               <a href="https://payhip.com/3000Studios" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Payhip Books</a>
               <a href="https://3000studios.gumroad.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Gumroad</a>
               <a href="https://www.barnesandnoble.com/w/family-game-night-games-jeremy-swain/1151782724" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Barnes & Noble</a>
-              <a href="https://aeropocalypse.online" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Aeropocalypse</a>
+              <a href="https://aeropocalypse.online" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Aeropocalypse: Online</a>
               <a href="https://voicetowebsite.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>VoiceToWebsite</a>
               <a href="https://getnexa.space" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Nexa</a>
               <a href="https://swain.pro" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--vip-cream)', textDecoration: 'none' }}>Swain.pro</a>
