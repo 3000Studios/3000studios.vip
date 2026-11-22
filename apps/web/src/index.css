@@ -51,6 +51,12 @@
 @import './styles/vip-redesign.css';
 @import './liquid/liquid.css';
 @import './styles/cockpit.css';
+@import './v3/home-empire.css';
+@import './styles/books.css';
+@import './styles/music-vault.css';
+@import './styles/game-vip.css';
+@import './styles/commerce.css';
+>>>>>>> origin/redesign-2026-11-18
 
 .routeLoader {
   min-height: 100vh;

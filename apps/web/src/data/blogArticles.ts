@@ -15,8 +15,17 @@ export interface BlogArticle {
     body: string[];
   }[];
   tags: string[];
+  /** Long-read pull quote, only where the mockup supplies one. */
+  pullQuote?: string;
 }
 
+/**
+ * The six Studio Notes posts from the redesign mockup (sections 15–16).
+ * Titles and categories follow the mockup exactly. Four articles carry the
+ * full body copy already in the repo; the last two have no body copy in the
+ * repo, so they ship as long-read shells (title + category only) until the
+ * studio supplies the text — see NOTES.md.
+ */
 export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: 'how-aeropocalypses-24-bosses-were-designed',
@@ -52,11 +61,12 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     ],
     tags: ['Game Dev', 'TypeScript', 'Canvas 2D', 'Aeropocalypse', 'Boss Design'],
     aliases: ['how-thunder-domes-24-bosses-were-designed'],
+    pullQuote: 'Four threat classes set the pace: ALPHA, OMEGA, TITAN and NEXUS.',
   },
   {
     slug: 'inside-amped-ear-3000-spectral-audio',
     title: 'Inside Amped Ear 3000: Real-Time Audio Analysis & Low-Latency Web Audio DSP',
-    category: 'Audio Engineering',
+    category: 'Software',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-10',
     updatedAt: '2026-09-25',
@@ -89,7 +99,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: 'building-production-site-on-cloudflare-pages',
     title: 'Building a Zero-Lag Production Website on Cloudflare Pages & Workers',
-    category: 'Web Architecture',
+    category: 'Engineering',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-05',
     updatedAt: '2026-09-22',
@@ -121,7 +131,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: 'how-3000-studios-uses-ai-to-build-faster',
     title: 'How 3000 Studios Uses AI to Accelerate Music, Visuals, and Code Production',
-    category: 'AI Workflows',
+    category: 'Studio',
     author: 'Jeremy Swain',
     publishedAt: '2026-08-30',
     updatedAt: '2026-09-20',
@@ -234,3 +244,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     tags: ['Publishing', 'Books', '3000 Studios Press', 'IngramSpark'],
   },
 ];
+
+/** Old slug for the bosses article — kept resolving so existing links keep working. */
+export const BLOG_SLUG_ALIASES: Record<string, string> = {
+  'how-thunder-domes-24-bosses-were-designed': 'aeropocalypse-bosses',
+};
+
+export function findBlogArticle(slug: string): BlogArticle | undefined {
+  const resolved = BLOG_SLUG_ALIASES[slug] ?? slug;
+  return BLOG_ARTICLES.find((a) => a.slug === resolved);
+}

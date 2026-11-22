@@ -1,14 +1,7 @@
 import { Link } from 'react-router-dom';
 import { PublicLayoutV2, LiveLine } from '../v2/PublicLayoutV2';
 import { Reveal, RevealGroup, RevealItem } from '../v2/Reveal';
-import {
-  ArrowRight,
-  Download,
-  MusicNote,
-  SealCheck,
-  ShoppingBag,
-  Sparkle,
-} from '@phosphor-icons/react';
+import { ArrowRight, Download, MusicNote, SealCheck, ShoppingBag } from '@phosphor-icons/react';
 import {
   BEAT_BUNDLE,
   BEAT_BUNDLE_SAVINGS_CENTS,
@@ -16,104 +9,87 @@ import {
   beatBuyUrl,
 } from '../data/beats';
 import { formatMoney } from '../lib/commerce';
+import '../styles/commerce.css';
 
 /**
- * /beats — the 3000 Studios digital instrumental store.
- * Digital catalog only: 16 instrumentals at $7 + the 16-track bundle at $49.
- * Merch lives on /shop. Checkout deep-links to the Shopify storefront.
+ * /beats — license-ready instrumentals, mockup section 8.
+ * The mockup lists 14 singles; the repo catalog (data/beats.ts) holds 16.
+ * The two not in the mockup are filtered out here and the conflict is
+ * logged in NOTES.md. Bundle price follows the mockup: $49 vs $112.
  */
+const MOCKUP_BEAT_IDS = [
+  'room-goes-cold',
+  'not-giving-up-tonight',
+  'motel-television',
+  'more-mass',
+  'midnight-haunt-dnb',
+  'midnight-haunt',
+  'keep-ridin',
+  'entertain-us',
+  'die-in-a-fire',
+  'crabs-n-aidas',
+  'burn-up-the-bass',
+  'amazon',
+  'am-i',
+  'after-hours-heaven',
+] as const;
+
+const MOCKUP_BEATS = MOCKUP_BEAT_IDS.map(
+  (id) => BEAT_ITEMS.find((item) => item.id === id)!,
+).filter(Boolean);
+
+function displayTitle(title: string): string {
+  return title.replace(/ \(Instrumental\)$/, '');
+}
+
 export function BeatsPage() {
   return (
     <PublicLayoutV2 wallpaper="eq">
-      <style>{`
-        .beats-headline { font-family: var(--nn-font); font-weight: 800; letter-spacing: .01em;
-          font-size: clamp(2.6rem, 7.5vw, 5.5rem); line-height: 1.02; margin: 18px 0 0; color: #fff;
-          text-align: center; }
-        .beats-shimmer { background: linear-gradient(100deg, var(--nn-gold) 10%, #fff6c9 30%, var(--nn-cyan) 55%, var(--nn-gold) 80%);
-          background-size: 220% auto; -webkit-background-clip: text; background-clip: text; color: transparent;
-          animation: beats-shimmer 6s linear infinite; }
-        @keyframes beats-shimmer { to { background-position: 220% center; } }
-        .beats-cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; justify-content: center; }
-        .nn-btn-big { padding: 16px 30px; font-size: 17px; border-radius: 14px; }
-        .beats-bundle { position: relative; overflow: hidden; border: 1px solid rgba(255,215,0,.45);
-          border-radius: 20px; background: linear-gradient(135deg, rgba(255,215,0,.09) 0%, rgba(10,14,20,.85) 45%, rgba(0,240,255,.07) 100%);
-          box-shadow: 0 18px 80px rgba(255,215,0,.14); padding: clamp(26px, 5vw, 48px); }
-        .beats-bundle-tag { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
-          border-radius: 999px; background: rgba(255,215,0,.14); border: 1px solid rgba(255,215,0,.4);
-          color: var(--nn-gold); font-weight: 800; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
-        .beats-save { display: inline-block; margin-top: 14px; padding: 8px 18px; border-radius: 12px;
-          background: rgba(0,240,255,.1); border: 1px solid rgba(0,240,255,.35);
-          color: var(--nn-cyan); font-weight: 800; font-size: 15px; }
-        .beats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
-        .beats-card { border: 1px solid rgba(0,240,255,.14); border-radius: 16px; background: rgba(10,14,20,.72);
-          padding: 22px; display: flex; flex-direction: column; transition: border-color .25s, transform .25s; }
-        .beats-card:hover { border-color: rgba(0,240,255,.45); transform: translateY(-3px); }
-        .beats-num { font-family: var(--nn-font); font-weight: 800; font-size: 13px; letter-spacing: .12em;
-          color: var(--nn-cyan); opacity: .75; }
-        .beats-delivery { display: flex; gap: 16px; align-items: flex-start; padding: 22px clamp(20px, 4vw, 32px);
-          border: 1px solid rgba(0,240,255,.2); border-radius: 16px; background: rgba(0,240,255,.04); }
-        .beats-merch-link { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: space-between;
-          padding: clamp(24px, 4vw, 36px); border: 1px solid rgba(255,215,0,.25); border-radius: 18px;
-          background: rgba(255,215,0,.05); }
-        @media (prefers-reduced-motion: reduce) { .beats-shimmer { animation: none; } }
-      `}</style>
-
       {/* HERO */}
-      <section className="v2-section" style={{ paddingTop: 'clamp(56px, 9vw, 110px)' }}>
-        <div className="v2-wrap" style={{ textAlign: 'center' }}>
+      <section className="v2-section commerce-hero">
+        <div className="v2-wrap">
           <Reveal>
-            <span className="v2-kicker">
+            <span className="commerce-kicker">
               <MusicNote size={15} weight="bold" style={{ marginRight: 8, verticalAlign: -2 }} />
-              Instrumentals · Instant Download
+              Beat Packs
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="beats-headline">
-              Own the <span className="beats-shimmer">sound.</span>
+            <h1 className="commerce-title">
+              License-ready <span className="commerce-gold">instrumentals</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="v2-lede" style={{ maxWidth: 640, margin: '20px auto 0' }}>
-              Studio-grade 3000 Studios instrumentals, yours to keep. Every track is an
-              instant MP3 download — pay once, download right after checkout, use it forever.
+            <p className="commerce-lede">
+              Instant MP3 delivery after checkout. For sync, exclusives or custom
+              production, talk to the studio first.
             </p>
-          </Reveal>
-          <Reveal delay={0.3}>
-            <div className="beats-cta-row">
-              <a className="nn-btn nn-btn-gold nn-btn-big" href="#bundle">
-                <Sparkle size={18} weight="fill" style={{ marginRight: 10, verticalAlign: -3 }} />
-                Get the Bundle — {formatMoney(BEAT_BUNDLE.priceCents)}
-              </a>
-              <a className="nn-btn nn-btn-ghost nn-btn-big" href="#tracks">
-                Browse Tracks
-              </a>
-            </div>
           </Reveal>
         </div>
       </section>
 
       <LiveLine />
 
-      {/* FEATURED BUNDLE */}
+      {/* BUNDLE HERO */}
       <section className="v2-section" id="bundle">
         <div className="v2-wrap" style={{ maxWidth: 900 }}>
           <Reveal>
-            <div className="beats-bundle">
-              <span className="beats-bundle-tag">
+            <div className="commerce-bundle">
+              <span className="commerce-bundle-tag">
                 <SealCheck size={16} weight="fill" /> Best value
               </span>
               <h2
                 className="v2-display"
                 style={{ fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', marginTop: 18 }}
               >
-                {BEAT_BUNDLE.title}
+                Complete Instrumental Bundle
               </h2>
               <p className="v2-lede" style={{ marginTop: 10, maxWidth: 560 }}>
-                {BEAT_BUNDLE.blurb} All 16 tracks, one checkout, one download.
+                Every instrumental in one download.
               </p>
               <div>
-                <span className="beats-save">
-                  All 16 tracks — save {formatMoney(BEAT_BUNDLE_SAVINGS_CENTS)}
+                <span className="commerce-save">
+                  Save {formatMoney(BEAT_BUNDLE_SAVINGS_CENTS)} — $49 vs $112 bought one by one
                 </span>
               </div>
               <div
@@ -127,21 +103,23 @@ export function BeatsPage() {
               >
                 <span
                   style={{
-                    fontFamily: 'var(--nn-font)',
-                    fontWeight: 800,
+                    fontFamily: 'var(--md-font-display, Georgia, serif)',
+                    fontWeight: 700,
                     fontSize: 34,
-                    color: 'var(--nn-gold)',
+                    color: 'var(--md-gold-hi, #f6dd8a)',
                   }}
                 >
                   {formatMoney(BEAT_BUNDLE.priceCents)}
+                  <span className="commerce-price-strike">$112</span>
                 </span>
                 <a
-                  className="nn-btn nn-btn-gold nn-btn-big"
+                  className="nn-btn nn-btn-gold"
                   href={beatBuyUrl(BEAT_BUNDLE)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{ padding: '16px 30px', fontSize: 17 }}
                 >
-                  Buy the Bundle <ArrowRight size={17} weight="bold" style={{ marginLeft: 8, verticalAlign: -2 }} />
+                  Buy the bundle <ArrowRight size={17} weight="bold" style={{ marginLeft: 8, verticalAlign: -2 }} />
                 </a>
               </div>
             </div>
@@ -151,15 +129,15 @@ export function BeatsPage() {
 
       <LiveLine />
 
-      {/* TRACK GRID */}
+      {/* SINGLES */}
       <section className="v2-section" id="tracks">
-        <div className="v2-wrap">
+        <div className="v2-wrap" style={{ maxWidth: 900 }}>
           <Reveal>
-            <span className="v2-kicker">Single Tracks</span>
+            <span className="commerce-eyebrow">Single Tracks</span>
           </Reveal>
           <Reveal delay={0.08}>
-            <h2 className="v2-display" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
-              The <span className="v2-grad-text">instrumentals</span>
+            <h2 className="commerce-section-title" style={{ marginTop: 12 }}>
+              The instrumentals
             </h2>
           </Reveal>
           <Reveal delay={0.16}>
@@ -167,66 +145,47 @@ export function BeatsPage() {
               {formatMoney(700)} each. Pick your weapons, or grab the bundle above.
             </p>
           </Reveal>
-          <div style={{ marginTop: 26 }}>
-          <RevealGroup className="beats-grid" stagger={0.06}>
-            {BEAT_ITEMS.map((item, i) => (
+          <RevealGroup className="commerce-beat-list" stagger={0.04}>
+            {MOCKUP_BEATS.map((item, i) => (
               <RevealItem key={item.id}>
-                <article className="beats-card">
-                  <span className="beats-num">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <h3
-                    style={{
-                      fontFamily: 'var(--nn-font)',
-                      fontSize: 18,
-                      margin: '10px 0 6px',
-                      color: '#fff',
-                      lineHeight: 1.35,
-                      flex: 1,
-                    }}
+                <div className="commerce-beat-row">
+                  <span className="commerce-beat-num">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="commerce-beat-name">{displayTitle(item.title)}</span>
+                  <span className="commerce-beat-price">{formatMoney(item.priceCents)}</span>
+                  <a
+                    className="nn-btn nn-btn-cyan"
+                    href={beatBuyUrl(item)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ padding: '10px 20px', fontSize: 14 }}
                   >
-                    {item.title}
-                  </h3>
-                  <p style={{ color: 'var(--v2-muted)', fontSize: 13, margin: '0 0 14px' }}>
-                    {item.blurb}
-                  </p>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: 12,
-                    }}
-                  >
-                    <strong style={{ color: 'var(--nn-gold)', fontSize: 20 }}>
-                      {formatMoney(item.priceCents)}
-                    </strong>
-                    <a
-                      className="nn-btn nn-btn-cyan"
-                      href={beatBuyUrl(item)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ padding: '10px 20px', fontSize: 14 }}
-                    >
-                      Buy
-                    </a>
-                  </div>
-                </article>
+                    Buy
+                  </a>
+                </div>
               </RevealItem>
             ))}
           </RevealGroup>
-          </div>
         </div>
       </section>
 
-      {/* DIGITAL DELIVERY NOTE */}
+      {/* DELIVERY NOTE */}
       <section className="v2-section" style={{ paddingTop: 0 }}>
         <div className="v2-wrap" style={{ maxWidth: 900 }}>
           <Reveal>
-            <div className="beats-delivery">
-              <Download size={30} weight="bold" style={{ color: 'var(--nn-cyan)', flexShrink: 0, marginTop: 2 }} />
+            <div
+              style={{
+                display: 'flex',
+                gap: 16,
+                alignItems: 'flex-start',
+                padding: '22px clamp(20px, 4vw, 32px)',
+                border: '1px solid rgba(212, 175, 55, 0.22)',
+                borderRadius: 16,
+                background: 'rgba(212, 175, 55, 0.04)',
+              }}
+            >
+              <Download size={30} weight="bold" style={{ color: 'var(--md-gold-hi, #f6dd8a)', flexShrink: 0, marginTop: 2 }} />
               <div>
-                <strong style={{ color: '#fff', fontSize: 17, fontFamily: 'var(--nn-font)' }}>
+                <strong style={{ color: '#fff', fontSize: 17, fontFamily: 'var(--md-font-display, Georgia, serif)' }}>
                   Instant digital delivery
                 </strong>
                 <p style={{ color: 'var(--v2-muted)', fontSize: 15, margin: '8px 0 0', lineHeight: 1.6 }}>
@@ -239,30 +198,82 @@ export function BeatsPage() {
         </div>
       </section>
 
-      {/* MERCH CROSS-LINK */}
+      {/* LICENSING */}
       <section className="v2-section" style={{ paddingTop: 0 }}>
         <div className="v2-wrap" style={{ maxWidth: 900 }}>
           <Reveal>
-            <div className="beats-merch-link">
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 18,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 'clamp(24px, 4vw, 36px)',
+                border: '1px solid rgba(212, 175, 55, 0.25)',
+                borderRadius: 18,
+                background: 'rgba(212, 175, 55, 0.05)',
+              }}
+            >
               <div>
                 <strong
                   style={{
                     color: '#fff',
                     fontSize: 20,
-                    fontFamily: 'var(--nn-font)',
+                    fontFamily: 'var(--md-font-display, Georgia, serif)',
+                  }}
+                >
+                  Licensing
+                </strong>
+                <p style={{ color: 'var(--v2-muted)', fontSize: 15, margin: '8px 0 0', maxWidth: 520 }}>
+                  For sync licensing, exclusives and custom production, contact the studio
+                  before purchasing.
+                </p>
+              </div>
+              <Link className="nn-btn nn-btn-gold" to="/contact" style={{ padding: '16px 30px', fontSize: 17 }}>
+                Contact the studio <ArrowRight size={17} weight="bold" style={{ marginLeft: 8, verticalAlign: -2 }} />
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* MERCH CROSS-LINK */}
+      <section className="v2-section" style={{ paddingTop: 0 }}>
+        <div className="v2-wrap" style={{ maxWidth: 900 }}>
+          <Reveal>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 18,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 'clamp(24px, 4vw, 36px)',
+                border: '1px solid rgba(212, 175, 55, 0.25)',
+                borderRadius: 18,
+                background: 'rgba(212, 175, 55, 0.05)',
+              }}
+            >
+              <div>
+                <strong
+                  style={{
+                    color: '#fff',
+                    fontSize: 20,
+                    fontFamily: 'var(--md-font-display, Georgia, serif)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 10,
                   }}
                 >
-                  <ShoppingBag size={22} weight="bold" style={{ color: 'var(--nn-gold)' }} />
+                  <ShoppingBag size={22} weight="bold" style={{ color: 'var(--md-gold-hi, #f6dd8a)' }} />
                   Looking for merch?
                 </strong>
                 <p style={{ color: 'var(--v2-muted)', fontSize: 15, margin: '8px 0 0' }}>
-                  Hoodies, tees, caps, and sticker packs live in the Supply Depot.
+                  Hoodies, tees, caps, and sticker packs live in the boutique.
                 </p>
               </div>
-              <Link className="nn-btn nn-btn-ghost nn-btn-big" to="/shop">
+              <Link className="nn-btn nn-btn-ghost" to="/shop" style={{ padding: '16px 30px', fontSize: 17 }}>
                 Visit /shop <ArrowRight size={17} weight="bold" style={{ marginLeft: 8, verticalAlign: -2 }} />
               </Link>
             </div>
