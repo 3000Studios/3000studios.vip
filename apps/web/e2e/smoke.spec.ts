@@ -28,11 +28,14 @@ test.describe('smoke', () => {
     expect(html).toContain('id="home-play-latest"');
   });
 
-  test('home discography appears after scroll', async ({ page }) => {
+  // Phase3's home had a #discography rail; the merged home is the Empire
+  // home (EmpireHome), whose sections are the game, books, video, podcast,
+  // shop and blog bands — assert the last band instead.
+  test('home sections appear after scroll', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await expect(page.locator('#discography')).toBeVisible({ timeout: 8000 });
-    await expect(page.locator('#discography').getByRole('button', { name: 'Play' }).first()).toBeVisible();
+    await expect(page.locator('#em-blog-title')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('#em-game-title')).toBeVisible();
   });
 
   test('NGUT mp3 and player control exist', async ({ page }) => {
