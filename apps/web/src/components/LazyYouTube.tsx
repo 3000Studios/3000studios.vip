@@ -24,6 +24,10 @@ export function LazyYouTube({
   className?: string;
 }) {
   const [load, setLoad] = useState(autoLoad);
+  // Guard (2026-10-11 bug fix): an empty/invalid videoId builds a dead
+  // youtube-nocookie embed (embed/) and a broken poster — render nothing
+  // (checked again after hooks below; no player/link is ever produced).
+  const hasValidId = typeof videoId === 'string' && /^[\w-]{11}$/.test(videoId.trim());
   const shouldLoad = autoLoad || load;
   const ref = useRef<HTMLDivElement>(null);
 
@@ -61,6 +65,8 @@ export function LazyYouTube({
     .join('&')}`;
 
   const poster = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+
+  if (!hasValidId) return null;
 
   return (
     <div ref={ref} className={`lazyYouTube ${className}`.trim()}>

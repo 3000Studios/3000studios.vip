@@ -430,6 +430,8 @@ const router = createBrowserRouter([
       { path: '/copyright', element: <RouteLoader><LegalPage type="copyright" /></RouteLoader> },
       { path: '/cookies', element: <RouteLoader><LegalPage type="cookies" /></RouteLoader> },
       { path: '/disclaimer', element: <RouteLoader><LegalPage type="disclaimer" /></RouteLoader> },
+      { path: '/shipping', element: <RouteLoader><LegalPage type="shipping" /></RouteLoader> },
+      { path: '/returns', element: <RouteLoader><LegalPage type="returns" /></RouteLoader> },
       { path: '*', element: <NotFoundPage /> },
       {
         path: '/admin',

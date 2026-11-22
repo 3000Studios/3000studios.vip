@@ -275,7 +275,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
   color: var(--v2-muted);
-  
+  cursor: pointer;
   transition:
     transform 0.25s var(--v2-ease),
     color 0.2s var(--v2-ease),

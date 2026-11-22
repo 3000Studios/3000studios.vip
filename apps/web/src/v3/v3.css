@@ -128,7 +128,7 @@
 .v3-vidbtn {
   position: absolute; top: 32%; transform: translateY(-50%);
   width: 48px; height: 48px; border-radius: 50%;
-  display: grid; place-items: center; 
+  display: grid; place-items: center; cursor: pointer;
   background: rgba(5, 6, 10, 0.72); color: var(--v3-gold);
   border: 1px solid var(--v3-line); backdrop-filter: blur(6px);
   z-index: 2; padding: 0;
@@ -142,7 +142,7 @@
 .v3-vidbtn-next { right: max(12px, 2vw); }
 
 .v3-viddots { display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 32px; flex-wrap: wrap; padding: 0 6vw; }
-.v3-viddot { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0;  padding: 0; touch-action: manipulation; }
+.v3-viddot { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; cursor: pointer; padding: 0; touch-action: manipulation; }
 .v3-viddot span { display: block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.22); transition: background 0.25s, transform 0.25s; }
 .v3-viddot[aria-current="true"] span { background: var(--v3-gold); transform: scale(1.35); box-shadow: 0 0 12px rgba(241, 183, 78, 0.6); }
 .v3-viddot:focus-visible { outline: 2px solid var(--v3-cyan); outline-offset: -8px; border-radius: 8px; }
@@ -236,7 +236,7 @@
 .v3-drop-pill {
   display: inline-flex; align-items: center; gap: 14px;
   background: var(--v3-glass); border: 1px solid rgba(241,183,78,.35); border-radius: 999px;
-  padding: 8px 22px 8px 8px;  color: var(--v3-ink);
+  padding: 8px 22px 8px 8px; cursor: pointer; color: var(--v3-ink);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   transition: transform .3s, border-color .3s, box-shadow .3s;
   font-family: var(--v3-font-body); max-width: min(92vw, 420px);

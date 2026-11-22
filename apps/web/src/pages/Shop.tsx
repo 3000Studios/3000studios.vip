@@ -332,6 +332,8 @@ export function ShopPage() {
           <nav>
             <Link to="/privacy">Privacy</Link>
             <Link to="/terms">Terms</Link>
+            <Link to="/shipping">Shipping</Link>
+            <Link to="/returns">Returns</Link>
             <Link to="/contact">Contact</Link>
           </nav>
           <p>© 2026 3000 Studios · All rights reserved</p>
