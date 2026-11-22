@@ -4,7 +4,7 @@
  *
  * Derives the route -> meta map for 3000studios.vip from the real app sources
  * and writes:
- *   - apps/web/functions/lib/route-meta.generated.ts  (consumed by the Pages
+ *   - functions/lib/route-meta.generated.ts  (consumed by the Pages
  *     Functions middleware for per-route head injection, 404s, redirects)
  *   - apps/web/public/sitemap.xml                     (all indexable routes)
  *   - apps/web/public/llms.txt                        (real studio llms.txt)
@@ -804,8 +804,8 @@ const llmsTxt = `# 3000 Studios VIP
 `;
 
 const outputs = new Map([
-  [join(WEB, 'functions/lib/route-meta.generated.ts'), generatedTs],
-  [join(WEB, 'functions/lib/route-content.generated.ts'), routeContentTs],
+  [join(ROOT, 'functions/lib/route-meta.generated.ts'), generatedTs],
+  [join(ROOT, 'functions/lib/route-content.generated.ts'), routeContentTs],
   [join(WEB, 'public/sitemap.xml'), sitemapXml],
   [join(WEB, 'public/llms.txt'), llmsTxt],
 ]);
