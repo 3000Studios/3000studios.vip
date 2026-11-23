@@ -275,6 +275,14 @@ export function Header() {
               {sfx ? <SpeakerHigh size={18} weight="duotone" /> : <SpeakerSlash size={18} weight="duotone" />}
             </button>
             <a
+              className="em-btn em-play"
+              href={AERO_PLAY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Aeropocalypse Online
+            </a>
+            <a
               className="em-btn em-subscribe"
               href="https://www.youtube.com/@3000Studio?sub_confirmation=1"
               target="_blank"
