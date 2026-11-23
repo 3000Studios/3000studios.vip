@@ -38,5 +38,47 @@
 # Prefer Functions (or Worker route) over this rewrite; keep as pass-through guard.
 /api/*  /api/:splat  200
 
-# SPA fallback for client routes only
-/*  /index.html  200
+# SPA-only routes (React Router paths with no static file — see src/main.tsx).
+# Each serves the app shell at its own URL so the router can render it.
+# There is deliberately NO /* catch-all: Pages' validator ignores splat ->
+# /index.html rules as infinite loops, and with dist/404.html present
+# (scripts/generate-404.mjs) unmatched paths are served 404.html with a
+# genuine 404 status. Rewrite target is / (the directory index), never
+# /index.html — the validator discards that target. Routes that DO have a
+# static file (/, /privacy, /terms, /thunderdome-privacy, /listen, /links,
+# /tiktok, /tiktok-games) need no rule: the file serves at its own URL.
+/about / 200
+/admin / 200
+/aeropocalypse / 200
+/aeropocalypse/privacy / 200
+/agent / 200
+/apps / 200
+/beats / 200
+/blog / 200
+/blog/* / 200
+/books / 200
+/command-deck / 200
+/community / 200
+/concepts / 200
+/contact / 200
+/cookies / 200
+/copyright / 200
+/disclaimer / 200
+/go-live / 200
+/live / 200
+/music / 200
+/office / 200
+/podcast / 200
+/projects / 200
+/requests / 200
+/returns / 200
+/shipping / 200
+/shop / 200
+/song/* / 200
+/sponsors / 200
+/thunder-dome/privacy / 200
+/vault / 200
+/vault/* / 200
+/video / 200
+/vip / 200
+/wallpaper / 200
