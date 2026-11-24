@@ -19,33 +19,32 @@ import { WaterWallpaper } from './components/WaterWallpaper';
 /* Route-level code splitting (fast-track 2026-10-29, audit Phase 2):
    every secondary page is lazy-loaded. Only the home page and the layout
    chrome stay in the initial bundle. */
-const AboutPage = lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
-const BlogPage = lazy(() => import('./pages/BlogPage').then((m) => ({ default: m.BlogPage })));
+const AboutPage = lazy(() => import('./empire/pages/AboutEmpire').then((m) => ({ default: m.AboutEmpire })));
+const BlogPage = lazy(() => import('./empire/pages/StudioNotes').then((m) => ({ default: m.StudioNotes })));
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })));
 const CommunityPage = lazy(() => import('./pages/CommunityPage').then((m) => ({ default: m.CommunityPage })));
-const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
+const ContactPage = lazy(() => import('./empire/pages/BookingDesk').then((m) => ({ default: m.BookingDesk })));
 const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })));
-const RequestsPage = lazy(() => import('./pages/RequestsPage').then((m) => ({ default: m.RequestsPage })));
-const SponsorsPage = lazy(() => import('./pages/SponsorsPage').then((m) => ({ default: m.SponsorsPage })));
-const AeropocalypsePage = lazy(() => import('./pages/AeropocalypsePage').then((m) => ({ default: m.AeropocalypsePage })));
+const RequestsPage = lazy(() => import('./empire/pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })));
+const SponsorsPage = lazy(() => import('./empire/pages/SponsorDesk').then((m) => ({ default: m.SponsorDesk })));
+const AeropocalypsePage = lazy(() => import('./empire/pages/AeroPage').then((m) => ({ default: m.AeroPage })));
 const AeropocalypsePrivacyPage = lazy(() => import('./pages/AeropocalypsePrivacyPage').then((m) => ({ default: m.AeropocalypsePrivacyPage })));
-const AppsPage = lazy(() => import('./pages/AppsPage').then((m) => ({ default: m.AppsPage })));
-const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })));
-const VipPage = lazy(() => import('./pages/VipPage').then((m) => ({ default: m.VipPage })));
-const MusicPage = lazy(() => import('./pages/MusicPage').then((m) => ({ default: m.MusicPage })));
-const VideoPage = lazy(() => import('./pages/VideoPage').then((m) => ({ default: m.VideoPage })));
-const LiveBroadcastPage = lazy(() => import('./pages/LiveBroadcastPage').then((m) => ({ default: m.LiveBroadcastPage })));
-const PodcastPage = lazy(() => import('./pages/PodcastPage').then((m) => ({ default: m.PodcastPage })));
-const BeatsPage = lazy(() => import('./pages/BeatsPage').then((m) => ({ default: m.BeatsPage })));
+const AppsPage = lazy(() => import('./empire/pages/AppsLab').then((m) => ({ default: m.AppsLab })));
+const ProjectsPage = lazy(() => import('./empire/pages/ProjectsLab').then((m) => ({ default: m.ProjectsLab })));
+const VipPage = lazy(() => import('./empire/pages/VipRope').then((m) => ({ default: m.VipRope })));
+const MusicPage = lazy(() => import('./empire/pages/MusicVault').then((m) => ({ default: m.MusicVault })));
+const VideoPage = lazy(() => import('./empire/pages/VideoVault').then((m) => ({ default: m.VideoVault })));
+const LiveBroadcastPage = lazy(() => import('./empire/pages/LiveCommand').then((m) => ({ default: m.LiveCommand })));
+const PodcastPage = lazy(() => import('./empire/pages/PodcastHub').then((m) => ({ default: m.PodcastHub })));
+const BeatsPage = lazy(() => import('./empire/pages/BeatPacks').then((m) => ({ default: m.BeatPacks })));
 const BooksPage = lazy(() => import('./pages/BooksPage').then((m) => ({ default: m.BooksPage })));
 const CommandDeckPage = lazy(() => import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })));
 const OfficePage = lazy(() => import('./pages/OfficePage').then((m) => ({ default: m.OfficePage })));
 const PhoneGoLive = lazy(() => import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })));
-const ShopPage = lazy(() => import('./pages/Shop').then((m) => ({ default: m.ShopPage })));
+const ShopPage = lazy(() => import('./empire/pages/EmpireShop').then((m) => ({ default: m.EmpireShop })));
 const ConceptBoard = lazy(() => import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })));
 const WallpaperPage = lazy(() => import('./pages/WallpaperPage').then((m) => ({ default: m.WallpaperPage })));
-import { BottomDock } from './components/BottomDock';
 import { MusicDock } from './components/MusicDock';
 import { SampleGate } from './components/SampleGate';
 import { ConsentManager } from './components/ConsentManager';
@@ -139,7 +138,6 @@ function RootLayout() {
       <SampleGate />
       <Outlet />
       <MusicDock />
-      <BottomDock />
       <AdminFab />
       <ConsentManager />
     </>
