@@ -156,8 +156,9 @@ export function StudioNotes() {
             <div className="dp-shade" aria-hidden="true" />
           </div>
           <div className="em-wrap sn-today-in">
+            <h1 className="sn-title">Studio notes: the 3000 Studios blog</h1>
             <span className="ep-chip is-live">Today on the blog · {formatDailyDate(today.date)}</span>
-            <h1 id="sn-today-title">{today.title}</h1>
+            <h2 id="sn-today-title" className="sn-today-h">{today.title}</h2>
             <p className="ep-lead">{today.description}</p>
             <div className="ep-ctas">
               <Link className="em-btn" to={today.path}>

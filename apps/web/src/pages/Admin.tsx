@@ -14,6 +14,14 @@ import { PublicLayoutV2 } from '../v2/PublicLayoutV2';
 import '../styles/discover.css';
 import '../v2/admin.css';
 
+const ADMIN_SECTIONS = [
+  { id: 'go-live', label: 'Go Live' },
+  { id: 'audience', label: 'Audience' },
+  { id: 'show', label: 'Show notes' },
+  { id: 'growth', label: 'Growth' },
+  { id: 'system', label: 'System' },
+];
+
 const PUBLIC_LIVE_URL = 'https://3000studios.vip/live';
 const NOTES_KEY = '3000-admin-rundown';
 const SESS_KEY = '3000-admin-sessions';
@@ -158,6 +166,14 @@ export function Admin() {
     return () => window.clearInterval(id);
   }, [broadcasting]);
 
+  useEffect(() => {
+    if (!isAuthenticated || !window.location.hash) return undefined;
+    const id = window.setTimeout(() => {
+      document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 250);
+    return () => window.clearTimeout(id);
+  }, [isAuthenticated]);
+
   const deviceBadge = useMemo(
     () => (device === 'phone' ? 'Phone ready' : 'Laptop ready'),
     [device],
@@ -241,8 +257,81 @@ export function Admin() {
                   Broadcast: {isLive || broadcasting ? 'ON AIR' : 'offline'}
                 </div>
               </section>
+              <nav className="adminJump" aria-label="Admin sections">
+                {ADMIN_SECTIONS.map((sec) => (
+                  <a key={sec.id} href={`#${sec.id}`} className="adminJumpLink">
+                    {sec.label}
+                  </a>
+                ))}
+              </nav>
+              <section className="cPanel adminGoLive" id="go-live">
+                <div className="cPanelHead">
+                  <h2>Go Live</h2>
+                  <span className="cSub">{device === 'phone' ? 'Phone detected: portrait 9:16, front camera' : 'Laptop detected: wide 16:9'}</span>
+                </div>
+                <div className="cPanelBody">
+                  <StreamStudioPanel
+                    whipUrl={whipUrl}
+                    whipReady={whipReady}
+                    liveInputId={liveInputId}
+                    onLiveChange={onStudioLive}
+                    onError={setStudioError}
+                  />
+                  {studioError ? <p className="adminError">{studioError}</p> : null}
+                  <p className="adminStandbyNote" style={{ marginTop: 10 }}>
+                    {broadcasting
+                      ? 'You are live on /live.'
+                      : 'Viewers stay on standby until you hit Go Live.'}{' '}
+                    <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
+                      Open /live
+                    </a>
+                  </p>
+                </div>
+              </section>
+              <section className="cPanel" id="audience">
+                <div className="cPanelHead">
+                  <h2>Public preview</h2>
+                  <span className="cSub">What viewers see on /live</span>
+                </div>
+                <div className="cPanelBody">
+                  <iframe
+                    className="adminPreviewFrame"
+                    title="Public live preview"
+                    src="/live"
+                    allow="autoplay; fullscreen"
+                  />
+                </div>
+              </section>
               <LiveAccessControl />
-              <AdminActivityLog />
+              <section className="cPanel" id="show">
+                <div className="cPanelHead">
+                  <h2>Run of show</h2>
+                  <span className="cSub">Local notes for this browser</span>
+                </div>
+                <div className="cPanelBody">
+                  <textarea
+                    className="adminNoteBox"
+                    value={notes}
+                    onChange={(e) => {
+                      setNotes(e.target.value);
+                      localStorage.setItem(NOTES_KEY, e.target.value);
+                    }}
+                    placeholder="Set list, overlays, sponsor reads, camera notes…"
+                  />
+                  <p className="cMuted" style={{ marginTop: 10 }}>
+                    Last session marks:{' '}
+                    {sessions.length === 0
+                      ? 'none yet'
+                      : sessions
+                          .slice(0, 4)
+                          .map(
+                            (s) =>
+                              `${s.live ? 'LIVE' : 'OFF'} ${new Date(s.ts).toLocaleTimeString()}`,
+                          )
+                          .join(' · ')}
+                  </p>
+                </div>
+              </section>
               <section className="cPanel adminPublicPreviewPanel">
                 <div className="cPanelHead">
                   <h2>Quick actions</h2>
@@ -263,9 +352,9 @@ export function Admin() {
                   >
                     {copied === 'inquiry' ? 'Copied email' : 'Copy inquiry email'}
                   </button>
-                  <Link className="cBtn sm ghost" to="/go-live">
-                    Phone Go Live
-                  </Link>
+                  <a className="cBtn sm ghost" href="#go-live">
+                    Jump to Go Live
+                  </a>
                   <Link className="cBtn sm ghost" to="/music">
                     Music deck
                   </Link>
@@ -285,7 +374,7 @@ export function Admin() {
                   </a>
                 </div>
               </section>
-              <section className="cPanel tiktokAdminPanel">
+              <section className="cPanel tiktokAdminPanel" id="growth">
                 <div className="cPanelHead">
                   <div>
                     <span className="adminEyebrow">SOCIAL DISTRIBUTION</span>
@@ -326,74 +415,9 @@ export function Admin() {
                   </div>
                 </div>
               </section>
-              <section className="cPanel">
-                <div className="cPanelHead">
-                  <h2>Run of show</h2>
-                  <span className="cSub">Local notes for this browser</span>
-                </div>
-                <div className="cPanelBody">
-                  <textarea
-                    className="adminNoteBox"
-                    value={notes}
-                    onChange={(e) => {
-                      setNotes(e.target.value);
-                      localStorage.setItem(NOTES_KEY, e.target.value);
-                    }}
-                    placeholder="Set list, overlays, sponsor reads, camera notes…"
-                  />
-                  <p className="cMuted" style={{ marginTop: 10 }}>
-                    Last session marks:{' '}
-                    {sessions.length === 0
-                      ? 'none yet'
-                      : sessions
-                          .slice(0, 4)
-                          .map(
-                            (s) =>
-                              `${s.live ? 'LIVE' : 'OFF'} ${new Date(s.ts).toLocaleTimeString()}`,
-                          )
-                          .join(' · ')}
-                  </p>
-                </div>
-              </section>
-              <section className="cPanel">
-                <div className="cPanelHead">
-                  <h2>Public preview</h2>
-                  <span className="cSub">What viewers see on /live</span>
-                </div>
-                <div className="cPanelBody">
-                  <iframe
-                    className="adminPreviewFrame"
-                    title="Public live preview"
-                    src="/live"
-                    allow="autoplay; fullscreen"
-                  />
-                </div>
-              </section>
-              <section className="cPanel">
-                <div className="cPanelHead">
-                  <h2>Studio</h2>
-                  <span className="cSub">Access camera → set the look → Go Live</span>
-                </div>
-                <div className="cPanelBody">
-                  <StreamStudioPanel
-                    whipUrl={whipUrl}
-                    whipReady={whipReady}
-                    liveInputId={liveInputId}
-                    onLiveChange={onStudioLive}
-                    onError={setStudioError}
-                  />
-                  {studioError ? <p className="adminError">{studioError}</p> : null}
-                  <p className="adminStandbyNote" style={{ marginTop: 10 }}>
-                    {broadcasting
-                      ? 'You are live on /live.'
-                      : 'Viewers stay on standby until you hit Go Live.'}{' '}
-                    <a href={PUBLIC_LIVE_URL} target="_blank" rel="noreferrer">
-                      Open /live
-                    </a>
-                  </p>
-                </div>
-              </section>
               <MarketingAdvisor />
+              <div id="system" className="adminAnchor" />
+              <AdminActivityLog />
               <AdminObservability />
               <section className="cPanel">
                 <div className="cPanelHead">

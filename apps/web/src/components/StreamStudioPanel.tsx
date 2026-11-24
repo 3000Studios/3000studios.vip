@@ -8,6 +8,7 @@ import {
   type CameraRotation,
   type LensFilterId,
   type OverlayId,
+  type StudioAspect,
 } from '../lib/streamStudio';
 import { WhipPublisher, describeCameraError, validateWhipUrl } from '../lib/webrtcStream';
 import { publishServerLiveFlag } from '../lib/streamLiveDetect';
@@ -33,6 +34,38 @@ const OVERLAY_SCENES: { label: string; overlays: OverlayId[] }[] = [
   { label: 'Neon energy', overlays: ['liveBadge', 'watermark', 'ticker', 'cyberNeon', 'electroPulse'] },
   { label: 'Holographic', overlays: ['liveBadge', 'watermark', 'vipCorner', 'holographic', 'pulseRing'] },
   { label: 'Clean studio', overlays: ['liveBadge', 'watermark', 'lowerThird'] },
+];
+
+/** Phones held upright stream 9:16; everything else 16:9. */
+function autoAspect(): StudioAspect {
+  if (typeof window === 'undefined') return 'landscape';
+  const coarse = window.matchMedia?.('(pointer: coarse)').matches;
+  const mobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+  return (coarse || mobileUa) && window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+}
+
+function clock(secs: number) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const ss = String(secs % 60).padStart(2, '0');
+  return h ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`;
+}
+
+function saveBlob(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+const ASPECTS: { value: StudioAspect; label: string }[] = [
+  { value: 'portrait', label: 'Phone 9:16' },
+  { value: 'landscape', label: 'Wide 16:9' },
+  { value: 'square', label: 'Square 1:1' },
 ];
 
 export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChange, onError }: Props) {
@@ -64,6 +97,16 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   const [hasCanvas, setHasCanvas] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(false);
   const [backgroundGuard, setBackgroundGuard] = useState<'idle' | 'active' | 'limited'>('idle');
+  const [aspect, setAspect] = useState<StudioAspect>(() => autoAspect());
+  const [countdownOn, setCountdownOn] = useState(true);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [recording, setRecording] = useState(false);
+  const [recSecs, setRecSecs] = useState(0);
+  const [liveSecs, setLiveSecs] = useState(0);
+  const [torchOk, setTorchOk] = useState(false);
+  const [torchOn, setTorchOn] = useState(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
 
   const canRequestMedia =
     typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia);
@@ -86,6 +129,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
         panX,
         panY,
       });
+      studioRef.current.setAspect(aspect);
       studioRef.current.setOnAudioTrackChange((track) => {
         setHasAudioTrack(true);
         if (publisherRef.current) {
@@ -94,7 +138,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       });
     }
     return studioRef.current;
-  }, [filter, overlays, lowerTitle, lowerSub, rotation, flipH, flipV, zoom, panX, panY]);
+  }, [filter, overlays, lowerTitle, lowerSub, rotation, flipH, flipV, zoom, panX, panY, aspect]);
 
   const mountCanvas = useCallback(() => {
     const studio = ensureStudio();
@@ -170,6 +214,8 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
           throw new Error('Camera did not start. Tap Allow when the phone asks.');
         }
         setHasAudioTrack(studio.hasAudioTrack());
+        setTorchOk(studio.torchSupported());
+        setTorchOn(false);
         studio.start();
         mountCanvas();
         await refreshDeviceLists();
@@ -283,6 +329,91 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
     };
   }, [status, onError]);
 
+  useEffect(() => {
+    if (status !== 'live') studioRef.current?.setAspect(aspect);
+  }, [aspect, status]);
+
+  useEffect(() => {
+    if (status !== 'live') return undefined;
+    const started = Date.now();
+    const id = window.setInterval(() => setLiveSecs(Math.floor((Date.now() - started) / 1000)), 1000);
+    return () => window.clearInterval(id);
+  }, [status]);
+
+  useEffect(() => {
+    if (!recording) return undefined;
+    const started = Date.now();
+    const id = window.setInterval(() => setRecSecs(Math.floor((Date.now() - started) / 1000)), 1000);
+    return () => window.clearInterval(id);
+  }, [recording]);
+
+  useEffect(() => () => recorderRef.current?.stop(), []);
+
+  function startGoLive() {
+    if (!countdownOn) {
+      void goLive();
+      return;
+    }
+    let n = 3;
+    setCountdown(n);
+    const id = window.setInterval(() => {
+      n -= 1;
+      if (n <= 0) {
+        window.clearInterval(id);
+        setCountdown(null);
+        void goLive();
+      } else {
+        setCountdown(n);
+      }
+    }, 1000);
+  }
+
+  function toggleRecord() {
+    const studio = studioRef.current;
+    if (recording) {
+      recorderRef.current?.stop();
+      return;
+    }
+    if (!studio || typeof MediaRecorder === 'undefined') {
+      setError('Recording is not supported in this browser.');
+      return;
+    }
+    const types = ['video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'];
+    const mimeType = types.find((t) => MediaRecorder.isTypeSupported(t)) || '';
+    try {
+      const rec = new MediaRecorder(studio.getOutputStream(30, false), mimeType ? { mimeType, videoBitsPerSecond: 4_000_000 } : undefined);
+      chunksRef.current = [];
+      rec.ondataavailable = (e) => {
+        if (e.data.size) chunksRef.current.push(e.data);
+      };
+      rec.onstop = () => {
+        setRecording(false);
+        recorderRef.current = null;
+        const type = rec.mimeType || 'video/webm';
+        const blob = new Blob(chunksRef.current, { type });
+        chunksRef.current = [];
+        if (blob.size) saveBlob(blob, `3000-studios-live-${Date.now()}.${type.includes('mp4') ? 'mp4' : 'webm'}`);
+      };
+      rec.start(1000);
+      recorderRef.current = rec;
+      setRecSecs(0);
+      setRecording(true);
+    } catch {
+      setError('Could not start recording on this device.');
+    }
+  }
+
+  async function takeSnapshot() {
+    const blob = await studioRef.current?.snapshot();
+    if (blob) saveBlob(blob, `3000-studios-still-${Date.now()}.png`);
+  }
+
+  async function toggleTorch() {
+    const next = !torchOn;
+    const ok = await studioRef.current?.setTorch(next);
+    if (ok) setTorchOn(next);
+  }
+
   function toggleOverlay(id: OverlayId) {
     setOverlays((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
@@ -393,6 +524,7 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
       publisherRef.current = publisher;
       await publisher.startWithStream(out);
 
+      setLiveSecs(0);
       setStatus('live');
       setHasAudioTrack(true);
       onLiveChange?.(true);
@@ -428,9 +560,15 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
   return (
     <div className="studioPanel prodStudio">
       <div className="prodStudioPreview">
-        <div className="adminCameraFrame studioPreviewFrame">
+        <div className="adminCameraFrame studioPreviewFrame" data-aspect={aspect}>
           <div ref={mountRef} className="studioCanvasMount" />
-          {status === 'live' ? <div className="streamLiveBadge">● LIVE · WHIP</div> : null}
+          {status === 'live' ? <div className="streamLiveBadge">● LIVE · {clock(liveSecs)}</div> : null}
+          {recording ? <div className="studioRecBadge">REC {clock(recSecs)}</div> : null}
+          {countdown !== null ? (
+            <div className="studioCountdown" key={countdown} aria-live="assertive">
+              {countdown}
+            </div>
+          ) : null}
           {hasCanvas ? (
             <div
               className={`studioMicIndicator ${micMuted ? 'is-muted' : audioLevel > 5 ? 'is-active' : 'is-listening'}`}
@@ -458,16 +596,47 @@ export function StreamStudioPanel({ whipUrl, whipReady, liveInputId, onLiveChang
             <button
               type="button"
               className="cBtn primary"
-              disabled={status === 'starting'}
-              onClick={() => void goLive()}
+              disabled={status === 'starting' || countdown !== null}
+              onClick={startGoLive}
             >
-              {status === 'starting' ? 'WHIP connecting…' : 'Go Live with looks'}
+              {status === 'starting' ? 'Connecting…' : countdown !== null ? `Live in ${countdown}` : 'Go Live'}
             </button>
           )}
           <button type="button" className="cBtn ghost" onClick={() => void startPreview(cameraId, facing, micId)}>
             {hasCanvas ? 'Refresh preview' : 'Retry access'}
           </button>
         </div>
+        {hasCanvas ? (
+          <div className="studioQuickTools" role="toolbar" aria-label="Quick tools">
+            <button type="button" className={`studioTool ${recording ? 'on rec' : ''}`} onClick={toggleRecord}>
+              {recording ? 'Stop rec' : 'Record'}
+            </button>
+            <button type="button" className="studioTool" onClick={() => void takeSnapshot()}>
+              Snapshot
+            </button>
+            {torchOk ? (
+              <button type="button" className={`studioTool ${torchOn ? 'on' : ''}`} onClick={() => void toggleTorch()}>
+                {torchOn ? 'Light off' : 'Light on'}
+              </button>
+            ) : null}
+            <button type="button" className={`studioTool ${countdownOn ? 'on' : ''}`} onClick={() => setCountdownOn((v) => !v)}>
+              {countdownOn ? '3-2-1 on' : '3-2-1 off'}
+            </button>
+            <div className="studioAspectRow">
+              {ASPECTS.map((a) => (
+                <button
+                  key={a.value}
+                  type="button"
+                  className={`studioChip ${aspect === a.value ? 'active' : ''}`}
+                  disabled={status === 'live'}
+                  onClick={() => setAspect(a.value)}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
         {status === 'live' ? (
           <div className={`studioBackgroundGuard ${backgroundGuard}`} role="status">
             <strong>{backgroundGuard === 'active' ? 'Background guard active' : 'Keep this tab visible'}</strong>

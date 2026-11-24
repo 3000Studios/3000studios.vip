@@ -460,3 +460,47 @@
   .tf-card { transition: none; }
   .tf-card.is-on, .tf-card.is-on::after { animation: none; }
 }
+
+/* ---- /live: mobile-first viewer deck ---- */
+.lv-top { padding-top: calc(var(--em-head-h, 72px) + 12px) !important; padding-bottom: 0 !important; }
+.lv-deck { display: grid; gap: 10px; min-width: 0; }
+.lv-deck .ep-live { min-height: 0; }
+.lv-deck .ep-live.is-on-air { box-shadow: 0 0 0 1px rgba(255, 77, 77, 0.6), 0 0 48px rgba(255, 60, 90, 0.35); }
+.lv-deck .ep-live:fullscreen { border-radius: 0; background: #000; }
+.lv-deck .ep-live:fullscreen :is(iframe, video) { width: 100%; height: 100%; }
+.lv-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(8, 10, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+.lv-bar strong { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; margin-right: auto; }
+.lv-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--em-jade, #3df2a8); }
+.lv-dot.is-live { background: #ff4d4d; box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); animation: lv-pulse 1.4s ease-out infinite; }
+@keyframes lv-pulse { to { box-shadow: 0 0 0 14px rgba(255, 77, 77, 0); } }
+.lv-btn {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.lv-btn:disabled { opacity: 0.45; cursor: default; }
+@media (max-width: 640px) {
+  .lv-top .em-wrap { padding-inline: 8px; }
+  .lv-bar { border-radius: 16px; }
+  .lv-btn { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .lv-dot.is-live { animation: none; } }
+.sn-today .sn-title { font-size: clamp(14px, 1.6vw, 18px); letter-spacing: 0.22em; text-transform: uppercase; line-height: 1.2; margin: 0; opacity: 0.85; }
+.sn-today .sn-today-h { font-size: clamp(32px, 6.2vw, 72px); line-height: 0.98; margin: 0; text-wrap: balance; }
