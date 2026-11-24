@@ -111,6 +111,12 @@ for (let i = 0; i < slugIdx.length; i++) {
   }
 }
 
+/* ------------------------------ live schedule ----------------------------- */
+const liveTs = read(join(WEB, 'src/data/liveStream.ts'));
+const liveSchedule = [
+  ...liveTs.matchAll(/title:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*when:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*note:\s*'((?:[^'\\]|\\.)*)'/g),
+].map((m) => ({ title: m[1].replace(/\\'/g, "'"), when: m[2].replace(/\\'/g, "'"), note: m[3].replace(/\\'/g, "'") }));
+
 /* ------------------------------ static routes ----------------------------- */
 const mainTs = read(join(WEB, 'src/main.tsx'));
 const titled = new Map();
@@ -488,9 +494,15 @@ routeContent['/contact'] = wrapMain(
 <p>Sync licenses, music features, live stream bookings, brand sponsorships, and press — reach Jeremy Swain directly.</p>
 <p>3000 Studios is an independent music and media label run by Jeremy Swain out of Acworth, Georgia. Every message from the contact page lands in the studio inbox — pick the route that fits and include your timeline so the reply can be specific.</p>
 <h2>Booking, sync &amp; press</h2>
-<p>Email <a href="mailto:mr.jwswain@gmail.com">mr.jwswain@gmail.com</a> directly, or use the contact form on this page. For team and VIP list matters, write to <a href="mailto:Team@3000studios.vip">Team@3000studios.vip</a>.</p>
+<p>Email <a href="mailto:mr.jwswain@gmail.com">mr.jwswain@gmail.com</a> directly, or use the contact form on this page. For team and VIP list matters, write to <a href="mailto:Team@3000studios.vip">Team@3000studios.vip</a>. For help with a purchase, a VIP Pass or the Aeropocalypse game, write to <a href="mailto:support@3000studios.vip">support@3000studios.vip</a>.</p>
+<h2>What to include in a request</h2>
+<p>The fastest replies go to messages that answer the obvious questions up front. For a <strong>sync license</strong>, name the song, the project (film, ad, game, podcast or social video), where it will be shown, how long the cue runs and your release date. For a <strong>feature or collaboration</strong>, link your own work and say whether you want a verse, a hook, production or a remix. For a <strong>live booking</strong>, give the date, the time zone, the format (studio session, listening party or game stream) and whether the stream is public. For <strong>press</strong>, name the outlet, the angle and your deadline.</p>
+<h2>Licensing at a glance</h2>
+<p>Personal listening is free: every song previews for one minute on this site and streams in full on Spotify, Apple Music and the other major platforms. Instrumentals for your own songs are licensed through <a href="/beats">Beat Packs</a>. Stems for remixing and study come with the <a href="/vip">VIP Pass</a>, for personal use. Anything commercial — a song in an advert, a film, a game or a monetised channel — needs a written license, so ask first and the right one can be drawn up for your project.</p>
+<h2>Sponsors and brands</h2>
+<p>Homepage sponsorship slots, release-day placements and sponsored segments on the live stage are listed on the <a href="/sponsors">Sponsors</a> page. Brands that want a custom package can use the same contact routes above.</p>
 <h2>Looking for something specific?</h2>
-<p>Song and video requests go through <a href="/requests">Requests</a>; homepage sponsorship slots are on <a href="/sponsors">Sponsors</a>; beat packs and licensing live on <a href="/beats">Beat Packs</a>; books are on the <a href="/books">Books</a> page; and merch is in the <a href="/shop">Shop</a>.</p>`,
+<p>Song and video requests go through <a href="/requests">Requests</a>; homepage sponsorship slots are on <a href="/sponsors">Sponsors</a>; beat packs and licensing live on <a href="/beats">Beat Packs</a>; books are on the <a href="/books">Books</a> page; and merch is in the <a href="/shop">Shop</a>. Upcoming broadcasts are on the <a href="/live">Live</a> page, and studio news lands on the <a href="/blog">blog</a> first.</p>`,
 );
 
 routeContent['/music'] = wrapMain(
@@ -601,10 +613,20 @@ routeContent['/video'] = wrapMain(
 <p>Official 3000 Studios music videos and Aeropocalypse cinematics — free to watch via YouTube, right here on the site.</p>
 <h2>Music videos</h2>
 <p>Every single from the ${songs.length}-song catalog gets an official video on the 3000 Studios YouTube channel. Watch the videos here, then stream the full tracks on Apple Music, Spotify, and every major platform — the songs themselves live in the <a href="/music">Music Vault</a>.</p>
+<p>New videos premiere on release day, usually alongside the weekly single. Each video page in the vault links to its song page, where you can preview the track, read its credits and jump to your streaming service of choice.</p>
+<h2>Official videos in the vault</h2>
+<ul>
+${songs
+  .filter((s) => s.youtubeId && !explicitRoutes.has(`/song/${s.slug}`))
+  .map((s) => `<li><a href="/song/${s.slug}">${escHtml(s.title)}</a>${s.duration ? ` — ${escHtml(s.duration)}` : ''}</li>`)
+  .join('\n')}
+</ul>
 <h2>Aeropocalypse cinematics</h2>
-<p>The opening, mid-game, and finale cinematics from AEROPOCALYPSE: ONLINE, the studio's 25-boss arcade flight combat game, screen in the vault alongside the music videos. Meet the full boss roster on the <a href="/aeropocalypse">Aeropocalypse page</a>.</p>
+<p>The opening, mid-game, and finale cinematics from AEROPOCALYPSE: ONLINE, the studio's ${bosses.length}-boss arcade flight combat game, screen in the vault alongside the music videos. Meet the full boss roster on the <a href="/aeropocalypse">Aeropocalypse page</a>.</p>
 <h2>Live broadcasts</h2>
-<p>Studio sessions, release drops, and game streams broadcast from the <a href="/live">Live stage</a> and are archived to the same YouTube channel.</p>`,
+<p>Studio sessions, release drops, and game streams broadcast from the <a href="/live">Live stage</a> and are archived to the same YouTube channel.</p>
+<h2>Watching on a phone</h2>
+<p>Videos play inside the page, so the site's menu and music controls stay where they are. Tap a video to start it; nothing autoplays with sound. Subscribing on YouTube puts each new release in your feed the day it drops.</p>`,
 );
 
 routeContent['/apps'] = wrapMain(
@@ -678,10 +700,19 @@ routeContent['/community'] = wrapMain(
 routeContent['/live'] = wrapMain(
   `<h1>Live Command — 3000 Studios VIP</h1>
 <p>Watch 3000 Studios live — broadcast deck, schedule, and chat. The live stage carries studio sessions, new-single drop parties, Aeropocalypse gameplay, and podcast recordings, streamed directly from the studio in Acworth, Georgia.</p>
+<h2>Weekly schedule</h2>
+<ul>
+${liveSchedule.map((s) => `<li><strong>${escHtml(s.title)}</strong> — ${escHtml(s.when)}. ${escHtml(s.note)}</li>`).join('\n')}
+</ul>
+<p>Times are US Eastern. A schedule change is posted on this page and on the studio's social channels before the stream.</p>
 <h2>What broadcasts here</h2>
 <p>Live broadcasts are announced on this page and on the studio's social channels before they start. Between broadcasts, the stage shows the current schedule and the most recent sessions; every broadcast is archived to the 3000 Studios YouTube channel and linked from the <a href="/video">Video Vault</a>.</p>
+<h2>How to join in</h2>
+<p>When the studio is on air, the player and the live chat open on this page with no account needed to watch. Chat runs through YouTube, so sign in there to talk with the studio and the rest of the audience. Song and video ideas raised in chat can be added to the <a href="/requests">Requests</a> board, where the community votes on what gets made next.</p>
 <h2>Podcast, live</h2>
-<p>Follow and Subscribe — the 3000 Studios podcast — records in front of the live audience on this stage. Finished episodes, with show notes and Spotify links, live on the <a href="/podcast">Podcast</a> page.</p>`,
+<p>Follow and Subscribe — the 3000 Studios podcast — records in front of the live audience on this stage. Finished episodes, with show notes and Spotify links, live on the <a href="/podcast">Podcast</a> page.</p>
+<h2>Book a stream</h2>
+<p>Artists, brands and game communities can book a collaboration or a sponsored segment on the live stage through the <a href="/contact">Contact</a> page.</p>`,
 );
 
 routeContent['/vip'] = wrapMain(
@@ -783,7 +814,7 @@ const llmsTxt = `# 3000 Studios VIP
 - [Podcast](${ORIGIN}/podcast): The 3000 Studios Podcast — every episode.
 - [Books](${ORIGIN}/books): Books by Jeremy Swain from 3000 Studios Press — ebooks in the studio store, print through IngramSpark.
 - [Beat Packs](${ORIGIN}/beats): License 3000 Studios instrumentals and bundles.
-- [AEROPOCALYPSE: ONLINE](${ORIGIN}/aeropocalypse): AEROPOCALYPSE: ONLINE — the arcade flight combat game with 25 stages and 25 bosses.
+- [AEROPOCALYPSE: ONLINE](${ORIGIN}/aeropocalypse): AEROPOCALYPSE: ONLINE — the arcade flight combat game with 25 stages and ${bosses.length} bosses.
 - [Shop](${ORIGIN}/shop): Merch, singles, and studio services.
 - [Blog](${ORIGIN}/blog): News, stories, and studio notes.
 - [Community Requests](${ORIGIN}/requests): Request a song, video, or cover.
