@@ -1254,3 +1254,91 @@ html.em-music-on .em-burger:not(.is-open) i { animation-duration: 0.9s, 2.4s; }
   .em-header-bar::after { display: none; }
   .em-header.is-hidden .em-header-bar { transform: none; opacity: 1; }
 }
+
+/* ==========================================================================
+   Living headings: per-letter dance, colour cycle, electric arcs
+   ========================================================================== */
+.hx { display: inline; }
+.hx-w { display: inline-block; white-space: nowrap; }
+.hx-l {
+  display: inline-block;
+  color: var(--c0);
+  -webkit-text-fill-color: currentColor;
+  background: none;
+  text-shadow: 0 0 6px color-mix(in srgb, currentColor 70%, transparent), 0 0 18px color-mix(in srgb, currentColor 35%, transparent), 0 2px 0 rgba(0, 0, 0, 0.55);
+  transform-origin: 50% 80%;
+  animation:
+    hx-dance 2.4s cubic-bezier(0.45, 0, 0.3, 1) infinite,
+    hx-colors 6s linear infinite;
+  animation-delay: calc(var(--k) * -0.11s), calc(var(--k) * -0.35s);
+  will-change: transform;
+}
+.hx-l.hx-zap { color: #e9fdff; text-shadow: 0 0 4px #fff, 0 0 14px #7cf4ff, 0 0 32px #3ee8ff; }
+@keyframes hx-dance {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  20% { transform: translateY(-0.14em) rotate(-6deg) scale(1.12); }
+  40% { transform: translateY(0.03em) rotate(3deg) scale(0.97); }
+  60% { transform: translateY(-0.08em) rotate(5deg) scale(1.08); }
+  80% { transform: translateY(0) rotate(-2deg) scale(1); }
+}
+@keyframes hx-colors {
+  0%, 100% { color: #f2c867; }
+  20% { color: #3ee8ff; }
+  40% { color: #3df2a8; }
+  60% { color: #ffffff; }
+  80% { color: #ff8a2c; }
+}
+/* With music: every letter jumps on the beat, harder and faster. */
+html.em-music-on .hx-l {
+  animation-duration: 0.9s, 3s;
+  translate: 0 calc(var(--beat, 0) * -0.35em);
+  scale: calc(1 + var(--beat, 0) * 0.35);
+}
+/* The heading itself no longer needs the whole-word wobble once split. */
+html.em-music-on .hx-on { transform: none; }
+.hx-arcs { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40; mix-blend-mode: screen; }
+@media (prefers-reduced-motion: reduce) {
+  .hx-l { animation: none; }
+  .hx-arcs { display: none; }
+}
+
+/* ==========================================================================
+   Steel ring: brushed-steel gradient that spins around hover/select rings
+   ========================================================================== */
+@property --steel-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes em-steelspin { to { --steel-a: 360deg; } }
+.em-steel-ring,
+.em-nav-pill::before,
+.em-tile::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--steel-a), #5d6670, #f5f8fc, #9aa4af, #2f353c, #dfe6ee, #7d8792, #ffffff, #5d6670);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: em-steelspin 2.4s linear infinite;
+  pointer-events: none;
+}
+.em-nav-pill { border-color: transparent; background: linear-gradient(135deg, rgba(220, 228, 238, 0.16), rgba(255, 255, 255, 0.03)); box-shadow: 0 0 20px rgba(210, 222, 236, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.em-tile::before { opacity: 0; transition: opacity 0.25s; }
+.em-tile:hover::before, .em-tile:focus-visible::before, .em-tile.is-active::before { opacity: 1; }
+.em-tile:focus-visible { outline: none; }
+/* Tap ring: steel instead of a flat accent line. */
+.em-ring {
+  border: 0;
+  padding: 2px;
+  background: conic-gradient(from var(--steel-a), #5d6670, #f5f8fc, #9aa4af, #2f353c, #dfe6ee, #ffffff, #5d6670);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: em-ring 0.6s var(--em-ease) forwards, em-steelspin 0.6s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .em-nav-pill::before, .em-tile::before, .em-steel-ring { animation: none; }
+}
+
+/* Header glass layer (GlassShatter draws into it). */
+.em-glass { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }

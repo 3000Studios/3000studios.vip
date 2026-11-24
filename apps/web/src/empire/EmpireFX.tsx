@@ -4,6 +4,7 @@ import { useGlobalMusic } from '../components/GlobalMusic';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { playSfx } from './sfx';
 import { tilt } from './tilt';
+import { HeadingFX } from './HeadingFX';
 
 /** Owner/office routes keep their own backdrop (mirrors WaterWallpaper). */
 const EXCLUDED = ['/office', '/admin', '/agent', '/vault', '/command-deck', '/go-live'];
@@ -265,6 +266,7 @@ export function EmpireFX() {
         <i className="a3" />
       </div>
       <div className="em-touch-glow" ref={glowRef} aria-hidden="true" />
+      <HeadingFX reduced={reduced} />
     </>
   );
 }

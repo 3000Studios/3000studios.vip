@@ -21,6 +21,8 @@ import {
 } from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { LiveBand } from '../empire/LiveBand';
+import { GlassShatter } from '../empire/GlassShatter';
+import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { isSfxOn, playSfx, setSfxOn } from '../empire/sfx';
 import { AERO_PLAY_URL, AERO_SITE_URL, SUPPORT_EMAIL } from '../empire/links';
 
@@ -94,6 +96,7 @@ function Logo() {
 export function Header() {
   const { pathname } = useLocation();
   const music = useGlobalMusic();
+  const reducedMotion = usePrefersReducedMotion();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -229,6 +232,7 @@ export function Header() {
       >
         <div className="em-header-bar">
           <LiveBand variant="header" />
+          <GlassShatter reduced={reducedMotion} />
           <Logo />
           <nav ref={navRef} className="em-nav" aria-label="Main" onMouseLeave={pillHome}>
             <span ref={pillRef} className="em-nav-pill" aria-hidden="true" />
