@@ -38,8 +38,6 @@ export function AeroPage() {
     () => (cls === 'ALL' ? AERO_BOSSES : AERO_BOSSES.filter((b) => b.threatLevel === cls)),
     [cls],
   );
-  const hero = AERO_STILLS[0];
-
   return (
     <EmpirePage>
       <section className="ep-band em-nostagger">
@@ -64,23 +62,32 @@ export function AeroPage() {
               </a>
             </div>
           </div>
-          <div className="ep-stage" data-em-tilt>
-            <img
-              src={hero ? hero.src : '/media/aeropocalypse/poster.jpg'}
-              alt={hero ? hero.alt : 'Aeropocalypse: Online combat'}
-              fetchPriority="high"
-              decoding="async"
-            />
-            <div className="ep-hud" aria-hidden="true">
-              <div>
-                STAGE 01 / 25
-                <div className="bar">
-                  <i />
-                </div>
-              </div>
-              <div>SCORE 128,400</div>
-            </div>
-          </div>
+          <a
+            className="ep-playcard"
+            href={AERO_PLAY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Download Aeropocalypse: Online on Google Play"
+            data-em-tilt
+          >
+            <span className="bar" aria-hidden="true">
+              <GooglePlayLogo size={18} weight="fill" /> Google Play
+            </span>
+            <span className="top">
+              <img className="icon" src="/media/aeropocalypse/icon.png" alt="" width={72} height={72} decoding="async" />
+              <span className="meta">
+                <strong>Aeropocalypse: Online</strong>
+                <span className="dev">3000 Studios</span>
+                <span className="tags">Action · Arcade shooter · Free</span>
+              </span>
+            </span>
+            <span className="install">Install</span>
+            <span className="shots" aria-hidden="true">
+              {AERO_STILLS.slice(0, 3).map((s) => (
+                <img key={s.src} src={s.src} alt="" loading="lazy" decoding="async" />
+              ))}
+            </span>
+          </a>
         </div>
       </section>
 

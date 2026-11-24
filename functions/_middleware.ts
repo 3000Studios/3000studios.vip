@@ -5,6 +5,7 @@ const CSP =
 
 import type { PagesEnv } from './env';
 import { isFilePath, redirectFor, transformHtmlResponse } from './lib/route-meta';
+import { dailySitemapXml } from '../apps/web/src/data/dailyBlog';
 import {
   clearLiveSessionCookie,
   createLiveSession,
@@ -96,6 +97,16 @@ export const onRequest: PagesFunction<PagesEnv> = async (context) => {
         },
       });
     }
+  }
+
+  // Daily auto blog: one sitemap entry per published day, built at the edge.
+  if ((request.method === 'GET' || request.method === 'HEAD') && url.pathname === '/blog-sitemap.xml') {
+    return new Response(request.method === 'HEAD' ? null : dailySitemapXml(), {
+      headers: {
+        'content-type': 'application/xml; charset=utf-8',
+        'cache-control': 'public, max-age=3600',
+      },
+    });
   }
 
   if (url.pathname === '/live/logout') {

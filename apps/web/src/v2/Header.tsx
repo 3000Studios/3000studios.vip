@@ -97,6 +97,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [dir, setDir] = useState<'up' | 'down'>('up');
   const [sfx, setSfx] = useState(isSfxOn);
   const headerRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -125,6 +126,7 @@ export function Header() {
       setScrolled(y > 24);
       if (Math.abs(y - lastY) > 6) {
         setHidden(y > lastY && y > 260);
+        setDir(y > lastY ? 'down' : 'up');
         lastY = y;
       }
     };
@@ -223,6 +225,7 @@ export function Header() {
       <header
         ref={headerRef}
         className={`em-header${scrolled ? ' is-scrolled' : ''}${hidden && !open ? ' is-hidden' : ''}`}
+        data-dir={dir}
       >
         <div className="em-header-bar">
           <LiveBand variant="header" />
@@ -279,8 +282,10 @@ export function Header() {
               href={AERO_PLAY_URL}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Play Aeropocalypse Online on Google Play"
             >
-              Aeropocalypse Online
+              <span className="full">Aeropocalypse Online</span>
+              <span className="short" aria-hidden="true">Play</span>
             </a>
             <a
               className="em-btn em-subscribe"

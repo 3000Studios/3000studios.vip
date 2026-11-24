@@ -1184,3 +1184,73 @@ img { content-visibility: auto; }
 .em-ways a { color: var(--em-cyan); }
 /* Book titles on shelves are not headings, so keep them out of the h2 sheen. */
 .em-shelf .em-book-meta b { font-family: var(--em-body); }
+
+/* ==========================================================================
+   Round 2: readable gold buttons, dancing burger, header scroll motion
+   ========================================================================== */
+/* Deeper gold so the dark label always reads (about 7:1 at the darkest stop). */
+.em-btn:not(.em-btn--ghost):not(.em-btn--play) {
+  background: linear-gradient(100deg, #c98a1a 0%, #f0b43a 30%, #ffd76a 50%, #f0b43a 70%, #c98a1a 100%);
+  background-size: 200% 100%;
+  color: #0b0700;
+  font-weight: 900;
+  text-shadow: 0 1px 0 rgba(255, 236, 180, 0.45);
+}
+/* Header buttons: compact, never taller than the bar. */
+.em-header .em-play,
+.em-header .em-subscribe {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  gap: 6px;
+  flex: none;
+  box-shadow: 0 6px 16px rgba(240, 180, 58, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.em-header .em-play .short { display: none; }
+@media (max-width: 640px) {
+  .em-header .em-play { padding: 0 12px; }
+  .em-header .em-play .full { display: none; }
+  .em-header .em-play .short { display: inline; }
+}
+
+/* Burger: three lines dance in a wave and cycle colour. */
+.em-burger i { background: linear-gradient(90deg, var(--em-gold), #3ee8ff, #3df2a8, var(--em-gold)); background-size: 300% 100%; transform-origin: left center; }
+.em-burger:not(.is-open) i { animation: em-burgerdance 1.6s ease-in-out infinite, em-burgerhue 4s linear infinite; }
+.em-burger:not(.is-open) i:nth-child(2) { animation-delay: -0.53s, -1.3s; }
+.em-burger:not(.is-open) i:nth-child(3) { animation-delay: -1.06s, -2.6s; }
+.em-burger:not(.is-open):hover i { animation-duration: 0.7s, 2s; }
+html.em-music-on .em-burger:not(.is-open) i { animation-duration: 0.9s, 2.4s; }
+@keyframes em-burgerdance {
+  0%, 100% { transform: scaleX(1) translateY(0); }
+  25% { transform: scaleX(0.55) translateY(-1px); }
+  50% { transform: scaleX(0.85) translateY(1px); }
+  75% { transform: scaleX(0.4) translateY(0); }
+}
+@keyframes em-burgerhue { to { background-position: 300% 0; } }
+
+/* Header: folds away on the way down, springs back with a light sweep on the way up. */
+.em-header { perspective: 900px; }
+.em-header-bar { transform-origin: top center; transition: height 0.4s var(--em-ease), background 0.4s, transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s; }
+.em-header.is-hidden { transform: translate3d(0, -100%, 0); transition: transform 0.4s cubic-bezier(0.55, 0, 0.75, 0.2); }
+.em-header.is-hidden .em-header-bar { transform: rotateX(55deg) scaleY(0.8); opacity: 0.3; transition-duration: 0.35s; }
+.em-header:not(.is-hidden) { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.em-header-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.22) 46%, rgba(62, 232, 255, 0.25) 50%, transparent 66%);
+  transform: translateX(-120%);
+  z-index: 3;
+}
+.em-header.is-scrolled[data-dir='up']:not(.is-hidden) .em-header-bar::after { animation: em-hdrsweep 0.9s ease-out 0.15s 1; }
+.em-header.is-scrolled[data-dir='down']:not(.is-hidden) .em-header-bar::after { animation: em-hdrsweep-back 0.8s ease-out 1; }
+@keyframes em-hdrsweep { to { transform: translateX(120%); } }
+@keyframes em-hdrsweep-back { from { transform: translateX(120%); } to { transform: translateX(-120%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .em-burger i, .em-burger:not(.is-open) i { animation: none; }
+  .em-header-bar::after { display: none; }
+  .em-header.is-hidden .em-header-bar { transform: none; opacity: 1; }
+}

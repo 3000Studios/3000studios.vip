@@ -25,6 +25,11 @@ import {
   type RouteMetaEntry,
 } from './route-meta.generated';
 import { ROUTE_CONTENT } from './route-content.generated';
+import { buildDailyPost, dailyPostExists, dailyPostHtml, dailyPostJsonLd } from '../../apps/web/src/data/dailyBlog';
+import { heroForDate } from '../../apps/web/src/data/dailyHero';
+
+/** Meta for one daily auto-blog post (/blog/daily/YYYY-MM-DD). */
+type DailyMeta = RouteMetaEntry & { daily?: string };
 
 export const APEX_HOST = '3000studios.vip';
 export const WWW_HOST = 'www.3000studios.vip';
@@ -61,6 +66,9 @@ export function resolveRouteMeta(pathname: string): RouteMetaEntry | null {
   const song = path.match(/^\/song\/([^/]+)$/);
   if (song) return SONG_ROUTES[song[1]] ?? null;
 
+  const daily = path.match(/^\/blog\/daily\/(\d{4}-\d{2}-\d{2})$/);
+  if (daily) return dailyMetaFor(daily[1]);
+
   const blog = path.match(/^\/blog\/([^/]+)$/);
   if (blog) return BLOG_ROUTES[blog[1]] ?? null;
 
@@ -68,6 +76,29 @@ export function resolveRouteMeta(pathname: string): RouteMetaEntry | null {
     return STATIC_ROUTES['/vault'] ?? null;
   }
   return null;
+}
+
+export function dailyMetaFor(date: string): DailyMeta | null {
+  if (!dailyPostExists(date)) return null;
+  const post = buildDailyPost(date);
+  const hero = heroForDate(date);
+  const image = hero.poster.startsWith('https://') ? hero.poster : `${ORIGIN}${hero.poster}`;
+  return { title: `${post.title} — 3000 Studios VIP`, description: post.description, image, type: 'article', daily: date };
+}
+
+function dailyJsonLd(meta: RouteMetaEntry): string | null {
+  const date = (meta as DailyMeta).daily;
+  if (!date) return null;
+  const post = buildDailyPost(date);
+  const hero = heroForDate(date);
+  const thumbnailUrl = hero.poster.startsWith('https://') ? hero.poster : `${ORIGIN}${hero.poster}`;
+  return dailyPostJsonLd(post, ORIGIN, {
+    name: hero.title,
+    thumbnailUrl,
+    ...(hero.kind === 'mp4'
+      ? { contentUrl: `${ORIGIN}${hero.src}` }
+      : { embedUrl: `https://www.youtube-nocookie.com/embed/${hero.videoId}` }),
+  });
 }
 
 export function isKnownRoute(pathname: string): boolean {
@@ -193,7 +224,7 @@ export function injectHead(html: string, meta: RouteMetaEntry, canonicalPath: st
     );
   }
 
-  const ld = songJsonLd(meta, canonical);
+  const ld = songJsonLd(meta, canonical) ?? dailyJsonLd(meta);
   if (ld) {
     out = out.replace(
       /<\/head>/i,
@@ -228,6 +259,8 @@ const POLICY_NAV =
  */
 export function bodyContentFor(path: string, meta: RouteMetaEntry): string | null {
   if (meta.noindex) return null;
+  const daily = (meta as DailyMeta).daily;
+  if (daily) return dailyPostHtml(buildDailyPost(daily)).replace('</main>', `${POLICY_NAV}\n</main>`);
   const exact = ROUTE_CONTENT[path];
   if (exact) return exact;
   if (meta.song) {
