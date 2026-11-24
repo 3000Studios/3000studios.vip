@@ -1350,3 +1350,38 @@ html.em-music-on .hx-on { transform: none; }
 .em-menu-grid, .em-menu-hud, .em-menu-foot, .em-swipehint, .em-menu-close { position: relative; z-index: 1; }
 .em-tile { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .em-tile.is-touched { transform: scale(1.04); box-shadow: 0 0 34px color-mix(in srgb, var(--c, var(--em-gold)) 45%, transparent); transition: transform 0.15s, box-shadow 0.15s; }
+
+/* ==========================================================================
+   Footer sea (FooterSea.tsx): rises out of the water as you scroll
+   ========================================================================== */
+.em-sea { position: absolute; left: 0; top: 0; width: 100%; z-index: 0; pointer-events: none; display: block; }
+.em-footer-in { position: relative; z-index: 1; }
+.em-footer { background: linear-gradient(180deg, rgba(6, 5, 10, 0.35), rgba(4, 8, 16, 0.9) 30%); }
+.em-sea-on :is(.em-footer-big, .em-kicker, .em-contact, .em-socials, .em-cols > div, .em-legal) {
+  opacity: 0.28;
+  filter: blur(2.5px) saturate(0.5) hue-rotate(-12deg);
+  transform: translate3d(0, 26px, 0) scale(0.985);
+  pointer-events: none;
+  transition: opacity 0.7s var(--em-ease), filter 0.7s var(--em-ease), transform 0.9s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+.em-sea-on :is(.em-footer-big, .em-kicker, .em-contact, .em-socials, .em-cols > div, .em-legal).is-dry {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  pointer-events: auto;
+}
+/* A wet sheen runs off each block the moment it surfaces. */
+.em-sea-on .is-dry:is(.em-contact, .em-socials, .em-cols > div, .em-legal) { position: relative; }
+.em-sea-on .is-dry:is(.em-contact, .em-socials, .em-cols > div, .em-legal)::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 18px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(160, 235, 255, 0.28), transparent 70%);
+  animation: em-drip 1.1s ease-out forwards;
+}
+@keyframes em-drip { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(18px); } }
+@media (prefers-reduced-motion: reduce) {
+  .em-sea { display: none; }
+}

@@ -13,7 +13,7 @@ import {
   GameController,
   Lifebuoy,
 } from '@phosphor-icons/react';
-import { LiveBand } from '../empire/LiveBand';
+import { FooterSea } from '../empire/FooterSea';
 import { AERO_PLAY_URL, AERO_SITE_URL, BOOK_STORE_URL, SUBSTACK_URL, SUPPORT_EMAIL, TEAM_EMAIL } from '../empire/links';
 
 const SHOP_URL = 'https://boughtitonline.com';
@@ -98,7 +98,7 @@ export function Footer() {
 
   return (
     <footer className="em-footer">
-      <LiveBand variant="footer" />
+      <FooterSea />
       <div className="em-footer-in">
         <p className="em-footer-big" aria-hidden="true">
           3000 Studios
