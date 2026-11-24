@@ -21,6 +21,12 @@ export type LensFilterId =
   | 'vhs'
   | 'chrome'
   | 'blush'
+  | 'goldenHour'
+  | 'ocean'
+  | 'cyberpunk'
+  | 'dreamy'
+  | 'sunset'
+  | 'monoPop'
   | 'greenScreen';
 
 export type OverlayId =
@@ -42,7 +48,11 @@ export type OverlayId =
   | 'cyberNeon'
   | 'diamondLuxury'
   | 'electroPulse'
-  | 'spotlightStudio';
+  | 'spotlightStudio'
+  | 'confetti'
+  | 'hearts'
+  | 'clock'
+  | 'beatBars';
 
 export const LENS_FILTERS: { id: LensFilterId; label: string; css: string; group?: string }[] = [
   { id: 'none', label: 'Clean', css: 'none', group: 'base' },
@@ -65,6 +75,12 @@ export const LENS_FILTERS: { id: LensFilterId; label: string; css: string; group
   { id: 'chrome', label: 'Chrome', css: 'grayscale(0.3) contrast(1.4) brightness(1.1) saturate(0.5)', group: 'fun' },
   { id: 'doggo', label: 'Doggo tint', css: 'sepia(0.25) hue-rotate(25deg) saturate(1.3) contrast(1.05)', group: 'fun' },
   { id: 'sparkle', label: 'Sparkle', css: 'brightness(1.15) contrast(1.1) saturate(1.35)', group: 'fun' },
+  { id: 'goldenHour', label: 'Golden hour', css: 'sepia(0.3) saturate(1.45) brightness(1.08) hue-rotate(-8deg)', group: 'pro' },
+  { id: 'ocean', label: 'Ocean', css: 'hue-rotate(170deg) saturate(1.25) contrast(1.08) brightness(1.04)', group: 'pro' },
+  { id: 'cyberpunk', label: 'Cyberpunk', css: 'contrast(1.3) saturate(1.8) hue-rotate(250deg) brightness(0.95)', group: 'fun' },
+  { id: 'dreamy', label: 'Dreamy', css: 'brightness(1.12) saturate(1.2) contrast(0.92) blur(0.6px)', group: 'face' },
+  { id: 'sunset', label: 'Sunset', css: 'sepia(0.45) saturate(1.9) hue-rotate(-20deg) contrast(1.05)', group: 'pro' },
+  { id: 'monoPop', label: 'Mono pop', css: 'grayscale(1) contrast(1.6) brightness(1.05)', group: 'pro' },
   { id: 'greenScreen', label: 'Chroma key', css: 'none', group: 'fx' },
 ];
 
@@ -88,6 +104,10 @@ export const PREMADE_OVERLAYS: { id: OverlayId; label: string; hint: string; gro
   { id: 'pulseRing', label: 'Pulse ring', hint: 'Animated live halo', group: 'frame' },
   { id: 'scanlines', label: 'Scanlines', hint: 'CRT overlay', group: 'fx' },
   { id: 'broadcastSafe', label: 'Safe title', hint: 'Action-safe guides', group: 'fx' },
+  { id: 'clock', label: 'Clock', hint: 'Live clock top-right', group: 'info' },
+  { id: 'confetti', label: 'Confetti', hint: 'Falling celebration confetti', group: 'fx' },
+  { id: 'hearts', label: 'Hearts', hint: 'Hearts float up the right side', group: 'fx' },
+  { id: 'beatBars', label: 'Beat bars', hint: 'Mic-reactive equaliser along the bottom', group: 'fx' },
 ];
 
 export type CameraRotation = 0 | 90 | 180 | 270;
@@ -108,7 +128,18 @@ export type StreamStudioOptions = {
   panY?: number;
 };
 
+export type StudioAspect = 'portrait' | 'landscape' | 'square';
+const ASPECT_SIZES: Record<StudioAspect, [number, number]> = {
+  portrait: [720, 1280],
+  landscape: [1280, 720],
+  square: [1080, 1080],
+};
+
+type Fleck = { x: number; y: number; vx: number; vy: number; r: number; hue: number; spin: number };
+
 export class StreamStudio {
+  private flecks: Fleck[] = [];
+  private floaters: Fleck[] = [];
   private video = document.createElement('video');
   private canvas = document.createElement('canvas');
   private ctx: CanvasRenderingContext2D;
@@ -454,6 +485,42 @@ export class StreamStudio {
     }
   }
 
+  /** Portrait (9:16) for phones, landscape (16:9) for laptops, square for feeds. */
+  setAspect(aspect: StudioAspect) {
+    const [w, h] = ASPECT_SIZES[aspect];
+    if (this.canvas.width === w && this.canvas.height === h) return;
+    this.canvas.width = w;
+    this.canvas.height = h;
+    this.outStream = null;
+  }
+
+  getAspect(): StudioAspect {
+    const { width: w, height: h } = this.canvas;
+    return w === h ? 'square' : h > w ? 'portrait' : 'landscape';
+  }
+
+  /** PNG of exactly what viewers see. */
+  snapshot(): Promise<Blob | null> {
+    return new Promise((resolve) => this.canvas.toBlob((b) => resolve(b), 'image/png'));
+  }
+
+  torchSupported(): boolean {
+    const track = this.camStream?.getVideoTracks()[0];
+    const caps = (track?.getCapabilities?.() ?? {}) as { torch?: boolean };
+    return Boolean(caps.torch);
+  }
+
+  async setTorch(on: boolean): Promise<boolean> {
+    const track = this.camStream?.getVideoTracks()[0];
+    if (!track || !this.torchSupported()) return false;
+    try {
+      await track.applyConstraints({ advanced: [{ torch: on } as MediaTrackConstraintSet] });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   setFilter(id: LensFilterId) {
     this.filter = id;
   }
@@ -741,6 +808,73 @@ export class StreamStudio {
       ctx.font = 'bold 18px Inter, Arial, sans-serif';
       const offset = (this.tick * 1.6) % 800;
       ctx.fillText((this.tickerText + this.tickerText).repeat(2), 20 - offset, h - 14);
+    }
+    if (this.overlays.has('clock')) {
+      const now = new Date();
+      const t = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      ctx.font = 'bold 22px Inter, Arial, sans-serif';
+      const tw = ctx.measureText(t).width + 28;
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      roundRect(ctx, w - tw - 24, 24, tw, 38, 19);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillText(t, w - tw - 10, 50);
+    }
+    if (this.overlays.has('confetti')) {
+      if (this.flecks.length < 90) {
+        this.flecks.push({ x: Math.random() * w, y: -10, vx: (Math.random() - 0.5) * 1.4, vy: 1.6 + Math.random() * 2.4, r: 4 + Math.random() * 6, hue: Math.random() * 360, spin: Math.random() * 6 });
+      }
+      for (const f of this.flecks) {
+        f.x += f.vx;
+        f.y += f.vy;
+        f.spin += 0.12;
+        ctx.save();
+        ctx.translate(f.x, f.y);
+        ctx.rotate(f.spin);
+        ctx.fillStyle = `hsl(${f.hue},90%,60%)`;
+        ctx.fillRect(-f.r / 2, -f.r / 4, f.r, f.r / 2);
+        ctx.restore();
+      }
+      this.flecks = this.flecks.filter((f) => f.y < h + 20);
+    } else if (this.flecks.length) {
+      this.flecks = [];
+    }
+    if (this.overlays.has('hearts')) {
+      if (this.tick % 9 === 0 && this.floaters.length < 40) {
+        this.floaters.push({ x: w - 80 + (Math.random() - 0.5) * 60, y: h - 60, vx: (Math.random() - 0.5) * 0.6, vy: -(1.4 + Math.random() * 1.6), r: 10 + Math.random() * 12, hue: 330 + Math.random() * 40, spin: Math.random() * 6 });
+      }
+      for (const f of this.floaters) {
+        f.spin += 0.05;
+        f.x += f.vx + Math.sin(f.spin) * 0.8;
+        f.y += f.vy;
+        const a = Math.max(0, Math.min(1, (f.y - h * 0.25) / (h * 0.4)));
+        ctx.fillStyle = `hsla(${f.hue % 360},90%,62%,${a})`;
+        const r = f.r;
+        ctx.beginPath();
+        ctx.moveTo(f.x, f.y + r * 0.35);
+        ctx.bezierCurveTo(f.x - r, f.y - r * 0.4, f.x - r * 0.5, f.y - r * 1.1, f.x, f.y - r * 0.45);
+        ctx.bezierCurveTo(f.x + r * 0.5, f.y - r * 1.1, f.x + r, f.y - r * 0.4, f.x, f.y + r * 0.35);
+        ctx.fill();
+      }
+      this.floaters = this.floaters.filter((f) => f.y > h * 0.2);
+    } else if (this.floaters.length) {
+      this.floaters = [];
+    }
+    if (this.overlays.has('beatBars') && this.analyser) {
+      const bins = new Uint8Array(this.analyser.frequencyBinCount);
+      this.analyser.getByteFrequencyData(bins);
+      const count = 32;
+      const bw = w / count;
+      for (let i = 0; i < count; i += 1) {
+        const v = bins[Math.floor((i / count) * bins.length * 0.7)] / 255;
+        const bh = 6 + v * h * 0.22;
+        const g = ctx.createLinearGradient(0, h - bh, 0, h);
+        g.addColorStop(0, `hsla(${190 + i * 4},95%,65%,0.95)`);
+        g.addColorStop(1, 'rgba(255,200,60,0.85)');
+        ctx.fillStyle = g;
+        roundRect(ctx, i * bw + 2, h - bh - 4, bw - 4, bh, 4);
+        ctx.fill();
+      }
     }
     ctx.restore();
   }

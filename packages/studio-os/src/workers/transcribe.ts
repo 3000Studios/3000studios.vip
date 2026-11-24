@@ -16,12 +16,13 @@ export function transcribeWithPipeline(
     'scripts',
     'transcribe_wav.py',
   );
-  if (!fs.existsSync(script)) return { text: null, skipped: false, error: 'script missing' };
-  if (!fs.existsSync(wavPath)) return { text: null, skipped: false, error: 'audio missing' };
   const outPath = opts?.outPath || path.join(config.dataDir, 'transcripts', `${path.basename(wavPath)}.txt`);
+  // A finished transcript is reused before anything else, so the skip works on machines without the pipeline.
   if (opts?.skipIfComplete !== false && fs.existsSync(outPath) && fs.statSync(outPath).size > 20) {
     return { text: fs.readFileSync(outPath, 'utf8').trim(), skipped: true };
   }
+  if (!fs.existsSync(wavPath)) return { text: null, skipped: false, error: 'audio missing' };
+  if (!fs.existsSync(script)) return { text: null, skipped: false, error: 'script missing' };
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   const py =
     process.env.SONG_DROP_PYTHON ||

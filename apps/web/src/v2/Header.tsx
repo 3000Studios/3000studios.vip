@@ -21,7 +21,10 @@ import {
 } from '@phosphor-icons/react';
 import { useGlobalMusic } from '../components/GlobalMusic';
 import { LiveBand } from '../empire/LiveBand';
-import { isSfxOn, playSfx, setSfxOn } from '../empire/sfx';
+import { GlassShatter } from '../empire/GlassShatter';
+import { usePrefersReducedMotion } from '../lib/mediaQuery';
+import { isSfxOn, playHover, playSfx, setSfxOn } from '../empire/sfx';
+import { LiveWallpaper } from '../empire/LiveWallpaper';
 import { AERO_PLAY_URL, AERO_SITE_URL, SUPPORT_EMAIL } from '../empire/links';
 
 type Item = { to: string; label: string; sub: string; icon: React.ReactNode; color: string; nav?: boolean };
@@ -94,9 +97,11 @@ function Logo() {
 export function Header() {
   const { pathname } = useLocation();
   const music = useGlobalMusic();
+  const reducedMotion = usePrefersReducedMotion();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [dir, setDir] = useState<'up' | 'down'>('up');
   const [sfx, setSfx] = useState(isSfxOn);
   const headerRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -125,6 +130,7 @@ export function Header() {
       setScrolled(y > 24);
       if (Math.abs(y - lastY) > 6) {
         setHidden(y > lastY && y > 260);
+        setDir(y > lastY ? 'down' : 'up');
         lastY = y;
       }
     };
@@ -203,6 +209,20 @@ export function Header() {
     }
   };
 
+  /* A finger sliding across the tiles plays each tile's note as it passes. */
+  const slideTile = useRef(-1);
+  const onGridSlide = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse') return;
+    const el = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>('[data-tile]');
+    const i = el ? Number(el.dataset.tile) : -1;
+    if (i >= 0 && i !== slideTile.current) {
+      slideTile.current = i;
+      playHover(1 + i * 0.06);
+      el?.classList.add('is-touched');
+      window.setTimeout(() => el?.classList.remove('is-touched'), 260);
+    }
+  };
+
   const toggleMenu = () => {
     playSfx(open ? 'close' : 'open');
     setOpen((o) => !o);
@@ -223,9 +243,11 @@ export function Header() {
       <header
         ref={headerRef}
         className={`em-header${scrolled ? ' is-scrolled' : ''}${hidden && !open ? ' is-hidden' : ''}`}
+        data-dir={dir}
       >
         <div className="em-header-bar">
           <LiveBand variant="header" />
+          <GlassShatter reduced={reducedMotion} />
           <Logo />
           <nav ref={navRef} className="em-nav" aria-label="Main" onMouseLeave={pillHome}>
             <span ref={pillRef} className="em-nav-pill" aria-hidden="true" />
@@ -279,8 +301,10 @@ export function Header() {
               href={AERO_PLAY_URL}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Play Aeropocalypse Online on Google Play"
             >
-              Aeropocalypse Online
+              <span className="full">Aeropocalypse Online</span>
+              <span className="short" aria-hidden="true">Play</span>
             </a>
             <a
               className="em-btn em-subscribe"
@@ -322,6 +346,7 @@ export function Header() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
+        {open && !reducedMotion && <LiveWallpaper scene="menu" className="em-menu-wall" target="parent" />}
         <span className="em-menu-scan" aria-hidden="true" />
         <button type="button" className="em-menu-close" onClick={closeMenu} aria-label="Close menu">
           <X size={22} weight="bold" aria-hidden="true" />
@@ -330,7 +355,7 @@ export function Header() {
           <span>3000 Studios // nav</span>
           <span>{current ? `Now: ${current.label}` : 'Choose a page'}</span>
         </div>
-        <nav className="em-menu-grid" aria-label="All pages">
+        <nav className="em-menu-grid" aria-label="All pages" onPointerMove={onGridSlide}>
           {ITEMS.map((item, i) => {
             const active = current?.to === item.to;
             const wide = item.to === '/aeropocalypse';
@@ -341,6 +366,9 @@ export function Header() {
                 className={`em-tile${active ? ' is-active' : ''}${wide ? ' wide' : ''}`}
                 aria-current={active ? 'page' : undefined}
                 onClick={() => setOpen(false)}
+                onMouseEnter={() => playHover(1 + i * 0.06)}
+                onFocus={() => playHover(1 + i * 0.06)}
+                data-tile={i}
                 style={{ '--i': i, '--c': item.color } as React.CSSProperties}
               >
                 {item.icon}

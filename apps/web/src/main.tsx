@@ -21,6 +21,7 @@ import { WaterWallpaper } from './components/WaterWallpaper';
    chrome stay in the initial bundle. */
 const AboutPage = lazy(() => import('./empire/pages/AboutEmpire').then((m) => ({ default: m.AboutEmpire })));
 const BlogPage = lazy(() => import('./empire/pages/StudioNotes').then((m) => ({ default: m.StudioNotes })));
+const DailyPostPage = lazy(() => import('./empire/pages/DailyPostPage').then((m) => ({ default: m.DailyPostPage })));
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })));
 const CommunityPage = lazy(() => import('./pages/CommunityPage').then((m) => ({ default: m.CommunityPage })));
 const ContactPage = lazy(() => import('./empire/pages/BookingDesk').then((m) => ({ default: m.BookingDesk })));
@@ -41,7 +42,6 @@ const BeatsPage = lazy(() => import('./empire/pages/BeatPacks').then((m) => ({ d
 const BooksPage = lazy(() => import('./pages/BooksPage').then((m) => ({ default: m.BooksPage })));
 const CommandDeckPage = lazy(() => import('./pages/CommandDeckPage').then((m) => ({ default: m.CommandDeckPage })));
 const OfficePage = lazy(() => import('./pages/OfficePage').then((m) => ({ default: m.OfficePage })));
-const PhoneGoLive = lazy(() => import('./pages/PhoneGoLive').then((m) => ({ default: m.PhoneGoLive })));
 const ShopPage = lazy(() => import('./empire/pages/EmpireShop').then((m) => ({ default: m.EmpireShop })));
 const ConceptBoard = lazy(() => import('./pages/ConceptBoard').then((m) => ({ default: m.ConceptBoard })));
 const WallpaperPage = lazy(() => import('./pages/WallpaperPage').then((m) => ({ default: m.WallpaperPage })));
@@ -335,17 +335,7 @@ const router = createBrowserRouter([
           </Titled>
         ),
       },
-      {
-        path: '/go-live',
-        element: (
-          <Titled
-            title="Go Live"
-            description="Start a 3000 Studios live broadcast from your phone."
-          >
-            <RouteLoader><PhoneGoLive /></RouteLoader>
-          </Titled>
-        ),
-      },
+      { path: '/go-live', element: <Navigate to="/admin#go-live" replace /> },
       {
         path: '/concepts',
         element: (
@@ -401,6 +391,7 @@ const router = createBrowserRouter([
           </Titled>
         ),
       },
+      { path: '/blog/daily/:date', element: <RouteLoader><DailyPostPage /></RouteLoader> },
       { path: '/blog/:slug', element: <RouteLoader><BlogPostPage /></RouteLoader> },
       {
         path: '/sponsors',

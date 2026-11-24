@@ -4,6 +4,14 @@ import { useGlobalMusic } from '../components/GlobalMusic';
 import { usePrefersReducedMotion } from '../lib/mediaQuery';
 import { playSfx } from './sfx';
 import { tilt } from './tilt';
+import { HeadingFX } from './HeadingFX';
+import { LiveWallpaper, type SceneId } from './LiveWallpaper';
+
+const SCENES: Record<string, SceneId> = {
+  home: 'home', aeropocalypse: 'aeropocalypse', music: 'music', song: 'music', video: 'video', podcast: 'podcast',
+  books: 'books', beats: 'beats', live: 'live', shop: 'shop', vip: 'shop', blog: 'blog', contact: 'contact',
+  about: 'contact', apps: 'apps', projects: 'apps',
+};
 
 /** Owner/office routes keep their own backdrop (mirrors WaterWallpaper). */
 const EXCLUDED = ['/office', '/admin', '/agent', '/vault', '/command-deck', '/go-live'];
@@ -259,12 +267,14 @@ export function EmpireFX() {
   return (
     <>
       <div className="em-aura" ref={auraRef} aria-hidden="true">
+        {!reduced && <LiveWallpaper scene={SCENES[routeKey(pathname)] ?? 'page'} />}
         <div className="grid" />
         <i className="a1" />
         <i className="a2" />
         <i className="a3" />
       </div>
       <div className="em-touch-glow" ref={glowRef} aria-hidden="true" />
+      <HeadingFX reduced={reduced} />
     </>
   );
 }

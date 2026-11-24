@@ -11,3 +11,4 @@ Disallow: /go-live
 # here until 2026-11-07 — that block is removed and must not come back.
 
 Sitemap: https://3000studios.vip/sitemap.xml
+Sitemap: https://3000studios.vip/blog-sitemap.xml

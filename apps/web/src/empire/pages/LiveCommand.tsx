@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { YoutubeLogo } from '@phosphor-icons/react';
 import { EmpirePage, PageHero, Head, Ext, Go } from '../kit';
 import { LIVE_STREAM_CONFIG } from '../../data/liveStream';
@@ -38,12 +38,80 @@ export function LiveCommand() {
     };
   }, []);
 
+  const playerRef = useRef<HTMLDivElement>(null);
+  const [shared, setShared] = useState('');
+
+  async function share() {
+    const url = 'https://3000studios.vip/live';
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: '3000 Studios live', text: 'Watch 3000 Studios live now', url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setShared('Link copied');
+    } catch {
+      setShared('');
+      return;
+    }
+    window.setTimeout(() => setShared(''), 1800);
+  }
+
+  function fullscreen() {
+    const el = playerRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void el.requestFullscreen?.().catch(() => undefined);
+  }
+
   const isLive = live === true;
   const useWhep = isLive && CAN_USE_WHEP;
   const status = live === null ? 'Checking signal' : isLive ? 'On air' : 'Off air';
 
+  const playerBlock = (
+    <div className="lv-deck">
+          <div ref={playerRef} className={`ep-glass ep-gilt ep-live${isLive ? ' is-on-air' : ''}`} style={{ position: 'relative', gridColumn: 'span 1' }}>
+            {useWhep ? (
+              <WhepStreamPlayer title="3000 Studios live stream" muted={false} autoplay />
+            ) : isLive ? (
+              <iframe
+                src={LIVE_STREAM_CONFIG.streamEmbedUrl}
+                title="3000 Studios live stream"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div className="inner">
+                <span className="ep-chip">{status}</span>
+                <h3 style={{ fontSize: 40 }}>Next broadcast</h3>
+                <p style={{ color: 'var(--fg-2)' }}>Announced here and on the 3000 Studios channels.</p>
+              </div>
+            )}
+            <div className="ep-hud" aria-hidden="true">
+              <span>DECK 01</span>
+              <span style={{ color: isLive ? '#ff4d4d' : 'var(--em-jade)' }}>{isLive ? 'LIVE' : 'STANDBY'}</span>
+            </div>
+          </div>
+      <div className="lv-bar">
+        <span className={`lv-dot${isLive ? ' is-live' : ''}`} aria-hidden="true" />
+        <strong>{status}</strong>
+        <button type="button" className="lv-btn" onClick={() => void share()}>
+          {shared || 'Share'}
+        </button>
+        <button type="button" className="lv-btn" onClick={fullscreen} disabled={!isLive}>
+          Full screen
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <EmpirePage>
+      {isLive && (
+        <section className="ep-sec lv-top">
+          <div className="em-wrap">{playerBlock}</div>
+        </section>
+      )}
       <PageHero
         eyebrow="Live command"
         title={
@@ -66,28 +134,7 @@ export function LiveCommand() {
 
       <section className="ep-sec" style={{ paddingTop: 0 }}>
         <div className="em-wrap ep-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', alignItems: 'start' }}>
-          <div className="ep-glass ep-gilt ep-live" style={{ position: 'relative', gridColumn: 'span 1' }}>
-            {useWhep ? (
-              <WhepStreamPlayer title="3000 Studios live stream" muted={false} autoplay />
-            ) : isLive ? (
-              <iframe
-                src={LIVE_STREAM_CONFIG.streamEmbedUrl}
-                title="3000 Studios live stream"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div className="inner">
-                <span className="ep-chip">{status}</span>
-                <h3 style={{ fontSize: 40 }}>Next broadcast</h3>
-                <p style={{ color: 'var(--fg-2)' }}>Announced here and on the 3000 Studios channels.</p>
-              </div>
-            )}
-            <div className="ep-hud" aria-hidden="true">
-              <span>DECK 01</span>
-              <span style={{ color: isLive ? '#ff4d4d' : 'var(--em-jade)' }}>{isLive ? 'LIVE' : 'STANDBY'}</span>
-            </div>
-          </div>
+          {!isLive && playerBlock}
           <div style={{ display: 'grid', gap: 18 }}>
             <div className="ep-glass ep-card">
               <span className={isLive ? 'ep-chip is-on' : 'ep-chip'}>{status}</span>
