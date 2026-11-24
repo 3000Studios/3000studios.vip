@@ -119,17 +119,17 @@ const STUDIO_NOTES = [
   {
     category: 'Games',
     title:
-      "How Aeropocalypse's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns",
-    to: '/blog/how-thunder-domes-24-bosses-were-designed',
+      "How Aeropocalypse's 24 Bosses Were Designed: Threat Classes, Telegraphs and Fair Bullet Patterns",
+    to: '/blog/how-aeropocalypses-24-bosses-were-designed',
   },
   {
     category: 'Software',
-    title: 'Inside Amped Ear 3000: Real-Time Audio Analysis & Low-Latency Web Audio DSP',
+    title: 'Inside Amped Ear 3000: How a 4096-Point FFT Helps You Fix a Mix',
     to: '/blog/inside-amped-ear-3000-spectral-audio',
   },
   {
     category: 'Engineering',
-    title: 'Building a Zero-Lag Production Website on Cloudflare Pages & Workers',
+    title: 'How 3000studios.vip Runs on Cloudflare Pages, and the Deploy Lesson We Learned',
     to: '/blog/building-production-site-on-cloudflare-pages',
   },
 ] as const;

@@ -916,23 +916,23 @@ export const SONG_ROUTES: Record<string, RouteMetaEntry> = {
 
 export const BLOG_ROUTES: Record<string, RouteMetaEntry> = {
   "how-aeropocalypses-24-bosses-were-designed": {
-    "title": "How Aeropocalypse's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns — 3000 Studios VIP",
-    "description": "A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Aeropocalypse’s 24 unique boss fights.",
+    "title": "How Aeropocalypse's 24 Bosses Were Designed: Threat Classes, Telegraphs and Fair Bullet Patterns — 3000 Studios VIP",
+    "description": "How the 24 bosses of Aeropocalypse: Online were planned: four threat classes, weak points that grow out of each setting, telegraphed attacks, readable bullet patterns and one-thumb touch controls.",
     "type": "article"
   },
   "inside-amped-ear-3000-spectral-audio": {
-    "title": "Inside Amped Ear 3000: Real-Time Audio Analysis & Low-Latency Web Audio DSP — 3000 Studios VIP",
-    "description": "How Amped Ear achieves 4096-bin Fast Fourier Transform decomposition and ultra-low latency acoustic visualization in browser and Android runtimes.",
+    "title": "Inside Amped Ear 3000: How a 4096-Point FFT Helps You Fix a Mix — 3000 Studios VIP",
+    "description": "How Amped Ear 3000 uses a high-resolution FFT to show what is happening in a mix, why window size matters, and how to use a spectrum analyzer and ear training to fix muddy, harsh or crowded mixes.",
     "type": "article"
   },
   "building-production-site-on-cloudflare-pages": {
-    "title": "Building a Zero-Lag Production Website on Cloudflare Pages & Workers — 3000 Studios VIP",
-    "description": "The architectural decisions behind 3000studios.vip: static Vite bundling, Cloudflare native Git CI, WebRTC WHIP streaming, and edge caching.",
+    "title": "How 3000studios.vip Runs on Cloudflare Pages, and the Deploy Lesson We Learned — 3000 Studios VIP",
+    "description": "How 3000studios.vip is built: a Vite and React single-page app on Cloudflare Pages, edge functions that serve real content to search engines, D1 and R2 for data and media, and the deployment lesson that kept those functions offline for weeks.",
     "type": "article"
   },
   "how-3000-studios-uses-ai-to-build-faster": {
     "title": "How 3000 Studios Uses AI to Accelerate Music, Visuals, and Code Production — 3000 Studios VIP",
-    "description": "An honest look at how autonomous agent fleets, neural audio generation, and multimodal AI tools supercharge solo and indie studio execution.",
+    "description": "An honest look at how a one-person studio uses AI agents for code, AI tools for music ideas and artwork, and human review at every step that ships.",
     "type": "article"
   },
   "from-demo-to-distrokid-how-a-3000-studios-single-is-made": {
