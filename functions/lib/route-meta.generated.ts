@@ -55,6 +55,10 @@ export const STATIC_ROUTES: Record<string, RouteMetaEntry> = {
     "title": "Shipping Policy — 3000 Studios VIP",
     "description": "Shipping policy for 3000studios.vip — physical merch ships via standard carriers, digital products are delivered electronically, usually within 24 hours."
   },
+  "/links": {
+    "title": "3000 Studios — All Links",
+    "description": "Every official 3000 Studios link in one place: Spotify, YouTube, Amazon Music, TikTok, Instagram, Facebook, the store, Aeropocalypse: Online on Google Play, and more."
+  },
   "/returns": {
     "title": "Returns & Refunds — 3000 Studios VIP",
     "description": "Returns and refunds for 3000studios.vip — 30-day returns on physical merch, digital products final sale once delivered, replacements for corrupted or wrong files."

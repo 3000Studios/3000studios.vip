@@ -185,6 +185,13 @@ const HAND = {
     description:
       'Shipping policy for 3000studios.vip — physical merch ships via standard carriers, digital products are delivered electronically, usually within 24 hours.',
   },
+  // Static link-in-bio page (apps/web/public/links/index.html); not a router
+  // path, so without this entry the middleware served it as a 404 + noindex.
+  '/links': {
+    title: '3000 Studios — All Links',
+    description:
+      'Every official 3000 Studios link in one place: Spotify, YouTube, Amazon Music, TikTok, Instagram, Facebook, the store, Aeropocalypse: Online on Google Play, and more.',
+  },
   '/returns': {
     title: brand('Returns & Refunds'),
     description:
