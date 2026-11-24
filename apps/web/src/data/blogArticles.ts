@@ -29,68 +29,126 @@ export interface BlogArticle {
 export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: 'how-aeropocalypses-24-bosses-were-designed',
-    title: "How Aeropocalypse's 24 Bosses Were Designed: Multi-Phase Combat & Algorithmic Bullet Patterns",
+    title: "How Aeropocalypse's 24 Bosses Were Designed: Threat Classes, Telegraphs and Fair Bullet Patterns",
     category: 'Game Design & Engineering',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-15',
-    updatedAt: '2026-09-28',
-    readTime: '6 min read',
-    summary: 'A deep dive into the mathematical algorithms, spatial collision matrices, and telegraphing systems behind Aeropocalypse’s 24 unique boss fights.',
-    leadParagraph: 'When building a high-speed arcade flight combat game in pure JavaScript and Canvas, the biggest architectural challenge is creating boss encounters that feel visually overwhelming while remaining completely fair, readable, and responsive on mobile touchscreens.',
+    updatedAt: '2026-11-24',
+    readTime: '8 min read',
+    summary: 'How the 24 bosses of Aeropocalypse: Online were planned: four threat classes, weak points that grow out of each setting, telegraphed attacks, readable bullet patterns and one-thumb touch controls.',
+    leadParagraph: 'Aeropocalypse: Online has 24 bosses spread across 24 levels, and every one of them has to do two jobs at once: look overwhelming on a phone screen, and still be fair to a player steering with one thumb. This is how the roster was planned, how the fights are paced, and the design rules every boss had to pass before it shipped.',
     sections: [
       {
-        heading: '1. The Mathematics of Bullet Emitters',
+        heading: 'Four threat classes set the pace',
         body: [
-          'Rather than spawning hundreds of unmanaged particle objects every frame, Aeropocalypse utilizes a high-efficiency pre-allocated object pool. Each boss phase calculates trigonometric bullet trajectories using parametric spiral equations:',
-          'By varying the rotational delta θ and velocity vectors dynamically against the game clock, we create complex geometric bullet curtains—like the "Magma Caldera Eruption" in Level 2 or the "Chronos Vortex" in Level 24—with virtually zero garbage collection stutter.',
+          'The 24 bosses are grouped into four threat classes, and each class marks a step in what the game expects from you. ALPHA covers levels 1 to 3: Vanguard Sentinel over Orbital Station Alpha, Pyroclast Titan above the Volcanic Ash Caldera, and Cybernetic Leviathan in the Sub-Zero Cloud Ocean. These fights teach the basic loop of dodging a pattern, finding the weak point and punishing it.',
+          'OMEGA runs from level 4 to level 12 and is the longest stretch. It starts with Goliath Dread-Mech in the Neon Megacity Spire and ends with Neon Reaper in the Cyber City Ruins. In between are Void Harvester, Tempest Dread-Wing, Dune Revenant, Abyssal Maw, Frostbite Sovereign, Rust Colossus and Viridian Idol. OMEGA bosses add a second idea to every fight: a hazard, a moving weak point or a pattern that changes speed.',
+          'TITAN covers levels 13 to 18, from Solar Inquisitor in the Solar Flare Corridor to Obsidian Mirror in the Lunar Dark Basin. These bosses attack the way you play: Quantum Harlequin sends a mirror copy of your own ship, Iron Matriarch floods the screen with fighters, and Obsidian Mirror answers with shadow clones.',
+          'NEXUS is the final six, levels 19 to 24: Void Archon, Chrono Tyrant, Starforge Leviathan, Nightmare Protocol, Harbinger of Silence and Apex Overlord 3000 in The Dimensional Core. By this point the player knows every tool, so NEXUS fights combine them.',
         ],
       },
       {
-        heading: '2. Multi-Phase Telegraphing & Weak Points',
+        heading: 'Every boss is built from the same five parts',
         body: [
-          'Every boss in Aeropocalypse features distinct visual telegraphs before executing devastating signature attacks. Glowing obsidian armor plates shift to molten gold, indicating a 600ms vulnerability window where precision hits deal 3x critical damage.',
-          'This dynamic risk-reward loop ensures that players who master evasive maneuvers can speedrun boss stages and climb the global leaderboards.',
+          'Each boss in the game data has the same fields: a name and codename, a level, a threat class, an environment, a weak point, a signature attack and a score value. That structure is deliberate. It forces every new boss to answer the same questions before any art is made: where does this fight happen, what does it do that no other boss does, and where should the player aim.',
+          'The environment comes first because it decides what the boss is made of. A fight above lava suggests heat vents and magma bombs, so Pyroclast Titan is weak at its cooling exhaust ducts. A fight under the sea suggests pressure, so Abyssal Maw is weak at its pressure-sealed gill vents. When the weak point grows out of the setting, players can often guess where to shoot before the game tells them.',
         ],
       },
       {
-        heading: '3. Mobile Touch Optimization & Input Latency',
+        heading: 'Telegraphs: the rule that keeps a fight fair',
         body: [
-          'On mobile devices, touch lag can destroy the arcade experience. Aeropocalypse bypasses standard DOM event bubbling, capturing direct PointerEvents on the raw canvas viewport with sub-millisecond interpolation.',
+          'A boss attack is only fair if the player can see it coming. Every signature attack in Aeropocalypse gets a telegraph: a change of colour, a charge-up sound, a pause or a visible wind-up before the damage arrives. Big attacks get long warnings and small ones get short warnings, so the size of the warning tells you how much trouble you are in.',
+          'The same rule works in reverse for weak points. A weak point that opens without warning feels random. A weak point that opens right after a telegraphed attack feels like a reward for surviving it, and that rhythm of danger followed by an opening is the heartbeat of every fight in the game.',
+        ],
+      },
+      {
+        heading: 'Readable bullet patterns on a small screen',
+        body: [
+          'Bullet patterns are designed around one question: can a player on a phone read this at a glance? Patterns are built from shapes the eye picks up quickly, such as spirals, rings, fans and lanes, and each boss leans on one family of shapes so its fight has its own identity.',
+          'Projectiles that hurt you are kept visually separate from your own fire and from the background, and the densest patterns always leave a gap. The goal is a screen that looks overwhelming but is always survivable for a player who reads it correctly.',
+        ],
+      },
+      {
+        heading: 'Designed for one thumb',
+        body: [
+          'Aeropocalypse is a mobile game first, so every boss is tested against touch controls. The ship sits above your thumb instead of under it, so you never hide your own plane, and attacks are tuned so you can dodge them with small movements rather than long swipes across the screen.',
+          'That is also why fights avoid attacks that cover the bottom edge of the screen for long: that is where the thumb lives. Pressure comes from above and from the sides, where the player can see it.',
+        ],
+      },
+      {
+        heading: 'How difficulty climbs across 24 levels',
+        body: [
+          'Difficulty climbs in three ways at once: faster patterns, more simultaneous threats and shorter openings at the weak point. Score values climb with it, from 15,000 points for the first boss upward, so later fights are worth chasing even for players who have already beaten them once.',
+          'Each class change is also a lesson change. ALPHA teaches dodging, OMEGA teaches reading the environment, TITAN teaches dealing with bosses that copy or swarm you, and NEXUS asks you to use everything at once.',
+        ],
+      },
+      {
+        heading: 'Play the fights yourself',
+        body: [
+          'Aeropocalypse: Online is free on Google Play. The game page on this site lists every boss with its environment, weak point and signature attack, so you can scout a fight before you take it on.',
         ],
       },
     ],
-    tags: ['Game Dev', 'TypeScript', 'Canvas 2D', 'Aeropocalypse', 'Boss Design'],
+    tags: ['Game Design', 'Aeropocalypse', 'Boss Design', 'Mobile Games'],
     aliases: ['how-thunder-domes-24-bosses-were-designed'],
     pullQuote: 'Four threat classes set the pace: ALPHA, OMEGA, TITAN and NEXUS.',
   },
   {
     slug: 'inside-amped-ear-3000-spectral-audio',
-    title: 'Inside Amped Ear 3000: Real-Time Audio Analysis & Low-Latency Web Audio DSP',
+    title: 'Inside Amped Ear 3000: How a 4096-Point FFT Helps You Fix a Mix',
     category: 'Software',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-10',
-    updatedAt: '2026-09-25',
-    readTime: '5 min read',
-    summary: 'How Amped Ear achieves 4096-bin Fast Fourier Transform decomposition and ultra-low latency acoustic visualization in browser and Android runtimes.',
-    leadParagraph: 'Pro music producers and mixing engineers need instantaneous feedback when hunting down harsh resonances and muddiness in frequency spectra. Amped Ear 3000 was built to bring laboratory-grade FFT waterfall graphs and precision EQ ear training directly into the studio workflow.',
+    updatedAt: '2026-11-24',
+    readTime: '7 min read',
+    summary: 'How Amped Ear 3000 uses a high-resolution FFT to show what is happening in a mix, why window size matters, and how to use a spectrum analyzer and ear training to fix muddy, harsh or crowded mixes.',
+    leadParagraph: 'A spectrum analyzer shows you what your ears are hearing as a picture of frequencies. Amped Ear 3000 is the 3000 Studios audio analyzer and ear trainer, built around a 4096-point FFT. This article explains what that number means, why it matters for bass-heavy music, and how to use an analyzer alongside your ears to make better mixing decisions.',
     sections: [
       {
-        heading: '1. Web Audio API & 4096-Bin FFT Resolution',
+        heading: 'What an FFT actually does',
         body: [
-          'Standard browser visualizers use low-resolution 512-point FFTs that smear low-end bass frequencies below 150 Hz. Amped Ear utilizes a 4096-sample AnalyserNode paired with Blackman-Harris windowing to resolve sub-bass fundamentals down to 10 Hz.',
-          'This allows mixing engineers to isolate 808 sub rumble from kick drum punch with surgical precision.',
+          'A Fast Fourier Transform takes a short slice of audio and splits it into frequency bins, each one showing how much energy sits in a narrow band of the spectrum. Draw those bins side by side and you get the familiar spectrum display: low frequencies on the left, highs on the right, loudness going up.',
+          'The width of each bin is the sample rate divided by the FFT size. At a 48 kHz sample rate, a 512-point FFT gives bins about 94 Hz wide, which means everything from a deep sub to the body of a kick drum can land in one or two bins. A 4096-point FFT gives bins about 11.7 Hz wide, enough to separate an 808 sitting at 45 Hz from a kick fundamental at 60 Hz.',
         ],
       },
       {
-        heading: '2. GPU-Accelerated Spectral Waterfall Rendering',
+        heading: 'The trade-off: detail in frequency or detail in time',
         body: [
-          'To render 60 FPS waterfall spectrums without dropping audio frames, rendering is decoupled from the audio processing thread using requestAnimationFrame and OffscreenCanvas where available.',
+          'A larger FFT needs a longer slice of audio, so frequency detail comes at the cost of time detail. At 48 kHz, 4096 samples is about 85 milliseconds, which is long enough to blur very fast transients such as the click of a kick or a snare crack.',
+          'That is why a good analyzer is used for the steady parts of a sound: the sustain of a bass note, the body of a vocal, the ring of a resonance. For transients, your ears and a level meter are better tools. Knowing which tool answers which question is half of using an analyzer well.',
         ],
       },
       {
-        heading: '3. Ear Training & Resonance Recognition',
+        heading: 'Why windowing matters',
         body: [
-          'The ear training module generates randomized narrow-Q frequency boosts and challenges users to identify the exact resonant center frequency by ear, developing sharp auditory instincts for mixing and mastering.',
+          'Cutting audio into slices creates sharp edges, and sharp edges smear energy across neighbouring bins. A window function fades each slice in and out so the spectrum shows real peaks instead of a haze. Windows with steep side lobes, such as Blackman-Harris, keep a loud bass note from spilling into the bins around it, which matters when you are hunting a problem frequency just next to a strong one.',
+        ],
+      },
+      {
+        heading: 'Smooth display without dropped audio',
+        body: [
+          'Analysis and drawing are kept apart. The audio engine fills the frequency data, and the display reads the latest data once per screen refresh. If drawing ever falls behind, the picture skips a frame but the sound never does, which is the right priority for a tool that sits in a studio session.',
+        ],
+      },
+      {
+        heading: 'Using an analyzer to fix common mix problems',
+        body: [
+          'Muddy mixes usually have too much energy building up between about 200 and 400 Hz, where guitars, keys, vocals and the upper part of the bass all overlap. An analyzer shows that build-up as a hump. Cutting a little from the instruments that do not need that range clears space for the ones that do.',
+          'Harshness usually lives between about 2 and 5 kHz, where the ear is most sensitive. A narrow peak that jumps out on the display and also sounds piercing is a good candidate for a small, narrow cut. Low-end clashes show up as two strong peaks close together under 100 Hz; deciding whether the kick or the bass owns the lowest octave, and shaping the other one around it, makes both hit harder.',
+          'The display is a guide, not the judge. If a cut looks right but sounds worse, undo it.',
+        ],
+      },
+      {
+        heading: 'Ear training: learning to hear frequencies',
+        body: [
+          'The ear training mode plays audio with a narrow boost at a hidden frequency and asks you to name it. Over time this builds the skill that matters most: hearing a problem and knowing roughly where it lives before you ever look at a screen.',
+          'Short daily sessions work better than long ones. Start with octave-wide guesses, then narrow them down as your accuracy improves.',
+        ],
+      },
+      {
+        heading: 'Where Amped Ear fits in the studio',
+        body: [
+          'At 3000 Studios the analyzer sits at the end of the chain while mixing singles, as a second opinion on the low end and on harsh peaks. You can find Amped Ear 3000 with the rest of the studio\'s tools on the Apps page.',
         ],
       },
     ],
@@ -98,31 +156,58 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   },
   {
     slug: 'building-production-site-on-cloudflare-pages',
-    title: 'Building a Zero-Lag Production Website on Cloudflare Pages & Workers',
+    title: 'How 3000studios.vip Runs on Cloudflare Pages, and the Deploy Lesson We Learned',
     category: 'Engineering',
     author: 'Jeremy Swain',
     publishedAt: '2026-09-05',
-    updatedAt: '2026-09-22',
-    readTime: '5 min read',
-    summary: 'The architectural decisions behind 3000studios.vip: static Vite bundling, Cloudflare native Git CI, WebRTC WHIP streaming, and edge caching.',
-    leadParagraph: 'Modern media websites often crumble under heavy JavaScript bundles, bloated analytics, and slow CDN roundtrips. At 3000 Studios, we engineered 3000studios.vip to deliver instant 47-song streaming, live broadcast stage integration, and full commerce with sub-second page loads globally.',
+    updatedAt: '2026-11-24',
+    readTime: '8 min read',
+    summary: 'How 3000studios.vip is built: a Vite and React single-page app on Cloudflare Pages, edge functions that serve real content to search engines, D1 and R2 for data and media, and the deployment lesson that kept those functions offline for weeks.',
+    leadParagraph: '3000studios.vip is a music, books, podcast and game site run by one studio, so it has to be fast, cheap to run and easy to change. It runs on Cloudflare Pages: a static app served from the edge, plus a small set of edge functions for the parts that need a server. This is how it fits together, and what we learned when part of it quietly stopped deploying.',
     sections: [
       {
-        heading: '1. Native Cloudflare Pages Git Integration',
+        heading: 'The front end: a static app built with Vite',
         body: [
-          'Rather than relying on third-party CI/CD chains with billing limits, our production deployment pipeline leverages Cloudflare Pages native Git integration. A direct push to main automatically triggers an edge-optimized build and atomic worldwide deployment in under 60 seconds.',
+          'The site is a React single-page app built with Vite. Each page is loaded on demand, so a visitor on the home page does not download the code for the admin dashboard or the video vault. The build produces plain files, and Cloudflare Pages serves them from data centres close to each visitor.',
+          'Styles are plain CSS with shared variables for colour and spacing, and fluid type sizes that scale with the screen. There is no CSS-in-JS runtime to download, which keeps the first paint fast on phones.',
         ],
       },
       {
-        heading: '2. Sub-Second Live Video via WebRTC WHIP/WHEP',
+        heading: 'Deploys from Git',
         body: [
-          'Traditional HLS streaming introduces 6 to 15 seconds of latency. By pairing Cloudflare Stream WebRTC WHIP ingress with WHEP playback, our live stage achieves sub-500ms glass-to-glass latency directly on mobile phones.',
+          'Every change goes through a pull request. When it merges into main, Cloudflare Pages builds the site and swaps the new version in all at once, so visitors never see half of an update. Every pull request also gets its own preview address, which is where changes are checked before they reach the live site.',
         ],
       },
       {
-        heading: '3. CSS Tokens & Zero-Runtime Styles',
+        heading: 'Edge functions for what needs a server',
         body: [
-          'We eliminated heavy runtime CSS-in-JS libraries in favor of clean CSS variables, clamp() typography, and modular stylesheets, keeping our first contentful paint (FCP) blazing fast on mobile 4G networks.',
+          'A single-page app has one weakness: until the JavaScript runs, every page is the same empty shell. Search engines and link previews often see that shell. To fix it, an edge function runs in front of every page request and injects that page\'s real title, description, structured data and body text into the HTML before it leaves the server.',
+          'The same layer handles the parts of the site that need private logic: the live stream access gate, the on-air flag that turns the live page on, signed playback for the broadcast, the live chat room, song requests and the music proxy that streams tracks from storage.',
+        ],
+      },
+      {
+        heading: 'D1 and R2 for data and media',
+        body: [
+          'Small pieces of state, such as whether the studio is live and who may watch a private stream, are stored in Cloudflare D1, a SQL database that runs next to the functions. Full-length audio is stored in R2, Cloudflare\'s object storage, and streamed through a function so the site controls exactly which files are reachable.',
+        ],
+      },
+      {
+        heading: 'Live video with WebRTC',
+        body: [
+          'Most live streams on the web use HLS, which delivers video in chunks and usually runs several seconds behind real life. The 3000 Studios live stage uses Cloudflare Stream with WebRTC ingest and playback instead, which keeps the delay to around a second, short enough for a real conversation with the chat. The broadcast studio lives inside the owner dashboard and sends video straight from a phone or laptop.',
+        ],
+      },
+      {
+        heading: 'The lesson: a build that failed without failing',
+        body: [
+          'In October the edge functions were moved to a new folder so Cloudflare would pick them up. Three of the files were deleted instead of moved, and another file still imported one of them. From then on the functions could not be built, but the site itself still deployed, so the problem was easy to miss: pages loaded, while every server route quietly fell back to the 404 page.',
+          'The fix was to restore the missing files and make sure the functions folder is found from the project root that Cloudflare actually builds from. The bigger lesson is to test what you deploy, not just whether it deployed. A green deploy only means the build finished. A simple request to one API route after each deploy would have caught this on the first day.',
+        ],
+      },
+      {
+        heading: 'What keeps it fast and cheap',
+        body: [
+          'The whole site runs on Cloudflare\'s free tier. Most requests are static files served from cache, the functions are small and short-lived, and media streams from object storage without a separate server. For an independent studio, that means the site can grow with the catalogue without a hosting bill that grows with it.',
         ],
       },
     ],
@@ -134,27 +219,48 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: 'Studio',
     author: 'Jeremy Swain',
     publishedAt: '2026-08-30',
-    updatedAt: '2026-09-20',
-    readTime: '6 min read',
-    summary: 'An honest look at how autonomous agent fleets, neural audio generation, and multimodal AI tools supercharge solo and indie studio execution.',
-    leadParagraph: 'The modern digital studio is no longer constrained by the traditional boundaries of team size. By orchestrating AI across software development, musical composition, and visual art creation, 3000 Studios ships full-length music catalogs, games, and web apps with studio-grade velocity.',
+    updatedAt: '2026-11-24',
+    readTime: '7 min read',
+    summary: 'An honest look at how a one-person studio uses AI agents for code, AI tools for music ideas and artwork, and human review at every step that ships.',
+    leadParagraph: '3000 Studios is run by one person, Jeremy Swain, yet it ships a music catalogue, a podcast, a shelf of books, a mobile game and a set of websites. AI is a big part of how that is possible. This is an honest look at where AI helps, where it does not, and the rules that keep the work good.',
     sections: [
       {
-        heading: '1. Agentic Coding & Autonomous Refactoring',
+        heading: 'AI agents for code, with every change reviewed',
         body: [
-          'We utilize advanced AI agents equipped with local tools to handle dependency updates, test automation, accessibility auditing, and code cleanups, freeing our focus for core creative direction and user experience.',
+          'Most of the studio\'s software work is done with AI coding agents. They write features, fix bugs, update dependencies and run the tests, but they work the same way a human developer would: on a branch, through a pull request, with automated checks that have to pass before anything merges.',
+          'That process matters more than the agent. A pull request leaves a record of what changed and why, a preview deploy shows the change running before it goes live, and nothing reaches the public site without a final yes.',
         ],
       },
       {
-        heading: '2. Neural Audio Ideation to Master Release',
+        heading: 'More than one agent, each with a job',
         body: [
-          'AI audio generation serves as a rapid idea scratchpad. Raw generated stems are imported into digital audio workstations (DAWs), resampled, mixed with analog synthesizers, and mastered to DistroKid standards.',
+          'Different agents handle different kinds of work. One runs on the studio\'s own machine and handles builds, media processing and anything that needs local files. Others work in the cloud on code changes and research. A shared set of notes records what each one is doing, so work is not repeated and finished tasks are not reopened by mistake.',
         ],
       },
       {
-        heading: '3. Creative Ownership & Human Curation',
+        heading: 'AI as a sketchpad for music',
         body: [
-          'AI accelerates production velocity, but human curation, sound design, and engineering rigor define the final quality of everything released under the 3000 Studios banner.',
+          'On the music side, AI generation is used as an idea sketchpad: a fast way to try a hook, a groove or an arrangement and hear whether it works. Ideas that survive are developed further, arranged, mixed and mastered before release through DistroKid to Spotify, Apple Music and the other platforms.',
+          'Song titles, lyrics, concepts and the final say on every release stay with the artist. The step-by-step process is in the companion article on how a 3000 Studios single is made.',
+        ],
+      },
+      {
+        heading: 'Artwork, video and the podcast',
+        body: [
+          'Cover art, video clips and promotional images often start with AI image and video tools, then get edited, cropped and assembled by hand. The Follow and Subscribe podcast is produced with AI help too, and every episode has to pass its checks before it is published.',
+        ],
+      },
+      {
+        heading: 'Where AI does not help',
+        body: [
+          'AI is fast, but it is not careful on its own. It can be confidently wrong, it can repeat the same mistake across many files, and it does not know what the studio actually wants unless someone tells it. A recent example: a change to the website\'s deploy setup quietly stopped the server functions from building, and it took a deliberate check of the live site to find it.',
+          'So the rules are simple. Every change is tested, every claim about what is live is checked against the live site, and anything that speaks for the studio, spends money or cannot be undone needs a human yes.',
+        ],
+      },
+      {
+        heading: 'Why this matters for a small studio',
+        body: [
+          'Without AI, a one-person studio has to choose between making things and running the business around them. With AI doing a large share of the repetitive work, more time goes into the parts only a person can do: deciding what to make, judging whether it is good, and talking to the people who listen, read and play.',
         ],
       },
     ],
@@ -247,7 +353,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 
 /** Old slug for the bosses article — kept resolving so existing links keep working. */
 export const BLOG_SLUG_ALIASES: Record<string, string> = {
-  'how-thunder-domes-24-bosses-were-designed': 'aeropocalypse-bosses',
+  'how-thunder-domes-24-bosses-were-designed': 'how-aeropocalypses-24-bosses-were-designed',
 };
 
 export function findBlogArticle(slug: string): BlogArticle | undefined {
