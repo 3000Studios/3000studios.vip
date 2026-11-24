@@ -6,7 +6,7 @@
     <title>3000 Studios — All Links</title>
     <meta
       name="description"
-      content="Every official 3000 Studios link in one place: Spotify, YouTube, Amazon Music, TikTok, Instagram, Facebook, the store, Thunderdome, and more."
+      content="Every official 3000 Studios link in one place: Spotify, YouTube, Amazon Music, TikTok, Instagram, Facebook, the store, Aeropocalypse: Online on Google Play, and more."
     />
     <meta property="og:title" content="3000 Studios — All Links" />
     <meta
@@ -177,6 +177,97 @@
         background: rgba(224, 38, 60, 0.14);
         border-color: rgba(224, 38, 60, 0.4);
       }
+      a.row.game {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        border-color: transparent;
+        background:
+          radial-gradient(120% 160% at 0% 0%, rgba(0, 215, 254, 0.18), transparent 55%),
+          radial-gradient(120% 160% at 100% 100%, rgba(255, 58, 68, 0.14), transparent 55%),
+          linear-gradient(180deg, #0f1420, var(--md-ink));
+      }
+      a.row.game::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(from var(--play-angle, 0deg), #00d7fe, #00f076, #ffce00, #ff3a44, #00d7fe);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        animation: play-spin 4s linear infinite;
+      }
+      a.row.game::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%);
+        transform: translateX(-130%);
+        animation: play-shine 3.8s ease-in-out infinite;
+      }
+      a.row.game .icon {
+        background: rgba(0, 215, 254, 0.1);
+        border-color: rgba(0, 215, 254, 0.35);
+        transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+      }
+      a.row.game:hover .icon,
+      a.row.game:focus-visible .icon {
+        transform: rotate(-10deg) scale(1.12);
+      }
+      a.row.game:hover,
+      a.row.game:focus-visible {
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 32px rgba(0, 240, 118, 0.25);
+      }
+      .play-pill {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.05;
+        padding: 7px 12px;
+        border-radius: 10px;
+        background: #000;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95rem;
+        white-space: nowrap;
+      }
+      .play-pill small {
+        font-size: 0.6rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.72);
+      }
+      @property --play-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+      }
+      @keyframes play-spin {
+        to {
+          --play-angle: 360deg;
+        }
+      }
+      @keyframes play-shine {
+        0%,
+        55% {
+          transform: translateX(-130%);
+        }
+        100% {
+          transform: translateX(130%);
+        }
+      }
+      @media (max-width: 420px) {
+        .play-pill {
+          padding: 6px 9px;
+          font-size: 0.82rem;
+        }
+      }
       button.row {
         width: 100%;
         font: inherit;
@@ -204,6 +295,10 @@
       @media (prefers-reduced-motion: reduce) {
         a.row {
           transition: none;
+        }
+        a.row.game::before,
+        a.row.game::after {
+          animation: none;
         }
       }
     </style>
@@ -288,13 +383,25 @@
           </span>
           <span class="arrow" aria-hidden="true">→</span>
         </a>
-        <a class="row" href="https://thunderdome.store" rel="noopener">
-          <span class="icon" aria-hidden="true">🎮</span>
-          <span class="txt">
-            <span class="name">Thunderdome</span>
-            <span class="hook">The game — in development, closed beta updates</span>
+        <a
+          class="row game"
+          href="https://play.google.com/store/apps/details?id=com.studios3000.thunderdome"
+          target="_blank"
+          rel="noopener"
+        >
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="#00d7fe" d="M3.6 1.8 13.8 12 3.6 22.2c-.4-.2-.6-.7-.6-1.2V3c0-.5.2-1 .6-1.2Z" />
+              <path fill="#ffce00" d="m17.2 8.6-3.4 3.4 3.4 3.4 3.8-2.2c.9-.5.9-1.9 0-2.4l-3.8-2.2Z" />
+              <path fill="#ff3a44" d="M13.8 12 3.6 22.2c.4.2.9.2 1.4-.1l12.2-6.7-3.4-3.4Z" />
+              <path fill="#00f076" d="M3.6 1.8c.4-.3 1-.3 1.4-.1l12.2 6.9-3.4 3.4L3.6 1.8Z" />
+            </svg>
           </span>
-          <span class="arrow" aria-hidden="true">→</span>
+          <span class="txt">
+            <span class="name">Aeropocalypse: Online</span>
+            <span class="hook">Formerly Thunderdome. Free: 25 stages, co-op, 1v1 duels</span>
+          </span>
+          <span class="play-pill"><small>Get it on</small>Google Play</span>
         </a>
         <a class="row" href="https://3000studios.vip" rel="noopener">
           <span class="icon" aria-hidden="true">🏠</span>
