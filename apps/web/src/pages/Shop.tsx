@@ -38,7 +38,7 @@ function rememberPendingShopItem(id: string, via: 'stripe' | 'paypal') {
   writePending(SHOP_PENDING_KEY, { id, via, ts: Date.now() });
 }
 
-function CartDrawer({
+export function CartDrawer({
   open,
   onClose,
   cart,
