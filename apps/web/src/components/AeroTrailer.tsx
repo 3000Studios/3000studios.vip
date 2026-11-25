@@ -1,12 +1,15 @@
 import { useRef, useState } from 'react';
 import './aeroTrailer.css';
 
-/* Official 45-second Aeropocalypse: Online trailer (portrait 9:16, cut
-   2026-11-20 from 1.3.7 build footage). Served from public/ (15 MB, under
-   the Cloudflare Pages 25 MiB per-file limit). Opt-in like every other
-   video on the site: preload="none", nothing downloads until tapped. */
-export const AERO_TRAILER_SRC = '/media/aeropocalypse/trailer.mp4';
-export const AERO_TRAILER_POSTER = '/media/aeropocalypse/trailer-poster.jpg';
+/* Official 45-second Aeropocalypse: Online trailer, v3 (portrait 9:16,
+   1080x1920 at 60 fps, rendered natively from the 1.4.0 engine: all 25
+   stages, the asteroid field, the warp tunnel and five bosses). Built by
+   thunderdome/distribution/play_preview/v3 and kept under the Cloudflare
+   Pages 25 MiB per-file limit. A new file name, because /media/* is cached
+   for a week. Opt-in like every other video on the site: preload="none",
+   nothing downloads until tapped. */
+export const AERO_TRAILER_SRC = '/media/aeropocalypse/trailer-v3.mp4';
+export const AERO_TRAILER_POSTER = '/media/aeropocalypse/trailer-v3-poster.jpg';
 
 type Props = {
   kicker?: string;
@@ -18,7 +21,7 @@ type Props = {
 export function AeroTrailer({
   kicker = 'Official trailer',
   title = 'Watch it fight',
-  lede = 'Forty-five seconds of real Aeropocalypse: Online combat, cut to the game’s own theme. Sound on.',
+  lede = 'All 25 stages and the bosses in forty-five seconds of real Aeropocalypse: Online combat, cut to the game’s own theme. Sound on.',
   children,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -51,8 +54,8 @@ export function AeroTrailer({
             poster={AERO_TRAILER_POSTER}
             preload="none"
             playsInline
-            width={720}
-            height={1280}
+            width={1080}
+            height={1920}
             aria-label="Aeropocalypse: Online official trailer"
             onEnded={() => setStarted(false)}
           />
