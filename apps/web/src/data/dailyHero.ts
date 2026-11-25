@@ -12,8 +12,8 @@ export type DailyHero =
 const TRAILER: DailyHero = {
   kind: 'mp4',
   title: 'Aeropocalypse: Online trailer',
-  src: '/media/aeropocalypse/trailer-v3.mp4',
-  poster: '/media/aeropocalypse/trailer-v3-poster.jpg',
+  src: '/media/aeropocalypse/trailer-v3b.mp4',
+  poster: '/media/aeropocalypse/trailer-v3b-poster.jpg',
 };
 
 export const DAILY_HERO_POOL: DailyHero[] = [

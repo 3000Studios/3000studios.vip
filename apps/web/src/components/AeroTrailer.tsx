@@ -8,8 +8,8 @@ import './aeroTrailer.css';
    Pages 25 MiB per-file limit. A new file name, because /media/* is cached
    for a week. Opt-in like every other video on the site: preload="none",
    nothing downloads until tapped. */
-export const AERO_TRAILER_SRC = '/media/aeropocalypse/trailer-v3.mp4';
-export const AERO_TRAILER_POSTER = '/media/aeropocalypse/trailer-v3-poster.jpg';
+export const AERO_TRAILER_SRC = '/media/aeropocalypse/trailer-v3b.mp4';
+export const AERO_TRAILER_POSTER = '/media/aeropocalypse/trailer-v3b-poster.jpg';
 
 type Props = {
   kicker?: string;
